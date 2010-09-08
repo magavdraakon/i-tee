@@ -1,0 +1,17 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  name: MyString
+  image_id: MyString
+  lab_id: 1
+  ram: 1
+  hdd: 1
+  nic_count: 1
+
+two:
+  name: MyString
+  image_id: MyString
+  lab_id: 1
+  ram: 1
+  hdd: 1
+  nic_count: 1

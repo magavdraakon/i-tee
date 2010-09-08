@@ -2,6 +2,12 @@ ITee::Application.routes.draw do
   
   
   
+  resources :vms
+
+  resources :materials
+
+  resources :labs
+
   resources :hosts
 
   # The priority is based upon order of creation:

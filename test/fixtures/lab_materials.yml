@@ -1,0 +1,13 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  lab_id: 1
+  material_id: 1
+  description: MyText
+  sort: 1
+
+two:
+  lab_id: 1
+  material_id: 1
+  description: MyText
+  sort: 1

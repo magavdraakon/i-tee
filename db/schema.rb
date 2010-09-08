@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100908122718) do
+ActiveRecord::Schema.define(:version => 20100908132304) do
 
   create_table "hosts", :force => true do |t|
     t.string   "name"
@@ -21,6 +21,40 @@ ActiveRecord::Schema.define(:version => 20100908122718) do
     t.integer  "cpu_cores"
     t.integer  "hdd"
     t.integer  "priority"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "lab_materials", :force => true do |t|
+    t.integer  "lab_id"
+    t.integer  "material_id"
+    t.text     "description"
+    t.integer  "sort"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "labs", :force => true do |t|
+    t.string   "name"
+    t.text     "description"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "materials", :force => true do |t|
+    t.string   "name"
+    t.text     "source"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "vms", :force => true do |t|
+    t.string   "name"
+    t.string   "image_id"
+    t.integer  "lab_id"
+    t.integer  "ram"
+    t.integer  "hdd"
+    t.integer  "nic_count"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

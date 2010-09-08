@@ -1,0 +1,35 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Name:</b>
+  <%= @vm.name %>
+</p>
+
+<p>
+  <b>Image:</b>
+  <%= @vm.image_id %>
+</p>
+
+<p>
+  <b>Lab:</b>
+  <%= @vm.lab_id %>
+</p>
+
+<p>
+  <b>Ram:</b>
+  <%= @vm.ram %>
+</p>
+
+<p>
+  <b>Hdd:</b>
+  <%= @vm.hdd %>
+</p>
+
+<p>
+  <b>Nic count:</b>
+  <%= @vm.nic_count %>
+</p>
+
+
+<%= link_to 'Edit', edit_vm_path(@vm) %> |
+<%= link_to 'Back', vms_path %>

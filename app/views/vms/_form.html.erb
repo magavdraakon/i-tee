@@ -1,0 +1,41 @@
+<%= form_for(@vm) do |f| %>
+  <% if @vm.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@vm.errors.count, "error") %> prohibited this vm from being saved:</h2>
+
+      <ul>
+      <% @vm.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :name %><br />
+    <%= f.text_field :name %>
+  </div>
+  <div class="field">
+    <%= f.label :image_id %><br />
+    <%= f.text_field :image_id %>
+  </div>
+  <div class="field">
+    <%= f.label :lab_id %><br />
+    <%= f.text_field :lab_id %>
+  </div>
+  <div class="field">
+    <%= f.label :ram %><br />
+    <%= f.text_field :ram %>
+  </div>
+  <div class="field">
+    <%= f.label :hdd %><br />
+    <%= f.text_field :hdd %>
+  </div>
+  <div class="field">
+    <%= f.label :nic_count %><br />
+    <%= f.text_field :nic_count %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>
