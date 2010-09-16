@@ -1,4 +1,10 @@
 <h1> i-tee</h1>
+<%if ITee::Application.config.fake_environment then%>
+Ilma virtualiseerimiseta keskkond
+<%else%>
+Virtuaalhostiga keskkond
+<%end%>
+
 
 <%= link_to('hosts', :controller=>'hosts', :action=>'index')%> |
 <%= link_to('labs', :controller=>'labs', :action=>'index')%> |

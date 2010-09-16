@@ -2,6 +2,8 @@ ITee::Application.routes.draw do
   
   
   
+  devise_for :users
+
   resources :vms
 
   resources :materials
