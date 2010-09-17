@@ -3,6 +3,9 @@ ITee::Application.configure do
   
   #fake_environment = true means that eucalyptus virtualization evnironment is't installed
   config.fake_environment = true
+  
+  #Administrator usernames
+  config.admins = ['mernits','matoom','ttanav']
 
   # In the development environment your application's code is reloaded on
   # every request.  This slows down response time but is perfect for development

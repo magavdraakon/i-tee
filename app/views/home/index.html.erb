@@ -1,9 +1,32 @@
 <h1> i-tee</h1>
 <%if ITee::Application.config.fake_environment then%>
-Ilma virtualiseerimiseta keskkond
+<p>DEVELOPMENT</p>
 <%else%>
-Virtuaalhostiga keskkond
+
 <%end%>
+<hr>
+<div id="user_nav">  
+  <% if user_signed_in? %>  
+    Signed in as <%= current_user.username %>. Not you?  
+    <%= link_to "Sign out", destroy_user_session_path %>  
+  <% else %>  
+    <%= link_to "Sign up", new_user_registration_path %> or  
+    <%= link_to "Sign in", new_user_session_path %>  
+  <% end %>  
+</div> 
+<hr>
+
+<% if @admin %>
+  <div id="adminmenu">
+    Sa oled administraator
+  </div>
+<%else%>
+  <div id="usermenu">
+    Sa oled tavakasutaja
+  </div>
+<%end%>
+
+
 
 
 <%= link_to('hosts', :controller=>'hosts', :action=>'index')%> |
