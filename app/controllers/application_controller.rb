@@ -3,10 +3,17 @@ class ApplicationController < ActionController::Base
     render :text => exception, :status => 500
   end
   protect_from_forgery
-  before_filter :authenticate_user!
-  before_filter :admin?
+  if ITee::Application.config.fake_ldap then
+    before_filter :fake_user
+  else
+    before_filter :authenticate_user!
+    before_filter :admin?
+  end
   
   
+  def fake_user
+    @admin=true
+  end
   def admin?
     if current_user==nil then
       @admin=false
