@@ -25,5 +25,9 @@ class ApplicationController < ActionController::Base
       @admin=false
     end
   end
-  
+
+  def muna
+    
+  end
+
 end
