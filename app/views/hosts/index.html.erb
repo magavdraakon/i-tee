@@ -1,6 +1,22 @@
-<h1>Listing hosts</h1>
+<% content_for :sidebar_head do %>
+  Hosts
+<% end %>
 
+
+<% content_for :sidebar do %>
+    <li><%= link_to 'New Host', new_host_path %></li>
+    <li><%= link_to('Home', :controller=>'home', :action=>'index')%></li>
+<% end %>
+
+
+<% content_for :body do %>
+<div class="head">Listing hosts</div>
+<div class="hr"></div>
+<div class="text-box round">
+<div id="control-table">
 <table>
+  <caption class="round-top">Server hosts (<%= @hosts.count  %>)</caption>
+  <thead>
   <tr>
     <th>Name</th>
     <th>Ip</th>
@@ -14,24 +30,25 @@
     <th></th>
     <th></th>
   </tr>
-
-<% @hosts.each do |host| %>
-  <tr>
-    <td><%= host.name %></td>
-    <td><%= host.ip %></td>
-    <td><%= host.publickey %></td>
-    <td><%= host.privatekey %></td>
-    <td><%= host.ram %></td>
-    <td><%= host.cpu_cores %></td>
-    <td><%= host.hdd %></td>
-    <td><%= host.priority %></td>
-    <td><%= link_to 'Show', host %></td>
-    <td><%= link_to 'Edit', edit_host_path(host) %></td>
-    <td><%= link_to 'Destroy', host, :confirm => 'Are you sure?', :method => :delete %></td>
-  </tr>
-<% end %>
+  </thead>
+  <tbody>
+  <% @hosts.each do |host| %>
+    <tr>
+      <td><%= host.name %></td>
+      <td><%= host.ip %></td>
+      <td style="word-break:break-all;"><%= host.publickey %></td>
+      <td style="word-break:break-all;"><%= host.privatekey %></td>
+      <td><%= host.ram %></td>
+      <td><%= host.cpu_cores %></td>
+      <td><%= host.hdd %></td>
+      <td><%= host.priority %></td>
+      <td><%= link_to 'Show', host %></td>
+      <td><%= link_to 'Edit', edit_host_path(host) %></td>
+      <td><%= link_to 'Destroy', host, :confirm => 'Are you sure?', :method => :delete %></td>
+    </tr>
+  <% end %>
+  </tbody>
 </table>
-
-<br />
-
-<%= link_to 'New Host', new_host_path %> <%= link_to('home', :controller=>'home', :action=>'index')%>
+</div>
+</div>
+<% end %>

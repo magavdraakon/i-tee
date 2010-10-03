@@ -1,36 +1,30 @@
+<% content_for :sidebar_head do %>
+  Dashboard
+<% end %>
+
+<% content_for :sidebar do %>
+    <li><a href="">Dynamic name server for beginners</a></li>
+    <li><a href="">LDAP configurations</a></li>
+    <li><a href="">Introduction to GNU/Linux</a></li>
+    <li><a href="">Multimedia Communications and Networking</a></li>
+<% end %>
 
 
-<h1> i-tee</h1>
-<%if ITee::Application.config.fake_environment then%>
-<p>DEVELOPMENT</p>
-<%else%>
+<% content_for :body do %>
+  <div class="head">Home View</div>
+  <div class="hr"></div>
+  <div class="text-box round">
 
-ai<%end%>
-<hr>
-<div id="user_nav">  
-  <% if user_signed_in? %>  
-    Signed in as <%= current_user.username %>. Not you?  
-    <%= link_to "Sign out", destroy_user_session_path %>  
-  <% else %>  
-    <%= link_to "Sign up", new_user_registration_path %> or  
-    <%= link_to "Sign in", new_user_session_path %>  
-  <% end %>  
-</div> 
-<hr>
-<% if @admin %>
-  <div id="adminmenu">
-    Sa oled administraator
+    <p>Emulated virtualization environment: <%= ITee::Application.config.emulate_virtualization %></p>
+
+    <% if @admin %>
+      <div id="adminmenu">
+        Sa oled administraator
+      </div>
+    <%else%>
+      <div id="usermenu">
+        Sa oled tavakasutaja
+      </div>
+    <%end%>
   </div>
-<%else%>
-  <div id="usermenu">
-    Sa oled tavakasutaja
-  </div>
-<%end%>
-
-
-
-
-<%= link_to('hosts', :controller=>'hosts', :action=>'index')%> |
-<%= link_to('labs', :controller=>'labs', :action=>'index')%> |
-<%= link_to('materials', :controller=>'materials', :action=>'index')%> |
-<%= link_to('vms', :controller=>'vms', :action=>'index')%>
+<% end %>

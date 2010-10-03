@@ -1,3 +1,16 @@
+<% content_for :sidebar_head do %>
+  Hosts
+<% end %>
+
+
+<% content_for :sidebar do %>
+    <li><%= link_to 'Edit', edit_host_path(@host) %></li>
+    <li><%= link_to 'Back', hosts_path %></li>
+<% end %>
+
+<% content_for :body do %>
+<div class="text-box round">
+  
 <p id="notice"><%= notice %></p>
 
 <p>
@@ -39,7 +52,6 @@
   <b>Priority:</b>
   <%= @host.priority %>
 </p>
+</div>
+<% end %>
 
-
-<%= link_to 'Edit', edit_host_path(@host) %> |
-<%= link_to 'Back', hosts_path %>

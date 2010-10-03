@@ -4,8 +4,4 @@ class HomeController < ApplicationController
 
   end
 
-  def jstest
-    
-  end
-
 end
