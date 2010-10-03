@@ -1,0 +1,182 @@
+#container {
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	min-height: 600px;
+	min-width: 960px;
+	overflow: hidden;
+}
+
+#body {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	background: #F0F0F0;
+	min-height: 600px;
+	border-bottom: 1px solid #C2C2C2;
+	overflow: hidden;
+}
+
+#left {
+	float:left;
+	width: 300px;
+	margin-left: -100%;
+	min-width: 300px;
+	min-height: 600px;
+	border-right: 1px solid #C2C2C2;
+	background: white;
+	margin: 0;
+	padding: 0;
+	margin-bottom: -2000px; padding-bottom: 2000px;
+}
+
+#right {
+	margin-left: 300px;
+	padding: 20px;
+	font-size: 1em;
+	font-family: "Helvetica Neue", "Lucida Grande", Helvetica, Arial, Verdana, sans-serif;
+	display: block;
+}
+
+#menu-show {
+	display: none;
+	height: 30px;
+	width: 15px;
+	position: absolute;
+	left: 0;
+	background: transparent url("../images/menu-show.png") no-repeat 0 0px;
+	cursor: pointer;
+}
+
+/* for all */
+
+.buttons a {
+	margin: 2px;
+	display: inline-block;
+	width: 75px;
+	height: 30px;
+	line-height: 30px;
+	color: #666666;
+	text-decoration: none;
+	text-indent: 15px;
+	text-align: center;
+	font-family: Verdana, Helvetica, Arial, sans-serif;
+	font-size: 0.8em;
+	border: 1px solid #C2C2C2;
+}
+
+
+a.submit-button {
+	background: white url("../images/submit.png") no-repeat 0 5px;
+}
+
+a.edit-button {
+	background: white url("../imgages/edit.png") no-repeat 2px 7px;
+}
+
+a.add-button {
+	background: white url("../images/add.png") no-repeat 2px 7px;
+}
+
+a.delete-button {
+	background: white url("../images/delete.png") no-repeat 2px 7px;
+}
+
+a.cancel-button {
+	background: white url("../images/cancel.png") no-repeat 2px 7px;
+}
+
+
+.head {
+	color: #235275;
+	font-size: 1.4em;
+	font-weight: 500;
+	font-family: Verdana, Helvetica, Arial, sans-serif;
+	margin-bottom: 10px;
+}
+
+.hr {
+	background: transparent;
+	border-top: 2px groove white;
+	width: 100%;
+	margin-bottom: 20px;
+}
+
+.text-box {
+	border: 1px solid #C2C2C2;
+	background: white;
+	font-size: 1em;
+	line-height: 1.5em;
+	font-family: Georgia, serif;
+	font-weight: 100;
+	padding: 1.5em; 
+	margin-bottom: 1.5em;
+        overflow: auto;
+}
+
+
+
+#control-table table {
+	border-collapse: collapse;
+	font: 1.0em sans-serif, "Century Gothic", "Trebuchet MS", Arial, Helvetica;
+	font-size: .94em;
+        width: 100%;
+}
+
+#control-table table caption {
+	padding: 4px 15px;
+	caption-side: top;
+	text-align: left;
+	color: #215B8D;
+	background: white url("../images/caption-bg.png") repeat-x;
+	border-top: 1px solid #C0C0C0;
+	border-right: 1px solid #C0C0C0;
+	border-left: 1px solid #C0C0C0;
+        margin-left: -1px;
+}
+
+#control-table .col1 {
+	background: #f9fcfe;
+}
+
+#control-table th {
+	font-weight: normal;
+	color: #678197;
+	text-align: left;
+	border: 1px solid #e5eff8;
+	padding: .3em 1em;
+	border: 1px solid #C0C0C0;
+}
+
+#control-table thead th {
+	text-align: left;
+	color: #4C4C4C;
+	/*background: white url("../images/th-bg.png") repeat-x;*/
+        background: #DFDFDF;
+	border: 1px solid #C0C0C0;
+}
+
+
+#control-table td {
+    color: #8E8E8E;
+    padding: .5em 1.5em;
+    text-align: left;
+    background: white;
+    border: 1px solid #C0C0C0;
+    /*background: white url("../images/td-bg.png") repeat-x;*/
+    background: #FDFDFD;
+    word-wrap: break-word;
+}
+
+#control-table tr:hover td {
+    background: #E9F3FF;
+}
+
+
+.error .ui-dialog-titlebar {
+    background: #D54141;
+}
+
+.alert .ui-dialog-titlebar {
+    background: #519FCB;
+}
