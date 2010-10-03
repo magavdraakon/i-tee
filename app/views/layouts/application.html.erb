@@ -35,13 +35,13 @@
 
       </div>
     </div>
-    
+
     <div id="menu">
       <ul>
-        <li><%= link_to('Hosts', :controller=>'hosts', :action=>'index')%></li>
-        <li class="selected"><%= link_to('Labs', :controller=>'labs', :action=>'index')%></li>
-        <li><%= link_to('Materials', :controller=>'materials', :action=>'index')%></li>
-        <li><%= link_to('Vms', :controller=>'vms', :action=>'index')%></li>
+        <li <% if params[:controller] == "hosts"%> class="selected" <% end %>><%= link_to('Hosts', :controller=>'hosts', :action=>'index')%></li>
+        <li <% if params[:controller] == "labs"%> class="selected" <% end %>><%= link_to('Labs', :controller=>'labs', :action=>'index')%></li>
+        <li <% if params[:controller] == "materials"%> class="selected" <% end %>><%= link_to('Materials', :controller=>'materials', :action=>'index')%></li>
+        <li <% if params[:controller] == "vms"%> class="selected" <% end %>><%= link_to('Vms', :controller=>'vms', :action=>'index')%></li>
       </ul>
     </div>
   </div>

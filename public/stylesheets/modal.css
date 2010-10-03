@@ -13,45 +13,45 @@
  */
 
 #basic-modal-content {
-	display:none;
+    display:none;
 }
 
 /* Overlay */
 #simplemodal-overlay {
-	background-color: #000;
-	cursor: cursor;
+    background-color: #000;
+    cursor: default;
 }
 
 /* Container */
 #simplemodal-container {
-	height: 320px;
-	width: 600px;
-	color: #29383D;
-	background: #F0F0F0;
-	border: 1px solid #C2C2C2;
-	padding: 12px;
+    height: 320px;
+    width: 600px;
+    color: #29383D;
+    background: #F0F0F0;
+    border: 1px solid #C2C2C2;
+    padding: 12px;
 }
 
 #simplemodal-container a.modalCloseImg {
-	background: url(img/x.png) no-repeat; 
-	width: 25px;
-	height: 29px;
-	display: inline;
-	z-index: 3200;
-	position: absolute;
-	top: -8px; 
-	right: -10px;
-	cursor: pointer;
+    background: url("img/x.png") no-repeat;
+    width: 25px;
+    height: 29px;
+    display: inline;
+    z-index: 3200;
+    position: absolute;
+    top: -8px;
+    right: -10px;
+    cursor: pointer;
 }
 
 #simplemodal-container #basic-modal-content {
-	padding: 8px;
+    padding: 8px;
 }
 
 #simplemodal-container .heading {
-	color: #235275;
-	font-size: 1.4em;
-	font-weight: 500;
-	font-family: Verdana, Helvetica, Arial, sans-serif;
-	margin-bottom: 10px;	
+    color: #235275;
+    font-size: 1.4em;
+    font-weight: 500;
+    font-family: Verdana, Helvetica, Arial, sans-serif;
+    margin-bottom: 10px;
 }

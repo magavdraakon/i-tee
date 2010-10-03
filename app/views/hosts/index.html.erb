@@ -10,45 +10,46 @@
 
 
 <% content_for :body do %>
-<div class="head">Listing hosts</div>
-<div class="hr"></div>
-<div class="text-box round">
-<div id="control-table">
-<table>
-  <caption class="round-top">Server hosts (<%= @hosts.count  %>)</caption>
-  <thead>
-  <tr>
-    <th>Name</th>
-    <th>Ip</th>
-    <th>Publickey</th>
-    <th>Privatekey</th>
-    <th>Ram</th>
-    <th>Cpu cores</th>
-    <th>Hdd</th>
-    <th>Priority</th>
-    <th></th>
-    <th></th>
-    <th></th>
-  </tr>
-  </thead>
-  <tbody>
-  <% @hosts.each do |host| %>
-    <tr>
-      <td><%= host.name %></td>
-      <td><%= host.ip %></td>
-      <td style="word-break:break-all;"><%= host.publickey %></td>
-      <td style="word-break:break-all;"><%= host.privatekey %></td>
-      <td><%= host.ram %></td>
-      <td><%= host.cpu_cores %></td>
-      <td><%= host.hdd %></td>
-      <td><%= host.priority %></td>
-      <td><%= link_to 'Show', host %></td>
-      <td><%= link_to 'Edit', edit_host_path(host) %></td>
-      <td><%= link_to 'Destroy', host, :confirm => 'Are you sure?', :method => :delete %></td>
-    </tr>
-  <% end %>
-  </tbody>
-</table>
-</div>
-</div>
+  <div class="head">Listing hosts</div>
+  <div class="hr"></div>
+  <div class="text-box round">
+    <div id="content-table">
+      <table>
+        <caption class="round-top">Server hosts (<%= @hosts.count  %>)</caption>
+        <thead>
+        <tr>
+          <th>Name</th>
+          <th>Ip</th>
+          <th>Publickey</th>
+          <th>Privatekey</th>
+          <th>Ram</th>
+          <th>Cpu cores</th>
+          <th>Hdd</th>
+          <th>Priority</th>
+          <th></th>
+          <th></th>
+          <th></th>
+        </tr>
+        </thead>
+        <tbody>
+          <% @hosts.each do |host| %>
+          <tr>
+            <td><%= host.name %></td>
+            <td><%= host.ip %></td>
+            <td><%= truncate(host.publickey, :length => 10) %></td>
+            <td><%= truncate(host.privatekey, :length => 10) %></td>
+            <td><%= host.ram %></td>
+            <td><%= host.cpu_cores %></td>
+            <td><%= host.hdd %></td>
+            <td><%= host.priority %></td>
+            <td><%= link_to 'Show', host %></td>
+            <td><%= link_to 'Edit', edit_host_path(host) %></td>
+            <td><%= link_to 'Destroy', host, :confirm => 'Are you sure?', :method => :delete %></td>
+          </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
 <% end %>

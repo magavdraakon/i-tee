@@ -1,99 +1,93 @@
 /* Main Menu */
 
 #menu ul {
-	margin: 0;
-	padding: 0;
-	list-style-type: none;
-	width: auto;
-	position: relative;
-	display: block;
-	height: 30px;
-	font-size: 12px;
-	background: transparent url("../images/menu-bg.png") repeat-x top left;
-	font-family: Verdana, Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    width: auto;
+    position: relative;
+    display: block;
+    height: 30px;
+    font-size: 12px;
+    background: transparent url("../images/menu-bg.png") repeat-x top left;
+    font-family: Verdana, Helvetica, Arial, sans-serif;
 }
             
 #menu ul li {
-	display: block;
-	float: left;
-	margin: 0;
-	padding: 0;
+    display: block;
+    float: left;
+    margin: 0;
+    padding: 0;
 }
 
 #menu ul li a {
-	display: block;
-	float: left;
-	color: white;
-	text-decoration: none;
-	padding: 0px 15px;
-	height: 30px;
-	line-height: 30px;
+    display: block;
+    float: left;
+    color: white;
+    text-decoration: none;
+    padding: 0px 15px;
+    height: 30px;
+    line-height: 30px;
 }
 
 #menu ul li a:hover {
-	height: 30px;
-	background: transparent url("../images/menu-hover.png") repeat-x top right;
+    height: 30px;
+    background: transparent url("../images/menu-hover.png") repeat-x top right;
 }
 
 #menu ul .selected {
-	height: 30px;
-	background: transparent url("../images/menu-hover.png") repeat-x top right;
+    height: 30px;
+    background: transparent url("../images/menu-hover.png") repeat-x top right;
 }
 
 
 /* Side Menu */
 
 #sidemenu #menu-head-wrap {
-	margin-top: 35px;
-	height: 40px;
-	background: transparent url("../images/sidemenu-header.png") repeat-x top left;
-	border-top: 1px solid #C2C2C2;
-	border-bottom: 1px solid #C2C2C2;
+    margin-top: 35px;
+    height: 40px;
+    background: transparent url("../images/sidemenu-header.png") repeat-x top left;
+    border-top: 1px solid #C2C2C2;
+    border-bottom: 1px solid #C2C2C2;
 }
 
 #sidemenu #menu-head {
-	color: #235275;
-	font-size: 1.2em;
-	font-weight: 500;
-	font-family: Verdana, Helvetica, Arial, sans-serif;
-	padding-left: 20px;
-	padding-top: 10px;
-
-}
-
-#sidemenu #menu-items ul {
-
+    color: #235275;
+    font-size: 1.2em;
+    font-weight: 500;
+    font-family: Verdana, Helvetica, Arial, sans-serif;
+    padding-left: 20px;
+    padding-top: 10px;
 }
 
 #sidemenu #menu-items li {
-	list-style-type:none;	
-	height: 3em;
-	border-bottom: 1px solid #C2C2C2;
-	font-size: 0.8em;
-	font-family: "Helvetica Neue", "Lucida Grande", Helvetica, Arial, Verdana, sans-serif;
+    list-style-type:none;
+    height: 3em;
+    border-bottom: 1px solid #C2C2C2;
+    font-size: 0.8em;
+    font-family: "Helvetica Neue", "Lucida Grande", Helvetica, Arial, Verdana, sans-serif;
 }
 
 #sidemenu #menu-items li a {
-	height: 3em;
-	line-height: 3em;
-	padding-left: 30px;
-	color: black;
-	display: block;
-	text-decoration: none;
-
+    height: 3em;
+    line-height: 3em;
+    padding-left: 30px;
+    color: black;
+    display: block;
+    text-decoration: none;
 }
 
 #sidemenu #menu-items a:hover {
-	background: #F8F8FF;
+    background: #F8F8FF;
 }
 
 #sidemenu #menu-hide {
-	position: relative;
-	top: 20px;
-	left: 285px;
-	height: 30px;
-	width: 15px;
-	display: block;
-	background: transparent url("../images/menu-hide.png") no-repeat;
-	cursor: pointer;
+    position: relative;
+    top: 20px;
+    left: 285px;
+    height: 30px;
+    width: 15px;
+    display: block;
+    background: transparent url("../images/menu-hide.png") no-repeat;
+    cursor: pointer;
 }
