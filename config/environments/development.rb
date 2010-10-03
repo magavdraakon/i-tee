@@ -1,10 +1,12 @@
 ITee::Application.configure do
   # Settings specified here will take precedence over those in config/environment.rb
   
-  #fake_environment = true means that eucalyptus virtualization evnironment is't installed
-  config.fake_environment = true
-  config.fake_eucalyptus = true
-  config.fake_ldap = true
+  #emulate_virtualization = true means that eucalyptus virtualization evnironment is't installed
+  config.emulate_virtualization = false
+  #not needed?
+  config.emulate_eucalyptus = false
+  config.emulate_ldap = true
+  
   #Administrator usernames
   config.admins = ['mernits','matoom','ttanav','admin']
 
@@ -30,4 +32,3 @@ ITee::Application.configure do
   # Only use best-standards-support built into browsers
   config.action_dispatch.best_standards_support = :builtin
 end
-
