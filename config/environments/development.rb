@@ -5,7 +5,7 @@ ITee::Application.configure do
   config.emulate_virtualization = false
   #not needed?
   config.emulate_eucalyptus = false
-  config.emulate_ldap = true
+  config.emulate_ldap = false
   
   #Administrator usernames
   config.admins = ['mernits','matoom','ttanav','admin']

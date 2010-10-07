@@ -1,4 +1,6 @@
 class HostsController < ApplicationController
+  layout 'main'
+
   # GET /hosts
   # GET /hosts.xml
   def index

@@ -28,12 +28,4 @@ class ApplicationController < ActionController::Base
       @admin = false
     end
   end
-
-  ## except bug || :new bug
-  # http://dev.rubyonrails.org/ticket/8867
-  # https://rails.lighthouseapp.com/projects/8994/tickets/5371-layout-with-onlyexcept-options-makes-other-actions-render-without-layouts
-  # layout 'application', :except => :sign_in
-
-  layout 'login', :only => [:sign_in, :sign_up]
-  layout 'application', :only => [:index, :show, :edit, :new]
 end

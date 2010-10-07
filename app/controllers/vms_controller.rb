@@ -1,4 +1,6 @@
 class VmsController < ApplicationController
+  layout 'main'
+  
   # GET /vms
   # GET /vms.xml
   def index

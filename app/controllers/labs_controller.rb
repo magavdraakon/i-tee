@@ -1,4 +1,6 @@
 class LabsController < ApplicationController
+  layout 'main'
+
   # GET /labs
   # GET /labs.xml
   def index

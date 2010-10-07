@@ -132,7 +132,7 @@ a.cancel-button {
     border-top: 1px solid #C0C0C0;
     border-right: 1px solid #C0C0C0;
     border-left: 1px solid #C0C0C0;
-    margin-left: -1px;
+    margin-right: -1px;
 }
 
 #content-table .col1 {

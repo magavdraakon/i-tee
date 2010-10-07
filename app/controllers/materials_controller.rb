@@ -1,4 +1,6 @@
 class MaterialsController < ApplicationController
+  layout 'main'
+
   # GET /materials
   # GET /materials.xml
   def index
