@@ -82,4 +82,15 @@ class HostsController < ApplicationController
       format.xml  { head :ok }
     end
   end
+
+  def machines
+    @images = Host.new.getEycalyptusInstance.getImages
+  end
+
+  def instances
+    @instances = Host.new.getEycalyptusInstance.getInstances
+    @runningInstances = Host.new.getEycalyptusInstance.getRunningInstances    
+  end
 end
+
+
