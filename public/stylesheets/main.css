@@ -244,13 +244,6 @@ table caption {
     text-decoration: none;
 }
 
-label {
-width:200px;
-}
-input[type="text"] {
-
-}
-
 
 .error .ui-dialog-titlebar {
     background: #D54141;
