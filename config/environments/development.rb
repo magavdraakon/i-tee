@@ -3,10 +3,14 @@ ITee::Application.configure do
   
   #emulate_virtualization = true means that eucalyptus virtualization evnironment is't installed
   config.emulate_virtualization = false
-  #not needed?
-  config.emulate_eucalyptus = false
+  config.emulate_eucalyptus = true
   config.emulate_ldap = false
-  
+
+  #eycalyptus aws information
+  config.ec2_url = 'http://192.168.13.13:8773/services/Eucalyptus'
+  config.access_key = '95cPcqlup5jNLhxtY6NxzIkzcthow5ZpA6xNBg'
+  config.secret_key = '8NPspBnqoCQM4kKhQ98TAsd2rLZ8R0lZzdnm7g'
+
   #Administrator usernames
   config.admins = ['mernits','matoom','ttanav','admin']
 

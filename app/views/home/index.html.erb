@@ -16,6 +16,8 @@
   <div class="text-box round">
 
     <p>Emulated virtualization environment: <%= ITee::Application.config.emulate_virtualization %></p>
+    <p>Emulated eucalyptus environment: <%= ITee::Application.config.emulate_eucalyptus %></p>
+    <p>Emulated ldap environment: <%= ITee::Application.config.emulate_ldap %></p>
 
     <% if @admin %>
       <div id="adminmenu">
@@ -27,4 +29,5 @@
       </div>
     <%end%>
   </div>
+
 <% end %>
