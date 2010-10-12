@@ -11,7 +11,7 @@ ITee::Application.routes.draw do
   resources :hosts
 
   # route, :to => 'controller#action'
-  match 'jstest', :to => 'home#jstest'
+  # match 'jstest', :to => 'home#jstest'
 
   # The priority is based upon order of creation:
   # first created -> highest priority.
