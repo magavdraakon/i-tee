@@ -5,17 +5,17 @@
 
 <% content_for :sidebar do %>
     <li><%= link_to 'New Host', new_host_path %></li>
-    <li><%= link_to('Home', :controller=>'home', :action=>'index')%></li>
+    
 <% end %>
 
 
 <% content_for :body do %>
   <div class="head">Listing hosts</div>
   <div class="hr"></div>
-  <div class="text-box round">
+  <div class="text-box">
     <div id="content-table">
       <table>
-        <caption class="round-top">Server hosts (<%= @hosts.count  %>)</caption>
+        <caption >Server hosts (<%= @hosts.count  %>)</caption>
         <thead>
         <tr>
           <th>Name</th>
@@ -26,8 +26,6 @@
           <th>Cpu cores</th>
           <th>Hdd</th>
           <th>Priority</th>
-          <th></th>
-          <th></th>
           <th></th>
         </tr>
         </thead>
@@ -42,9 +40,7 @@
             <td><%= host.cpu_cores %></td>
             <td><%= host.hdd %></td>
             <td><%= host.priority %></td>
-            <td><%= link_to 'Show', host %></td>
-            <td><%= link_to 'Edit', edit_host_path(host) %></td>
-            <td><%= link_to 'Destroy', host, :confirm => 'Are you sure?', :method => :delete %></td>
+            <td><%= link_to 'Show', host, :class=> 'edit-nupp nupp' %><%= link_to 'Edit', edit_host_path(host), :class=> 'edit-nupp nupp' %><%= link_to 'Destroy', host, :confirm => 'Are you sure?', :method => :delete, :class=> 'delete-nupp nupp' %></td>
           </tr>
           <% end %>
         </tbody>

@@ -50,6 +50,60 @@
 
 /* for all */
 
+
+
+a.edit-nupp {background: url("../images/edit.png") 6px 2px no-repeat;}
+
+a.delete-nupp {background: url("../images/delete.png") 6px 2px no-repeat;}
+
+a.add-nupp {background: url("../images/add.png") 6px 2px no-repeat;}
+
+a.submit-nupp {background: url("../images/submit.png") 6px 2px no-repeat;}
+
+a.cancel-nupp {background: url("../images/cancel.png") 6px 2px no-repeat;}
+
+a.nupp {
+/*increase roundness (for firefox)*/
+-moz-border-radius-topleft: 5px;
+-moz-border-radius-topright: 15px;
+-moz-border-radius-bottomleft: 15px;
+-moz-border-radius-bottomright: 5px;
+-moz.
+/*increase roundness (for webkit)*/
+-webkit-border-top-left-radius: 5px;
+-webkit-border-top-right-radius: 15px;
+-webkit-border-bottom-left-radius: 15px;
+-webkit-border-bottom-right-radius: 5px;
+border: 2px solid rgba(125, 159, 186, .5);
+padding-left:25px;
+padding-right:8px;
+background-color: rgba(255, 255, 255, .7);
+ text-decoration:none;
+}
+
+a.nupp:hover {
+background-color: rgba(255, 255, 255, 1.0);
+}
+
+input[type="submit"] {  
+  /*increase roundness (for firefox)*/
+-moz-border-radius-topleft: 5px;
+-moz-border-radius-topright: 15px;
+-moz-border-radius-bottomleft: 15px;
+-moz-border-radius-bottomright: 5px;
+-moz.
+/*increase roundness (for webkit)*/
+-webkit-border-top-left-radius: 5px;
+-webkit-border-top-right-radius: 15px;
+-webkit-border-bottom-left-radius: 15px;
+-webkit-border-bottom-right-radius: 5px;
+border: 2px solid rgba(125, 159, 186, .5);
+padding-left:25px;
+padding-right:8px;
+background: url("../images/submit.png") 6px 2px no-repeat rgba(255, 255, 255, .7) ;
+ text-decoration:none;;  
+    }  
+
 .buttons a {
     margin: 2px;
     display: inline-block;
@@ -103,6 +157,12 @@ a.cancel-button {
 }
 
 .text-box {
+ /*increase roundness (for firefox)*/
+-moz-border-radius: 10px;
+
+/*increase roundness (for webkit)*/
+-webkit-border-radius: 10px;
+
     border: 1px solid #C2C2C2;
     background: white;
     font-size: 1em;
@@ -123,8 +183,19 @@ a.cancel-button {
     width: 100%;
 }
 
-#content-table table caption {
+table caption {
     padding: 4px 15px;
+  /*increase roundness (for firefox)*/
+-moz-border-radius-topleft: 15px;
+-moz-border-radius-topright: 15px;
+-moz-border-radius-bottomleft: 0px;
+-moz-border-radius-bottomright: 0px;
+
+/*increase roundness (for webkit)*/
+-webkit-border-top-left-radius: 15px;
+-webkit-border-top-right-radius: 15px;
+-webkit-border-bottom-left-radius: 0px;
+-webkit-border-bottom-right-radius: 0px;
     caption-side: top;
     text-align: left;
     color: #215B8D;
@@ -132,7 +203,7 @@ a.cancel-button {
     border-top: 1px solid #C0C0C0;
     border-right: 1px solid #C0C0C0;
     border-left: 1px solid #C0C0C0;
-    margin-right: -1px;
+   
 }
 
 #content-table .col1 {
@@ -151,8 +222,10 @@ a.cancel-button {
 #content-table thead th {
     text-align: left;
     color: #4C4C4C;
-    /*background: white url("../images/th-bg.png") repeat-x;*/
-    background: #DFDFDF;
+    /*background: white url("../images/th-bg.png") repeat-x;
+    background: #DFDFDF;*/
+background: -moz-linear-gradient(100% 100% 90deg, #fff, #DFDFDF);
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fff), to(#DFDFDF));
     border: 1px solid #C0C0C0;
 }
 
@@ -174,6 +247,14 @@ a.cancel-button {
 #content-table a {
     text-decoration: none;
 }
+
+label {
+width:200px;
+}
+input[type="text"] {
+
+}
+
 
 .error .ui-dialog-titlebar {
     background: #D54141;
