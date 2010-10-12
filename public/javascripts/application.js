@@ -21,9 +21,6 @@ function showDialog(title, msg, type) {
 }
 
 $(document).ready(function(){
-	$(".round").corner("5px");
-	$(".round-top").corner("top 5px");
-
 	jQuery(function ($) {
 		$('#basic-modal .modal').click(function (e) {
 			$('#basic-modal-content').modal();
