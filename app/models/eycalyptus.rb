@@ -21,7 +21,6 @@ class Eycalyptus
   end
 
   def startInstance
-
     @ec2 = RightAws::Ec2.new(@@ACCESS_KEY, @@SECRET_KEY, :endpoint_url => @@EC2_URL)
     @key = @ec2.create_key_pair("ssh_key")
     @ec2.describe_key_pairs

@@ -1,17 +1,121 @@
+<%  content_for :javascript do %>
+<script>
+function getJSON(url, data, callback) {
+  // shift arguments if data argument was ommited
+  if ( jQuery.isFunction( data ) ) {
+    callback = data;
+    data = null;
+  }
+
+  return jQuery.ajax({
+    type: "GET",
+    url: url,
+    cache: false,
+    data: data,
+    success: callback,
+    dataType: "json"
+  });
+}
+
+function getDetails(id){
+  var url = "<%= url_for :controller => 'hosts', :action => 'getInstanceJSON' %>";
+
+  getJSON(url, {id: id}, function(data) {
+    var innerHtml = '<div class="head">Instance Details</div><div class="text-box text-small">';
+    
+    innerHtml += '<p><b>Id:</b> '+ data.aws_instance_id +'</p>' +
+      '<p><b>Kernel:</b> '+ data.aws_kernel_id +'</p>' +
+      '<p><b>Ramdisk:</b> '+ data.aws_ramdisk_id +'</p>' +
+      '<p><b>Image:</b> '+ data.aws_image_id +'</p>' +
+      '<p><b>Zone:</b> '+ data.aws_instance_id +'</p>' +
+      '<p><b>owner:</b> '+ data.aws_owner +'</p>' +
+      '<p><b>type:</b> '+ data.aws_instance_type +'</p>' +
+      '<p><b>Ip:</b> '+ data.dns_name +'</p>' +
+      '<p><b>state:</b> '+ data.aws_state +'</p>' +
+      '<p><b>Launch Time:</b> '+ data.aws_launch_time +'</p>';
+
+    innerHtml += '</div>';
+
+    $('#basic-modal-content').empty().append(innerHtml);
+  });
+}
+
+$(document).ready(function(){
+  $(".action-button").contextMenu({
+    menu: 'instanceActionMenu'
+  },
+  function(action, el, pos) {
+    if(action == "details" && !$("#instanceActionMenu").find("." + action).hasClass('disabled')){
+      getDetails($(el).parent().parent().find('.id').html());
+      $('#basic-modal-content').modal();
+    } else if (action == "terminate" && !$("#instanceActionMenu").find("." + action).hasClass('disabled')){
+      var url = "/terminate/" + $(el).parent().parent().find('.id').html();
+      $(location).attr('href',url);
+    }
+  });
+
+  $(".action-button").click( function() {
+    if($(this).parent().parent().find('.state').html() == 'Terminated'){
+      // example: $('#instanceActionMenu').disableContextMenuItems('#cut,#copy');
+      $('#instanceActionMenu').disableContextMenuItems('#terminate');
+    } else {
+      // null overload enables all
+      $('#instanceActionMenu').enableContextMenuItems();
+    }
+  });
+});
+</script>
+<% end %>
+
 <% content_for :sidebar_head do %>
   Administration
 <% end %>
 
 <% content_for :sidebar do %>
-  <li><%= link_to('Running Instances', :controller=>'hosts', :action=>'instances')%></li>
+  <li><%= link_to('Instance Management', :controller=>'hosts', :action=>'instances')%></li>
   <li><%= link_to('Virtual Machines', :controller=>'hosts', :action=>'machines')%></li>
 <% end %>
 
 <% content_for :body do %>
-  <div class="head">Running Instances</div>
+  <div class="head">Instance Management</div>
   <div class="hr"></div>
-  <div class="text-box round">
-    <%= debug @instances  %>
-    <%= debug @runningInstances  %>
+  <div class="text-box">
+      <div id="content-table">
+      <table>
+        <caption>Virtual Machine Instances (<%= @instances.count %>)</caption>
+        <thead>
+        <tr>
+          <th>Instance Id</th>
+          <th>Ip</th>
+          <th>Launch Time</th>
+          <th>State</th>
+          <th></th>
+        </tr>
+        </thead>
+        <tbody>
+          <% @instances.each do |instance| %>
+          <tr>
+            <td class="id"><%= instance[:aws_instance_id] %></td>
+            <td><%= instance[:dns_name] %></td>
+            <td><%= Time.parse(instance[:aws_launch_time]) %></td>
+            <td class="state"><%= instance[:aws_state].capitalize %></td>
+            <td><div class="action-button"></div></td>
+          </tr>
+          <% end %>
+        </tbody>
+      </table>
   </div>
+</div>
+
+ <ul id="instanceActionMenu" class="contextMenu">
+    <li class="details">
+        <a href="#details">Details</a>
+    </li>
+    <li class="terminate separator">
+        <a href="#terminate">Terminate</a>
+    </li>
+</ul>
+
+<div id="basic-modal-content">Loading ..</div>
+
 <% end %>

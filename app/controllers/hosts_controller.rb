@@ -91,6 +91,28 @@ class HostsController < ApplicationController
     @instances = Host.new.getEycalyptusInstance.getInstances
     @runningInstances = Host.new.getEycalyptusInstance.getRunningInstances    
   end
+
+  def getInstanceJSON
+    @instances = Host.new.getEycalyptusInstance.getInstances
+
+    @instances.each do |instance|
+      if instance[:aws_instance_id] == params[:id]
+        @inst = instance
+        break
+      end
+    end
+    
+    render :json => @inst
+  end
+
+  def terminate
+    @instances = Host.new.getEycalyptusInstance.getInstances
+
+    Host.new.getEycalyptusInstance.terinateInstance(params[:id])
+
+    render :action => "instances"
+  end
+
 end
 
 

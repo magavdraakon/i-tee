@@ -14,7 +14,7 @@ class ApplicationController < ActionController::Base
   def emulate_user
     @admin = true
     @logged_in = true
-    @username = "Peeter Pakiraam"
+    @username = "Test User"
   end
 
   def admin?
