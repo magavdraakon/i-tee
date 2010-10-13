@@ -35,12 +35,12 @@
 #simplemodal-container a.modalCloseImg {
     background: url("../images/x.png") no-repeat;
     width: 25px;
-    height: 29px;
+    height: 20px;
     display: inline;
     z-index: 3200;
     position: absolute;
-    top: -8px;
-    right: -10px;
+    top: 1px;
+    right: -8px;
     cursor: pointer;
 }
 

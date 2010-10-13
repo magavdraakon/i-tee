@@ -35,32 +35,42 @@ function getDetails(id){
       '<p><b>Launch Time:</b> '+ data.aws_launch_time +'</p>';
 
     innerHtml += '</div>';
+    /*innerHtml += '<div class="buttons"><a href="" class="cancel-button">Close</a></div>';*/
 
     $('#basic-modal-content').empty().append(innerHtml);
   });
 }
 
 $(document).ready(function(){
-  $(".action-button").contextMenu({
-    menu: 'instanceActionMenu'
-  },
-  function(action, el, pos) {
-    if(action == "details" && !$("#instanceActionMenu").find("." + action).hasClass('disabled')){
-      getDetails($(el).parent().parent().find('.id').html());
-      $('#basic-modal-content').modal();
-    } else if (action == "terminate" && !$("#instanceActionMenu").find("." + action).hasClass('disabled')){
-      var url = "/terminate/" + $(el).parent().parent().find('.id').html();
-      $(location).attr('href',url);
-    }
+  $(".addInstance").click(function(){
+    alert("Add new instance");
   });
 
-  $(".action-button").click( function() {
+  $(".killAllInstances").click(function(){
+    alert("Kill all instances");
+  });  
+
+  // use mousedown for event order priority: 1. mousedown, 2. mouseup, 3. click
+  $(".action-button").mousedown( function() {
     if($(this).parent().parent().find('.state').html() == 'Terminated'){
-      // example: $('#instanceActionMenu').disableContextMenuItems('#cut,#copy');
+      // example: disableContextMenuItems('#cut,#copy');
       $('#instanceActionMenu').disableContextMenuItems('#terminate');
     } else {
       // null overload enables all
       $('#instanceActionMenu').enableContextMenuItems();
+    }
+  });
+
+  $(".action-button").contextMenu({
+    menu: 'instanceActionMenu'
+  },
+  function(action, el, pos) {
+    if(action == "details"){
+      getDetails($(el).parent().parent().find('.id').html());
+      $('#basic-modal-content').modal();
+    } else if (action == "terminate"){
+      var url = "/terminate/" + $(el).parent().parent().find('.id').html();
+      $(location).attr('href',url);
     }
   });
 });
@@ -80,6 +90,12 @@ $(document).ready(function(){
   <div class="head">Instance Management</div>
   <div class="hr"></div>
   <div class="text-box">
+      <div class="buttons">
+        <a href="" class="add-button addInstance">Add</a>
+        <a href="" class="cancel-button killAllInstances">Kill</a>
+      </div>
+      <br />
+
       <div id="content-table">
       <table>
         <caption>Virtual Machine Instances (<%= @instances.count %>)</caption>
