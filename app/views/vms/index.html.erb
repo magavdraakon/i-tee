@@ -1,6 +1,11 @@
-<h1>Listing vms</h1>
-
+<% content_for :body do %>
+<div class="head">Listing VMs</div>
+ <div class="hr"></div>
+ <div class="text-box">
+    <div id="content-table">
 <table>
+   <caption >Server hosts (<%= @vms.count  %>)</caption>
+  <thead>
   <tr>
     <th>Name</th>
     <th>Image</th>
@@ -9,10 +14,9 @@
     <th>Hdd</th>
     <th>Nic count</th>
     <th></th>
-    <th></th>
-    <th></th>
+   
   </tr>
-
+</thead>
 <% @vms.each do |vm| %>
   <tr>
     <td><%= vm.name %></td>
@@ -21,14 +25,22 @@
     <td><%= vm.ram %></td>
     <td><%= vm.hdd %></td>
     <td><%= vm.nic_count %></td>
-    <td><%= link_to 'Show', vm %></td>
-    <td><%= link_to 'Edit', edit_vm_path(vm) %></td>
-    <td><%= link_to 'Destroy', vm, :confirm => 'Are you sure?', :method => :delete %></td>
+    <td><%= link_to 'Show', vm,:class=> 'edit-nupp nupp' %><%= link_to 'Edit', edit_vm_path(vm),:class=> 'edit-nupp nupp' %><%= link_to 'Destroy', vm, :confirm => 'Are you sure?', :method => :delete,:class=> 'delete-nupp nupp' %></td>
   </tr>
 <% end %>
 </table>
 
-<br />
+ </div>
+  </div>
 
-<%= link_to 'New Vm', new_vm_path %>
+<% end %>
+<% content_for :sidebar_head do %>
+VM
+  <%end%>
+<% content_for :sidebar do %>
+<li><%= link_to 'New VM', new_vm_path %>
+</li>
+<%end%>
+
+
 

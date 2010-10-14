@@ -1,5 +1,21 @@
-<h1>New lab</h1>
+
+<% content_for :sidebar_head do %>
+  Labs
+<% end %>
+
+<% content_for :sidebar do %>
+
+  <li><%= link_to 'Back', labs_path %></li>
+
+<% end %>
+
+
+<% content_for :body do %>
+<div class="head">New lab</div>
+<div class="hr"></div>
+<div class="text-box round">
 
 <%= render 'form' %>
 
-<%= link_to 'Back', labs_path %>
+</div>
+<% end %>

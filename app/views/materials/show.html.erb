@@ -1,3 +1,16 @@
+<% content_for :sidebar_head do %>
+  Materials
+<% end %>
+
+
+<% content_for :sidebar do %>
+    <li><%= link_to 'Edit', edit_material_path(@material) %></li>
+    <li><%= link_to 'Back', materials_path %></li>
+<% end %>
+
+<% content_for :body do %>
+<div class="text-box round">
+
 <p id="notice"><%= notice %></p>
 
 <p>
@@ -10,6 +23,5 @@
   <%= @material.source %>
 </p>
 
-
-<%= link_to 'Edit', edit_material_path(@material) %> |
-<%= link_to 'Back', materials_path %>
+</div>
+<%end%>

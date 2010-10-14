@@ -1,5 +1,22 @@
-<h1>New vm</h1>
+
+
+<% content_for :sidebar_head do %>
+  VM
+<% end %>
+
+<% content_for :sidebar do %>
+
+  <li><%= link_to 'Back', vms_path %></li>
+
+<% end %>
+
+
+<% content_for :body do %>
+<div class="head">New VM</div>
+<div class="hr"></div>
+<div class="text-box round">
 
 <%= render 'form' %>
 
-<%= link_to 'Back', vms_path %>
+</div>
+<% end %>

@@ -1,3 +1,16 @@
+<% content_for :sidebar_head do %>
+  Labs
+<% end %>
+
+
+<% content_for :sidebar do %>
+    <li><%= link_to 'Edit', edit_lab_path(@lab) %></li>
+    <li><%= link_to 'Back', labs_path %></li>
+<% end %>
+
+<% content_for :body do %>
+<div class="text-box round">
+
 <p id="notice"><%= notice %></p>
 
 <p>
@@ -9,7 +22,5 @@
   <b>Description:</b>
   <%= @lab.description %>
 </p>
-
-
-<%= link_to 'Edit', edit_lab_path(@lab) %> |
-<%= link_to 'Back', labs_path %>
+</div>
+<%end%>

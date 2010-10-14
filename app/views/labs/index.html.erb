@@ -1,26 +1,35 @@
-<h1>Listing labs</h1>
-
+<% content_for :body do %>
+<div class="head">Listing labs</div>
+ <div class="hr"></div>
+ <div class="text-box">
+    <div id="content-table">
 <table>
+   <caption >Server hosts (<%= @labs.count  %>)</caption>
+  <thead>
   <tr>
     <th>Name</th>
     <th>Description</th>
     <th></th>
-    <th></th>
-    <th></th>
   </tr>
-
+</thead>
 <% @labs.each do |lab| %>
   <tr>
     <td><%= lab.name %></td>
     <td><%= lab.description %></td>
-    <td><%= link_to 'Show', lab %></td>
-    <td><%= link_to 'Edit', edit_lab_path(lab) %></td>
-    <td><%= link_to 'Destroy', lab, :confirm => 'Are you sure?', :method => :delete %></td>
+    <td><%= link_to 'Show', lab,:class=> 'edit-nupp nupp' %><%= link_to 'Edit', edit_lab_path(lab) ,:class=> 'edit-nupp nupp'%><%= link_to 'Destroy', lab, :confirm => 'Are you sure?', :method => :delete,:class=> 'delete-nupp nupp' %></td>
   </tr>
 <% end %>
 </table>
+ </div>
+  </div>
 
-<br />
+<% end %>
+<% content_for :sidebar_head do %>
+Labs
+  <%end%>
+<% content_for :sidebar do %>
+<li><%= link_to 'New Lab', new_lab_path %>
+</li>
+<%end%>
 
-<%= link_to 'New Lab', new_lab_path %>
 

@@ -1,26 +1,33 @@
-<h1>Listing materials</h1>
-
+<% content_for :body do %>
+<div class="head">Listing materials</div>
+ <div class="hr"></div>
+ <div class="text-box">
+    <div id="content-table">
 <table>
+    <caption >Server hosts (<%= @materials.count  %>)</caption>
+  <thead>
   <tr>
     <th>Name</th>
     <th>Source</th>
     <th></th>
-    <th></th>
-    <th></th>
   </tr>
-
+</thead>
 <% @materials.each do |material| %>
   <tr>
     <td><%= material.name %></td>
     <td><%= material.source %></td>
-    <td><%= link_to 'Show', material %></td>
-    <td><%= link_to 'Edit', edit_material_path(material) %></td>
-    <td><%= link_to 'Destroy', material, :confirm => 'Are you sure?', :method => :delete %></td>
+    <td><%= link_to 'Show', material,:class=> 'edit-nupp nupp' %><%= link_to 'Edit', edit_material_path(material),:class=> 'edit-nupp nupp' %><%= link_to 'Destroy', material, :confirm => 'Are you sure?', :method => :delete, :class=> 'delete-nupp nupp' %></td>
   </tr>
 <% end %>
 </table>
+  </div>
+  </div>
 
-<br />
-
-<%= link_to 'New Material', new_material_path %>
-
+<% end %>
+<% content_for :sidebar_head do %>
+Materials
+  <%end%>
+<% content_for :sidebar do %>
+<li><%= link_to 'New Material', new_material_path %>
+</li>
+<%end%>
