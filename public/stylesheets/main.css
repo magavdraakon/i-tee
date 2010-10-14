@@ -51,17 +51,17 @@
 
 /* for all */
 
-a.edit-nupp {background: url("../images/edit.png") 6px 2px no-repeat;}
+a.edit-button {background: url("../images/edit.png") 6px 2px no-repeat;}
 
-a.delete-nupp {background: url("../images/delete.png") 6px 2px no-repeat;}
+a.delete-button {background: url("../images/delete.png") 6px 2px no-repeat;}
 
-a.add-nupp {background: url("../images/add.png") 6px 2px no-repeat;}
+a.add-button {background: url("../images/add.png") 6px 2px no-repeat;}
 
-a.submit-nupp {background: url("../images/submit.png") 6px 2px no-repeat;}
+a.submit-button {background: url("../images/submit.png") 6px 2px no-repeat;}
 
-a.cancel-nupp {background: url("../images/cancel.png") 6px 2px no-repeat;}
+a.cancel-button {background: url("../images/cancel.png") 6px 2px no-repeat;}
 
-a.nupp {
+a.button {
     /*increase roundness (for firefox)*/
     -moz-border-radius-topleft: 5px;
     -moz-border-radius-topright: 15px;
@@ -79,7 +79,7 @@ a.nupp {
     text-decoration:none;
 }
 
-a.nupp:hover {
+a.button:hover {
     background-color: rgba(255, 255, 255, 1.0);
 }
 
@@ -101,41 +101,9 @@ input[type="submit"] {
     text-decoration:none;;
 }  
 
-.buttons a {
-    margin: 2px;
-    display: inline-block;
-    width: 75px;
-    height: 30px;
-    line-height: 30px;
-    color: #666666;
-    text-decoration: none;
-    text-indent: 15px;
-    text-align: center;
-    font-family: Verdana, Helvetica, Arial, sans-serif;
-    font-size: 0.8em;
-    border: 1px solid #C2C2C2;
-}
 
 
-a.submit-button {
-    background: white url("../images/submit.png") no-repeat 0 5px;
-}
 
-a.edit-button {
-    background: white url("../imgages/edit.png") no-repeat 2px 7px;
-}
-
-a.add-button {
-    background: white url("../images/add.png") no-repeat 2px 7px;
-}
-
-a.delete-button {
-    background: white url("../images/delete.png") no-repeat 2px 7px;
-}
-
-a.cancel-button {
-    background: white url("../images/cancel.png") no-repeat 2px 7px;
-}
 
 .action-button {
     display: inline-block;
