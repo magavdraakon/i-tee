@@ -111,6 +111,12 @@ class HostsController < ApplicationController
     render :json => @machineImages
   end
 
+  def getUsersJSON
+    @users = User.all(:select => "username")
+    
+    render :json => @users
+  end
+
   def terminate
     @instances = Host.new.getEycalyptusInstance.getInstances
 

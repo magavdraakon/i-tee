@@ -35,7 +35,7 @@ function getDetails(id){
       '<p><span class="bold">Launch Time:</span> '+ data.aws_launch_time +'</p>';
 
     innerHtml += '</div>';
-    /*innerHtml += '<div class="buttons"><a href="" class="cancel-button">Close</a></div>';*/
+    innerHtml += '<div class="buttons"><a href="" class="cancel-button">Close</a></div>';
 
     $('#basic-modal-content').empty().append(innerHtml);
   });
@@ -44,7 +44,6 @@ function getDetails(id){
 $(document).ready(function(){
   $(".addInstance").click(function(){
       var imagesUrl = "<%= url_for :controller => 'hosts', :action => 'getImagesJSON' %>";
-
       var imageSelect = '';
       getJSON(imagesUrl, function(data) {
         $('#images').empty();
@@ -58,7 +57,21 @@ $(document).ready(function(){
         }
       });
 
-      var instanceForm = '<div class="text-box"><% form_tag(action="/run", :method=>'post') do %>' +
+      var usersUrl = "<%= url_for :controller => 'hosts', :action => 'getUsersJSON' %>";
+      var usersSelect = '';
+      getJSON(usersUrl, function(data) {
+        $('#user').empty();
+        if(data){
+          for ( var i in data ){
+            usersSelect += '<option>' + data[i].aws_id + '</option>';
+            $('#user').append(usersSelect);
+          }
+        } else {
+          alert("error");
+        }
+      });
+
+      var instanceForm = '<div class="text-box"><%= form_tag(action="/run", :method=>'post') do %>' +
       '<p> Select user:<br />' +
       '<%= select_tag("user", options_for_select([['', '1']], '1'),{ :size =>3, :style => "width:150px"}) %>' +
       '</p>' +
@@ -73,7 +86,7 @@ $(document).ready(function(){
 
       $('#basic-modal-content').empty().append(instanceForm);
 
-      $('#basic-modal-content').modal({onClose: function (dialog) {
+      $('#basic-modal-content').modal({persist:true, onClose: function (dialog) {
           $('#basic-modal-content').empty().append("Loading ..");
           $.modal.close();
       }});
@@ -101,7 +114,7 @@ $(document).ready(function(){
   function(action, el, pos) {
     if(action == "details"){
       getDetails($(el).parent().parent().find('.id').html());
-      $('#basic-modal-content').modal({onClose: function (dialog) {
+      $('#basic-modal-content').modal({persist:true, onClose: function (dialog) {
           $('#basic-modal-content').empty().append("Loading ..");
           $.modal.close();
       }});

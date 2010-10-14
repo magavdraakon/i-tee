@@ -15,7 +15,7 @@ class EmulateEycalyptus
     return true
   end
 
-  def startInstance
+  def startInstance(aws_instance_id)
     return true
   end
 
