@@ -13,7 +13,9 @@ ITee::Application.routes.draw do
   # route, :to => 'controller#action'
   match 'machines', :to => 'hosts#machines'
   match 'instances', :to => 'hosts#instances'
+  match 'run', :to => 'hosts#run'
   match 'getInstanceJSON', :to => 'hosts#getInstanceJSON'
+  match 'getImagesJSON', :to => 'hosts#getImagesJSON'
   match 'terminate/:id', :to => 'hosts#terminate'
     
   # The priority is based upon order of creation:

@@ -23,16 +23,16 @@ function getDetails(id){
   getJSON(url, {id: id}, function(data) {
     var innerHtml = '<div class="head">Instance Details</div><div class="text-box text-small">';
     
-    innerHtml += '<p><b>Id:</b> '+ data.aws_instance_id +'</p>' +
-      '<p><b>Kernel:</b> '+ data.aws_kernel_id +'</p>' +
-      '<p><b>Ramdisk:</b> '+ data.aws_ramdisk_id +'</p>' +
-      '<p><b>Image:</b> '+ data.aws_image_id +'</p>' +
-      '<p><b>Zone:</b> '+ data.aws_instance_id +'</p>' +
-      '<p><b>owner:</b> '+ data.aws_owner +'</p>' +
-      '<p><b>type:</b> '+ data.aws_instance_type +'</p>' +
-      '<p><b>Ip:</b> '+ data.dns_name +'</p>' +
-      '<p><b>state:</b> '+ data.aws_state +'</p>' +
-      '<p><b>Launch Time:</b> '+ data.aws_launch_time +'</p>';
+    innerHtml += '<p><span class="bold">Id:</span> '+ data.aws_instance_id +'</p>' +
+      '<p><span class="bold">Kernel:</span> '+ data.aws_kernel_id +'</p>' +
+      '<p><span class="bold">Ramdisk:</span> '+ data.aws_ramdisk_id +'</p>' +
+      '<p><span class="bold">Image:</span> '+ data.aws_image_id +'</p>' +
+      '<p><span class="bold">Zone:</span> '+ data.aws_instance_id +'</p>' +
+      '<p><span class="bold">Owner:</span> '+ data.aws_owner +'</p>' +
+      '<p><span class="bold">Type:</span> '+ data.aws_instance_type +'</p>' +
+      '<p><span class="bold">Ip:</span> '+ data.dns_name +'</p>' +
+      '<p><span class="bold">State:</span> '+ data.aws_state +'</p>' +
+      '<p><span class="bold">Launch Time:</span> '+ data.aws_launch_time +'</p>';
 
     innerHtml += '</div>';
     /*innerHtml += '<div class="buttons"><a href="" class="cancel-button">Close</a></div>';*/
@@ -43,7 +43,40 @@ function getDetails(id){
 
 $(document).ready(function(){
   $(".addInstance").click(function(){
-    alert("Add new instance");
+      var imagesUrl = "<%= url_for :controller => 'hosts', :action => 'getImagesJSON' %>";
+
+      var imageSelect = '';
+      getJSON(imagesUrl, function(data) {
+        $('#images').empty();
+        if(data){
+          for ( var i in data ){
+            imageSelect += '<option>' + data[i].aws_id + '</option>';
+            $('#image').append(imageSelect);
+          }
+        } else {
+          alert("error");
+        }
+      });
+
+      var instanceForm = '<div class="text-box"><% form_tag(action="/run", :method=>'post') do %>' +
+      '<p> Select user:<br />' +
+      '<%= select_tag("user", options_for_select([['', '1']], '1'),{ :size =>3, :style => "width:150px"}) %>' +
+      '</p>' +
+      '<p> Select image: <br />' +
+      '<%= select_tag("image", options_for_select([['', '1']], '1'),{ :size =>3, :style => "width:150px"}) %>' +
+      '</p>' +
+      '<p>' +
+      '<%= submit_tag 'Run' %>' +
+      '</p>' +
+      '<% end %>' +
+      '</div>';
+
+      $('#basic-modal-content').empty().append(instanceForm);
+
+      $('#basic-modal-content').modal({onClose: function (dialog) {
+          $('#basic-modal-content').empty().append("Loading ..");
+          $.modal.close();
+      }});
   });
 
   $(".killAllInstances").click(function(){
@@ -52,7 +85,8 @@ $(document).ready(function(){
 
   // use mousedown for event order priority: 1. mousedown, 2. mouseup, 3. click
   $(".action-button").mousedown( function() {
-    if($(this).parent().parent().find('.state').html() == 'Terminated'){
+    var state = $(this).parent().parent().find('.state').html();
+    if(state == 'Terminated' || state == 'Shutting-down'){
       // example: disableContextMenuItems('#cut,#copy');
       $('#instanceActionMenu').disableContextMenuItems('#terminate');
     } else {
@@ -67,7 +101,10 @@ $(document).ready(function(){
   function(action, el, pos) {
     if(action == "details"){
       getDetails($(el).parent().parent().find('.id').html());
-      $('#basic-modal-content').modal();
+      $('#basic-modal-content').modal({onClose: function (dialog) {
+          $('#basic-modal-content').empty().append("Loading ..");
+          $.modal.close();
+      }});
     } else if (action == "terminate"){
       var url = "/terminate/" + $(el).parent().parent().find('.id').html();
       $(location).attr('href',url);
@@ -91,8 +128,8 @@ $(document).ready(function(){
   <div class="hr"></div>
   <div class="text-box">
       <div class="buttons">
-        <a href="" class="add-button addInstance">Add</a>
-        <a href="" class="cancel-button killAllInstances">Kill</a>
+        <a href="#" class="add-button addInstance">Add</a>
+        <a href="#" class="cancel-button killAllInstances">Kill</a>
       </div>
       <br />
 
@@ -101,9 +138,9 @@ $(document).ready(function(){
         <caption>Virtual Machine Instances (<%= @instances.count %>)</caption>
         <thead>
         <tr>
-          <th>Instance Id</th>
+          <th>Instance id</th>
           <th>Ip</th>
-          <th>Launch Time</th>
+          <th>Launch time</th>
           <th>State</th>
           <th></th>
         </tr>

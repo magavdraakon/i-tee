@@ -89,7 +89,7 @@ class HostsController < ApplicationController
 
   def instances
     @instances = Host.new.getEycalyptusInstance.getInstances
-    @runningInstances = Host.new.getEycalyptusInstance.getRunningInstances    
+    @runningInstances = Host.new.getEycalyptusInstance.getRunningInstances
   end
 
   def getInstanceJSON
@@ -101,8 +101,14 @@ class HostsController < ApplicationController
         break
       end
     end
-    
+   
     render :json => @inst
+  end
+
+  def getImagesJSON
+    @machineImages = Host.new.getEycalyptusInstance.getMachineImages
+
+    render :json => @machineImages
   end
 
   def terminate
@@ -110,7 +116,13 @@ class HostsController < ApplicationController
 
     Host.new.getEycalyptusInstance.terinateInstance(params[:id])
 
-    render :action => "instances"
+    redirect_to :action => "instances"
+  end
+
+  def run
+    Host.new.getEycalyptusInstance.startInstance(params[:image])
+
+    redirect_to :action => "instances"
   end
 
 end

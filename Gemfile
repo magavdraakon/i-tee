@@ -7,7 +7,7 @@ gem 'rails', '3.0.0'
 
 gem 'sqlite3-ruby', :require => 'sqlite3'
 
-#gem "right_aws"
+gem "right_aws"
 
 gem "devise"
 gem "devise_ldap_authenticatable", "0.4.5"

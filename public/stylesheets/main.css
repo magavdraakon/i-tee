@@ -51,6 +51,32 @@
 
 /* for all */
 
+.buttons a {
+    /*increase roundness (for firefox)*/
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 15px;
+    -moz-border-radius-bottomleft: 15px;
+    -moz-border-radius-bottomright: 5px;
+    /*increase roundness (for webkit)*/
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 15px;
+    -webkit-border-bottom-left-radius: 15px;
+    -webkit-border-bottom-right-radius: 5px;
+    border: 2px solid rgba(125, 159, 186, .5);
+    background-color: rgba(255, 255, 255, .7);
+    margin: 2px;
+    display: inline-block;
+    width: 75px;
+    height: 20px;
+    line-height: 20px;
+    color: #666666;
+    text-decoration: none;
+    text-indent: 15px;
+    text-align: center;
+    font-family: Verdana, Helvetica, Arial, sans-serif;
+    font-size: 0.8em;
+}
+
 a.edit-button {background: url("../images/edit.png") 6px 2px no-repeat;}
 
 a.delete-button {background: url("../images/delete.png") 6px 2px no-repeat;}
@@ -61,7 +87,11 @@ a.submit-button {background: url("../images/submit.png") 6px 2px no-repeat;}
 
 a.cancel-button {background: url("../images/cancel.png") 6px 2px no-repeat;}
 
-a.button {
+a.button:hover {
+    background-color: rgba(255, 255, 255, 1.0);
+}
+
+button {
     /*increase roundness (for firefox)*/
     -moz-border-radius-topleft: 5px;
     -moz-border-radius-topright: 15px;
@@ -77,10 +107,6 @@ a.button {
     padding-right:8px;
     background-color: rgba(255, 255, 255, .7);
     text-decoration:none;
-}
-
-a.button:hover {
-    background-color: rgba(255, 255, 255, 1.0);
 }
 
 input[type="submit"] {  
@@ -100,10 +126,6 @@ input[type="submit"] {
     background: url("../images/submit.png") 6px 2px no-repeat rgba(255, 255, 255, .7);
     text-decoration:none;;
 }  
-
-
-
-
 
 .action-button {
     display: inline-block;
@@ -258,4 +280,8 @@ html:first-child caption { /* Opera only */
 
 .terminated {
     color: #A63A58;
+}
+
+.bold {
+    font-weight: bold;
 }
