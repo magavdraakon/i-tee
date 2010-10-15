@@ -35,7 +35,7 @@ function getDetails(id){
       '<p><span class="bold">Launch Time:</span> '+ data.aws_launch_time +'</p>';
 
     innerHtml += '</div>';
-    innerHtml += '<div class="buttons"><a href="" class="cancel-button">Close</a></div>';
+    innerHtml += '<div><a href="" class="cancel-button button">Close</a></div>';
 
     $('#basic-modal-content').empty().append(innerHtml);
   });
@@ -71,18 +71,17 @@ $(document).ready(function(){
         }
       });
 
-      var instanceForm = '<div class="text-box"><%= form_tag(action="/run", :method=>'post') do %>' +
+      var instanceForm = '<%= form_tag(action="/run", :method=>'post') do %> <div class="text-box">' +
       '<p> Select user:<br />' +
       '<%= select_tag("user", options_for_select([['', '1']], '1'),{ :size =>3, :style => "width:150px"}) %>' +
       '</p>' +
       '<p> Select image: <br />' +
       '<%= select_tag("image", options_for_select([['', '1']], '1'),{ :size =>3, :style => "width:150px"}) %>' +
-      '</p>' +
+      '</p> </div>' +
       '<p>' +
       '<%= submit_tag 'Run' %>' +
       '</p>' +
-      '<% end %>' +
-      '</div>';
+      '<% end %>';
 
       $('#basic-modal-content').empty().append(instanceForm);
 
@@ -140,9 +139,9 @@ $(document).ready(function(){
   <div class="head">Instance Management</div>
   <div class="hr"></div>
   <div class="text-box">
-      <div class="buttons">
-        <a href="#" class="add-button addInstance">Add</a>
-        <a href="#" class="cancel-button killAllInstances">Kill</a>
+      <div >
+        <a href="#" class="add-button button addInstance">Add</a>
+        <a href="#" class="cancel-button button killAllInstances">Kill</a>
       </div>
       <br />
 

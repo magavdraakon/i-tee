@@ -91,7 +91,7 @@ a.button:hover {
     background-color: rgba(255, 255, 255, 1.0);
 }
 
-button {
+a.button {
     /*increase roundness (for firefox)*/
     -moz-border-radius-topleft: 5px;
     -moz-border-radius-topright: 15px;
@@ -105,8 +105,11 @@ button {
     border: 2px solid rgba(125, 159, 186, .5);
     padding-left:25px;
     padding-right:8px;
+    padding-top:3px;
+    padding-bottom:3px;
     background-color: rgba(255, 255, 255, .7);
     text-decoration:none;
+     color: #666666;
 }
 
 input[type="submit"] {  
@@ -123,6 +126,8 @@ input[type="submit"] {
     border: 2px solid rgba(125, 159, 186, .5);
     padding-left:25px;
     padding-right:8px;
+    padding-top:3px;
+    padding-bottom:3px;
     background: url("../images/submit.png") 6px 2px no-repeat rgba(255, 255, 255, .7);
     text-decoration:none;;
 }  
