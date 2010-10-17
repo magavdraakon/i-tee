@@ -16,9 +16,9 @@
     <div id="header-bar">
       <div id="name" class="column span-10">
         <% if user_signed_in? %>
-          Welcome, <%= current_user.username %>
+          You are logged in as <span class="caps"><%= current_user.username %></span>
         <% elsif @logged_in %>
-          Welcome, <%=  @username %>
+          You are logged in as <span class="caps"><%=  @username %></span>
         <% end %>
       </div>
 
@@ -42,10 +42,12 @@
     <div id="menu">
       <ul>
         <li<% if params[:controller] == "home"%> class="selected" <% end %>><%= link_to('Home', :controller=>'home', :action=>'index')%></li>
-        <li<% if params[:controller] == "labs"%> class="selected" <% end %>><%= link_to('Labs', :controller=>'labs', :action=>'index')%></li>
+        <li<% if params[:controller] == "labs"%> class="selected" <% end %>><%= link_to('Courses', :controller=>'labs', :action=>'courses', :id=>1)%></li>
         <li<% if params[:controller] == "materials"%> class="selected" <% end %>><%= link_to('Materials', :controller=>'materials', :action=>'index')%></li>
         <li<% if params[:controller] == "vms"%> class="selected" <% end %>><%= link_to('Vms', :controller=>'vms', :action=>'index')%></li>
+        <% if @admin then %>
         <li<% if params[:controller] == "hosts"%> class="selected" <% end %>><%= link_to('Administration', :controller => 'hosts', :action => 'instances')%></li>
+        <% end %>
       </ul>
     </div>
   </div>

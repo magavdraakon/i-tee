@@ -82,4 +82,22 @@ class LabsController < ApplicationController
       format.xml  { head :ok }
     end
   end
+
+  def courses
+    @labs = Lab.all
+  end
+
+  def startLabJSON
+    @msg = "ok"
+    if user_signed_in? then
+      Host.new.getEycalyptusInstance.startInstance("emi-E0DF1082", current_user.username )
+    elsif @username then
+      Host.new.getEycalyptusInstance.startInstance("emi-E0DF1082", @username )
+    else
+      @msg = "User not found!"
+    end
+
+    render :json => [@msg]
+  end
+
 end

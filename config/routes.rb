@@ -18,6 +18,10 @@ ITee::Application.routes.draw do
   match 'getImagesJSON', :to => 'hosts#getImagesJSON'
   match 'getUsersJSON', :to => 'hosts#getUsersJSON'
   match 'terminate/:id', :to => 'hosts#terminate'
+
+  match 'courses/:id', :to => 'labs#courses'
+  match 'startLabJSON', :to => 'labs#startLabJSON'
+
     
   # The priority is based upon order of creation:
   # first created -> highest priority.

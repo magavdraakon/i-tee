@@ -36,7 +36,7 @@ function getDetails(id){
       '<p><span class="bold">Launch Time:</span> '+ data.aws_launch_time +'</p>';
 
     innerHtml += '</div>';
-    innerHtml += '<a href="" class="cancel-button button">Close</a>';
+    innerHtml += '<a href="" class="cancel-button buttons">Close</a>';
 
     $('#basic-modal-content').empty().append(innerHtml);
   });
@@ -92,7 +92,7 @@ $(document).ready(function(){
       }});
   });
 
-  $(".killAllInstances").click(function(){
+  $(".killInstances").click(function(){
     alert("Kill all instances");
   });  
 
@@ -139,13 +139,9 @@ $(document).ready(function(){
 <% content_for :body do %>
   <div class="head">Instance Management</div>
   <div class="hr"></div>
+  <div class="add-button buttons w-4 addInstance">Add</div>
+  <div class="cancel-button buttons w-4 killInstances">Kill</div>
   <div class="text-box">
-
-      <a href="#" class="add-button button addInstance">Add</a>
-      <a href="#" class="cancel-button button killAllInstances">Kill</a>
-
-      <br />
-      <br />
       
       <div id="content-table">
       <table>

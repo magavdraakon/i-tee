@@ -29,7 +29,8 @@
     color: #29383D;
     background: #F0F0F0;
     border: 1px solid #C2C2C2;
-    padding: 12px;
+    padding: 20px;
+    padding-bottom: 30px;
 }
 
 #simplemodal-container a.modalCloseImg {

@@ -17,6 +17,10 @@
     color: #F4F4F4;
 }
 
+.caps {
+    font-variant: small-caps;
+}
+
 #control ul {
     float: right;
     margin: 0;
