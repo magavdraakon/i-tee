@@ -101,7 +101,7 @@ class HostsController < ApplicationController
         break
       end
     end
-   
+
     render :json => @inst
   end
 
@@ -113,24 +113,20 @@ class HostsController < ApplicationController
 
   def getUsersJSON
     @users = User.all(:select => "username")
-    
+    #@cities = City.find_by_state(:all)
     render :json => @users
   end
 
   def terminate
-    @instances = Host.new.getEycalyptusInstance.getInstances
-
     Host.new.getEycalyptusInstance.terinateInstance(params[:id])
 
     redirect_to :action => "instances"
   end
 
   def run
-    Host.new.getEycalyptusInstance.startInstance(params[:image])
-
+    Host.new.getEycalyptusInstance.startInstance(params[:image], User.find_by_username(params[:user]))
+    
     redirect_to :action => "instances"
   end
 
 end
-
-

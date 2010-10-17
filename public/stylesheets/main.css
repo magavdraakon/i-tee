@@ -77,15 +77,15 @@
     font-size: 0.8em;
 }
 
-a.edit-button {background: url("../images/edit.png") 6px 2px no-repeat;}
+a.edit-button {background: url("../images/edit.png") 6px 4px no-repeat;}
 
-a.delete-button {background: url("../images/delete.png") 6px 2px no-repeat;}
+a.delete-button {background: url("../images/delete.png") 6px 4px no-repeat;}
 
-a.add-button {background: url("../images/add.png") 6px 2px no-repeat;}
+a.add-button {background: url("../images/add.png") 6px 4px no-repeat;}
 
-a.submit-button {background: url("../images/submit.png") 6px 2px no-repeat;}
+a.submit-button {background: url("../images/submit.png") 6px 4px no-repeat;}
 
-a.cancel-button {background: url("../images/cancel.png") 6px 2px no-repeat;}
+a.cancel-button {background: url("../images/cancel.png") 6px 4px no-repeat;}
 
 a.button:hover {
     background-color: rgba(255, 255, 255, 1.0);
@@ -109,7 +109,7 @@ a.button {
     padding-bottom:3px;
     background-color: rgba(255, 255, 255, .7);
     text-decoration:none;
-     color: #666666;
+    color: #666666;
 }
 
 input[type="submit"] {  

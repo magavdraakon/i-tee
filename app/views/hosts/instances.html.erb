@@ -29,13 +29,14 @@ function getDetails(id){
       '<p><span class="bold">Image:</span> '+ data.aws_image_id +'</p>' +
       '<p><span class="bold">Zone:</span> '+ data.aws_instance_id +'</p>' +
       '<p><span class="bold">Owner:</span> '+ data.aws_owner +'</p>' +
+      '<p><span class="bold">SSH key:</span> '+ data.ssh_key_name +'</p>' +
       '<p><span class="bold">Type:</span> '+ data.aws_instance_type +'</p>' +
       '<p><span class="bold">Ip:</span> '+ data.dns_name +'</p>' +
       '<p><span class="bold">State:</span> '+ data.aws_state +'</p>' +
       '<p><span class="bold">Launch Time:</span> '+ data.aws_launch_time +'</p>';
 
     innerHtml += '</div>';
-    innerHtml += '<div><a href="" class="cancel-button button">Close</a></div>';
+    innerHtml += '<a href="" class="cancel-button button">Close</a>';
 
     $('#basic-modal-content').empty().append(innerHtml);
   });
@@ -46,7 +47,6 @@ $(document).ready(function(){
       var imagesUrl = "<%= url_for :controller => 'hosts', :action => 'getImagesJSON' %>";
       var imageSelect = '';
       getJSON(imagesUrl, function(data) {
-        $('#images').empty();
         if(data){
           for ( var i in data ){
             imageSelect += '<option>' + data[i].aws_id + '</option>';
@@ -60,10 +60,9 @@ $(document).ready(function(){
       var usersUrl = "<%= url_for :controller => 'hosts', :action => 'getUsersJSON' %>";
       var usersSelect = '';
       getJSON(usersUrl, function(data) {
-        $('#user').empty();
         if(data){
-          for ( var i in data ){
-            usersSelect += '<option>' + data[i].aws_id + '</option>';
+          for ( var i in data[0] ){
+            usersSelect += '<option>' + data[0][i].username + '</option>';
             $('#user').append(usersSelect);
           }
         } else {
@@ -71,19 +70,21 @@ $(document).ready(function(){
         }
       });
 
-      var instanceForm = '<%= form_tag(action="/run", :method=>'post') do %> <div class="text-box">' +
+      var instanceForm = '<div class="head">Run new instance</div>' +
+      '<%= form_tag(action="/run", :method=>'post') do %>' +
+      '<div class="text-box text-small">' +
       '<p> Select user:<br />' +
-      '<%= select_tag("user", options_for_select([['', '1']], '1'),{ :size =>3, :style => "width:150px"}) %>' +
+      '<%= select_tag("user", options_for_select([['', '1']], '1'),{ :size =>3, :style => "width:120px"}) %>' +
       '</p>' +
       '<p> Select image: <br />' +
-      '<%= select_tag("image", options_for_select([['', '1']], '1'),{ :size =>3, :style => "width:150px"}) %>' +
-      '</p> </div>' +
+      '<%= select_tag("image", options_for_select([['', '1']], '1'),{ :size =>3, :style => "width:120px"}) %>' +
+      '</p></div>' +
       '<p>' +
       '<%= submit_tag 'Run' %>' +
       '</p>' +
       '<% end %>';
 
-      $('#basic-modal-content').empty().append(instanceForm);
+      $('#basic-modal-content').empty().html(instanceForm);
 
       $('#basic-modal-content').modal({persist:true, onClose: function (dialog) {
           $('#basic-modal-content').empty().append("Loading ..");
@@ -139,12 +140,13 @@ $(document).ready(function(){
   <div class="head">Instance Management</div>
   <div class="hr"></div>
   <div class="text-box">
-      <div >
-        <a href="#" class="add-button button addInstance">Add</a>
-        <a href="#" class="cancel-button button killAllInstances">Kill</a>
-      </div>
-      <br />
 
+      <a href="#" class="add-button button addInstance">Add</a>
+      <a href="#" class="cancel-button button killAllInstances">Kill</a>
+
+      <br />
+      <br />
+      
       <div id="content-table">
       <table>
         <caption>Virtual Machine Instances (<%= @instances.count %>)</caption>

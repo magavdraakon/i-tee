@@ -12,6 +12,7 @@ class Eycalyptus
 
   def getMachineImages
     @ec2 = RightAws::Ec2.new(@@ACCESS_KEY, @@SECRET_KEY, :endpoint_url => @@EC2_URL)
+    #@ec2.describe_images(:aws_image_type => 'machine')
     j = 0
     @machines = []
     for i in @ec2.describe_images()
@@ -33,13 +34,14 @@ class Eycalyptus
     @ec2.terminate_instances(aws_instance_id)
   end
 
-  def startInstance(aws_image_id)
+  def startInstance(aws_image_id, user)
     @ec2 = RightAws::Ec2.new(@@ACCESS_KEY, @@SECRET_KEY, :endpoint_url => @@EC2_URL)
+    
+    if !@ec2.describe_key_pairs(user.username) then      
+      @ec2.create_key_pair(user.username)
+    end
 
-    #@key = @ec2.create_key_pair("ssh_key")
-    #@ec2.describe_key_pairs
-
-    @instance = @ec2.run_instances(aws_image_id, 1, 1, ['default'], 'ssh_key', 'SomeImportantUserData', 'private')
+    @instance = @ec2.run_instances(aws_image_id, 1, 1, ['default'], user.username, 'SomeImportantUserData', 'public')
   end
 
   def getRunningInstances
