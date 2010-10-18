@@ -16,9 +16,9 @@
     <div id="header-bar">
       <div id="name" class="column span-10">
         <% if user_signed_in? %>
-          You are logged in as <span class="caps"><%= current_user.username %></span>
+          You are logged in as <%= current_user.username %>
         <% elsif @logged_in %>
-          You are logged in as <span class="caps"><%=  @username %></span>
+          You are logged in as <%=  @username %>
         <% end %>
       </div>
 

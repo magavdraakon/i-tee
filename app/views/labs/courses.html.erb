@@ -1,0 +1,61 @@
+<%  content_for :javascript do %>
+<script>
+function getJSON(url, data, callback) {
+  // shift arguments if data argument was ommited
+  if ( jQuery.isFunction( data ) ) {
+    callback = data;
+    data = null;
+  }
+
+  return jQuery.ajax({
+    type: "GET",
+    url: url,
+    cache: false,
+    data: data,
+    success: callback,
+    dataType: "json"
+  });
+}
+
+$(document).ready(function(){
+
+  $(".startCourse").click(function(){
+    var startUrl = "<%= url_for :controller => 'labs', :action => 'startLabJSON' %>";
+
+    getJSON(startUrl, function(data) {
+      if(data){
+        if(data != "ok"){
+          alert(data) ;
+        }
+      }
+    });
+
+  });
+      
+});
+</script>
+<% end %>
+
+<% content_for :sidebar_head do %>
+  Course List
+<% end %>
+
+<% content_for :sidebar do %>
+  <% if @admin then %>
+  <li><%= link_to 'New Lab', new_lab_path %></li>
+  <% end %>
+
+  <% @labs.each do |lab| %>
+    <li><%= link_to(lab.name, :controller=>'labs', :action=>'courses', :id=>lab.id)%></li>
+  <% end %>
+<% end %>
+
+<% content_for :body do %>
+  <div class="head"><%=  @labs[params[:id].to_i - 1][:name] %></div>
+  <div class="hr"></div>
+  <div class="text-box">
+    <%=  @labs[params[:id].to_i - 1][:description] %>
+  </div>
+
+  <div class="add-button buttons startCourse">Start</div>
+<% end %>

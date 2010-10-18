@@ -1,4 +1,4 @@
-class Eycalyptus
+class Eucalyptus
   @@EC2_URL = ITee::Application.config.ec2_url
   @@ACCESS_KEY = ITee::Application.config.access_key
   @@SECRET_KEY = ITee::Application.config.secret_key
@@ -12,7 +12,6 @@ class Eycalyptus
 
   def getMachineImages
     @ec2 = RightAws::Ec2.new(@@ACCESS_KEY, @@SECRET_KEY, :endpoint_url => @@EC2_URL)
-    #@ec2.describe_images(:aws_image_type => 'machine')
     j = 0
     @machines = []
     for i in @ec2.describe_images()
@@ -37,7 +36,7 @@ class Eycalyptus
   def startInstance(aws_image_id, user)
     @ec2 = RightAws::Ec2.new(@@ACCESS_KEY, @@SECRET_KEY, :endpoint_url => @@EC2_URL)
     
-    if !@ec2.describe_key_pairs(user.username) then      
+    if !@ec2.describe_key_pairs(user.username).empty? then
       @ec2.create_key_pair(user.username)
     end
 
