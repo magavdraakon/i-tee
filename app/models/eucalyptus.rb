@@ -36,7 +36,7 @@ class Eucalyptus
   def startInstance(aws_image_id, user)
     @ec2 = RightAws::Ec2.new(@@ACCESS_KEY, @@SECRET_KEY, :endpoint_url => @@EC2_URL)
     
-    if !@ec2.describe_key_pairs(user.username).empty? then
+    if @ec2.describe_key_pairs(user.username).empty? then
       @ec2.create_key_pair(user.username)
     end
 

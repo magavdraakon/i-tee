@@ -6,8 +6,8 @@ gem 'rails', '3.0.0'
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 
 gem 'sqlite3-ruby', :require => 'sqlite3'
-
-gem "right_aws"
+gem 'ckeditor', '3.4.2.pre'
+#gem "right_aws"
 
 gem "devise"
 gem "devise_ldap_authenticatable", "0.4.5"
