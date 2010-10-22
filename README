@@ -8,3 +8,82 @@ Configuration files are needed as following with sample files included:
 - config/ldap.yml
 - config/database.yml
 
+
+== Installation
+
+Check the version of ruby and rails installed:
+
+ ruby -v
+ruby 1.8.7 (2010-01-10 patchlevel 249) [x86_64-linux]
+
+ rails -v
+Rails 3.0.0
+
+Have git installed:
+apt-get install git-core
+
+Download the code from GitHub to the /usr/local folder
+cd /usr/local
+git clone git://github.com/magavdraakon/i-tee.git
+
+Go to the project folder
+cd i-tee
+
+Create config files from the sample files
+
+Changing the database config
+cp config/database_sample.yml config/database.yml 
+
+For the database use mysql server.
+Creating the user for the database:
+
+create database itee character set utf8;
+create user 'itee'@'localhost' identified by 's0mestrongpassw0rd';
+grant all privileges on itee.* to 'itee'@'localhost';
+
+Change info in the database.yml file
+
+production:
+  adapter: mysql
+  database: itee
+  username: root
+  password: s0mestrongpassw0rd
+
+Getting the production config
+cp config/environments/production_sample.rb config/environments/production.rb 
+
+Ensure that emulate_virtualization is set to false
+  config.emulate_virtualization = false
+  config.emulate_eucalyptus = false
+  config.emulate_ldap = false
+
+Enter correct eucalyptus url and creditentials
+  #eycalyptus aws information
+  config.ec2_url = 'http://youreucaIP:8773/services/Eucalyptus'
+  config.access_key = 'access key from your installation'
+  config.secret_key = 'secret key from your euca installation'
+
+  #Administrator usernames
+  config.admins = ['admin1','admin2','admin3','etc']
+  
+Create the LDAP config
+cp config/ldap_sample.yml config/ldap.yml 
+
+And change the info according to your own LDAP server settings
+production:
+  host: yourhost
+  port: 636
+  attribute: cn
+  base: ou=people,dc=test,dc=com
+  admin_user: cn=admin,dc=test,dc=com
+  admin_password: admin_password
+  ssl: true
+
+install the sqlite development packages
+apt-get install libsqlite3-dev 
+
+Install gems
+bundle install
+
+Now migrate the database
+RAILS_ENV=production rake db:migrate
