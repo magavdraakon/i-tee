@@ -35,6 +35,7 @@ Changing the database config
 cp config/database_sample.yml config/database.yml 
 
 For the database use mysql server.
+apt-get install libmysqlclient-dev mysql-server
 Creating the user for the database:
 
 create database itee character set utf8;
@@ -87,3 +88,17 @@ bundle install
 
 Now migrate the database
 RAILS_ENV=production rake db:migrate
+
+Install passanger for hosting rails applications
+sudo aptitude install libapache2-mod-passenger
+
+allow apache rewrite module
+sudo a2enmod rewrite
+
+create railsapps directory
+mkdir /var/www/railsapps/
+
+link public directory to web directory
+ln -s /usr/local/i-tee/public/ /var/www/railsapps/i-tee
+
+
