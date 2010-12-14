@@ -129,11 +129,32 @@ input[type="submit"] {
     cursor: pointer;
 }
 
+.tools-button {
+    vertical-align: middle;
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background: transparent url("../images/action.png") no-repeat 0px 0px;
+    cursor: pointer;
+}
+
 .action-menu {
     display: none;
     width: 150px;
     background-color: white;
     padding: 5px;
+}
+
+.tools-menu {
+    float: right;
+    right: 20px;
+    color: gray;
+    font-size: 0.8em;
+    vertical-align: middle;
+    display: block;
+}
+.pointer {
+    cursor: pointer;
 }
 
 .head {

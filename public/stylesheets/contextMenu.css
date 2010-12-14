@@ -10,6 +10,17 @@
 	display: none;
 }
 
+.contextMenu-tools {
+	position: absolute;
+	width: 150px;
+	z-index: 99999;
+	border: solid 1px #CCC;
+	background: white;
+	padding: 0px;
+	margin: 0px;
+	display: none;
+}
+
 .contextMenu LI {
 	list-style: none;
 	padding: 0px;
@@ -49,5 +60,7 @@
 	border-top: solid 1px #CCC;
 }
 
-.contextMenu LI.terminate A { background-image: url(../images/terminate.png); }
+.contextMenu LI.terminate A { background-image: url(../images/mini-down.gif); }
 .contextMenu LI.details A { background-image: url(../images/details.png); }
+.contextMenu LI.run A { background-image: url(../images/mini-new.png); }
+.contextMenu LI.kill A { background-image: url(../images/mini-down.gif); }

@@ -69,7 +69,7 @@ if(jQuery)( function() {
 							
 							// Show the menu
 							$(document).unbind('click');
-							$(menu).css({ top: el.position().top + 5, left: el.position().left - 90 }).fadeIn(o.inSpeed);
+							$(menu).css({ top: el.position().top + 5, left: el.position().left - ($(menu).width() - 10)}).fadeIn(o.inSpeed);
 							// Hover events
 							$(menu).find('A').mouseover( function() {
 								$(menu).find('LI.hover').removeClass('hover');

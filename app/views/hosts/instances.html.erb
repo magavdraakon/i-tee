@@ -92,10 +92,6 @@ $(document).ready(function(){
       }});
   });
 
-  $(".killInstances").click(function(){
-    alert("Kill all instances");
-  });  
-
   // use mousedown for event order priority: 1. mousedown, 2. mouseup, 3. click
   $(".action-button").mousedown( function() {
     var state = $(this).parent().parent().find('.state').html();
@@ -103,7 +99,7 @@ $(document).ready(function(){
       // example: disableContextMenuItems('#cut,#copy');
       $('#instanceActionMenu').disableContextMenuItems('#terminate');
     } else {
-      // null overload enables all
+      // no overload enables all
       $('#instanceActionMenu').enableContextMenuItems();
     }
   });
@@ -111,7 +107,7 @@ $(document).ready(function(){
   $(".action-button").contextMenu({
     menu: 'instanceActionMenu'
   },
-  function(action, el, pos) {
+  function(action, el, pos){
     if(action == "details"){
       getDetails($(el).parent().parent().find('.id').html());
       $('#basic-modal-content').modal({persist:true, onClose: function (dialog) {
@@ -120,9 +116,21 @@ $(document).ready(function(){
       }});
     } else if (action == "terminate"){
       var url = "/terminate/" + $(el).parent().parent().find('.id').html();
-      $(location).attr('href',url);
+      $(location).attr('href', url);
     }
   });
+
+  $(".tools-button").contextMenu({
+    menu: 'instanceToolsMenu'
+  },
+  function(action, el, pos){
+    if(action == "run"){
+      alert(1);
+    } else if (action == "kill"){
+      alert(2);
+    }
+  });
+
 });
 </script>
 <% end %>
@@ -139,10 +147,10 @@ $(document).ready(function(){
 <% content_for :body do %>
   <div class="head">Instance Management</div>
   <div class="hr"></div>
-  <div class="add-button buttons w-4 addInstance">Add</div>
-  <div class="cancel-button buttons w-4 killInstances">Kill</div>
-  <div class="text-box">
-      
+  <div class="tools-menu"><span class="addInstance pointer">Run new instance</span> | <div class="tools-button"></div> </div>
+  <br/><br/>
+
+  <div class="text-box">      
       <div id="content-table">
       <table>
         <caption>Virtual Machine Instances (<%= @instances.count %>)</caption>
@@ -176,6 +184,15 @@ $(document).ready(function(){
     </li>
     <li class="terminate separator">
         <a href="#terminate">Terminate</a>
+    </li>
+</ul>
+
+ <ul id="instanceToolsMenu" class="contextMenu contextMenu-tools">
+    <li class="run">
+        <a href="#run">Run new instance</a>
+    </li>
+    <li class="kill separator">
+        <a href="#kill">Terminate all</a>
     </li>
 </ul>
 

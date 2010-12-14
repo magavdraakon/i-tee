@@ -1,5 +1,5 @@
 ITee::Application.routes.draw do
-     
+
   devise_for :users
 
   resources :vms
@@ -22,7 +22,7 @@ ITee::Application.routes.draw do
   match 'courses/:id', :to => 'labs#courses'
   match 'startLabJSON', :to => 'labs#startLabJSON'
 
-    
+
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
