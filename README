@@ -13,17 +13,20 @@ Configuration files are needed as following with sample files included:
 
 Check the version of ruby and rails installed:
 
- ruby -v
+ruby -v
 ruby 1.8.7 (2010-01-10 patchlevel 249) [x86_64-linux]
 
- rails -v
+rails -v
 Rails 3.0.0
 
 Have git installed:
 apt-get install git-core
 
-Download the code from GitHub to the /usr/local folder
-cd /usr/local
+Create the railsapps directory
+mkdir /var/www/railsapps/
+
+Download the code from GitHub to the newly created folder
+cd /var/www/railsapps
 git clone git://github.com/magavdraakon/i-tee.git
 
 Go to the project folder
@@ -36,18 +39,22 @@ cp config/database_sample.yml config/database.yml
 
 For the database use mysql server.
 apt-get install libmysqlclient-dev mysql-server
+
+run the mysql client under root
+mysql -p
+
 Creating the user for the database:
 
-create database itee character set utf8;
+create database itee_production character set utf8;
 create user 'itee'@'localhost' identified by 's0mestrongpassw0rd';
-grant all privileges on itee.* to 'itee'@'localhost';
+grant all privileges on itee_production.* to 'itee'@'localhost';
 
 Change info in the database.yml file
 
 production:
   adapter: mysql
-  database: itee
-  username: root
+  database: itee_production
+  username: itee
   password: s0mestrongpassw0rd
 
 Getting the production config
@@ -89,16 +96,67 @@ bundle install
 Now migrate the database
 RAILS_ENV=production rake db:migrate
 
-Install passanger for hosting rails applications
-sudo aptitude install libapache2-mod-passenger
 
-allow apache rewrite module
-sudo a2enmod rewrite
+install passenger for hosting rails applications 
+gem install passenger
 
-create railsapps directory
-mkdir /var/www/railsapps/
+Install the required software:
 
-link public directory to web directory
-ln -s /usr/local/i-tee/public/ /var/www/railsapps/i-tee
+  Curl development headers with SSL support
+  apt-get install libcurl4-openssl-dev
 
+  OpenSSL development headers
+  apt-get install libssl-dev
+
+  Apache 2 development headers
+  apt-get install apache2-prefork-dev
+
+  Apache Portable Runtime (APR) development headers
+  apt-get install libapr1-dev
+
+  Apache Portable Runtime Utility (APU) development headers
+  apt-get install libaprutil1-dev
+
+And run the installer
+passenger-install-apache2-module
+
+Create new configuration files to enable passenger
+/etc/apache2/mods-available/passenger.load
+/etc/apache2/mods-available/passenger.conf
+
+insert the following line into the .load file
+LoadModule passenger_module /usr/lib/ruby/gems/1.8/gems/passenger-3.0.2/ext/apache2/mod_passenger.so
+
+insert the following lines into the .conf file
+PassengerRoot /usr/lib/ruby/gems/1.8/gems/passenger-3.0.2
+PassengerRuby /usr/bin/ruby1.8
+
+execute these commands to enable passenger and restart the apache server
+a2enmod passenger
+/etc/init.d/apache2 restart
+
+Create a file 
+/etc/apache2/sites-available/itee
+
+And insert the following lines
+<VirtualHost *:80>
+    ServerName elab.itcollege.ee
+    DocumentRoot /var/www/railsapps/i-tee/public
+    <Directory /var/www/railsapps/i-tee/public>
+       AllowOverride all
+       Options -MultiViews
+    </Directory>
+</VirtualHost>
+
+Disable the default site
+a2dissite default
+
+and enable the new site
+a2ensite itee
+
+reload the web servers configuration files
+/etc/init.d/apache2 reload
+
+To see the site go to
+http://localhost
 
