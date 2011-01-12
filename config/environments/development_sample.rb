@@ -5,6 +5,7 @@ ITee::Application.configure do
   config.emulate_virtualization = false
   config.emulate_eucalyptus = true
   config.emulate_ldap = false
+  config.use_libvirt = true
 
   #eycalyptus aws information
   config.ec2_url = 'http://192.168.13.13:8773/services/Eucalyptus'

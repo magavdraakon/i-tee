@@ -9,5 +9,14 @@ class Host < ActiveRecord::Base
       return Eucalyptus.new
     end
   end
+  
+  def getVirtInstance
+    if ITee::Application.config.use_libvirt then
+      return Libvirt.new
+    else
+      getEycalyptusInstance
+    end
+    
+  end
 
 end
