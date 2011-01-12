@@ -11,6 +11,8 @@ class ApplicationController < ActionController::Base
     before_filter :admin?
   end
   
+   layout 'main'
+  
   def emulate_user
     @admin = true
     @logged_in = true
