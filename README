@@ -1,3 +1,7 @@
+== About i-tee
+i-tee is a distance laboratory system, that is based on ruby on rails and uses virtualization technologies like libvirt.
+i-tee is developed by the Estonian IT College.
+
 == Application Config
 Configuration files are needed as following with sample files included:
 
