@@ -1,12 +1,22 @@
 <% content_for :sidebar_head do %>
+  <% if @admin %>
   Dashboard
+  <%else%>
+  Vali labor
+  <%end%>
+  
 <% end %>
 
 <% content_for :sidebar do %>
+  <% if @admin %>
     <li><a href="">Dynamic name server for beginners</a></li>
     <li><a href="">LDAP configurations</a></li>
     <li><a href="">Introduction to GNU/Linux</a></li>
     <li><a href="">Multimedia Communications and Networking</a></li>
+  <%else%>
+  Laborite nimekiri
+  <%end%>
+    
 <% end %>
 
 
@@ -15,17 +25,20 @@
   <div class="hr"></div>
   <div class="text-box round">
 
-    <p>Emulated virtualization environment: <%= ITee::Application.config.emulate_virtualization %></p>
-    <p>Emulated eucalyptus environment: <%= ITee::Application.config.emulate_eucalyptus %></p>
-    <p>Emulated ldap environment: <%= ITee::Application.config.emulate_ldap %></p>
+    
 
     <% if @admin %>
       <div id="adminmenu">
-        Sa oled administraator
+        <p>Sa oled administraator</p>
+        
+        <p>Emulated virtualization environment: <%= ITee::Application.config.emulate_virtualization %></p>
+        <p>Emulated eucalyptus environment: <%= ITee::Application.config.emulate_eucalyptus %></p>
+        <p>Emulated ldap environment: <%= ITee::Application.config.emulate_ldap %></p>
+        
       </div>
     <%else%>
       <div id="usermenu">
-        Sa oled tavakasutaja
+        Siia tuleb abiinfo, mis räägib i-tee keskkonna kasutamisest
       </div>
     <%end%>
   </div>
