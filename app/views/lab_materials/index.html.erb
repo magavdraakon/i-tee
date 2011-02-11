@@ -1,0 +1,44 @@
+<% content_for :sidebar_head do %>
+<h1>lab_materials</h1>
+<%end%>
+<% content_for :body do %>
+<div class="head">Listing lab_materials</div>
+ <div class="hr"></div>
+ <div class="text-box">
+    <div id="content-table">
+
+<table>
+
+ <caption >Lab_materials (<%= @lab_materials.count  %>)</caption>
+  <thead>
+  <tr>
+    <th>Lab</th>
+    <th>Material</th>
+    <th>Description</th>
+    <th>Sort</th>
+    <th></th>
+  </tr>
+</thead>
+
+
+<% @lab_materials.each do |lab_material| %>
+  <tr>
+    <td><%= lab_material.lab.name if lab_material.lab!=nil %></td>
+    <td><%= lab_material.material.name if lab_material.material!=nil%></td>
+    <td><%= lab_material.description %></td>
+    <td><%= lab_material.sort %></td>
+    <td><%= link_to 'Show', lab_material %> <%= link_to 'Edit', edit_lab_material_path(lab_material) %> <%= link_to 'Destroy', lab_material, :confirm => 'Are you sure?', :method => :delete%></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+</div>
+ </div>
+ 
+<%end%>
+
+<% content_for :sidebar do %>
+<li><%# link_to 'New Lab material', new_lab_material_path %></li>
+<%end%>

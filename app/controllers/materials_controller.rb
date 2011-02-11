@@ -1,5 +1,6 @@
 class MaterialsController < ApplicationController
   layout 'main'
+   before_filter :authorise_as_admin, :except => [:show]
 
   # GET /materials
   # GET /materials.xml

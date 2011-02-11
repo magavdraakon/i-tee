@@ -17,7 +17,7 @@ function getJSON(url, data, callback) {
   });
 }
 
-$(document).ready(function(){
+jQuery(document).ready(function() {
 
   $(".startCourse").click(function(){
     var startUrl = "<%= url_for :controller => 'labs', :action => 'startLabJSON' %>";
@@ -51,10 +51,18 @@ $(document).ready(function(){
 <% end %>
 
 <% content_for :body do %>
-  <div class="head"><%=  @labs[params[:id].to_i - 1][:name] %></div>
+  <div class="head"><%=  @lab.name %></div>
   <div class="hr"></div>
   <div class="text-box">
-    <%=  @labs[params[:id].to_i - 1][:description] %>
+    <%= raw @lab.description %>
+    <br/>
+    <h3>materials</h3>
+<% @lab.lab_materials.each do |material| %>
+  <p><%=link_to(material.material.name, :controller=>'materials', :action=>'show', :id=>material.material)%> 
+  <%# link_to('Destroy', material, :method => :delete) %>
+</p> 
+<%end%>
+    
   </div>
 
 <a class="add-button button startCourse">Start</a>

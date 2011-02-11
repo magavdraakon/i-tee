@@ -1,5 +1,6 @@
 class LabsController < ApplicationController
   layout 'main'
+  before_filter :authorise_as_admin, :except => [:courses]
 
   # GET /labs
   # GET /labs.xml
@@ -85,6 +86,7 @@ class LabsController < ApplicationController
 
   def courses
     @labs = Lab.all
+    @lab = Lab.find(params[:id])
   end
 
   def startLabJSON

@@ -1,0 +1,13 @@
+<% content_for :body do %><h1>Editing lab_material</h1>
+
+<%= render 'form' %>
+
+<%end%>
+
+<% content_for :sidebar do %>
+<li><%= link_to 'Show', @lab_material %></li>
+<li><%= link_to 'Back', lab_materials_path %></li>
+<%end%>
+<% content_for :sidebar_head do %>
+<h1>lab_materials</h1>
+<%end%>

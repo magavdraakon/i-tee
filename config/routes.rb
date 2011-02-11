@@ -1,4 +1,7 @@
 ITee::Application.routes.draw do
+  
+  
+  resources :lab_materials
 
   devise_for :users
 
@@ -10,8 +13,12 @@ ITee::Application.routes.draw do
 
   resources :hosts
 
+
   # route, :to => 'controller#action'
+  
   match 'machines', :to => 'hosts#machines'
+  match 'error_401', :to => 'home#error_401'
+  
   match 'instances', :to => 'hosts#instances'
   match 'run', :to => 'hosts#run'
   match 'getInstanceJSON', :to => 'hosts#getInstanceJSON'
@@ -22,7 +29,7 @@ ITee::Application.routes.draw do
   match 'courses/:id', :to => 'labs#courses'
   match 'startLabJSON', :to => 'labs#startLabJSON'
 
-
+  
   # The priority is based upon order of creation:
   # first created -> highest priority.
 

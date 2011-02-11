@@ -4,4 +4,7 @@ class HomeController < ApplicationController
   def index
   end
 
+  def error_401
+    
+  end
 end

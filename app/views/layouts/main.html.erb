@@ -5,7 +5,7 @@
   <%= stylesheet_link_tag :all %>
   <%= javascript_include_tag :all %>
   <%= javascript_include_tag :ckeditor %>
-
+  
   <%= csrf_meta_tag %>
 </head>
 
@@ -47,10 +47,16 @@
         <% if user_signed_in? %>
           <li<% if params[:controller] == "home"%> class="selected" <% end %>><%= link_to('Home', :controller=>'home', :action=>'index')%></li>
           <li<% if params[:controller] == "labs"%> class="selected" <% end %>><%= link_to('Courses', :controller=>'labs', :action=>'courses', :id=>1)%></li>
-          <li<% if params[:controller] == "materials"%> class="selected" <% end %>><%= link_to('Materials', :controller=>'materials', :action=>'index')%></li>
-          <li<% if params[:controller] == "vms"%> class="selected" <% end %>><%= link_to('Vms', :controller=>'vms', :action=>'index')%></li>
+          
+           <% if !@admin then %>
+          <li<% if params[:controller] == "vms"%> class="selected" <% end %>><%= link_to('My machines', :controller=>'vms', :action=>'index')%></li>
+            <%end%>
           <% if @admin then %>
-            <li<% if params[:controller] == "hosts"%> class="selected" <% end %>><%= link_to('Administration', :controller => 'hosts', :action => 'instances')%></li>
+          <li<% if params[:controller] == "labs"%> class="selected" <% end %>><%= link_to('Labs', :controller=>'labs', :action=>'index')%></li>
+          <li<% if params[:controller] == "materials"%> class="selected" <% end %>><%= link_to('Materials', :controller=>'materials', :action=>'index')%></li>
+          <li<% if params[:controller] == "lab_materials"%> class="selected" <% end %>><%= link_to('Lab_materials', :controller=>'lab_materials', :action=>'index')%></li>
+          <li<% if params[:controller] == "vms"%> class="selected" <% end %>><%= link_to('Vms', :controller=>'vms', :action=>'index')%></li>
+          <li<% if params[:controller] == "hosts"%> class="selected" <% end %>><%= link_to('Administration', :controller => 'hosts', :action => 'instances')%></li>
           <% end %>
         <% end %>
       </ul>

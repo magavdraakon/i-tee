@@ -25,7 +25,7 @@
     <td><%= vm.ram %></td>
     <td><%= vm.hdd %></td>
     <td><%= vm.nic_count %></td>
-    <td><%= link_to 'Show', vm,:class=> 'edit-button button' %><%= link_to 'Edit', edit_vm_path(vm),:class=> 'edit-button button' %><%= link_to 'Destroy', vm, :confirm => 'Are you sure?', :method => :delete,:class=> 'delete-button button' %></td>
+    <td><%= link_to 'Show', vm,:class=> 'edit-button button' %><%= link_to 'Edit', edit_vm_path(vm),:class=> 'edit-button button' if @admin%><%= link_to 'Destroy', vm, :confirm => 'Are you sure?', :method => :delete,:class=> 'delete-button button' %></td>
   </tr>
 <% end %>
 </table>
@@ -38,8 +38,13 @@
 VM
   <%end%>
 <% content_for :sidebar do %>
-<li><%= link_to 'New VM', new_vm_path %>
-</li>
+<%#tavakasutaja ei saa endale masinaid juurde tekitada!%>
+<%#TODO: lingid näiteks näitamaks ainult aktiivseid masinaid, mitteaktiivseid masinaid etc%>
+ 
+ <% if @admin then %>
+<li><%= link_to 'New VM', new_vm_path %></li>
+<%end%>
+
 <%end%>
 
 

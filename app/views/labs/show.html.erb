@@ -20,7 +20,19 @@
 
 <p>
   <b>Description:</b>
-  <%= @lab.description %>
+  <%=raw @lab.description %>
 </p>
+<br/>
+<h3>materials</h3>
+<%  @lab.lab_materials.sort! { |a,b| a.sort <=> b.sort }
+%>
+<% @lab.lab_materials.each do |material| %>
+  <p><%=material.sort%>.
+  <%=link_to(material.material.name, :controller=>'materials', :action=>'show', :id=>material.material, :lab=>@lab)%>
+  
+ <%# link_to("remove",material, :method=>:delete)%>
+</p> 
+<%end%>
+<p><%=link_to 'Add materials', :controller=>'lab_materials', :action=>'new', :lab=>@lab %></p>
 </div>
 <%end%>

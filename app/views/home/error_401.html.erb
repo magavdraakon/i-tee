@@ -1,0 +1,10 @@
+<%= render :partial => "shared/no_permission" %>
+
+
+<% content_for :sidebar_head do %>
+  401
+<% end %>
+
+<% content_for :sidebar do %>
+  <li><%= link_to('Unauthorized', :controller=>'home', :action=>'index')%></li>
+<% end %>

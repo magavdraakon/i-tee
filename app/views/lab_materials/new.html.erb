@@ -1,0 +1,14 @@
+<% content_for :sidebar_head do %>
+  Lab materials
+<% end %>
+
+<% content_for :sidebar do %>
+    <li><%= link_to('back to lab', :controller=>'labs', :action=>'show', :id=>@lab) %></li>
+<% end %>
+
+<% content_for :body do %>
+<h1><%= @lab.name%></h1>
+
+<%= render 'form' %>
+
+<%end%>

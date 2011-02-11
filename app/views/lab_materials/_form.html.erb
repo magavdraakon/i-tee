@@ -1,0 +1,40 @@
+<%= form_for(@lab_material) do |f| %>
+  <% if @lab_material.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@lab_material.errors.count, "error") %> prohibited this lab_material from being saved:</h2>
+
+      <ul>
+      <% @lab_material.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%# f.label :lab_id %><!--<br />-->
+    <%# f.hidden_field_tag :lab_id, @lab.id %>
+    
+    <%= f.text_field :lab_id, :value =>@lab.id %>
+    <%#collection_select(:lab_material, :lab_id, @labs, :id, :name, {:index => @lab})%>
+   
+  </div>
+  <div class="field">
+    <%= f.label :material_id %><br />
+    <%# f.text_field :material_id %>
+    <%=collection_select(:lab_material, :material_id, @materials, :id, :name, {:prompt => true})%>
+<%#collection_select(:user, :role_id, @roles, :id, :role_title, {:prompt => true})
+%>
+  </div>
+  <div class="field">
+    <%= f.label :description %><br />
+    <%= f.text_area :description %>
+  </div>
+  <div class="field">
+    <%= f.label :sort %><br />
+    <%= f.text_field :sort, :value=>'0' %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

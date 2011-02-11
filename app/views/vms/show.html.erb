@@ -4,7 +4,9 @@
 
 
 <% content_for :sidebar do %>
-    <li><%= link_to 'Edit', edit_vm_path(@host) %></li>
+     <% if @admin then %>
+      <li><%= link_to 'Edit', edit_vm_path(@host) %></li>
+      <%end%>
     <li><%= link_to 'Back', vms_path %></li>
 <% end %>
 

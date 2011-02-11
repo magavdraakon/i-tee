@@ -30,4 +30,13 @@ class ApplicationController < ActionController::Base
       @admin = false
     end
   end
+  
+  def authorise_as_admin
+    unless ITee::Application.config.admins.include?(current_user.username)
+      #You don't belong here. Go away.
+      flash[:alert]  = "Restricted access!"
+        redirect_to (:controller=>'home', :action=>'error_401')
+      end
+    end
+  
 end
