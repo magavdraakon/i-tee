@@ -1,0 +1,18 @@
+
+<% content_for :body do %>
+  <div class="head">Editing VMT in Lab</div>
+  <div class="hr"></div>
+  <div class="text-box round">
+    <%= render 'form' %>
+  </div>
+<% end %>
+
+
+<% content_for :sidebar_head do %>
+  VMT in labs
+<% end %>
+
+<% content_for :sidebar do %>
+    <li><%= link_to 'Show', @lab_vmt %></li>
+    <li><%= link_to 'Back', lab_vmts_path %></li>
+<% end %>

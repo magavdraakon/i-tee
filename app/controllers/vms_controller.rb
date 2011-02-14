@@ -1,6 +1,6 @@
 class VmsController < ApplicationController
   layout 'main'
-  before_filter :authorise_as_admin, :except => [:index, :show, :delete]
+  before_filter :authorise_as_admin
 
   # GET /vms
   # GET /vms.xml

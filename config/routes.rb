@@ -1,6 +1,10 @@
 ITee::Application.routes.draw do
   
   
+  resources :lab_vmts
+
+  resources :vmts
+
   resources :lab_materials
 
   devise_for :users

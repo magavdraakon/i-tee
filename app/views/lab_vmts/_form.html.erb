@@ -1,0 +1,36 @@
+<%= form_for(@lab_vmt) do |f| %>
+  <% if @lab_vmt.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@lab_vmt.errors.count, "error") %> prohibited this lab_vmt from being saved:</h2>
+
+      <ul>
+      <% @lab_vmt.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :name %><br />
+    <%= f.text_field :name %>
+  </div>
+  <div class="field">
+    <%if @lab!=0%>
+    <%= f.text_field :lab_id, :value =>@lab.id %>
+    <%else%>
+    <%# f.text_field :lab_id %>
+     <%= f.label :lab_id %><br />
+    <%=collection_select(:lab_vmt, :lab_id, @labs, :id, :name)%>
+    <%end%>
+    
+  </div>
+  <div class="field">
+    <%= f.label :vmt_id %><br />
+    <%# f.text_field :vmt_id %>
+    <%=collection_select(:lab_vmt, :vmt_id, @vmts, :id, :image)%>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

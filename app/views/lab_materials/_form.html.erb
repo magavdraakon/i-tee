@@ -14,8 +14,13 @@
   <div class="field">
     <%# f.label :lab_id %><!--<br />-->
     <%# f.hidden_field_tag :lab_id, @lab.id %>
-    
+    <%if @lab!=0%>
     <%= f.text_field :lab_id, :value =>@lab.id %>
+    <%else%>
+    <%# f.text_field :lab_id %>
+     <%= f.label :lab_id %><br />
+    <%=collection_select(:lab_material, :lab_id, @labs, :id, :name)%>
+    <%end%>
     <%#collection_select(:lab_material, :lab_id, @labs, :id, :name, {:index => @lab})%>
    
   </div>

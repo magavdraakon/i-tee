@@ -1,7 +1,7 @@
 
 
 <% content_for :sidebar_head do %>
-  VM
+  Virtual Machines
 <% end %>
 
 <% content_for :sidebar do %>
@@ -11,7 +11,7 @@
 
  <% if @admin then %>
 <% content_for :body do %>
-  <div class="head">Editing VM</div>
+  <div class="head">Editing virtual machine</div>
   <div class="hr"></div>
   <div class="text-box round">
     <%= render 'form' %>

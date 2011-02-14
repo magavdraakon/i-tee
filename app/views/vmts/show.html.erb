@@ -1,0 +1,30 @@
+<% content_for :sidebar_head do %>
+  Virtual Machine Templates
+<% end %>
+<% content_for :sidebar do %>
+     <% if @admin then %>
+      <li><%= link_to 'Edit', edit_vmt_path(@vmt) %></li>
+      <%end%>
+    <li><%= link_to 'Back', vmts_path %></li>
+<% end %>
+
+<% content_for :body do %>
+<div class="text-box round">
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Image:</b>
+  <%= @vmt.image %>
+</p>
+
+<p>
+  <b>Xml script:</b>
+  <%= @vmt.xml_script %>
+</p>
+
+<p>
+  <b>Private:</b>
+  <%= @vmt.private %>
+</p>
+</div>
+<%end%>

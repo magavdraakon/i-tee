@@ -28,8 +28,9 @@
 Labs
   <%end%>
 <% content_for :sidebar do %>
-<li><%= link_to 'New Lab', new_lab_path %>
-</li>
+<li><%= link_to 'New Lab', new_lab_path %></li>
+<li><%= link_to 'Add materials to lab', :controller=>'lab_materials', :action=>'new' %></li>
+<li><%= link_to 'Add VMTs to lab', new_lab_vmt_path %></li>
 <%end%>
 
 

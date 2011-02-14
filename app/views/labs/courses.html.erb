@@ -41,10 +41,6 @@ jQuery(document).ready(function() {
 <% end %>
 
 <% content_for :sidebar do %>
-  <% if @admin then %>
-  <li><%= link_to 'New Lab', new_lab_path %></li>
-  <% end %>
-
   <% @labs.each do |lab| %>
     <li><%= link_to(lab.name, :controller=>'labs', :action=>'courses', :id=>lab.id)%></li>
   <% end %>
@@ -57,8 +53,9 @@ jQuery(document).ready(function() {
     <%= raw @lab.description %>
     <br/>
     <h3>materials</h3>
-<% @lab.lab_materials.each do |material| %>
-  <p><%=link_to(material.material.name, :controller=>'materials', :action=>'show', :id=>material.material)%> 
+    <%  @lab.lab_materials.sort! { |a,b| a.sort <=> b.sort }%>
+    <% @lab.lab_materials.each do |material| %>
+    <p><%=link_to(material.material.name, :controller=>'materials', :action=>'show', :id=>material.material)%> 
   <%# link_to('Destroy', material, :method => :delete) %>
 </p> 
 <%end%>

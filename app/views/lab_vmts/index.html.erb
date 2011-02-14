@@ -1,0 +1,34 @@
+<% content_for :body do %>
+<div class="head">Listing VMTs in labs</div>
+ <div class="hr"></div>
+ <div class="text-box">
+    <div id="content-table">
+<table>
+   <caption >Templates in labs (<%= @lab_vmts.count  %>)</caption>
+  <thead>
+    <tr>
+    <th>Name</th>
+    <th>Lab</th>
+    <th>Vmt</th>
+    <th></th>
+   
+  </tr>
+</thead>
+
+<% @lab_vmts.each do |lab_vmt| %>
+  <tr>
+    <td><%= lab_vmt.name %></td>
+    <td><%= lab_vmt.lab.name %></td>
+    <td><%= lab_vmt.vmt.image %></td>
+    <td><%= link_to 'Show', lab_vmt,:class=> 'edit-button button' %><%= link_to 'Edit', edit_lab_vmt_path(lab_vmt),:class=> 'edit-button button' %><%= link_to 'Destroy', lab_vmt, :confirm => 'Are you sure?', :method => :delete ,:class=> 'delete-button button'%></td>
+  </tr>
+<% end %>
+</table>
+<%end%>
+<% content_for :sidebar_head do %>
+VMT in labs
+  <%end%>
+<% content_for :sidebar do %>
+<li><%= link_to 'Add VMT to lab', new_lab_vmt_path %></li>
+
+<%end%>

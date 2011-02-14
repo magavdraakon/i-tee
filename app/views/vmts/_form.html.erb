@@ -1,0 +1,29 @@
+<%= form_for(@vmt) do |f| %>
+  <% if @vmt.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@vmt.errors.count, "error") %> prohibited this vmt from being saved:</h2>
+
+      <ul>
+      <% @vmt.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :image %><br />
+    <%= f.text_field :image %>
+  </div>
+  <div class="field">
+    <%= f.label :xml_script %><br />
+    <%= f.text_field :xml_script %>
+  </div>
+  <div class="field">
+    <%= f.label :private %><br />
+    <%= f.text_area :private %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

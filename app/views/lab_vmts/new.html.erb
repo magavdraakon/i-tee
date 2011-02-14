@@ -1,27 +1,30 @@
 <% @lab=0 if @lab==nil%>
 <% content_for :sidebar_head do %>
-  Lab materials
+  VMT in labs
 <% end %>
 
 <% content_for :sidebar do %>
-  <%if @lab!=0%>
-    <li><%= link_to('back to lab', :controller=>'labs', :action=>'show', :id=>@lab) %></li>
+ <%if @lab!=0%>
+    <li><%= link_to('Back to lab', :controller=>'labs', :action=>'show', :id=>@lab) %></li>
     <%else%>
-    <li><%= link_to('back to labs', :controller=>'labs', :action=>'index') %></li>
+    <li><%= link_to('Back to labs', :controller=>'labs', :action=>'index') %></li>
     <%end%>
+ 
+
 <% end %>
+
 
 <% content_for :body do %>
 <div class="head">
 <%if @lab!=0%>
 <%= @lab.name%>
 <%else%>
-Add material
-<%end%>
-</div>
+Add VMT
+<%end%></div>
 <div class="hr"></div>
 <div class="text-box round">
 
 <%= render 'form' %>
 
-<%end%>
+</div>
+<% end %>
