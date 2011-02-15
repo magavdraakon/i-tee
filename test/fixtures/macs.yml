@@ -1,0 +1,11 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  mac: MyString
+  ip: MyString
+  vm_id: 1
+
+two:
+  mac: MyString
+  ip: MyString
+  vm_id: 1

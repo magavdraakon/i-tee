@@ -16,25 +16,21 @@
     <%= f.text_field :name %>
   </div>
   <div class="field">
-    <%= f.label :image_id %><br />
-    <%= f.text_field :image_id %>
+    <%= f.label :lab_vmt_id %><br />
+    <%# f.text_field :template_id %>
+    <%=collection_select(:vm, :lab_vmt_id, @templates, :id, :menustr)%>
+       <%#TODO add list of templates here? %>
   </div>
   <div class="field">
-    <%= f.label :lab_id %><br />
-    <%= f.text_field :lab_id %>
+    <%= f.label :user_id %><br />
+    <%# f.text_field :user_id %>
+    <%=collection_select(:vm, :user_id, User.all, :id, :username)%>
   </div>
   <div class="field">
-    <%= f.label :ram %><br />
-    <%= f.text_field :ram %>
+    <%= f.label :description %><br />
+    <%= f.text_area :description %>
   </div>
-  <div class="field">
-    <%= f.label :hdd %><br />
-    <%= f.text_field :hdd %>
-  </div>
-  <div class="field">
-    <%= f.label :nic_count %><br />
-    <%= f.text_field :nic_count %>
-  </div>
+  
   <div class="actions">
     <%= f.submit %>
   </div>

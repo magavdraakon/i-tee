@@ -1,12 +1,11 @@
 class VmsController < ApplicationController
   layout 'main'
-  before_filter :authorise_as_admin
+  before_filter :authorise_as_admin, :except => [:show, :index]
 
   # GET /vms
   # GET /vms.xml
   def index
-    @vms = Vm.all
-
+    @vms = Vm.all      
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @vms }
@@ -28,7 +27,7 @@ class VmsController < ApplicationController
   # GET /vms/new.xml
   def new
     @vm = Vm.new
-
+    @templates=LabVmt.all
     respond_to do |format|
       format.html # new.html.erb
       format.xml  { render :xml => @vm }
@@ -38,6 +37,7 @@ class VmsController < ApplicationController
   # GET /vms/1/edit
   def edit
     @vm = Vm.find(params[:id])
+    @templates=LabVmt.all
   end
 
   # POST /vms

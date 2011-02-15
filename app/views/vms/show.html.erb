@@ -1,3 +1,5 @@
+
+
 <% content_for :sidebar_head do %>
   Virtual Machines
 <% end %>
@@ -21,30 +23,33 @@
 </p>
 
 <p>
-  <b>Image:</b>
-  <%= @vm.image_id %>
+  <b>Template:</b>
+  <%= @vm.lab_vmt.name %>
 </p>
 
 <p>
   <b>Lab:</b>
-  <%= @vm.lab_id %>
+  <%= @vm.lab_vmt.lab.name %>
 </p>
 
 <p>
-  <b>Ram:</b>
-  <%= @vm.ram %>
+  <b>IP:</b>
+  <%= @vm.mac.ip if @vm.mac!=nil%>
 </p>
 
 <p>
-  <b>Hdd:</b>
-  <%= @vm.hdd %>
+  <b>Mac:</b>
+  <%= @vm.mac.mac if @vm.mac!=nil %>
 </p>
 
 <p>
-  <b>Nic count:</b>
-  <%= @vm.nic_count %>
+  <b>User:</b>
+  <%= @vm.user.username %>
 </p>
 
-
+<p>
+  <b>Description:</b>
+  <%= @vm.description %>
+</p>
 </div> 
 <% end %>

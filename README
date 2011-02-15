@@ -100,6 +100,8 @@ bundle install
 Now migrate the database
 RAILS_ENV=production rake db:migrate
 
+Add default data to the tables
+rake db:seed
 
 install passenger for hosting rails applications 
 gem install passenger
