@@ -46,7 +46,7 @@
       <ul>
         <% if user_signed_in? %>
           <li<% if params[:controller] == "home"%> class="selected" <% end %>><%= link_to('Home', :controller=>'home', :action=>'index')%></li>
-          <li<% if params[:controller] == "labs"%> class="selected" <% end %>><%= link_to('Courses', :controller=>'labs', :action=>'courses', :id=>1)%></li>
+          <li<% if params[:controller] == "labs"%> class="selected" <% end %>><%= link_to('Courses', :controller=>'labs', :action=>'courses')%></li>
           
            <% if !@admin then %>
           <li<% if params[:controller] == "vms"%> class="selected" <% end %>><%= link_to('My machines', :controller=>'vms', :action=>'index')%></li>

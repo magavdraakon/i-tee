@@ -12,8 +12,8 @@
  <caption >Lab_materials (<%= @lab_materials.count  %>)</caption>
   <thead>
   <tr>
-    <th>Lab</th>
-    <th>Material</th>
+    <th><%=link_to("Lab", :controller=>"lab_materials",:action=>"index", :sort_by=>"lab_id")%></th>
+    <th><%=link_to("Material", :controller=>"lab_materials",:action=>"index", :sort_by=>"material_id")%></th>
     <th>Description</th>
     <th>Sort</th>
     <th></th>

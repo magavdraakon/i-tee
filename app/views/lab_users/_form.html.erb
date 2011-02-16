@@ -1,0 +1,46 @@
+<%= form_for(@lab_user) do |f| %>
+  <% if @lab_user.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@lab_user.errors.count, "error") %> prohibited this lab_user from being saved:</h2>
+
+      <ul>
+      <% @lab_user.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :lab_id %><br /> 
+     <%=collection_select(:lab_user, :lab_id, Lab.all, :id, :name)%>
+  </div>
+  <div class="field">
+    <%= f.label :user_id %><br />
+     <%=collection_select(:lab_user, :user_id, User.all, :id, :username)%>
+  </div>
+  <div class="field">
+    <%= f.label :progress %><br />
+    <%= f.text_field :progress %>
+  </div>
+  <div class="field">
+    <%= f.label :result %><br />
+    <%= f.text_field :result %>
+  </div><!--
+  <div class="field">
+    <%# f.label :start %><br />
+    <%# f.datetime_select :start %>
+  </div>
+  <div class="field">
+    <%# f.label :pause %><br />
+    <%# f.datetime_select :pause %>
+  </div>
+  <div class="field">
+    <%# f.label :end %><br />
+    <%# f.datetime_select :end %>
+  </div>
+  -->
+  <div class="actions">
+    <%= f.submit "Submit"%>
+  </div>
+<% end %>

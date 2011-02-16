@@ -5,8 +5,7 @@ class LabMaterialsController < ApplicationController
 
   
   def index
-    @lab_materials = LabMaterial.all
-
+    @lab_materials = LabMaterial.find(:all, :order=>params[:sort_by])
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @lab_materials }

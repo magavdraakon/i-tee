@@ -1,25 +1,16 @@
 class LabVmtsController < ApplicationController
   # GET /lab_vmts
   # GET /lab_vmts.xml
+  before_filter :authorise_as_admin
   def index
-    @lab_vmts = LabVmt.all
-
+    @lab_vmts = LabVmt.find(:all, :order=>params[:sort_by])
+    @lab_vmt = LabVmt.new
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @lab_vmts }
     end
   end
-
-  # GET /lab_vmts/1
-  # GET /lab_vmts/1.xml
-  def show
-    @lab_vmt = LabVmt.find(params[:id])
-
-    respond_to do |format|
-      format.html # show.html.erb
-      format.xml  { render :xml => @lab_vmt }
-    end
-  end
+  
 
   # GET /lab_vmts/new
   # GET /lab_vmts/new.xml
@@ -39,7 +30,7 @@ class LabVmtsController < ApplicationController
   # GET /lab_vmts/1/edit
   def edit
     @lab_vmt = LabVmt.find(params[:id])
-    @lab=LabVmt.lab
+    @lab=@lab_vmt.lab
     @labs= Lab.all
     @vmts= Vmt.all
   end
@@ -51,7 +42,7 @@ class LabVmtsController < ApplicationController
 
     respond_to do |format|
       if @lab_vmt.save
-        format.html { redirect_to(@lab_vmt, :notice => 'Lab vmt was successfully created.') }
+        format.html { redirect_to(lab_vmts_url, :notice => 'Lab vmt was successfully created.') }
         format.xml  { render :xml => @lab_vmt, :status => :created, :location => @lab_vmt }
       else
         format.html { render :action => "new" }
@@ -67,7 +58,7 @@ class LabVmtsController < ApplicationController
 
     respond_to do |format|
       if @lab_vmt.update_attributes(params[:lab_vmt])
-        format.html { redirect_to(@lab_vmt, :notice => 'Lab vmt was successfully updated.') }
+        format.html { redirect_to(lab_vmts_url, :notice => 'Lab vmt was successfully updated.') }
         format.xml  { head :ok }
       else
         format.html { render :action => "edit" }

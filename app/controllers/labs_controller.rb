@@ -85,8 +85,22 @@ class LabsController < ApplicationController
   end
 
   def courses
-    @labs = Lab.all
-    @lab = Lab.find(params[:id])
+    @labs=[] #only let the users pick from labs assigned to them
+     current_user.lab_users.each do |u|
+        @labs<<u.lab
+      end 
+    
+    if params[:id]!=nil then
+      @lab = Lab.find(params[:id])
+    else
+      @lab=@labs.first 
+    end
+    
+    @allowed=false    # to avoid users from seeing labs, that arent for them
+    if @labs.include?(@lab) then
+      @allowed=true
+    end
+    
   end
 
   def startLabJSON

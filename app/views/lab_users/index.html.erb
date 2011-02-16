@@ -1,0 +1,62 @@
+<% content_for :body do %>
+<div class="head">Listing users in labs</div>
+ <div class="hr"></div>
+ <div class="text-box">
+<p id="notice"><%= notice %></p>
+    <div id="content-table">
+<table>
+   <caption >users in labs (<%= @lab_users.count  %>)</caption>
+  <thead>
+  <tr>
+    <th><%=link_to("Lab", :controller=>"lab_users",:action=>"index", :sort_by=>"lab_id")%></th>
+    <th><%=link_to("User", :controller=>"lab_users",:action=>"index", :sort_by=>"user_id")%></th>
+    <th>Progress</th>
+    <th>Result</th>
+    <th>Start</th>
+    <th>Pause</th>
+    <th>End</th>
+    <th></th>
+   
+  </tr>
+</thead>
+
+
+<% @lab_users.each do |lab_user| %>
+  <tr>
+    <td><%= lab_user.lab.name %></td>
+    <td><%= lab_user.user.username %></td>
+    <td><%= lab_user.progress %></td>
+    <td><%= lab_user.result %></td>
+    <td><%= lab_user.start %></td>
+    <td><%= lab_user.pause %></td>
+    <td><%= lab_user.end %></td>
+    <td><%# link_to 'Show', lab_user,:class=> 'edit-button button' %><%= link_to 'Edit', edit_lab_user_path(lab_user) ,:class=> 'edit-button button'%><%= link_to 'Destroy', lab_user, :confirm => 'Are you sure?', :method => :delete,:class=> 'delete-button button' %></td>
+  </tr>
+<% end %>
+</table>
+ </div>
+
+<%= form_for(@lab_user) do |f| %>
+<table>
+<tr>
+  
+<td>
+<%=collection_select(:lab_user, :lab_id, Lab.all, :id, :name)%>
+</td>
+<td>
+<%=collection_select(:lab_user, :user_id, User.all, :id, :username)%>
+</td>
+<td><%= f.submit "Add"%> </td>
+</tr>
+</table>
+<%end%>
+  </div>
+<%end%>
+<% content_for :sidebar_head do %>
+Users in Labs
+  <%end%>
+<% content_for :sidebar do %>
+
+<li></li>
+
+<%end%>

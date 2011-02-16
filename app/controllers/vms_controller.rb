@@ -5,7 +5,12 @@ class VmsController < ApplicationController
   # GET /vms
   # GET /vms.xml
   def index
-    @vms = Vm.all      
+    if @admin then
+    @vms = Vm.all 
+  else
+    #@vms=Vm.find(:all, :conditions=>["user_id=?",current_user])
+    @vms=current_user.vms
+  end
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @vms }
@@ -16,7 +21,7 @@ class VmsController < ApplicationController
   # GET /vms/1.xml
   def show
     @vm = Vm.find(params[:id])
-
+    
     respond_to do |format|
       format.html # show.html.erb
       format.xml  { render :xml => @vm }

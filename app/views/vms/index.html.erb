@@ -18,20 +18,7 @@
   </tr>
 </thead>
 <% @vms.each do |vm| %>
-  <%if !@admin then%>
-  
-    <%if current_user.username==vm.user.username then%>
-  <tr>
-    <td><%= vm.name %></td>
-    <td><%= vm.lab_vmt.name%> </td>
-    <td><%= vm.lab_vmt.lab.name%> </td>
-    <td><%= vm.user.username %></td>
-    <td><%= vm.description %></td>
-    <td><%= vm.mac.ip if vm.mac!=nil %></td>
-    <td><%= link_to 'Show', vm,:class=> 'edit-button button' %><%= link_to 'Destroy', vm, :confirm => 'Are you sure?', :method => :delete,:class=> 'delete-button button' %></td>
-  </tr>
-  <%end%>
-  <%else%>
+ 
   <tr>
     <td><%= vm.name %></td>
     <td><%= vm.lab_vmt.name%> </td>
@@ -42,7 +29,7 @@
     <td><%= link_to 'Show', vm,:class=> 'edit-button button' %><%= link_to 'Edit', edit_vm_path(vm),:class=> 'edit-button button' if @admin%><%= link_to 'Destroy', vm, :confirm => 'Are you sure?', :method => :delete,:class=> 'delete-button button' %></td>
   </tr>
   
-  <%end%>
+ 
 <% end %>
 </table>
 

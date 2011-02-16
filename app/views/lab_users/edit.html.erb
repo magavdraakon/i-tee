@@ -1,0 +1,16 @@
+<% content_for :body do %>
+  <div class="head">Editing user in lab</div>
+  <div class="hr"></div>
+  <div class="text-box round">
+<%= render 'form' %>
+</div>
+<%end%>
+
+<% content_for :sidebar_head do %>
+Users in Labs
+  <%end%>
+
+<% content_for :sidebar do %>
+<li><%= link_to 'Back', lab_users_path %></li>
+
+<%end%>

@@ -1,6 +1,8 @@
 ITee::Application.routes.draw do
   
   
+  resources :lab_users
+
   resources :lab_vmts
 
   resources :vmts
@@ -30,6 +32,7 @@ ITee::Application.routes.draw do
   match 'getUsersJSON', :to => 'hosts#getUsersJSON'
   match 'terminate/:id', :to => 'hosts#terminate'
 
+  match 'courses', :to =>'labs#courses'
   match 'courses/:id', :to => 'labs#courses'
   match 'startLabJSON', :to => 'labs#startLabJSON'
 

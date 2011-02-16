@@ -46,6 +46,8 @@ jQuery(document).ready(function() {
   <% end %>
 <% end %>
 
+<%if @allowed || @admin then%>
+
 <% content_for :body do %>
   <div class="head"><%=  @lab.name %></div>
   <div class="hr"></div>
@@ -64,3 +66,6 @@ jQuery(document).ready(function() {
 
 <a class="add-button button startCourse">Start</a>
 <% end %>
+<%else%>
+<%= render :partial => "shared/no_permission" %>
+<%end%>

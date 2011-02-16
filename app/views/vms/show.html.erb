@@ -13,6 +13,7 @@
 <% end %>
 
 <% content_for :body do %>
+  <%  if @vm.user.username==current_user.username || @admin then%>
 <div class="text-box round">
 
 <p id="notice"><%= notice %></p>
@@ -52,4 +53,7 @@
   <%= @vm.description %>
 </p>
 </div> 
+<%else%>
+<%= render :partial => "shared/no_permission" %>
+<%end%>
 <% end %>
