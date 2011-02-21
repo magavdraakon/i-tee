@@ -1,19 +1,27 @@
 #!/bin/bash
-if [ $# -ne 2 ]
+if [ $# -ne 3 ]
 then 
-echo "anna kaks argumenti"
+echo "anna kolm argumenti (mac template name)"
 
 exit 1
 fi
 
 MAC=$1
 TEMPLATE=$2
+NAME=$3
+VIRT_DIR="/var/lib/libvirt/images"
+IMAGE=$VIRT_DIR/$NAME.img
+XML=/etc/libvirt/qemu/$NAME.xml
 
-echo "tekitan virtuaalmasina template-ist $TEMPLATE Mac aadressiga $MAC"
-
-cat > masin.xml << LOPP
+echo "tekitan virtuaalmasina $NAME template-ist $TEMPLATE Mac aadressiga $MAC"
+#luua TEMPLATE põhjal koopia IMAGE
+echo "alustan kopeerimist"
+cp $TEMPLATE $IMAGE
+chown libvirt-qemu:kvm $IMAGE 
+echo "masin kopeeritud"
+cat > $XML << LOPP
 <domain type='kvm'>
-  <name>test</name>
+  <name>$NAME</name>
   <uuid>$(uuid)</uuid>
   <memory>524288</memory>
   <currentMemory>524288</currentMemory>
@@ -35,7 +43,7 @@ cat > masin.xml << LOPP
     <emulator>/usr/bin/kvm</emulator>
     <disk device='disk' type='file'>
       <driver name='qemu' type='raw'/>
-      <source file='/var/lib/libvirt/images/test-1.img'/>
+      <source file='$IMAGE'/>
       <target bus='virtio' dev='vda'/>
       <address bus='0x00' domain='0x0000' type='pci' function='0x0' slot='0x05'/>
     </disk>
@@ -76,4 +84,7 @@ cat > masin.xml << LOPP
   </devices>
 </domain>
 LOPP
+
+virsh -c qemu:///system create $XML
+echo "masin loodud"
 
