@@ -11,6 +11,7 @@ ITee::Application.routes.draw do
 
   devise_for :users
 
+
   resources :vms
 
   resources :materials
@@ -32,6 +33,8 @@ ITee::Application.routes.draw do
   match 'getUsersJSON', :to => 'hosts#getUsersJSON'
   match 'terminate/:id', :to => 'hosts#terminate'
 
+  match 'add_users', :to=> 'lab_users#add_users'
+  match 'profile', :to=>'home#profile'
   match 'courses', :to =>'labs#courses'
   match 'courses/:id', :to => 'labs#courses'
   match 'startLabJSON', :to => 'labs#startLabJSON'

@@ -46,12 +46,21 @@ jQuery(document).ready(function() {
   <% end %>
 <% end %>
 
-<%if @allowed || @admin then%>
+<%if @allowed || @admin || @labs==[] then%>
 
 <% content_for :body do %>
-  <div class="head"><%=  @lab.name %></div>
+  <div class="head"><%if @labs==[] then%>
+    No labs
+    <%else%>
+    <%=  @lab.name %>
+    <%end%></div>
   <div class="hr"></div>
   <div class="text-box">
+  <%if @labs==[] then%>
+  You dont have any labs assigned!
+    <%else%>
+    
+   
     <%= raw @lab.description %>
     <br/>
     <h3>materials</h3>
@@ -61,10 +70,11 @@ jQuery(document).ready(function() {
   <%# link_to('Destroy', material, :method => :delete) %>
 </p> 
 <%end%>
-    
+ <%end%>    
   </div>
-
+<%if @labs!=[] then%>
 <a class="add-button button startCourse">Start</a>
+<%end%>
 <% end %>
 <%else%>
 <%= render :partial => "shared/no_permission" %>

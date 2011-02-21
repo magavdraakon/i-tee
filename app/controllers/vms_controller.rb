@@ -21,7 +21,7 @@ class VmsController < ApplicationController
   # GET /vms/1.xml
   def show
     @vm = Vm.find(params[:id])
-    
+    @vm.state="started"
     respond_to do |format|
       format.html # show.html.erb
       format.xml  { render :xml => @vm }
@@ -89,4 +89,5 @@ class VmsController < ApplicationController
     end
   end
 
+  
 end

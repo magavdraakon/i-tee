@@ -3,4 +3,17 @@ class Vm < ActiveRecord::Base
   belongs_to :user
   belongs_to :lab_vmt
 
+   attr_accessor :state
+  
+  def state=(val)
+    @state=val
+  end
+  
+  def state?
+    if @state==nil
+      "stopped"
+    else
+      @state
+    end
+  end
 end

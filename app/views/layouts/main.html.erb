@@ -26,8 +26,8 @@
 
       <div id="control" class="column span-11">
         <ul><% if user_signed_in? %>
-          <li><a href="" class="profile">User Profile</a></li>
-          <li><a href="" class="settings">Settings</a></li>
+          <li><%=link_to("User profile", profile_path, :class=> 'profile')%></li>
+          <li><%=link_to("Settings", edit_user_registration_path, :class=> 'settings')%></li>
           <% end %>
         </ul>
       </div>
@@ -45,19 +45,19 @@
     <div id="menu">
       <ul>
         <% if user_signed_in? %>
-          <li<% if params[:controller] == "home"%> class="selected" <% end %>><%= link_to('Home', :controller=>'home', :action=>'index')%></li>
-          <li<% if params[:controller] == "labs"%> class="selected" <% end %>><%= link_to('Courses', :controller=>'labs', :action=>'courses')%></li>
+          <li<% if params[:controller] == "home"%> class="selected" <% end %>><%= link_to('Home', root_path)%></li>
+          <li<% if params[:controller] == "labs"%> class="selected" <% end %>><%= link_to('Courses', courses_path)%></li>
           
            <% if !@admin then %>
-          <li<% if params[:controller] == "vms"%> class="selected" <% end %>><%= link_to('My machines', :controller=>'vms', :action=>'index')%></li>
+          <li<% if params[:controller] == "vms"%> class="selected" <% end %>><%= link_to('My machines', vms_path)%></li>
             <%end%>
           <% if @admin then %>
-          <li<% if params[:controller] == "labs"%> class="selected" <% end %>><%= link_to('Labs', :controller=>'labs', :action=>'index')%></li>
-          <li<% if params[:controller] == "materials"%> class="selected" <% end %>><%= link_to('Materials', :controller=>'materials', :action=>'index')%></li>
+          <li<% if params[:controller] == "labs"%> class="selected" <% end %>><%= link_to('Labs', labs_path)%></li>
+          <li<% if params[:controller] == "materials"%> class="selected" <% end %>><%= link_to('Materials', materials_path)%></li>
           <li<% if params[:controller] == "lab_materials"%> class="selected" <% end %>><%# link_to('Lab_materials', :controller=>'lab_materials', :action=>'index')%></li>
-          <li<% if params[:controller] == "vms"%> class="selected" <% end %>><%= link_to('Vms', :controller=>'vms', :action=>'index')%></li>
-          <li<% if params[:controller] == "vmts"%> class="selected" <% end %>><%= link_to('Vmts', :controller=>'vmts', :action=>'index')%></li>
-          <li<% if params[:controller] == "hosts"%> class="selected" <% end %>><%= link_to('Administration', :controller => 'hosts', :action => 'instances')%></li>
+          <li<% if params[:controller] == "vms"%> class="selected" <% end %>><%= link_to('Vms', vms_path)%></li>
+          <li<% if params[:controller] == "vmts"%> class="selected" <% end %>><%= link_to('Vmts', vmts_path)%></li>
+          <li<% if params[:controller] == "hosts"%> class="selected" <% end %>><%= link_to('Administration', instances_path)%></li>
           <% end %>
         <% end %>
       </ul>

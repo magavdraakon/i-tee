@@ -22,10 +22,32 @@ class LabUsersController < ApplicationController
   # POST /lab_users
   # POST /lab_users.xml
   def create
-    @lab_user = LabUser.new(params[:lab_user])
 
+     if params[:lab_user][:page]=='bulk_add' then
+      all_users=User.all
+      checked_users=get_users_from(params[:users])
+      removed_users=all_users-checked_users
+      lab=params[:lab_user][:lab_id]
+      
+      checked_users.each do |c|
+        l=LabUser.new
+        l.lab_id=lab
+        l.user_id=c.id
+        if LabUser.find(:first, :conditions=>["lab_id=? and user_id=?", lab, c.id])==nil then
+          l.save
+        end
+      end
+      removed_users.each do |d|
+        l=LabUser.find(:first, :conditions=>["lab_id=? and user_id=?", lab, d.id])
+        l.delete if l!=nil
+      end
+      redirect_to(lab_users_url, :notice => 'Lab user was successfully created.')
+    else
+      
+       @lab_user = LabUser.new(params[:lab_user])
     respond_to do |format|
       if @lab_user.save
+        
         format.html { redirect_to(lab_users_url, :notice => 'Lab user was successfully created.') }
         format.xml  { render :xml => @lab_user, :status => :created, :location => @lab_user }
       else
@@ -34,12 +56,13 @@ class LabUsersController < ApplicationController
       end
     end
   end
+  end
 
   # PUT /lab_users/1
   # PUT /lab_users/1.xml
   def update
     @lab_user = LabUser.find(params[:id])
-
+    
     respond_to do |format|
       if @lab_user.update_attributes(params[:lab_user])
         format.html { redirect_to(lab_users_url, :notice => 'Lab user was successfully updated.') }
@@ -61,5 +84,16 @@ class LabUsersController < ApplicationController
       format.html { redirect_to(lab_users_url) }
       format.xml  { head :ok }
     end
+  end
+  
+  def add_users
+    @lab_users = LabUser.all
+    @lab_user = LabUser.new
+    
+  end
+  private #-----------------------------------------------
+  def get_users_from(u_list)
+    u_list=[] if u_list.blank?
+    return u_list.collect{|u| User.find_by_id(u.to_i)}.compact
   end
 end

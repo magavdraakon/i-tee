@@ -1,0 +1,37 @@
+
+<% content_for :body do %>
+<div class="head">Add users in labs</div>
+ <div class="hr"></div>
+ <div class="text-box">
+<p id="notice"><%= notice %></p>
+
+<%= form_for(@lab_user) do |f| %>
+<table>
+  <tr>
+<td>
+<%= f.hidden_field :page, :value=>'bulk_add'%>
+<%=collection_select(:lab_user, :lab_id, Lab.all, :id, :name)%>
+</td>
+<td>
+  <ul>
+<%User.all.each do |u|%>
+  <li><%= check_box_tag('users[]',u.id)%> <%=u.username%></li>
+<%end%>
+</ul>
+<%#collection_select(:lab_user, :user_id, User.all, :id, :username)%>
+</td>
+</tr>
+</table>
+<%= f.submit "Add"%> 
+
+<%end%>
+  </div>
+<%end%>
+<% content_for :sidebar_head do %>
+Users in Labs
+  <%end%>
+<% content_for :sidebar do %>
+
+<li><%=link_to 'back', lab_users_path%></li>
+
+<%end%>
