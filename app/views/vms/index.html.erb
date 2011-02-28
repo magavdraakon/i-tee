@@ -29,8 +29,10 @@
     <td><%= vm.description %></td>
     <td><%= vm.mac.ip if vm.mac!=nil %></td>
     <td><%= vm.state? %>
-    <%= link_to('S', :action=>'init_vm', :id=>vm.id) if vm.state?()=='uninitialized'%>
-     
+    <%= link_to('Init', :action=>'init_vm', :id=>vm.id) if vm.state?()=='uninitialized'%>
+    <%= link_to('Pause', :action=>'pause_vm', :id=>vm.id) if vm.state?()=='uninitialized'%>
+    <%= link_to('Resume', :action=>'resume_vm', :id=>vm.id) if vm.state?()=='uninitialized'%>
+    
   </td>
     <td><%= link_to 'Show', vm,:class=> 'edit-button button' %><%= link_to 'Edit', edit_vm_path(vm),:class=> 'edit-button button' if @admin%><%= link_to 'Destroy', vm, :confirm => 'Are you sure?', :method => :delete,:class=> 'delete-button button' %></td>
   </tr>
