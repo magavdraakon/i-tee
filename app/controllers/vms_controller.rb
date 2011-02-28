@@ -101,7 +101,8 @@ class VmsController < ApplicationController
     if @mac.save
       flash[:notice] = "Successful vm initialisation." 
       #save õnnestus, masinal on mac olemas.. TODO: skripti käivitamine
-      system "./start_machine.sh #{@vm.mac.mac} #{@vm.lab_vmt.vmt.image} #{@vm.name}"
+      a=system "./start_machine.sh #{@vm.mac.mac} #{@vm.lab_vmt.vmt.image} #{@vm.name}"
+      logger.info a
       redirect_to(vms_url)
     end
   rescue ActiveRecord::StaleObjectError # to resque from conflict, go on a new round of init?
