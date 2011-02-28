@@ -100,8 +100,10 @@ class VmsController < ApplicationController
     @mac.vm_id=@vm.id
     if @mac.save
       flash[:notice] = "Successful vm initialisation." 
+      logger.info "käivitame masina skripti"
       #save õnnestus, masinal on mac olemas.. TODO: skripti käivitamine
-      a=system "./start_machine.sh #{@vm.mac.mac} #{@vm.lab_vmt.vmt.image} #{@vm.name}"
+      a=%x("/var/www/railsapps/i-tee/utils/start_machine.sh #{@vm.mac.mac} #{@vm.lab_vmt.vmt.image} #{@vm.name}")
+      
       logger.info a
       redirect_to(vms_url)
     end

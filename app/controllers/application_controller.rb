@@ -36,7 +36,7 @@ class ApplicationController < ActionController::Base
     unless ITee::Application.config.admins.include?(current_user.username)
       #You don't belong here. Go away.
       flash[:alert]  = "Restricted access!"
-        redirect_to (:controller=>'home', :action=>'error_401')
+        redirect_to(:controller=>'home', :action=>'error_401')
       end
     end
   
