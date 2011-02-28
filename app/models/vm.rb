@@ -11,7 +11,8 @@ class Vm < ActiveRecord::Base
   
   def state?
     if @state==nil
-      "stopped"
+      "uninitialized" #kas siin peaks pigem tegema päringu masina seisu kohta?
+      #virsh -c qemu:///system domstate masina_nimi
     else
       @state
     end

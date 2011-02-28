@@ -17,6 +17,7 @@
   </div>
   <div class="field">
     <%if @lab!=0%>
+     <%= f.label :lab_id %><br />
     <%= f.text_field :lab_id, :value =>@lab.id %>
     <%else%>
     <%# f.text_field :lab_id %>

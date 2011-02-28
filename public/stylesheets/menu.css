@@ -68,6 +68,23 @@
     font-family: "Helvetica Neue", "Lucida Grande", Helvetica, Arial, Verdana, sans-serif;
 }
 
+#sidemenu #menu-items li.started {
+    list-style-type:none;
+    height: 3em;
+    border-bottom: 1px solid #C2C2C2;
+    font-size: 0.8em;
+    background:#e0f2dc;
+    font-family: "Helvetica Neue", "Lucida Grande", Helvetica, Arial, Verdana, sans-serif;
+}
+#sidemenu #menu-items li.ended {
+    list-style-type:none;
+    height: 3em;
+    border-bottom: 1px solid #C2C2C2;
+    font-size: 0.8em;
+    background:#F8F8FF;
+    font-family: "Helvetica Neue", "Lucida Grande", Helvetica, Arial, Verdana, sans-serif;
+}
+
 #sidemenu #menu-items li a {
     height: 3em;
     line-height: 3em;

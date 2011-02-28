@@ -9,7 +9,8 @@
      <% if @admin then %>
       <li><%= link_to 'Edit', edit_vm_path(@host) %></li>
       <%end%>
-    <li><%= link_to 'Back', vms_path %></li>
+    <li><%= link_to 'Back to vms', vms_path %></li>
+        <li><%= link_to 'Back', :back %></li>
 <% end %>
 
 <% content_for :body do %>

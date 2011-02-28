@@ -1,21 +1,27 @@
 
 <% content_for :body do %>
-<div class="head">Add users in labs</div>
+<div class="head">Add users to '<%= @lab.name%>'</div>
  <div class="hr"></div>
  <div class="text-box">
 <p id="notice"><%= notice %></p>
+
 
 <%= form_for(@lab_user) do |f| %>
 <table>
   <tr>
 <td>
 <%= f.hidden_field :page, :value=>'bulk_add'%>
-<%=collection_select(:lab_user, :lab_id, Lab.all, :id, :name)%>
+<%= f.hidden_field :lab_id, :value=>@lab.id%>
+<%#collection_select(:lab_user, :lab_id, Lab.all, :id, :name)%>
+
 </td>
 <td>
   <ul>
 <%User.all.each do |u|%>
-  <li><%= check_box_tag('users[]',u.id)%> <%=u.username%></li>
+  <li><%# check_box_tag('users[]',u.id, :checked=>@users_in.include?(u))%> 
+<%= check_box_tag('users[]',u.id, @users_in.include?(u))%>
+
+<%=u.username%></li>
 <%end%>
 </ul>
 <%#collection_select(:lab_user, :user_id, User.all, :id, :username)%>
@@ -33,5 +39,8 @@ Users in Labs
 <% content_for :sidebar do %>
 
 <li><%=link_to 'back', lab_users_path%></li>
+<% Lab.all.each do |l|%>
+<li><%=link_to(l.name, :controller=>"lab_users", :action=>"add_users", :id=>l.id)%></li>
+<%end%>
 
 <%end%>

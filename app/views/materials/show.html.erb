@@ -6,11 +6,13 @@
 <% content_for :sidebar do %>
    <% if @admin then %>
   <li><%= link_to 'Edit', edit_material_path(@material) %></li>
-    <li><%= link_to 'Back', materials_path %></li>
-    <%end%>
+    <li><%= link_to 'Back to materials', materials_path %></li>
+   
     <%if params[:lab] != nil%>
-      <li><%=link_to('back to lab', :controller=>'labs', :action=>'show', :id=>params[:lab]) %></li>
+      <li><%=link_to('Back to lab', :controller=>'labs', :action=>'show', :id=>params[:lab]) %></li>
     <%end%>
+     <%end%>
+    <li> <%=link_to('Back', :back )%></li>
       
 <% end %>
 

@@ -3,6 +3,7 @@ class ApplicationController < ActionController::Base
     render :text => exception, :status => 500
   end
   
+  Time.zone='Tallinn'
   protect_from_forgery
   if ITee::Application.config.emulate_ldap then
     before_filter :emulate_user

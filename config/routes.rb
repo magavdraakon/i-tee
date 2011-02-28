@@ -33,6 +33,15 @@ ITee::Application.routes.draw do
   match 'getUsersJSON', :to => 'hosts#getUsersJSON'
   match 'terminate/:id', :to => 'hosts#terminate'
 
+  
+    match 'init_vm', :to=> 'vms#init_vm'
+    match 'pause_vm', :to=> 'vms#pause_vm'
+    match 'resume_vm', :to=> 'vms#resume_vm'
+    match 'stop_vm', :to=> 'vms#stop_vm'
+  
+  match 'end_lab', :to=>'labs#end_lab'
+  match 'running_lab', :to=> 'labs#running_lab'
+  match 'running_lab/:id', :to=> 'labs#running_lab'
   match 'add_users', :to=> 'lab_users#add_users'
   match 'profile', :to=>'home#profile'
   match 'courses', :to =>'labs#courses'

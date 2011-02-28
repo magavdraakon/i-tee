@@ -1,0 +1,69 @@
+<% content_for :body do %>
+  <div class="head">Running lab: <%=@lab.name%></div>
+  <div class="hr"></div>
+  <div class="text-box round">
+<p id="notice"><%= @note %></p>
+<% #show lab info
+    #list the materials
+    #list the machines
+    
+    %>
+    <%=raw @lab.description%>
+    <br/>
+   
+    
+    started at: <%=@lab_user.start%>
+        <br/>
+    ended at: <%=@lab_user.end%>
+    <br/>
+    progress: <%= @lab_user.progress%>
+    <br/>
+     result: <%= @lab_user.result%>
+    <br/>
+    <div id="content-table">
+<table>
+  <thead>
+    <tr> <th>Materials</th>
+    <%if @lab_user.end==nil then %> <th>Machines</th><%end%>
+    </tr>  
+</thead>
+<tr>
+  <td>
+<%  @lab.lab_materials.sort! { |a,b| a.sort <=> b.sort }%>
+<% @lab.lab_materials.each do |material| %>
+  <p><%=material.sort%>.
+  <%=link_to(material.material.name, :controller=>'materials', :action=>'show', :id=>material.material, :lab=>@lab)%>
+</p> 
+<%end%>
+<%if @lab_user.end==nil then %>
+</td>
+<td><% @vms.each do |vm| %>
+  <p><%=link_to(vm.name, :controller=>'vms', :action=>'show', :id=>vm.id) %> (status)
+    start/stop/pause
+</p> 
+<%end%>
+<br/>
+<p>start all</p></td>
+<%end%>
+</tr>
+</table>
+</div>
+<%if @lab_user.end==nil then%> 
+    <table width="100%">
+      <tr>
+        <td>pause/resume lab </td>
+        <td><%= link_to('End lab', :controller=>'labs', :action=>'end_lab', :id=>@lab_user.id) %> </td>
+      </tr>
+    </table>
+    <%end%>
+</div>
+<%end%>
+
+<% content_for :sidebar_head do %>
+Running lab
+  <%end%>
+
+<% content_for :sidebar do %>
+<li><%= link_to 'Back', :back %></li>
+
+<%end%>

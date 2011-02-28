@@ -1,6 +1,6 @@
 class LabsController < ApplicationController
   layout 'main'
-  before_filter :authorise_as_admin, :except => [:courses]
+  before_filter :authorise_as_admin, :except => [:courses, :running_lab, :end_lab]
 
   # GET /labs
   # GET /labs.xml
@@ -86,16 +86,23 @@ class LabsController < ApplicationController
 
   def courses
     @labs=[] #only let the users pick from labs assigned to them
-     current_user.lab_users.each do |u|
-        @labs<<u.lab
-      end 
-    
+    @started=[]
+    @complete=[]
+    current_user.lab_users.each do |u|
+      @labs<<u.lab        
+      @started<<u.lab  if u.start!=nil && u.end==nil 
+      @complete<<u.lab  if u.start!=nil && u.end!=nil 
+    end 
+      @labs=Lab.all if @admin #admins should see them all
+      
+      
+      
     if params[:id]!=nil then
       @lab = Lab.find(params[:id])
     else
       @lab=@labs.first 
     end
-    
+     
     @allowed=false    # to avoid users from seeing labs, that arent for them
     if @labs.include?(@lab) then
       @allowed=true
@@ -103,6 +110,66 @@ class LabsController < ApplicationController
     
   end
 
+  
+  
+  def running_lab
+    @lab=Lab.find(params[:id])
+    @lab_user = LabUser.find(:last, :conditions=>["lab_id=? and user_id=?", @lab.id, current_user.id])
+    @note=""
+    @vms=[]
+    
+    if @lab_user!=nil then #this user has this lab
+    # generating vm info if needed
+    @lab_user.lab.lab_vmts.each do |template|
+      #is there a machine like that already?
+      vm=Vm.find(:first, :conditions=>["lab_vmt_id=? and user_id=?", template.id, current_user.id ])
+      if vm==nil && @lab_user.start==nil then
+        #no there is not
+        v=Vm.new
+        v.name="#{template.name}-#{current_user.username}"
+        #TODO mingi muu moodi nimi luua, see ei tule unikaalne
+        v.lab_vmt_id=template.id
+        v.user_id=current_user.id
+        v.description="generated description"
+        v.save
+        @note="Machines successfully generated."
+        @vms<<v
+      else
+        @vms<<vm
+      end
+    end #end of making vms based of templates
+    if @lab_user.start==nil then
+      @lab_user.start=Time.now
+      @lab_user.save
+    end
+  else
+    #the lab is not meant for this user, redirect
+    redirect_to(error_401_path)
+  end
+  end
+  
+  def end_lab
+    @lab_user=LabUser.find(params[:id])
+    @note=""
+    @lab=@lab_user.lab
+    @lab_user.lab.lab_vmts.each do |template|
+      #is there a machine like that 
+      vm=Vm.find(:first, :conditions=>["lab_vmt_id=? and user_id=?", template.id, current_user.id ])
+      if vm!=nil then
+        #yes, delete it
+        vm.destroy
+        @note="Machines successfully deleted."
+      end
+    end #end of deleting vms for this lab
+    if @note!="" then
+      @lab_user.end=Time.now
+      @lab_user.save
+    end
+    
+    redirect_to(:action=>'running_lab', :id=>@lab.id)
+  end
+  
+  
   def startLabJSON
     @msg = "ok"
     if user_signed_in? then

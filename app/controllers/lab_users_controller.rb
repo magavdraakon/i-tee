@@ -41,14 +41,14 @@ class LabUsersController < ApplicationController
         l=LabUser.find(:first, :conditions=>["lab_id=? and user_id=?", lab, d.id])
         l.delete if l!=nil
       end
-      redirect_to(lab_users_url, :notice => 'Lab user was successfully created.')
+      redirect_to(lab_users_url, :notice => 'successful update.')
     else
       
        @lab_user = LabUser.new(params[:lab_user])
     respond_to do |format|
       if @lab_user.save
         
-        format.html { redirect_to(lab_users_url, :notice => 'Lab user was successfully created.') }
+        format.html { redirect_to(lab_users_url, :notice => 'successful update.') }
         format.xml  { render :xml => @lab_user, :status => :created, :location => @lab_user }
       else
         format.html { render :action => "new" }
@@ -65,7 +65,7 @@ class LabUsersController < ApplicationController
     
     respond_to do |format|
       if @lab_user.update_attributes(params[:lab_user])
-        format.html { redirect_to(lab_users_url, :notice => 'Lab user was successfully updated.') }
+        format.html { redirect_to(lab_users_url, :notice => 'successful update.') }
         format.xml  { head :ok }
       else
         format.html { render :action => "edit" }
@@ -89,7 +89,15 @@ class LabUsersController < ApplicationController
   def add_users
     @lab_users = LabUser.all
     @lab_user = LabUser.new
-    
+    if params[:id]==nil then
+      @lab=Lab.first
+    else
+      @lab=Lab.find(params[:id])
+    end
+    @users_in=[]
+    @lab.lab_users.each do |u|
+      @users_in<<u.user
+    end
   end
   private #-----------------------------------------------
   def get_users_from(u_list)

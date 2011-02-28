@@ -46,6 +46,8 @@ jQuery(function ($) {
 		$('#menu-show').css("display", "none");
     });
     
+    
+    
 
 //document ready
 });

@@ -56,12 +56,9 @@ cat > $XML << LOPP
     <controller type='ide' index='0'>
       <address bus='0x00' domain='0x0000' type='pci' function='0x1' slot='0x01'/>
     </controller>
-    <interface type='network'>
+    <interface type='bridge'>
+      <source bridge='br0'/>
       <mac address='$MAC'/>
-      <source network='default'/>
-      <target dev='vnet1'/>
-      <model type='virtio'/>
-      <address bus='0x00' domain='0x0000' type='pci' function='0x0' slot='0x03'/>
     </interface>
     <serial type='pty'>
       <target port='0'/>

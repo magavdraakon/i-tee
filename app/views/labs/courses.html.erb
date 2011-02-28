@@ -1,40 +1,3 @@
-<%  content_for :javascript do %>
-<script>
-function getJSON(url, data, callback) {
-  // shift arguments if data argument was ommited
-  if ( jQuery.isFunction( data ) ) {
-    callback = data;
-    data = null;
-  }
-
-  return jQuery.ajax({
-    type: "GET",
-    url: url,
-    cache: false,
-    data: data,
-    success: callback,
-    dataType: "json"
-  });
-}
-
-jQuery(document).ready(function() {
-
-  $(".startCourse").click(function(){
-    var startUrl = "<%= url_for :controller => 'labs', :action => 'startLabJSON' %>";
-
-    getJSON(startUrl, function(data) {
-      if(data){
-        if(data != "ok"){
-          alert(data) ;
-        }
-      }
-    });
-
-  });
-      
-});
-</script>
-<% end %>
 
 <% content_for :sidebar_head do %>
   Course List
@@ -42,7 +5,15 @@ jQuery(document).ready(function() {
 
 <% content_for :sidebar do %>
   <% @labs.each do |lab| %>
-    <li><%= link_to(lab.name, :controller=>'labs', :action=>'courses', :id=>lab.id)%></li>
+    <li <%if @started.include?(lab) then%>
+          class='started'
+        <%else if @complete.include?(lab) %>
+          class='ended'
+            <%end%>
+        <%end%>
+        >
+      <%= link_to(lab.name, :controller=>'labs', :action=>'courses', :id=>lab.id)%>
+    </li>
   <% end %>
 <% end %>
 
@@ -66,15 +37,21 @@ jQuery(document).ready(function() {
     <h3>materials</h3>
     <%  @lab.lab_materials.sort! { |a,b| a.sort <=> b.sort }%>
     <% @lab.lab_materials.each do |material| %>
-    <p><%=link_to(material.material.name, :controller=>'materials', :action=>'show', :id=>material.material)%> 
+    <p><%=link_to(material.material.name, :controller=>'materials', :action=>'show', :id=>material.material, :lab=>@lab)%> 
   <%# link_to('Destroy', material, :method => :delete) %>
 </p> 
 <%end%>
  <%end%>    
   </div>
 <%if @labs!=[] then%>
-<a class="add-button button startCourse">Start</a>
+  <%title="Start"%>
+  <% title='Continue' if @started.include?(@lab) %>
+  <% title='View' if @complete.include?(@lab) %>  
+  
+  <%= link_to(title,running_lab_path+"/"+@lab.id.to_s, :class=>'add-button button')%>
+  <!-- <a class="add-button button startCourse">Start</a>-->
 <%end%>
+
 <% end %>
 <%else%>
 <%= render :partial => "shared/no_permission" %>
