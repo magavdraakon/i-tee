@@ -1,8 +1,7 @@
 #!/bin/bash
 cd /var/www/railsapps/i-tee
 git pull
-if [ $? -eq 0 ]
-  then
+if [ $? -eq 0 ]; then
   echo "migrating database"
   rake db:migrate RAILS_ENV='production'
   echo "restarting rails app"
