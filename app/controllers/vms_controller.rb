@@ -95,25 +95,33 @@ class VmsController < ApplicationController
   #assign mac and start machine
   def init_vm
     @vm=Vm.find(params[:id])
-    @vm.state="running(i)"
-    #TODO mac sidumine antud masinaga
+    # binding a unused mac address with the vm
+    @mac= Mac.find(:first, :conditions=>["vm_id is null"])
+    @mac.vm_id=@vm.id
+    if @mac.save
+      flash[:notice] = "Successful vm initialisation." 
+      #save õnnestus, masinal on mac olemas.. TODO: skripti käivitamine
+      system "./start_machine.sh #{@vm.mac.mac} #{@vm.lab_vmt.vmt.image} #{@vm.name}"
+      redirect_to(vms_url)
+    end
+  rescue ActiveRecord::StaleObjectError # to resque from conflict, go on a new round of init?
+    redirect_to(init_vm_path, :id=>@vm.id)
     
-    redirect_to(vms_url)
   end
   
   #resume machine from pause
   def resume_vm
     @vm=Vm.find(params[:id])
-    @vm.state="running"
     #TODO @vm infoga resume skripti käivitamine
+    system "./resume_machine.sh #{@vm.name}"
     redirect_to(vms_url)
   end
   
   #pause a machine
   def pause_vm
     @vm=Vm.find(params[:id])
-    @vm.state="paused"
     #TODO @vm infoga pause skripti käivitamine
+     system "./pause_machine.sh #{@vm.name}"
     redirect_to(vms_url)
   end
   
@@ -122,6 +130,7 @@ class VmsController < ApplicationController
     @vm=Vm.find(params[:id])
     #TODO @vm infoga stop skripti käivitamine
     @vm.destroy
+    redirect_to(vms_url)
   end
   
 end

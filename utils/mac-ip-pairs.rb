@@ -9,6 +9,6 @@ puts "}"
 end
 puts "}"
 end
-puts "start"
-system './start_machine.sh 52:54:00:e9:8b:66 /var/www test'
-puts "fin"
+#puts "start"
+#system './start_machine.sh 52:54:00:e9:8b:66 /var/www test'
+#puts "fin"
