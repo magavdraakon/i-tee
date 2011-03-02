@@ -28,8 +28,8 @@
     <td><%= vm.user.username %></td>
     <td><%= vm.description %></td>
     <td><%= vm.mac.ip if vm.mac!=nil %></td>
-    <td><%state=%x(virsh -c qemu:///system domstate #{vm.name} 2>&1) %>
-    <%=state%>
+    <td><%state=%x(virsh -c qemu:///system domstate #{vm.name} 2>&1).chomp! %>
+    '<%=state%>'
     <%= link_to('Init', :action=>'init_vm', :id=>vm.id) if state!="running" || state!="paused"%>
     <%= link_to('Pause', :action=>'pause_vm', :id=>vm.id) if state=="running"  %>
     <%= link_to('Resume', :action=>'resume_vm', :id=>vm.id) if state=="paused"%>
