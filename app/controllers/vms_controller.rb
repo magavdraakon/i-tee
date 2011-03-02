@@ -1,6 +1,6 @@
 class VmsController < ApplicationController
   layout 'main'
-  before_filter :authorise_as_admin, :except => [:show, :index]
+  before_filter :authorise_as_admin, :except => [:show, :index,:init_vm, :stop_vm, :pause_vm, :resume_vm]
 
   # GET /vms
   # GET /vms.xml
@@ -150,6 +150,9 @@ class VmsController < ApplicationController
     a=%x(/var/www/railsapps/i-tee/utils/stop_machine.sh #{@vm.name}  2>&1)
     logger.info a
     flash[:notice] = "Successful vm deletion." 
+    @mac= Mac.find(:first, :conditions=>["vm_id=?", @vm.id])
+    @mac.vm_id=nil
+    @mac.save
     redirect_to(vms_url)
   end
   

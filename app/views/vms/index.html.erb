@@ -32,7 +32,7 @@
     <%= link_to('Init', :action=>'init_vm', :id=>vm.id)%>
     <%= link_to('Pause', :action=>'pause_vm', :id=>vm.id) %>
     <%= link_to('Resume', :action=>'resume_vm', :id=>vm.id)%>
-    <%= link_to('Stop', :action=>'stop_vm', :id=>vm.id, :confirm => 'Are you sure?')%>  
+    <%= link_to('Stop', :action=>'stop_vm', :id=>vm.id)%>  
   </td>
     <td><%= link_to 'Show', vm,:class=> 'edit-button button' %><%= link_to 'Edit', edit_vm_path(vm),:class=> 'edit-button button' if @admin%><%= link_to 'Destroy', vm, :confirm => 'Are you sure?', :method => :delete,:class=> 'delete-button button' %></td>
   </tr>
