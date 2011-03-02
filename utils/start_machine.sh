@@ -17,8 +17,10 @@ echo "tekitan virtuaalmasina $NAME template-ist $TEMPLATE Mac aadressiga $MAC"
 #luua TEMPLATE põhjal koopia IMAGE
 echo "alustan kopeerimist"
 cp $TEMPLATE $IMAGE
-chown libvirt-qemu:kvm $IMAGE 
+chgrp libvirtd $IMAGE
+#chown libvirt-qemu:kvm $IMAGE 
 echo "masin kopeeritud"
+
 cat > $XML << LOPP
 <domain type='kvm'>
   <name>$NAME</name>

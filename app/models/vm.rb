@@ -12,7 +12,7 @@ class Vm < ActiveRecord::Base
   def state?
     if @state==nil
       "uninitialized" #kas siin peaks pigem tegema päringu masina seisu kohta?
-      #virsh -c qemu:///system domstate masina_nimi
+      #system "virsh -c qemu:///system domstate #{@vm.name}"
     else
       @state
     end

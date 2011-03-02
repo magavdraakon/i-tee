@@ -95,16 +95,24 @@ class VmsController < ApplicationController
   #assign mac and start machine
   def init_vm
     @vm=Vm.find(params[:id])
-    # binding a unused mac address with the vm
-    @mac= Mac.find(:first, :conditions=>["vm_id is null"])
-    @mac.vm_id=@vm.id
-    if @mac.save
-      flash[:notice] = "Successful vm initialisation." 
-      logger.info "käivitame masina skripti"
-      #save õnnestus, masinal on mac olemas.. TODO: skripti käivitamine
-      a=%x("/var/www/railsapps/i-tee/utils/start_machine.sh #{@vm.mac.mac} #{@vm.lab_vmt.vmt.image} #{@vm.name}")
+    #find out if there is a mac address bound with this vm already
+    @mac= Mac.find(:first, :conditions=>["vm_id=?", @vm.id])
+    # binding a unused mac address with the vm if there is no mac
+    if @mac==nil then
+      @mac= Mac.find(:first, :conditions=>["vm_id is null"])
+      @mac.vm_id=@vm.id
+      if @mac.save
+       flash[:notice] = "Successful vm initialisation." 
+        logger.info "käivitame masina skripti"
+        #save õnnestus, masinal on mac olemas.. TODO: skripti käivitamine
+        a=%x(/var/www/railsapps/i-tee/utils/start_machine.sh #{@vm.mac.mac} #{@vm.lab_vmt.vmt.image} #{@vm.name})
       
-      logger.info a
+       logger.info a
+       redirect_to(vms_url)
+      end
+    else
+      #the vm had a mac already, dont do anything
+      flash[:notice] = "Vm already initialized."
       redirect_to(vms_url)
     end
   rescue ActiveRecord::StaleObjectError # to resque from conflict, go on a new round of init?
@@ -116,7 +124,10 @@ class VmsController < ApplicationController
   def resume_vm
     @vm=Vm.find(params[:id])
     #TODO @vm infoga resume skripti käivitamine
-    system "./resume_machine.sh #{@vm.name}"
+    logger.info "käivitame masina taastamise skripti"
+    a=%x(/var/www/railsapps/i-tee/utils/resume_machine.sh #{@vm.name})
+    flash[:notice] = "Successful vm resume." 
+    logger.info a
     redirect_to(vms_url)
   end
   
@@ -124,7 +135,10 @@ class VmsController < ApplicationController
   def pause_vm
     @vm=Vm.find(params[:id])
     #TODO @vm infoga pause skripti käivitamine
-     system "./pause_machine.sh #{@vm.name}"
+    logger.info "käivitame masina taastamise skripti"
+    a=%x(/var/www/railsapps/i-tee/utils/pause_machine.sh #{@vm.name})
+    flash[:notice] = "Successful vm pause." 
+     logger.info a
     redirect_to(vms_url)
   end
   
@@ -132,7 +146,10 @@ class VmsController < ApplicationController
   def stop_vm
     @vm=Vm.find(params[:id])
     #TODO @vm infoga stop skripti käivitamine
-    @vm.destroy
+    logger.info "käivitame masina taastamise skripti"
+    a=%x(/var/www/railsapps/i-tee/utils/stop_machine.sh #{@vm.name})
+    logger.info a
+    flash[:notice] = "Successful vm deletion." 
     redirect_to(vms_url)
   end
   
