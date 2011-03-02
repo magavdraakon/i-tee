@@ -105,7 +105,7 @@ class VmsController < ApplicationController
        flash[:notice] = "Successful vm initialisation." 
         logger.info "käivitame masina skripti"
         #save õnnestus, masinal on mac olemas.. TODO: skripti käivitamine
-        a=%x(/var/www/railsapps/i-tee/utils/start_machine.sh #{@vm.mac.mac} #{@vm.lab_vmt.vmt.image} #{@vm.name})
+        a=%x(/var/www/railsapps/i-tee/utils/start_machine.sh #{@vm.mac.mac} #{@vm.lab_vmt.vmt.image} #{@vm.name} 2>&1)
       
        logger.info a
        redirect_to(vms_url)
@@ -125,7 +125,7 @@ class VmsController < ApplicationController
     @vm=Vm.find(params[:id])
     #TODO @vm infoga resume skripti käivitamine
     logger.info "käivitame masina taastamise skripti"
-    a=%x(/var/www/railsapps/i-tee/utils/resume_machine.sh #{@vm.name})
+    a=%x(/var/www/railsapps/i-tee/utils/resume_machine.sh #{@vm.name}  2>&1)
     flash[:notice] = "Successful vm resume." 
     logger.info a
     redirect_to(vms_url)
@@ -136,7 +136,7 @@ class VmsController < ApplicationController
     @vm=Vm.find(params[:id])
     #TODO @vm infoga pause skripti käivitamine
     logger.info "käivitame masina taastamise skripti"
-    a=%x(/var/www/railsapps/i-tee/utils/pause_machine.sh #{@vm.name})
+    a=%x(/var/www/railsapps/i-tee/utils/pause_machine.sh #{@vm.name}  2>&1)
     flash[:notice] = "Successful vm pause." 
      logger.info a
     redirect_to(vms_url)
@@ -147,7 +147,7 @@ class VmsController < ApplicationController
     @vm=Vm.find(params[:id])
     #TODO @vm infoga stop skripti käivitamine
     logger.info "käivitame masina taastamise skripti"
-    a=%x(/var/www/railsapps/i-tee/utils/stop_machine.sh #{@vm.name})
+    a=%x(/var/www/railsapps/i-tee/utils/stop_machine.sh #{@vm.name}  2>&1)
     logger.info a
     flash[:notice] = "Successful vm deletion." 
     redirect_to(vms_url)
