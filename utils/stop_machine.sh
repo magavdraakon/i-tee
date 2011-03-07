@@ -14,3 +14,4 @@ echo "haltin virtuaalmasina $NAME"
 virsh -c qemu:///system shutdown $NAME
 
 
+#TODO: img faili kustutamine

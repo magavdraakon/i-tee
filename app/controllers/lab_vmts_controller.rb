@@ -74,7 +74,7 @@ class LabVmtsController < ApplicationController
     @lab_vmt.destroy
 
     respond_to do |format|
-      format.html { redirect_to(lab_vmts_url) }
+      format.html { redirect_to(:back) }
       format.xml  { head :ok }
     end
   end

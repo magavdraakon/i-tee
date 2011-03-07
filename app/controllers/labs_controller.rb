@@ -96,7 +96,6 @@ class LabsController < ApplicationController
       @labs=Lab.all if @admin #admins should see them all
       
       
-      
     if params[:id]!=nil then
       @lab = Lab.find(params[:id])
     else
@@ -165,8 +164,8 @@ class LabsController < ApplicationController
       @lab_user.end=Time.now
       @lab_user.save
     end
-    
-    redirect_to(:action=>'running_lab', :id=>@lab.id)
+    redirect_to(:back)
+    #redirect_to(:action=>'running_lab', :id=>@lab.id)
   end
   
   

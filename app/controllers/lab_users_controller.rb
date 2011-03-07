@@ -78,6 +78,12 @@ class LabUsersController < ApplicationController
   # DELETE /lab_users/1.xml
   def destroy
     @lab_user = LabUser.find(params[:id])
+    #when removing someone from a lab, you need to thow their machines away too
+    @lab_user.lab.lab_vmts.each do |template|
+      vm=Vm.find(:first, :conditions=>["lab_vmt_id=? and user_id=?", template.id, @lab_user.user.id ])
+      vm.destroy if vm!=nil
+    end
+    
     @lab_user.destroy
 
     respond_to do |format|

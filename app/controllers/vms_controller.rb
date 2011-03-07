@@ -108,12 +108,12 @@ class VmsController < ApplicationController
         a=%x(/var/www/railsapps/i-tee/utils/start_machine.sh #{@vm.mac.mac} #{@vm.lab_vmt.vmt.image} #{@vm.name} 2>&1)
       
        logger.info a
-       redirect_to(vms_url)
+       redirect_to(:back)
       end
     else
       #the vm had a mac already, dont do anything
       flash[:notice] = "Vm already initialized."
-      redirect_to(vms_url)
+      redirect_to(:back)
     end
   rescue ActiveRecord::StaleObjectError # to resque from conflict, go on a new round of init?
     redirect_to(init_vm_path, :id=>@vm.id)
@@ -128,7 +128,7 @@ class VmsController < ApplicationController
     a=%x(/var/www/railsapps/i-tee/utils/resume_machine.sh #{@vm.name}  2>&1)
     flash[:notice] = "Successful vm resume." 
     logger.info a
-    redirect_to(vms_url)
+    redirect_to(:back)
   end
   
   #pause a machine
@@ -139,10 +139,10 @@ class VmsController < ApplicationController
     a=%x(/var/www/railsapps/i-tee/utils/pause_machine.sh #{@vm.name}  2>&1)
     flash[:notice] = "Successful vm pause." 
      logger.info a
-    redirect_to(vms_url)
+    redirect_to(:back)
   end
   
-  #stop the machine/delete it, delete the vm row from the db (release mac)
+  #stop the machine, do not delete the vm row from the db (release mac, but allow reinitialization)
   def stop_vm
     @vm=Vm.find(params[:id])
     #TODO @vm infoga stop skripti käivitamine
@@ -153,7 +153,7 @@ class VmsController < ApplicationController
     @mac= Mac.find(:first, :conditions=>["vm_id=?", @vm.id])
     @mac.vm_id=nil
     @mac.save
-    redirect_to(vms_url)
+    redirect_to(:back)
   end
   
 end

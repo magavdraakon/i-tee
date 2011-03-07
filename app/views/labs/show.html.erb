@@ -37,7 +37,7 @@
   <p><%=material.sort%>.
   <%=link_to(material.material.name, :controller=>'materials', :action=>'show', :id=>material.material, :lab=>@lab)%>
   
- <%# link_to("remove",material, :method=>:delete)%>
+ <%= link_to("remove",material, :method=>:delete)%>
 </p> 
 <%end%>
 <br/>
@@ -46,7 +46,7 @@
 <td><% @lab.lab_vmts.each do |vmt| %>
   <p><%=link_to(vmt.name, :controller=>'vmts', :action=>'show', :id=>vmt.vmt, :lab=>@lab)%>
   
- <%# link_to("remove",material, :method=>:delete)%>
+ <%= link_to("remove", vmt, :method=>:delete)%>
 </p> 
 <%end%>
 <br/>

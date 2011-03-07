@@ -40,12 +40,13 @@ ITee::Application.routes.draw do
     match 'stop_vm', :to=> 'vms#stop_vm'
   
   match 'end_lab', :to=>'labs#end_lab'
-  match 'running_lab', :to=> 'labs#running_lab'
   match 'running_lab/:id', :to=> 'labs#running_lab'
+  match 'running_lab', :to=> 'labs#running_lab'
   match 'add_users', :to=> 'lab_users#add_users'
   match 'profile', :to=>'home#profile'
-  match 'courses', :to =>'labs#courses'
+  
   match 'courses/:id', :to => 'labs#courses'
+  match 'courses', :to =>'labs#courses'
   match 'startLabJSON', :to => 'labs#startLabJSON'
 
   

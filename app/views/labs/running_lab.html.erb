@@ -38,8 +38,15 @@
 <%if @lab_user.end==nil then %>
 </td>
 <td><% @vms.each do |vm| %>
-  <p><%=link_to(vm.name, :controller=>'vms', :action=>'show', :id=>vm.id) %> (status)
-    start/stop/pause
+  <p><%=link_to(vm.name, :controller=>'vms', :action=>'show', :id=>vm.id) %> 
+  <%state=%x(virsh -c qemu:///system domstate #{vm.name} 2>&1).rstrip %>
+  <%if state=="running" || state=="paused" then%>
+    (<%=state%>) 
+    <%end%>
+     <%= link_to('Init',:controller=>'vms', :action=>'init_vm', :id=>vm.id) if state!="running" && state!="paused"%>
+    <%= link_to('Pause',:controller=>'vms',:action=>'pause_vm', :id=>vm.id) if state=="running"  %>
+    <%= link_to('Resume',:controller=>'vms', :action=>'resume_vm', :id=>vm.id) if state=="paused"%>
+    <%= link_to('Stop',:controller=>'vms', :action=>'stop_vm', :id=>vm.id) if state=="running" || state=="paused"%>
 </p> 
 <%end%>
 <br/>

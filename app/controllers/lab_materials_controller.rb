@@ -90,17 +90,9 @@ class LabMaterialsController < ApplicationController
     @lab=@lab_material.lab
     @lab_material.destroy
    
-    if params[:location] == "labs"
-     respond_to do |format|
-      format.html { redirect_to(:controller=>'labs', :action=>'show', :id=>@lab) }
-      format.xml  { head :ok }
-    end
-  else
-    
     respond_to do |format|
-      format.html { redirect_to(:controller=>'lab_materials', :action=>'index') }
+      format.html { redirect_to(:back) }
       format.xml  { head :ok }
     end
-  end
 end
 end
