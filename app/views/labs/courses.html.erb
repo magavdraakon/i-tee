@@ -17,8 +17,9 @@
   <% end %>
 <% end %>
 
-<%if @allowed || @admin || @labs==[] then%>
+<%#if @allowed || @admin || @labs==[] then%>
 
+<%#if @admin || @labs==[] then%>
 <% content_for :body do %>
   <div class="head"><%if @labs==[] then%>
     No labs
@@ -53,6 +54,6 @@
 <%end%>
 
 <% end %>
-<%else%>
-<%= render :partial => "shared/no_permission" %>
-<%end%>
+<%#else%>
+<%#= render :partial => "shared/no_permission" %>
+<%#end%>

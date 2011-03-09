@@ -1,5 +1,6 @@
 class MaterialsController < ApplicationController
-  layout 'main'
+  
+  #restricted to admins, users can only view the material
    before_filter :authorise_as_admin, :except => [:show]
 
   # GET /materials

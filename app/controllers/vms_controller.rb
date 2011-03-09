@@ -1,5 +1,5 @@
 class VmsController < ApplicationController
-  layout 'main'
+
   before_filter :authorise_as_admin, :except => [:show, :index,:init_vm, :stop_vm, :pause_vm, :resume_vm]
 
   # GET /vms
@@ -95,65 +95,79 @@ class VmsController < ApplicationController
   #assign mac and start machine
   def init_vm
     @vm=Vm.find(params[:id])
-    #find out if there is a mac address bound with this vm already
-    @mac= Mac.find(:first, :conditions=>["vm_id=?", @vm.id])
-    # binding a unused mac address with the vm if there is no mac
-    if @mac==nil then
-      @mac= Mac.find(:first, :conditions=>["vm_id is null"])
-      @mac.vm_id=@vm.id
-      if @mac.save
-       flash[:notice] = "Successful vm initialisation." 
+    #is this vm this users?
+    if current_user==@vm.user || @admin then
+     #find out if there is a mac address bound with this vm already
+     @mac= Mac.find(:first, :conditions=>["vm_id=?", @vm.id])
+      # binding a unused mac address with the vm if there is no mac
+     if @mac==nil then
+       @mac= Mac.find(:first, :conditions=>["vm_id is null"])
+        @mac.vm_id=@vm.id
+       if @mac.save  #save õnnestus, masinal on mac olemas..
+        flash[:notice] = "Successful vm initialisation." 
         logger.info "käivitame masina skripti"
-        #save õnnestus, masinal on mac olemas.. TODO: skripti käivitamine
         a=%x(/var/www/railsapps/i-tee/utils/start_machine.sh #{@vm.mac.mac} #{@vm.lab_vmt.vmt.image} #{@vm.name} 2>&1)
-      
-       logger.info a
-       redirect_to(:back)
-      end
-    else
-      #the vm had a mac already, dont do anything
-      flash[:notice] = "Vm already initialized."
-      redirect_to(:back)
+        logger.info a
+         redirect_to(:back)
+        end #end -if save
+      else
+        #the vm had a mac already, dont do anything
+       flash[:notice] = "Vm already initialized."
+        redirect_to(:back)
+      end # end if nil
+    else #not this users machine
+      redirect_to(error_401_path)
     end
-  rescue ActiveRecord::StaleObjectError # to resque from conflict, go on a new round of init?
-    redirect_to(init_vm_path, :id=>@vm.id)
-    
+    rescue ActiveRecord::StaleObjectError # to resque from conflict, go on a new round of init?
+      redirect_to(init_vm_path, :id=>@vm.id)
   end
   
   #resume machine from pause
   def resume_vm
     @vm=Vm.find(params[:id])
-    #TODO @vm infoga resume skripti käivitamine
-    logger.info "käivitame masina taastamise skripti"
-    a=%x(/var/www/railsapps/i-tee/utils/resume_machine.sh #{@vm.name}  2>&1)
-    flash[:notice] = "Successful vm resume." 
-    logger.info a
-    redirect_to(:back)
+     #is this vm this users?
+    if current_user==@vm.user || @admin then
+      logger.info "käivitame masina taastamise skripti"
+      a=%x(/var/www/railsapps/i-tee/utils/resume_machine.sh #{@vm.name}  2>&1)
+      flash[:notice] = "Successful vm resume." 
+      logger.info a
+      redirect_to(:back)
+    else #not this users machine
+      redirect_to(error_401_path)
+    end
   end
   
   #pause a machine
   def pause_vm
     @vm=Vm.find(params[:id])
-    #TODO @vm infoga pause skripti käivitamine
-    logger.info "käivitame masina taastamise skripti"
-    a=%x(/var/www/railsapps/i-tee/utils/pause_machine.sh #{@vm.name}  2>&1)
-    flash[:notice] = "Successful vm pause." 
-     logger.info a
-    redirect_to(:back)
+     #is this vm this users?
+    if current_user==@vm.user || @admin then
+      logger.info "käivitame masina taastamise skripti"
+      a=%x(/var/www/railsapps/i-tee/utils/pause_machine.sh #{@vm.name}  2>&1)
+      flash[:notice] = "Successful vm pause." 
+      logger.info a
+      redirect_to(:back) 
+    else #not this users machine
+      redirect_to(error_401_path)
+    end
   end
   
   #stop the machine, do not delete the vm row from the db (release mac, but allow reinitialization)
   def stop_vm
     @vm=Vm.find(params[:id])
-    #TODO @vm infoga stop skripti käivitamine
-    logger.info "käivitame masina taastamise skripti"
-    a=%x(/var/www/railsapps/i-tee/utils/stop_machine.sh #{@vm.name}  2>&1)
-    logger.info a
-    flash[:notice] = "Successful vm deletion." 
-    @mac= Mac.find(:first, :conditions=>["vm_id=?", @vm.id])
-    @mac.vm_id=nil
-    @mac.save
-    redirect_to(:back)
+   #is this vm this users?
+    if current_user==@vm.user || @admin then
+      logger.info "käivitame masina taastamise skripti"
+      a=%x(/var/www/railsapps/i-tee/utils/stop_machine.sh #{@vm.name}  2>&1)
+      logger.info a
+      flash[:notice] = "Successful vm deletion." 
+      @mac= Mac.find(:first, :conditions=>["vm_id=?", @vm.id])
+      @mac.vm_id=nil
+      @mac.save
+      redirect_to(:back)
+     else #not this users machine
+      redirect_to(error_401_path)
+    end
   end
   
 end

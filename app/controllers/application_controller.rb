@@ -20,6 +20,7 @@ class ApplicationController < ActionController::Base
     @username = "Test User"
   end
 
+  #return true if the current user is a admin
   def admin?
     if current_user == nil then
       @admin = false
@@ -32,6 +33,7 @@ class ApplicationController < ActionController::Base
     end
   end
   
+  #redirect user if they are not admin but try to see things not meant for them
   def authorise_as_admin
     unless ITee::Application.config.admins.include?(current_user.username)
       #You don't belong here. Go away.

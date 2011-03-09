@@ -12,24 +12,17 @@
   <% end %>
 
   <div class="field">
-    <%# f.label :lab_id %><!--<br />-->
-    <%# f.hidden_field_tag :lab_id, @lab.id %>
-    <%if @lab!=0%>
-    <%= f.text_field :lab_id, :value =>@lab.id %>
-    <%else%>
-    <%# f.text_field :lab_id %>
+  <%# if a lab is selected let it be as the selected value in the dropbox%>
+    <%@lab_material.lab_id=@lab.id if @lab!=nil%>
      <%= f.label :lab_id %><br />
-    <%=collection_select(:lab_material, :lab_id, @labs, :id, :name)%>
-    <%end%>
-    <%#collection_select(:lab_material, :lab_id, @labs, :id, :name, {:index => @lab})%>
+    <%=collection_select(:lab_material, :lab_id, @labs, :id, :name,{:prompt => true})%>
+    
    
   </div>
   <div class="field">
     <%= f.label :material_id %><br />
-    <%# f.text_field :material_id %>
     <%=collection_select(:lab_material, :material_id, @materials, :id, :name, {:prompt => true})%>
-<%#collection_select(:user, :role_id, @roles, :id, :role_title, {:prompt => true})
-%>
+
   </div>
   <div class="field">
     <%= f.label :description %><br />

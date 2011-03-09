@@ -1,5 +1,6 @@
 class LabsController < ApplicationController
   layout 'main'
+  #users can see courses, running labs and end their OWN lab
   before_filter :authorise_as_admin, :except => [:courses, :running_lab, :end_lab]
 
   # GET /labs
@@ -84,10 +85,12 @@ class LabsController < ApplicationController
     end
   end
 
+  #view of labs that can be started/continued/viewed
   def courses
     @labs=[] #only let the users pick from labs assigned to them
     @started=[]
     @complete=[]
+    #categorize the labs
     current_user.lab_users.each do |u|
       @labs<<u.lab        
       @started<<u.lab  if u.start!=nil && u.end==nil 
@@ -95,24 +98,25 @@ class LabsController < ApplicationController
     end 
       @labs=Lab.all if @admin #admins should see them all
       
-      
+    # if no course is selected show the first one
     if params[:id]!=nil then
       @lab = Lab.find(params[:id])
     else
       @lab=@labs.first 
     end
      
-    @allowed=false    # to avoid users from seeing labs, that arent for them
-    if @labs.include?(@lab) then
-      @allowed=true
+   # to avoid users from seeing labs, that arent for them
+    if !@labs.include?(@lab) then
+     redirect_to(error_401_path)
     end
     
   end
 
   
-  
+  #view for running or completed labs
   def running_lab
     @lab=Lab.find(params[:id])
+    #find the last appearance of the current users lab (repeating a lab made possible)
     @lab_user = LabUser.find(:last, :conditions=>["lab_id=? and user_id=?", @lab.id, current_user.id])
     @note=""
     @vms=[]
@@ -147,25 +151,32 @@ class LabsController < ApplicationController
   end
   end
   
+  #method for ending a lab, deletes virtual machine db rows and sets the end date for the lab
   def end_lab
     @lab_user=LabUser.find(params[:id])
     @note=""
-    @lab=@lab_user.lab
-    @lab_user.lab.lab_vmts.each do |template|
-      #is there a machine like that 
-      vm=Vm.find(:first, :conditions=>["lab_vmt_id=? and user_id=?", template.id, current_user.id ])
-      if vm!=nil then
-        #yes, delete it
-        vm.destroy
-        @note="Machines successfully deleted."
-      end
-    end #end of deleting vms for this lab
-    if @note!="" then
-      @lab_user.end=Time.now
-      @lab_user.save
-    end
+    #check if this is this users lab (to not allow url hacking) /admins can end users labs
+    if current_user==@lab_user.user || @admin then
+      @lab=@lab_user.lab
+     @lab_user.lab.lab_vmts.each do |template|
+        #is there a machine like that 
+       vm=Vm.find(:first, :conditions=>["lab_vmt_id=? and user_id=?", template.id, current_user.id ])
+       if vm!=nil then
+         #yes, delete it
+         vm.destroy
+         @note="Machines successfully deleted."
+        end
+      end #end of deleting vms for this lab
+     if @note!="" then
+        @lab_user.end=Time.now
+        @lab_user.save
+     end
     redirect_to(:back)
-    #redirect_to(:action=>'running_lab', :id=>@lab.id)
+  else #this lab doesnt belong to this user, permission error
+    flash[:alert]  = "Restricted access!"
+    redirect_to(error_401_path)
+  end # end- this users lab
+  
   end
   
   

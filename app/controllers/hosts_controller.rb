@@ -1,7 +1,6 @@
 class HostsController < ApplicationController
-  layout 'main'
-
-     before_filter :authorise_as_admin
+  #restricted to admins
+   before_filter :authorise_as_admin
 
   # GET /hosts
   # GET /hosts.xml

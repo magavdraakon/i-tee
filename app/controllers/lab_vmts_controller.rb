@@ -1,7 +1,10 @@
 class LabVmtsController < ApplicationController
+  #restricted to admins
+  before_filter :authorise_as_admin
+  
   # GET /lab_vmts
   # GET /lab_vmts.xml
-  before_filter :authorise_as_admin
+  #index and new view are merged, but there is also a separate view for new 
   def index
     @lab_vmts = LabVmt.find(:all, :order=>params[:sort_by])
     @lab_vmt = LabVmt.new
@@ -14,6 +17,7 @@ class LabVmtsController < ApplicationController
 
   # GET /lab_vmts/new
   # GET /lab_vmts/new.xml
+  #used to add vmts from the lab side
   def new
     @lab_vmt = LabVmt.new
     @labs= Lab.all

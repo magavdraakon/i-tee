@@ -1,7 +1,9 @@
 class VmtsController < ApplicationController
+  #restricted to admins 
+  before_filter :authorise_as_admin
+  
   # GET /vmts
   # GET /vmts.xml
-  before_filter :authorise_as_admin
   def index
     @vmts = Vmt.all
 

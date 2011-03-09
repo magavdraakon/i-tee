@@ -1,9 +1,10 @@
 class LabMaterialsController < ApplicationController
-  # GET /lab_materials
-  # GET /lab_materials.xml
+  
+  #restricted to admins
    before_filter :authorise_as_admin
 
-  
+  # GET /lab_materials
+  # GET /lab_materials.xml  
   def index
     @lab_materials = LabMaterial.find(:all, :order=>params[:sort_by])
     respond_to do |format|
@@ -29,12 +30,14 @@ class LabMaterialsController < ApplicationController
     @lab_material = LabMaterial.new
     @labs= Lab.all
     lab_materials=[]
+    # if the lab is preset, add all the materials already bound with it in an array
     if params[:lab]!=nil
       @lab = Lab.find(params[:lab])
       @lab.lab_materials.each do |m|
         lab_materials<<m.material
       end  
     end
+    #take away the materials that are already bound with the lab
     @materials= Material.all-lab_materials
     respond_to do |format|
       format.html # new.html.erb
