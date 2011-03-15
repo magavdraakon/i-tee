@@ -1,7 +1,7 @@
 class VmsController < ApplicationController
 
   before_filter :authorise_as_admin, :except => [:show, :index,:init_vm, :stop_vm, :pause_vm, :resume_vm]
-  before_filter :auth_as_owner, :only=>[:init_vm, :stop_vm, :pause_vm, :resume_vm]
+  before_filter :auth_as_owner, :only=>[:show, :init_vm, :stop_vm, :pause_vm, :resume_vm]
 
   # GET /vms
   # GET /vms.xml
@@ -95,8 +95,6 @@ class VmsController < ApplicationController
   #assign mac and start machine
   def init_vm
     @vm=Vm.find(params[:id])
-    #is this vm this users?
-    #if current_user==@vm.user || @admin then
      #find out if there is a mac address bound with this vm already
      @mac= Mac.find(:first, :conditions=>["vm_id=?", @vm.id])
       # binding a unused mac address with the vm if there is no mac
@@ -115,9 +113,6 @@ class VmsController < ApplicationController
        flash[:notice] = "Vm already initialized."
         redirect_to(:back)
       end # end if nil
-      #else #not this users machine
-      #redirect_to(error_401_path)
-      #  end
     rescue ActiveRecord::StaleObjectError # to resque from conflict, go on a new round of init?
       redirect_to(init_vm_path, :id=>@vm.id)
   end
@@ -125,38 +120,26 @@ class VmsController < ApplicationController
   #resume machine from pause
   def resume_vm
     @vm=Vm.find(params[:id])
-     #is this vm this users?
-    #if current_user==@vm.user || @admin then
       logger.info "käivitame masina taastamise skripti"
       a=@vm.res_vm # the script is called in the model
       flash[:notice] = "Successful vm resume." 
       logger.info a
       redirect_to(:back)
-      #  else #not this users machine
-      #redirect_to(error_401_path)
-      #end
   end
   
   #pause a machine
   def pause_vm
     @vm=Vm.find(params[:id])
-     #is this vm this users?
-    #if current_user==@vm.user || @admin then
       logger.info "käivitame masina pausimise skripti"
       a=@vm.pau_vm #the script is called in the model
       flash[:notice] = "Successful vm pause." 
       logger.info a
       redirect_to(:back) 
-      #    else #not this users machine
-      #redirect_to(error_401_path)
-      # end
   end
   
   #stop the machine, do not delete the vm row from the db (release mac, but allow reinitialization)
   def stop_vm
     @vm=Vm.find(params[:id])
-   #is this vm this users?
-  #  if current_user==@vm.user || @admin then
       logger.info "käivitame masina sulgemise skripti"
       a=@vm.del_vm #the script is called in the model
       logger.info a
@@ -165,18 +148,15 @@ class VmsController < ApplicationController
       @mac.vm_id=nil
       @mac.save
       redirect_to(:back)
-      # else #not this users machine
-   #   redirect_to(error_401_path)
-  # end
   end
   
-   #redirect user if they are not admin but try to see things not meant for them
+   #redirect user if they are not admin or the machine owner but try to modify a machine
   def auth_as_owner
     @vm=Vm.find(params[:id])
    #is this vm this users?
     unless current_user==@vm.user || @admin
       #You don't belong here. Go away.
-      flash[:notice]  = "cant edit others machines!"
+      flash[:notice]  = "Sorry, this machine doesnt belong to you!"
         redirect_to(vms_path)
       end
     end

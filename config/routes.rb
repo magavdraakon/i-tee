@@ -34,12 +34,12 @@ ITee::Application.routes.draw do
   match 'terminate/:id', :to => 'hosts#terminate'
 
   
-    match 'init_vm', :to=> 'vms#init_vm'
-    match 'pause_vm', :to=> 'vms#pause_vm'
-    match 'resume_vm', :to=> 'vms#resume_vm'
-    match 'stop_vm', :to=> 'vms#stop_vm'
+    match 'init_vm/:id', :to=> 'vms#init_vm'
+    match 'pause_vm/:id', :to=> 'vms#pause_vm'
+    match 'resume_vm/_id', :to=> 'vms#resume_vm'
+    match 'stop_vm/:id', :to=> 'vms#stop_vm'
   
-  match 'end_lab', :to=>'labs#end_lab'
+  match 'end_lab/:id', :to=>'labs#end_lab'
   match 'running_lab/:id', :to=> 'labs#running_lab'
   match 'running_lab', :to=> 'labs#running_lab'
   match 'add_users', :to=> 'lab_users#add_users'
