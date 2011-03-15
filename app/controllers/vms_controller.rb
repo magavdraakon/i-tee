@@ -142,7 +142,7 @@ class VmsController < ApplicationController
     @vm=Vm.find(params[:id])
      #is this vm this users?
     if current_user==@vm.user || @admin then
-      logger.info "käivitame masina taastamise skripti"
+      logger.info "käivitame masina pausimise skripti"
       a=%x(/var/www/railsapps/i-tee/utils/pause_machine.sh #{@vm.name}  2>&1)
       flash[:notice] = "Successful vm pause." 
       logger.info a
@@ -157,13 +157,7 @@ class VmsController < ApplicationController
     @vm=Vm.find(params[:id])
    #is this vm this users?
     if current_user==@vm.user || @admin then
-      logger.info "käivitame masina taastamise skripti"
-      a=%x(/var/www/railsapps/i-tee/utils/stop_machine.sh #{@vm.name}  2>&1)
-      logger.info a
-      flash[:notice] = "Successful vm deletion." 
-      @mac= Mac.find(:first, :conditions=>["vm_id=?", @vm.id])
-      @mac.vm_id=nil
-      @mac.save
+      @vm.del_vm
       redirect_to(:back)
      else #not this users machine
       redirect_to(error_401_path)

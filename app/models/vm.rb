@@ -2,19 +2,16 @@ class Vm < ActiveRecord::Base
   has_one :mac
   belongs_to :user
   belongs_to :lab_vmt
+  before_destroy :delete_vms
 
-   attr_accessor :state
-  
-  def state=(val)
-    @state=val
+  def del_vm
+    logger.info "käivitame masina sulgemise skripti"
+      a=%x(/var/www/railsapps/i-tee/utils/stop_machine.sh #{name}  2>&1)
+      logger.info a
+      flash[:notice] = "Successful vm deletion." 
+      @mac= Mac.find(:first, :conditions=>["vm_id=?", id])
+      @mac.vm_id=nil
+      @mac.save
   end
   
-  def state?
-    if @state==nil
-      "uninitialized" #kas siin peaks pigem tegema päringu masina seisu kohta?
-      #system "virsh -c qemu:///system domstate #{@vm.name}"
-    else
-      @state
-    end
-  end
 end
