@@ -57,7 +57,7 @@
           <li<% if params[:controller] == "lab_materials"%> class="selected" <% end %>><%# link_to('Lab_materials', :controller=>'lab_materials', :action=>'index')%></li>
           <li<% if params[:controller] == "vms"%> class="selected" <% end %>><%= link_to('Vms', vms_path)%></li>
           <li<% if params[:controller] == "vmts"%> class="selected" <% end %>><%= link_to('Vmts', vmts_path)%></li>
-          <li<% if params[:controller] == "hosts"%> class="selected" <% end %>><%= link_to('Administration', instances_path)%></li>
+          <li<% if params[:controller] == "hosts"%> class="selected" <% end %>><%= link_to('Hosts', hosts_path)%></li>
           <% end %>
         <% end %>
       </ul>
