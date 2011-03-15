@@ -1,5 +1,4 @@
-class LabsController < ApplicationController
-  layout 'main'
+class LabsController < ApplicationController  
   #users can see courses, running labs and end their OWN lab
   before_filter :authorise_as_admin, :except => [:courses, :running_lab, :end_lab]
 

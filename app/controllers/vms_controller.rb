@@ -106,7 +106,7 @@ class VmsController < ApplicationController
        if @mac.save  #save õnnestus, masinal on mac olemas..
         flash[:notice] = "Successful vm initialisation." 
         logger.info "käivitame masina skripti"
-        a=%x(/var/www/railsapps/i-tee/utils/start_machine.sh #{@vm.mac.mac} #{@vm.lab_vmt.vmt.image} #{@vm.name} 2>&1)
+        a=@vm.ini_vm #the script is called in the model
         logger.info a
          redirect_to(:back)
         end #end -if save
@@ -128,7 +128,7 @@ class VmsController < ApplicationController
      #is this vm this users?
     if current_user==@vm.user || @admin then
       logger.info "käivitame masina taastamise skripti"
-      a=%x(/var/www/railsapps/i-tee/utils/resume_machine.sh #{@vm.name}  2>&1)
+      a=@vm.res_vm # the script is called in the model
       flash[:notice] = "Successful vm resume." 
       logger.info a
       redirect_to(:back)
@@ -143,7 +143,7 @@ class VmsController < ApplicationController
      #is this vm this users?
     if current_user==@vm.user || @admin then
       logger.info "käivitame masina pausimise skripti"
-      a=%x(/var/www/railsapps/i-tee/utils/pause_machine.sh #{@vm.name}  2>&1)
+      a=@vm.pau_vm #the script is called in the model
       flash[:notice] = "Successful vm pause." 
       logger.info a
       redirect_to(:back) 
@@ -158,7 +158,7 @@ class VmsController < ApplicationController
    #is this vm this users?
     if current_user==@vm.user || @admin then
       logger.info "käivitame masina sulgemise skripti"
-      a=@vm.del_vm
+      a=@vm.del_vm #the script is called in the model
       logger.info a
       flash[:notice] = "Successful vm deletion." 
       @mac= Mac.find(:first, :conditions=>["vm_id=?", @vm.id])

@@ -83,8 +83,6 @@ end
   def destroy
     @lab_user = LabUser.find(params[:id])
     #when removing someone from a lab, you need to thow their machines away too
-    
-    # NB! you need to destroy the real virtual machines too!
     @lab_user.lab.lab_vmts.each do |template|
       vm=Vm.find(:first, :conditions=>["lab_vmt_id=? and user_id=?", template.id, @lab_user.user.id ])
       vm.destroy if vm!=nil
@@ -101,7 +99,7 @@ end
   #view for adding multiple users to a lab
   def add_users
     @lab_users = LabUser.all
-    @lab_user = LabUser.new
+    @lab_user = LabUser.new  layout 'main'
     #if no lab is set, take the first
     if params[:id]==nil then
       @lab=Lab.first
