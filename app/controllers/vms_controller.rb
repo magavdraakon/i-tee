@@ -157,7 +157,13 @@ class VmsController < ApplicationController
     @vm=Vm.find(params[:id])
    #is this vm this users?
     if current_user==@vm.user || @admin then
-      @vm.del_vm
+      logger.info "käivitame masina sulgemise skripti"
+      a=@vm.del_vm
+      logger.info a
+      flash[:notice] = "Successful vm deletion." 
+      @mac= Mac.find(:first, :conditions=>["vm_id=?", @vm.id])
+      @mac.vm_id=nil
+      @mac.save
       redirect_to(:back)
      else #not this users machine
       redirect_to(error_401_path)
