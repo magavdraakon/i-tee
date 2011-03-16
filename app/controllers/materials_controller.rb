@@ -2,6 +2,15 @@ class MaterialsController < ApplicationController
   
   #restricted to admins, users can only view the material
    before_filter :authorise_as_admin, :except => [:show]
+        #redirect to index view when trying to see unexisting things
+  before_filter :save_from_nil, :only=>[:show, :edit]
+  
+  def save_from_nil
+    @material = Material.find_by_id(params[:id])
+    if @material==nil 
+      redirect_to(materials_path,:notice=>"invalid id.")
+    end
+  end
 
   # GET /materials
   # GET /materials.xml
@@ -17,7 +26,7 @@ class MaterialsController < ApplicationController
   # GET /materials/1
   # GET /materials/1.xml
   def show
-    @material = Material.find(params[:id])
+    #@material = Material.find(params[:id])
 
     respond_to do |format|
       format.html # show.html.erb
@@ -38,7 +47,7 @@ class MaterialsController < ApplicationController
 
   # GET /materials/1/edit
   def edit
-    @material = Material.find(params[:id])
+    #@material = Material.find(params[:id])
   end
 
   # POST /materials

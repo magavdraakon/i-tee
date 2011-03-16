@@ -1,6 +1,15 @@
 class LabVmtsController < ApplicationController
   #restricted to admins
   before_filter :authorise_as_admin
+      #redirect to index view when trying to see unexisting things
+  before_filter :save_from_nil, :only=>[:edit]
+  
+  def save_from_nil
+    @lab_vmt = LabVmt.find_by_id(params[:id])
+    if @lab_vmt==nil 
+      redirect_to(lab_vmts_path,:notice=>"invalid id.")
+    end
+  end
   
   # GET /lab_vmts
   # GET /lab_vmts.xml
@@ -22,9 +31,8 @@ class LabVmtsController < ApplicationController
     @lab_vmt = LabVmt.new
     @labs= Lab.all
     @vmts= Vmt.all
-    if params[:lab]!=nil
-      @lab = Lab.find(params[:lab])
-    end
+    @lab = Lab.find_by_id(params[:lab])
+    
     respond_to do |format|
       format.html # new.html.erb
       format.xml  { render :xml => @lab_vmt }
@@ -33,7 +41,7 @@ class LabVmtsController < ApplicationController
 
   # GET /lab_vmts/1/edit
   def edit
-    @lab_vmt = LabVmt.find(params[:id])
+   # @lab_vmt = LabVmt.find(params[:id])
     @lab=@lab_vmt.lab
     @labs= Lab.all
     @vmts= Vmt.all

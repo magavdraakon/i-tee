@@ -16,20 +16,18 @@
     <%= f.text_field :name %>
   </div>
   <div class="field">
-    <%if @lab!=0%>
-     <%= f.label :lab_id %><br />
-    <%= f.text_field :lab_id, :value =>@lab.id %>
-    <%else%>
+     <%@lab_vmt.lab_id=@lab.id if @lab!=nil%>
+   
     <%# f.text_field :lab_id %>
      <%= f.label :lab_id %><br />
-    <%=collection_select(:lab_vmt, :lab_id, @labs, :id, :name)%>
-    <%end%>
+    <%=collection_select(:lab_vmt, :lab_id, @labs, :id, :name,{:prompt => true})%>
+    
     
   </div>
   <div class="field">
     <%= f.label :vmt_id %><br />
     <%# f.text_field :vmt_id %>
-    <%=collection_select(:lab_vmt, :vmt_id, @vmts, :id, :image)%>
+    <%=collection_select(:lab_vmt, :vmt_id, @vmts, :id, :image,{:prompt => true})%>
   </div>
   <div class="actions">
     <%= f.submit %>

@@ -1,7 +1,16 @@
 class LabUsersController < ApplicationController
   #restricted to admins 
   before_filter :authorise_as_admin
+    #redirect to index view when trying to see unexisting things
+  before_filter :save_from_nil, :only=>[:edit]
   
+  def save_from_nil
+    @lab_user = LabUser.find_by_id(params[:id])
+    if @lab_user==nil 
+      redirect_to(lab_users_path,:notice=>"invalid id.")
+    end
+  end
+
   
   # GET /lab_users
   # GET /lab_users.xml
@@ -19,7 +28,7 @@ class LabUsersController < ApplicationController
 
   # GET /lab_users/1/edit
   def edit
-    @lab_user = LabUser.find(params[:id])
+    #@lab_user = LabUser.find(params[:id])
   end
 
   # POST /lab_users
@@ -99,12 +108,12 @@ end
   #view for adding multiple users to a lab
   def add_users
     @lab_users = LabUser.all
-    @lab_user = LabUser.new  layout 'main'
+    @lab_user = LabUser.new 
     #if no lab is set, take the first
-    if params[:id]==nil then
+    @lab=Lab.find_by_id(params[:id])
+    if @lab==nil then
       @lab=Lab.first
-    else
-      @lab=Lab.find(params[:id])
+      redirect_to(add_users_path) if params[:id]!=nil
     end
     #users already in the particular lab
     @users_in=[]

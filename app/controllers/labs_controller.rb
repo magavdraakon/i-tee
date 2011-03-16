@@ -2,6 +2,16 @@ class LabsController < ApplicationController
   #users can see courses, running labs and end their OWN lab
   before_filter :authorise_as_admin, :except => [:courses, :running_lab, :end_lab]
 
+      #redirect to index view when trying to see unexisting things
+  before_filter :save_from_nil, :only=>[:show, :edit]
+  
+  def save_from_nil
+    @lab = Lab.find_by_id(params[:id])
+    if @lab==nil 
+      redirect_to(labs_path,:notice=>"invalid id.")
+    end
+  end
+  
   # GET /labs
   # GET /labs.xml
   def index
@@ -16,7 +26,7 @@ class LabsController < ApplicationController
   # GET /labs/1
   # GET /labs/1.xml
   def show
-    @lab = Lab.find(params[:id])
+    #@lab = Lab.find(params[:id])
 
     respond_to do |format|
       format.html # show.html.erb
@@ -37,7 +47,7 @@ class LabsController < ApplicationController
 
   # GET /labs/1/edit
   def edit
-    @lab = Lab.find(params[:id])
+    #@lab = Lab.find(params[:id])
   end
 
   # POST /labs
@@ -105,16 +115,18 @@ class LabsController < ApplicationController
     end
      
    # to avoid users from seeing labs, that arent for them
-    if !@labs.include?(@lab) then
+    if !@labs.include?(@lab) && @labs!=[] then
      redirect_to(error_401_path)
     end
-    
+    rescue ActiveRecord::RecordNotFound
+      redirect_to(courses_path)
   end
 
   
   #view for running or completed labs
   def running_lab
     @lab=Lab.find(params[:id])
+    
     #find the last appearance of the current users lab (repeating a lab made possible)
     @lab_user = LabUser.find(:last, :conditions=>["lab_id=? and user_id=?", @lab.id, current_user.id])
     @note=""
@@ -148,6 +160,8 @@ class LabsController < ApplicationController
     #the lab is not meant for this user, redirect
     redirect_to(error_401_path)
   end
+   rescue ActiveRecord::RecordNotFound
+      redirect_to(courses_path)
   end
   
   #method for ending a lab, deletes virtual machine db rows and sets the end date for the lab
@@ -175,7 +189,9 @@ class LabsController < ApplicationController
     flash[:alert]  = "Restricted access!"
     redirect_to(error_401_path)
   end # end- this users lab
-  
+  rescue ActiveRecord::RecordNotFound
+      redirect_to(courses_path)
+      
   end
   
   

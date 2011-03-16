@@ -2,6 +2,17 @@ class LabMaterialsController < ApplicationController
   
   #restricted to admins
    before_filter :authorise_as_admin
+  
+    #redirect to index view when trying to see unexisting things
+  before_filter :save_from_nil, :only=>[:show, :edit]
+  
+  def save_from_nil
+    @lab_material = LabMaterial.find_by_id(params[:id])
+    if @lab_material==nil 
+      redirect_to(lab_materials_path,:notice=>"invalid id.")
+    end
+  end
+
 
   # GET /lab_materials
   # GET /lab_materials.xml  
@@ -16,7 +27,7 @@ class LabMaterialsController < ApplicationController
   # GET /lab_materials/1
   # GET /lab_materials/1.xml
   def show
-    @lab_material = LabMaterial.find(params[:id])
+    #@lab_material = LabMaterial.find(params[:id])
 
     respond_to do |format|
       format.html # show.html.erb
@@ -30,12 +41,14 @@ class LabMaterialsController < ApplicationController
     @lab_material = LabMaterial.new
     @labs= Lab.all
     lab_materials=[]
+    
+    #find_by_id returns nil if there is no such lab_material
+    @lab = Lab.find_by_id(params[:lab])
     # if the lab is preset, add all the materials already bound with it in an array
-    if params[:lab]!=nil
-      @lab = Lab.find(params[:lab])
+    if @lab!=nil
       @lab.lab_materials.each do |m|
         lab_materials<<m.material
-      end  
+      end
     end
     #take away the materials that are already bound with the lab
     @materials= Material.all-lab_materials
@@ -47,7 +60,7 @@ class LabMaterialsController < ApplicationController
 
   # GET /lab_materials/1/edit
   def edit
-    @lab_material = LabMaterial.find(params[:id])
+    #@lab_material = LabMaterial.find(params[:id])
     @lab = @lab_material.lab
     @labs= Lab.all
     @materials= Material.all

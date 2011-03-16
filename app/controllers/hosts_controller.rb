@@ -1,6 +1,16 @@
 class HostsController < ApplicationController
   #restricted to admins
    before_filter :authorise_as_admin
+  
+  #redirect to index view when trying to see unexisting things
+  before_filter :save_from_nil, :only=>[:show, :edit]
+  
+  def save_from_nil
+    @host = Host.find_by_id(params[:id])
+    if @host==nil 
+      redirect_to(hosts_path,:notice=>"invalid id.")
+    end
+  end
 
   # GET /hosts
   # GET /hosts.xml
@@ -16,7 +26,7 @@ class HostsController < ApplicationController
   # GET /hosts/1
   # GET /hosts/1.xml
   def show
-    @host = Host.find(params[:id])
+    #@host = Host.find(params[:id])
 
     respond_to do |format|
       format.html # show.html.erb
@@ -37,7 +47,7 @@ class HostsController < ApplicationController
 
   # GET /hosts/1/edit
   def edit
-    @host = Host.find(params[:id])
+    #@host = Host.find(params[:id])
   end
 
   # POST /hosts

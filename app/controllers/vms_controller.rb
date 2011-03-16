@@ -1,8 +1,16 @@
 class VmsController < ApplicationController
 
   before_filter :authorise_as_admin, :except => [:show, :index,:init_vm, :stop_vm, :pause_vm, :resume_vm]
-  before_filter :auth_as_owner, :only=>[:show, :init_vm, :stop_vm, :pause_vm, :resume_vm]
-
+  #redirect to index view when trying to see unexisting things
+  before_filter :save_from_nil, :only=>[:show, :edit,:init_vm, :stop_vm, :pause_vm, :resume_vm]
+  before_filter :auth_as_owner, :only=>[:show, :init_vm, :stop_vm, :pause_vm, :resume_vm]       
+  
+  def save_from_nil
+    @vm = Vm.find_by_id(params[:id])
+    if @vm==nil 
+      redirect_to(vms_path,:notice=>"invalid id.")
+    end
+  end
   # GET /vms
   # GET /vms.xml
   def index
@@ -21,7 +29,7 @@ class VmsController < ApplicationController
   # GET /vms/1
   # GET /vms/1.xml
   def show
-    @vm = Vm.find(params[:id])
+   # @vm = Vm.find(params[:id])
     respond_to do |format|
       format.html # show.html.erb
       format.xml  { render :xml => @vm }
@@ -41,7 +49,7 @@ class VmsController < ApplicationController
 
   # GET /vms/1/edit
   def edit
-    @vm = Vm.find(params[:id])
+    #@vm = Vm.find(params[:id])
     @templates=LabVmt.all
   end
 
@@ -94,7 +102,7 @@ class VmsController < ApplicationController
   
   #assign mac and start machine
   def init_vm
-    @vm=Vm.find(params[:id])
+    #@vm=Vm.find(params[:id])
      #find out if there is a mac address bound with this vm already
      @mac= Mac.find(:first, :conditions=>["vm_id=?", @vm.id])
       # binding a unused mac address with the vm if there is no mac
@@ -119,7 +127,7 @@ class VmsController < ApplicationController
   
   #resume machine from pause
   def resume_vm
-    @vm=Vm.find(params[:id])
+    #@vm=Vm.find(params[:id])
       logger.info "käivitame masina taastamise skripti"
       a=@vm.res_vm # the script is called in the model
       flash[:notice] = "Successful vm resume." 
@@ -129,7 +137,7 @@ class VmsController < ApplicationController
   
   #pause a machine
   def pause_vm
-    @vm=Vm.find(params[:id])
+    #@vm=Vm.find(params[:id])
       logger.info "käivitame masina pausimise skripti"
       a=@vm.pau_vm #the script is called in the model
       flash[:notice] = "Successful vm pause." 
@@ -139,7 +147,7 @@ class VmsController < ApplicationController
   
   #stop the machine, do not delete the vm row from the db (release mac, but allow reinitialization)
   def stop_vm
-    @vm=Vm.find(params[:id])
+    #@vm=Vm.find(params[:id])
       logger.info "käivitame masina sulgemise skripti"
       a=@vm.del_vm #the script is called in the model
       logger.info a
@@ -152,7 +160,7 @@ class VmsController < ApplicationController
   
    #redirect user if they are not admin or the machine owner but try to modify a machine
   def auth_as_owner
-    @vm=Vm.find(params[:id])
+    #@vm=Vm.find(params[:id])
    #is this vm this users?
     unless current_user==@vm.user || @admin
       #You don't belong here. Go away.

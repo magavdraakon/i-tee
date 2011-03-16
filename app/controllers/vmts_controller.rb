@@ -1,6 +1,15 @@
 class VmtsController < ApplicationController
   #restricted to admins 
   before_filter :authorise_as_admin
+        #redirect to index view when trying to see unexisting things
+  before_filter :save_from_nil, :only=>[:show, :edit]
+  
+  def save_from_nil
+    @vmt = Vmts.find_by_id(params[:id])
+    if @vmt==nil 
+      redirect_to(vmts_path,:notice=>"invalid id.")
+    end
+  end
   
   # GET /vmts
   # GET /vmts.xml
@@ -16,7 +25,7 @@ class VmtsController < ApplicationController
   # GET /vmts/1
   # GET /vmts/1.xml
   def show
-    @vmt = Vmt.find(params[:id])
+    #@vmt = Vmt.find(params[:id])
 
     respond_to do |format|
       format.html # show.html.erb
@@ -37,7 +46,7 @@ class VmtsController < ApplicationController
 
   # GET /vmts/1/edit
   def edit
-    @vmt = Vmt.find(params[:id])
+    #@vmt = Vmt.find(params[:id])
   end
 
   # POST /vmts

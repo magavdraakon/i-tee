@@ -1,10 +1,10 @@
-<% @lab=0 if @lab==nil%>
+
 <% content_for :sidebar_head do %>
   VMT in labs
 <% end %>
 
 <% content_for :sidebar do %>
- <%if @lab!=0%>
+ <%if @lab!=nil%>
     <li><%= link_to('Back to lab', :controller=>'labs', :action=>'show', :id=>@lab) %></li>
     <%else%>
     <li><%= link_to('Back to labs', :controller=>'labs', :action=>'index') %></li>
@@ -16,7 +16,7 @@
 
 <% content_for :body do %>
 <div class="head">
-<%if @lab!=0%>
+<%if @lab!=nil%>
 <%= @lab.name%>
 <%else%>
 Add VMT
