@@ -1,6 +1,6 @@
 class VmsController < ApplicationController
 
-  before_filter :authorise_as_admin, :except => [:show, :index,:init_vm, :stop_vm, :pause_vm, :resume_vm]
+  before_filter :authorise_as_admin, :except => [:show, :index, :init_vm, :stop_vm, :pause_vm, :resume_vm, :start_vm, :start_all]
   #redirect to index view when trying to see unexisting things
   before_filter :save_from_nil, :only=>[:show, :edit, :start_vm, :stop_vm, :pause_vm, :resume_vm]
   before_filter :auth_as_owner, :only=>[:show, :start_vm, :stop_vm, :pause_vm, :resume_vm]       
@@ -109,7 +109,7 @@ class VmsController < ApplicationController
   #start all the machines this user has in a given lab
   def start_all
     current_user.vms.each do |vm|
-      init_vm(vm) if vm.lab_vmt.lab.id==params[:id]
+      init_vm(vm) if vm.lab_vmt.lab.id==params[:id]redirect_to(:back)
     end
     redirect_to(:back)
   end
