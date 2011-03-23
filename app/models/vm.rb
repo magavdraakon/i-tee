@@ -17,7 +17,7 @@ class Vm < ActiveRecord::Base
   end
   
   def ini_vm
-    %x(/var/www/railsapps/i-tee/utils/start_machine.sh #{mac.mac} #{lab_vmt.vmt.image} #{name} 2>&1)
+    return %x(/var/www/railsapps/i-tee/utils/start_machine.sh #{mac.mac} #{lab_vmt.vmt.image} #{name} 2>&1)
   end
   
 end

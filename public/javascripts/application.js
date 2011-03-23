@@ -4,28 +4,6 @@
 //jQuery.noConflict()
 
 jQuery(document).ready(function() {
- 
-
-function showDialog(title, msg, type) {
-	$("#dialog").empty();
-
-	$("#dialog").append("<p>" + msg + "</p>");
-
-
-	$("#dialog").dialog({
-		modal: true,
-		title: title,
-		dialogClass: type,
-		buttons: {
-			"Close": function() {
-				$(this).dialog("close");
-			}
-		}
-	});
-}
-
-
-
 
 jQuery(function ($) {
 		$('#basic-modal .modal').click(function (e) {
@@ -45,9 +23,5 @@ jQuery(function ($) {
 		$('#left').show("slow");
 		$('#menu-show').css("display", "none");
     });
-    
-    
-    
-
 //document ready
 });

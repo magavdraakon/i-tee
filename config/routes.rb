@@ -23,16 +23,8 @@ ITee::Application.routes.draw do
 
   # route, :to => 'controller#action'
   
-  match 'machines', :to => 'hosts#machines'
-  match 'error_401', :to => 'home#error_401'
   
-  match 'instances', :to => 'hosts#instances'
-  match 'run', :to => 'hosts#run'
-  match 'getInstanceJSON', :to => 'hosts#getInstanceJSON'
-  match 'getImagesJSON', :to => 'hosts#getImagesJSON'
-  match 'getUsersJSON', :to => 'hosts#getUsersJSON'
-  match 'terminate/:id', :to => 'hosts#terminate'
-
+  match 'error_401', :to => 'home#error_401'
   
     match 'init_vm/:id', :to=> 'vms#init_vm'
     match 'pause_vm/:id', :to=> 'vms#pause_vm'
@@ -47,7 +39,6 @@ ITee::Application.routes.draw do
   
   match 'courses/:id', :to => 'labs#courses'
   match 'courses', :to =>'labs#courses'
-  match 'startLabJSON', :to => 'labs#startLabJSON'
 
   
   # The priority is based upon order of creation:

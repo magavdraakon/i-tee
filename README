@@ -69,12 +69,7 @@ Ensure that emulate_virtualization is set to false
   config.emulate_eucalyptus = false
   config.emulate_ldap = false
 
-Enter correct eucalyptus url and creditentials
-  #eycalyptus aws information
-  config.ec2_url = 'http://youreucaIP:8773/services/Eucalyptus'
-  config.access_key = 'access key from your installation'
-  config.secret_key = 'secret key from your euca installation'
-
+Enter admin usernames
   #Administrator usernames
   config.admins = ['admin1','admin2','admin3','etc']
   

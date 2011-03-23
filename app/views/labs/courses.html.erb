@@ -17,9 +17,6 @@
   <% end %>
 <% end %>
 
-<%#if @allowed || @admin || @labs==[] then%>
-
-<%#if @admin || @labs==[] then%>
 <% content_for :body do %>
   <div class="head"><%if @labs==[] then%>
     No labs
@@ -50,10 +47,7 @@
   <% title='View' if @complete.include?(@lab) %>  
   
   <%= link_to(title,running_lab_path+"/"+@lab.id.to_s, :class=>'add-button button')%>
-  <!-- <a class="add-button button startCourse">Start</a>-->
 <%end%>
 
 <% end %>
-<%#else%>
-<%#= render :partial => "shared/no_permission" %>
-<%#end%>
+
