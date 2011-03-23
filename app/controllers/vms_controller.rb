@@ -105,12 +105,13 @@ class VmsController < ApplicationController
     end
   end
 
-  
+  #TODO: ei tööta
   #start all the machines this user has in a given lab
   def start_all
     current_user.vms.each do |vm|
       init_vm(vm) if vm.lab_vmt.lab.id==params[:id]
-    end
+      logger.info vm.name
+  end
     
     
   end
@@ -143,6 +144,7 @@ class VmsController < ApplicationController
         #redirect_to(:back)
       end # end if nil
     rescue ActiveRecord::StaleObjectError # to resque from conflict, go on a new round of init?
+      logger.info "Mac address conflict"
       redirect_to(init_vm_path, :id=>vm.id)
   end
   
