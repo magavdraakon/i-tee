@@ -205,9 +205,10 @@ class LabsController < ApplicationController
     redirect_to(error_401_path)
   end # end- this users lab
   rescue ActiveRecord::RecordNotFound
-      redirect_to(courses_path)
-      
+    redirect_to(courses_path)
   end
+  
+  
   
   private #----------------------------------------------------------------------------------
    def get_user_labs

@@ -2,8 +2,8 @@ class VmsController < ApplicationController
 
   before_filter :authorise_as_admin, :except => [:show, :index,:init_vm, :stop_vm, :pause_vm, :resume_vm]
   #redirect to index view when trying to see unexisting things
-  before_filter :save_from_nil, :only=>[:show, :edit,:init_vm, :stop_vm, :pause_vm, :resume_vm]
-  before_filter :auth_as_owner, :only=>[:show, :init_vm, :stop_vm, :pause_vm, :resume_vm]       
+  before_filter :save_from_nil, :only=>[:show, :edit, :start_vm, :stop_vm, :pause_vm, :resume_vm]
+  before_filter :auth_as_owner, :only=>[:show, :start_vm, :stop_vm, :pause_vm, :resume_vm]       
   
   def save_from_nil
     @vm = Vm.find_by_id(params[:id])
@@ -106,31 +106,43 @@ class VmsController < ApplicationController
   end
 
   
+  #start all the machines this user has in a given lab
+  def start_all
+    current_user.vms.each do |vm|
+      init_vm(vm) if vm.lab_vmt.lab.id==params[:id]
+    end
+    redirect_to(:back)
+  end
   
+  #start one machine
+  def start_vm
+    init_vm(@vm)
+    redirect_to(:back)
+  end
   
   #assign mac and start machine
-  def init_vm
+  def init_vm(vm)
     #@vm=Vm.find(params[:id])
      #find out if there is a mac address bound with this vm already
-     @mac= Mac.find(:first, :conditions=>["vm_id=?", @vm.id])
+     @mac= Mac.find(:first, :conditions=>["vm_id=?", vm.id])
       # binding a unused mac address with the vm if there is no mac
      if @mac==nil then
        @mac= Mac.find(:first, :conditions=>["vm_id is null"])
-        @mac.vm_id=@vm.id
+        @mac.vm_id=vm.id
        if @mac.save  #save õnnestus, masinal on mac olemas..
         flash[:notice] = "Successful vm initialisation." 
         logger.info "käivitame masina skripti"
-        a=@vm.ini_vm #the script is called in the model
+        a=vm.ini_vm #the script is called in the model
         logger.info a
-         redirect_to(:back)
+        # redirect_to(:back)
         end #end -if save
       else
         #the vm had a mac already, dont do anything
        flash[:notice] = "Vm already initialized."
-        redirect_to(:back)
+        #redirect_to(:back)
       end # end if nil
     rescue ActiveRecord::StaleObjectError # to resque from conflict, go on a new round of init?
-      redirect_to(init_vm_path, :id=>@vm.id)
+      redirect_to(init_vm_path, :id=>vm.id)
   end
   
   #resume machine from pause
@@ -165,6 +177,8 @@ class VmsController < ApplicationController
       @mac.save
       redirect_to(:back)
   end
+  
+  
   
    #redirect user if they are not admin or the machine owner but try to modify a machine
   def auth_as_owner

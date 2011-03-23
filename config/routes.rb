@@ -26,6 +26,8 @@ ITee::Application.routes.draw do
   
   match 'error_401', :to => 'home#error_401'
   
+  match 'start_all/:id', :to=> 'vms#start_all'
+   match 'start_vm/:id', :to=> 'vms#start_vm'
     match 'init_vm/:id', :to=> 'vms#init_vm'
     match 'pause_vm/:id', :to=> 'vms#pause_vm'
     match 'resume_vm/_id', :to=> 'vms#resume_vm'
