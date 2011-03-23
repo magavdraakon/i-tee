@@ -109,8 +109,9 @@ class VmsController < ApplicationController
   #start all the machines this user has in a given lab
   def start_all
     current_user.vms.each do |vm|
-      init_vm(vm) if vm.lab_vmt.lab.id==params[:id]redirect_to(:back)
+      init_vm(vm) if vm.lab_vmt.lab.id==params[:id]
     end
+    
     redirect_to(:back)
   end
   
