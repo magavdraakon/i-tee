@@ -1,0 +1,21 @@
+<% content_for :body do %>
+
+<div class="head">Started all machines</div>
+ <div class="hr"></div>
+ <div class="text-box">
+  <p id="notice"><%= notice %></p>
+  Successfully started all machines, go <%=link_to('back to lab', :back)%>
+  </div>
+
+<% end %>
+<% content_for :sidebar_head do %>
+Virtual Machines
+  <%end%>
+<% content_for :sidebar do %>
+
+  <li><%#=link_to('Back to lab', :back)%></li>
+
+<%end%>
+
+
+

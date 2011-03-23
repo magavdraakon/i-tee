@@ -112,7 +112,7 @@ class VmsController < ApplicationController
       init_vm(vm) if vm.lab_vmt.lab.id==params[:id]
     end
     
-    redirect_to(:back)
+    
   end
   
   #start one machine
