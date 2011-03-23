@@ -96,15 +96,16 @@ class LabsController < ApplicationController
 
   #view of labs that can be started/continued/viewed
   def courses
-    @labs=[] #only let the users pick from labs assigned to them
-    @started=[]
-    @complete=[]
+   # @labs=[] #only let the users pick from labs assigned to them
+  #  @started=[]
+  #  @complete=[]
     #categorize the labs
-    current_user.lab_users.each do |u|
-      @labs<<u.lab        
-      @started<<u.lab  if u.start!=nil && u.end==nil 
-      @complete<<u.lab  if u.start!=nil && u.end!=nil 
-    end 
+    # current_user.lab_users.each do |u|
+    #  @labs<<u.lab        
+    #  @started<<u.lab  if u.start!=nil && u.end==nil 
+    #  @complete<<u.lab  if u.start!=nil && u.end!=nil 
+    #  end
+    get_user_labs
       @labs=Lab.all if @admin #admins should see them all
       
     # if no course is selected show the first one
@@ -121,12 +122,23 @@ class LabsController < ApplicationController
     rescue ActiveRecord::RecordNotFound
       redirect_to(courses_path)
   end
-
   
   #view for running or completed labs
   def running_lab
+    get_user_labs
     @lab=Lab.find(params[:id])
     
+    @other=[]
+    if @started.include?(@lab)
+      @status="running"
+      @started.delete(@lab)
+      @other=@other+@started
+    else
+      @status="ended"
+      @complete.delete(@lab)
+      @other=@other+@complete
+    end
+      
     #find the last appearance of the current users lab (repeating a lab made possible)
     @lab_user = LabUser.find(:last, :conditions=>["lab_id=? and user_id=?", @lab.id, current_user.id])
     @note=""
@@ -155,6 +167,9 @@ class LabsController < ApplicationController
     if @lab_user.start==nil then
       @lab_user.start=Time.now
       @lab_user.save
+      #first time access to the lab
+      @status="running"
+      @other=@other+@started
     end
   else
     #the lab is not meant for this user, redirect
@@ -192,6 +207,19 @@ class LabsController < ApplicationController
   rescue ActiveRecord::RecordNotFound
       redirect_to(courses_path)
       
+  end
+  
+  private #----------------------------------------------------------------------------------
+   def get_user_labs
+    @labs=[] #only let the users pick from labs assigned to them
+    @started=[]
+    @complete=[]
+    #categorize the labs
+    current_user.lab_users.each do |u|
+      @labs<<u.lab        
+      @started<<u.lab  if u.start!=nil && u.end==nil 
+      @complete<<u.lab  if u.start!=nil && u.end!=nil 
+    end 
   end
   
 end

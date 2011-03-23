@@ -18,6 +18,7 @@
     float: left;
     margin: 0;
     padding: 0;
+
 }
 
 #menu ul li a {
@@ -63,9 +64,15 @@
 #sidemenu #menu-items li {
     list-style-type:none;
     height: 3em;
+    line-height: 3em;
+    color: black;
     border-bottom: 1px solid #C2C2C2;
     font-size: 0.8em;
     font-family: "Helvetica Neue", "Lucida Grande", Helvetica, Arial, Verdana, sans-serif;
+}
+#sidemenu #menu-items li.between {
+ padding-left: 30px;
+ background: #F8F8FF;
 }
 
 #sidemenu #menu-items li.started {

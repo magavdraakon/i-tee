@@ -22,6 +22,8 @@ jQuery(function ($) {
 		$('#right').css("margin-left", 300);
 		$('#left').show("slow");
 		$('#menu-show').css("display", "none");
-    });
+    
+});
+
 //document ready
 });

@@ -20,4 +20,7 @@ class Vm < ActiveRecord::Base
     return %x(/var/www/railsapps/i-tee/utils/start_machine.sh #{mac.mac} #{lab_vmt.vmt.image} #{name} 2>&1)
   end
   
+  def state
+    return %x(virsh -c qemu:///system domstate #{name} 2>&1).rstrip
+  end
 end

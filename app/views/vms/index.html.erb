@@ -1,4 +1,5 @@
 <% content_for :body do %>
+
 <div class="head">Listing Virtual Machines</div>
  <div class="hr"></div>
  <div class="text-box">
@@ -20,15 +21,17 @@
   </tr>
 </thead>
 <% @vms.each do |vm| %>
- 
-  <tr>
+ <%state=vm.state %>
+
+  <tr class="vm <%if state=="running" || state=="paused" then%>  <%=state%>  <%else%><%state="error: no such vm"%>
+    uninit<%end%>">
     <td><%= vm.name %></td>
     <td><%= vm.lab_vmt.name%> </td>
     <td><%= vm.lab_vmt.lab.name%> </td>
     <td><%= vm.user.username %></td>
     <td><%= vm.description %></td>
     <td><%= vm.mac.ip if vm.mac!=nil %></td>
-    <td><%state=%x(virsh -c qemu:///system domstate #{vm.name} 2>&1).rstrip %>
+    <td>
     '<%=state%>'
     <%= link_to('Init', :action=>'init_vm', :id=>vm.id) if state!="running" && state!="paused"%>
     <%= link_to('Pause', :action=>'pause_vm', :id=>vm.id) if state=="running"  %>
@@ -58,7 +61,10 @@ Virtual Machines
  <% if @admin then %>
 <li><%= link_to 'New VM', new_vm_path %></li>
 <%end%>
-
+<li><a href="#" onclick="$('.vm').show();">All machines</a></li>
+<li><a href="#" onclick="$('.vm').hide(); $('.running').show();">Running machines</a></li>
+<li><a href="#" onclick="$('.vm').hide(); $('.paused').show();">Paused machines</a></li>
+<li><a href="#" onclick="$('.vm').hide(); $('.uninit').show();">Uninitialized machines</a></li>
 <%end%>
 
 

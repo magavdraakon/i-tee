@@ -39,14 +39,15 @@
 </td>
 <td><% @vms.each do |vm| %>
   <p><%=link_to(vm.name, :controller=>'vms', :action=>'show', :id=>vm.id) %> 
-  <%state=%x(virsh -c qemu:///system domstate #{vm.name} 2>&1).rstrip %>
+  <%state=vm.state %>
   <%if state=="running" || state=="paused" then%>
     (<%=state%>) 
-    <%end%>
-     <%= link_to('Init',:controller=>'vms', :action=>'init_vm', :id=>vm.id) if state!="running" && state!="paused"%>
     <%= link_to('Pause',:controller=>'vms',:action=>'pause_vm', :id=>vm.id) if state=="running"  %>
     <%= link_to('Resume',:controller=>'vms', :action=>'resume_vm', :id=>vm.id) if state=="paused"%>
-    <%= link_to('Stop',:controller=>'vms', :action=>'stop_vm', :id=>vm.id) if state=="running" || state=="paused"%>
+    <%= link_to('Stop',:controller=>'vms', :action=>'stop_vm', :id=>vm.id)%>
+  <%end%>
+    <%= link_to('Init',:controller=>'vms', :action=>'init_vm', :id=>vm.id) if state!="running" && state!="paused"%>
+    
 </p> 
 <%end%>
 <br/>
@@ -71,6 +72,11 @@ Running lab
   <%end%>
 
 <% content_for :sidebar do %>
-<li><%= link_to 'Back', :back %></li>
-
+<li><%= link_to 'Back', courses_path %></li>
+<%if @other.length>0 then%>
+  <li class="between">Other <%=@status%> labs</li>
+  <% @other.each do |o| %>
+    <li><%= link_to(o.name, running_lab_path+"/"+o.id.to_s)%></li>
+  <% end %>
+  <%end%>
 <%end%>

@@ -15,11 +15,19 @@ class VmsController < ApplicationController
   # GET /vms.xml
   def index
     if @admin then
-    @vms = Vm.all 
-  else
-    #@vms=Vm.find(:all, :conditions=>["user_id=?",current_user])
-    @vms=current_user.vms
-  end
+     @vms = Vm.all 
+    else
+      #@vms=Vm.find(:all, :conditions=>["user_id=?",current_user])
+      @vms=current_user.vms
+    end
+    @uninitialized=[]
+    @paused=[]
+    @running=[]
+    @vms.each do |vm|
+      @running<< vm if vm.state=="running"
+      @paused<<vm if vm.state=="paused"
+    end
+  
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @vms }
