@@ -111,9 +111,7 @@ class VmsController < ApplicationController
     current_user.vms.each do |vm|
       init_vm(vm) if vm.lab_vmt.lab.id==params[:id]
       logger.info vm.name
-  end
-    
-    
+    end  
   end
   
   #start one machine
