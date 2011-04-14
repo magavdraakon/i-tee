@@ -5,7 +5,7 @@ class VmtsController < ApplicationController
   before_filter :save_from_nil, :only=>[:show, :edit]
   
   def save_from_nil
-    @vmt = Vmts.find_by_id(params[:id])
+    @vmt = Vmt.find_by_id(params[:id])
     if @vmt==nil 
       redirect_to(vmts_path,:notice=>"invalid id.")
     end
