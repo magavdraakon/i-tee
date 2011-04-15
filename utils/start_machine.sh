@@ -44,7 +44,7 @@ cat > $XML << LOPP
   <devices>
     <emulator>/usr/bin/kvm</emulator>
     <disk device='disk' type='file'>
-      <driver name='qemu' type='raw'/>
+      <driver name='qemu' type='qcow2'/>
       <source file='$IMAGE'/>
       <target bus='virtio' dev='vda'/>
       <address bus='0x00' domain='0x0000' type='pci' function='0x0' slot='0x05'/>

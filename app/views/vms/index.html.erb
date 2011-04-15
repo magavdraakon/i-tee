@@ -40,7 +40,7 @@
   </td>
   <%#no delete button, because there is no need to delete the row, it will be deleted either by 
   compleating the lab or when the user is removed from the lab%>
-    <td><%= link_to 'Show', vm,:class=> 'edit-button button' %><%= link_to 'Edit', edit_vm_path(vm),:class=> 'edit-button button' if @admin%><%#= link_to 'Destroy', vm, :confirm => 'Are you sure?', :method => :delete,:class=> 'delete-button button' %></td>
+    <td><%= link_to 'Show', vm,:class=> 'edit-button button' %><%= link_to 'Edit', edit_vm_path(vm),:class=> 'edit-button button' if @admin%><%= link_to 'Destroy', vm, :confirm => 'Are you sure?', :method => :delete,:class=> 'delete-button button' %></td>
   </tr>
   
  

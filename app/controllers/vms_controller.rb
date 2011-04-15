@@ -130,17 +130,25 @@ class VmsController < ApplicationController
        @mac= Mac.find(:first, :conditions=>["vm_id is null"])
         @mac.vm_id=vm.id
        if @mac.save  #save õnnestus, masinal on mac olemas..
-        flash[:notice] = "Successful vm initialisation." 
-        logger.info "käivitame masina skripti"
-        a=vm.ini_vm #the script is called in the model
-        logger.info a
+        flash[:notice] = "successful mac assignement."#"Successful vm initialisation." 
+      #  logger.info "käivitame masina skripti"
+      # a=vm.ini_vm #the script is called in the model
+      #logger.info a
         # redirect_to(:back)
         end #end -if save
       else
         #the vm had a mac already, dont do anything
-       flash[:notice] = "Vm already initialized."
+       flash[:notice] = "Vm already had a mac."
         #redirect_to(:back)
       end # end if nil
+      
+      if vm.state!="running" && vm.state!="paused"
+      logger.info "käivitame masina skripti"
+        a=vm.ini_vm #the script is called in the model
+        logger.info a
+        flash[:notice]=flash[:notice]+" Initialized machine"
+      end
+        
     rescue ActiveRecord::StaleObjectError # to resque from conflict, go on a new round of init?
       logger.info "Mac address conflict"
       redirect_to(init_vm_path, :id=>vm.id)
