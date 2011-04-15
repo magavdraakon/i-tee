@@ -148,7 +148,8 @@ class VmsController < ApplicationController
         logger.info a
         flash[:notice]=flash[:notice]+" Initialized machine"
       end
-        
+      
+      #VAADATA ÜLE!!!
     rescue ActiveRecord::StaleObjectError # to resque from conflict, go on a new round of init?
       logger.info "Mac address conflict"
       redirect_to(init_vm_path, :id=>vm.id)

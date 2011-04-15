@@ -3,6 +3,15 @@ class Vm < ActiveRecord::Base
   belongs_to :user
   belongs_to :lab_vmt
   before_destroy :del_vm
+  before_destroy :rel_mac
+  
+  def rel_mac
+    mac=Mac.find(:first, :conditions=>["vm_id=?", id])
+    if mac!=nil
+      mac.vm_id=nil
+      mac.save
+    end
+  end
 
   def del_vm
     return %x(/var/www/railsapps/i-tee/utils/stop_machine.sh #{name}  2>&1)

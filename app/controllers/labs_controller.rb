@@ -175,6 +175,7 @@ class LabsController < ApplicationController
     #the lab is not meant for this user, redirect
     redirect_to(error_401_path)
   end
+  
    rescue ActiveRecord::RecordNotFound
       redirect_to(courses_path)
   end
@@ -183,18 +184,16 @@ class LabsController < ApplicationController
   def end_lab
     @lab_user=LabUser.find(params[:id])
     @note=""
-    #check if this is this users lab (to not allow url hacking) /admins can end users labs
-    if current_user==@lab_user.user || @admin then
-      @lab=@lab_user.lab
-     @lab_user.lab.lab_vmts.each do |template|
-        #is there a machine like that 
-       vm=Vm.find(:first, :conditions=>["lab_vmt_id=? and user_id=?", template.id, current_user.id ])
-       if vm!=nil then
-         #yes, delete it
-         vm.destroy
-         @note="Machines successfully deleted."
+    #check if this is this users lab (to not allow url hacking)
+    if current_user==@lab_user.user 
+      @lab_user.lab.lab_vmts.each do |template|
+        template.vms.each do |t|
+        if t.user==current_user
+          t.destroy
+          @note="Machines successfully deleted."
         end
-      end #end of deleting vms for this lab
+      end
+    end #end of deleting vms for this lab
      if @note!="" then
         @lab_user.end=Time.now
         @lab_user.save
@@ -204,11 +203,32 @@ class LabsController < ApplicationController
     flash[:alert]  = "Restricted access!"
     redirect_to(error_401_path)
   end # end- this users lab
+  
   rescue ActiveRecord::RecordNotFound
     redirect_to(courses_path)
   end
   
-  
+  #restarting a lab means deleting virtual machines, removing start/end times and progress/results
+  def restart_lab
+    @lab=Lab.find(params[:id])
+    @lab_user=LabUser.find(:last, :conditions=>["lab_id=? and user_id=?", @lab.id, current_user.id])
+    if @lab_user!=nil 
+     @lab_user.update_attributes(:progress =>nil, :result =>nil, :start=>nil, :pause=>nil, :end=>nil) 
+    
+    @lab_user.lab.lab_vmts.each do |template|
+    template.vms.each do |t|
+      if t.user==current_user
+        t.destroy
+        @note="Machines successfully deleted."
+      end
+     end
+    end
+        
+  end
+     redirect_to(running_lab_path+"/"+@lab.id.to_s)
+  rescue ActiveRecord::RecordNotFound
+    redirect_to(courses_path)
+  end
   
   private #----------------------------------------------------------------------------------
    def get_user_labs

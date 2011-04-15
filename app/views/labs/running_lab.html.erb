@@ -41,7 +41,7 @@
   <p><%=link_to(vm.name, :controller=>'vms', :action=>'show', :id=>vm.id) %> 
   <%state=vm.state %>
   <%if state=="running" || state=="paused" then%>
-    (<%=state%>) 
+    (<%=state%>, IP <%=vm.mac.ip%>) 
     <%= link_to('Pause',:controller=>'vms',:action=>'pause_vm', :id=>vm.id) if state=="running"  %>
     <%= link_to('Resume',:controller=>'vms', :action=>'resume_vm', :id=>vm.id) if state=="paused"%>
     <%= link_to('Stop',:controller=>'vms', :action=>'stop_vm', :id=>vm.id) if state=="running"%>
@@ -64,7 +64,8 @@
         <td><%= link_to('End lab', :controller=>'labs', :action=>'end_lab', :id=>@lab_user.id) %> </td>
       </tr>
     </table>
-    <%end%>
+    <%end%>   
+    
 </div>
 <%end%>
 
@@ -73,7 +74,7 @@ Running lab
   <%end%>
 
 <% content_for :sidebar do %>
-<li><%= link_to 'Back', courses_path %></li>
+<li><%= link_to 'Back', :back %></li>
 <%if @other.length>0 then%>
   <li class="between">Other <%=@status%> labs</li>
   <% @other.each do |o| %>

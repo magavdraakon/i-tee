@@ -34,6 +34,8 @@ ITee::Application.routes.draw do
     match 'stop_vm/:id', :to=> 'vms#stop_vm'
   
   match 'end_lab/:id', :to=>'labs#end_lab'
+  match 'restart_lab/:id', :to=> 'labs#restart_lab'
+  match 'restart_lab', :to=> 'labs#restart_lab'
   match 'running_lab/:id', :to=> 'labs#running_lab'
   match 'running_lab', :to=> 'labs#running_lab'
   match 'add_users', :to=> 'lab_users#add_users'
