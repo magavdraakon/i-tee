@@ -9,13 +9,12 @@
 
 <% content_for :sidebar do %>
   <% if @admin %>
-    <li><a href="">Dynamic name server for beginners</a></li>
-    <li><a href="">LDAP configurations</a></li>
-    <li><a href="">Introduction to GNU/Linux</a></li>
-    <li><a href="">Multimedia Communications and Networking</a></li>
+    <li><%=link_to('index', root_path)%></li>
+    <li><%=link_to('Template guide', template_path)%></li>
+    <li><%=link_to('System guide', system_path)%></li>
   <%else%>
-  Laborite nimekiri
-  <%end%>
+Something useful
+<%end%>
     
 <% end %>
 

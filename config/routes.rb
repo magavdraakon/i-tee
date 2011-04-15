@@ -25,6 +25,9 @@ ITee::Application.routes.draw do
   
   
   match 'error_401', :to => 'home#error_401'
+  match 'template', :to => 'home#template'
+  match 'system', :to => 'home#system'
+  
   
   match 'start_all/:id', :to=> 'vms#start_all'
    match 'start_vm/:id', :to=> 'vms#start_vm'

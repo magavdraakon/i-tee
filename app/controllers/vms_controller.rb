@@ -152,7 +152,7 @@ class VmsController < ApplicationController
       #VAADATA ÜLE!!!
     rescue ActiveRecord::StaleObjectError # to resque from conflict, go on a new round of init?
       logger.info "Mac address conflict"
-      redirect_to(init_vm_path, :id=>vm.id)
+      redirect_to(:action=>'start_vm', :id=>vm.id)
   end
   
   #resume machine from pause
