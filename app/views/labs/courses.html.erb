@@ -30,7 +30,7 @@
     <%else%>
     
    
-    <%= raw @lab.description %>
+    <%=link_M raw @lab.description %>
     <br/>
     <h3>materials</h3>
     <%  @lab.lab_materials.sort! { |a,b| a.sort <=> b.sort }%>

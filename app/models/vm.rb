@@ -5,6 +5,8 @@ class Vm < ActiveRecord::Base
   before_destroy :del_vm
   before_destroy :rel_mac
   
+  validates_presence_of :name, :lab_vmt_id, :user_id
+  
   def rel_mac
     mac=Mac.find(:first, :conditions=>["vm_id=?", id])
     if mac!=nil

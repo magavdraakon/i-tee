@@ -39,7 +39,6 @@ class LabMaterialsController < ApplicationController
   # GET /lab_materials/new.xml
   def new
     @lab_material = LabMaterial.new
-    @labs= Lab.all
     lab_materials=[]
     
     #find_by_id returns nil if there is no such lab_material
@@ -62,7 +61,6 @@ class LabMaterialsController < ApplicationController
   def edit
     #@lab_material = LabMaterial.find(params[:id])
     @lab = @lab_material.lab
-    @labs= Lab.all
     @materials= Material.all
   end
 

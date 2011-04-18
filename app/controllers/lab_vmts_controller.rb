@@ -17,6 +17,7 @@ class LabVmtsController < ApplicationController
   def index
     @lab_vmts = LabVmt.find(:all, :order=>params[:sort_by])
     @lab_vmt = LabVmt.new
+    @lab = Lab.find_by_id(params[:lab]) if params[:lab]!=nil
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @lab_vmts }
@@ -24,40 +25,25 @@ class LabVmtsController < ApplicationController
   end
   
 
-  # GET /lab_vmts/new
-  # GET /lab_vmts/new.xml
-  #used to add vmts from the lab side
-  def new
-    @lab_vmt = LabVmt.new
-    @labs= Lab.all
-    @vmts= Vmt.all
-    @lab = Lab.find_by_id(params[:lab])
-    
-    respond_to do |format|
-      format.html # new.html.erb
-      format.xml  { render :xml => @lab_vmt }
-    end
-  end
 
   # GET /lab_vmts/1/edit
   def edit
    # @lab_vmt = LabVmt.find(params[:id])
     @lab=@lab_vmt.lab
-    @labs= Lab.all
-    @vmts= Vmt.all
+    
   end
 
   # POST /lab_vmts
   # POST /lab_vmts.xml
   def create
     @lab_vmt = LabVmt.new(params[:lab_vmt])
-
+    @lab_vmts=LabVmt.all
     respond_to do |format|
       if @lab_vmt.save
         format.html { redirect_to(lab_vmts_url, :notice => 'Lab vmt was successfully created.') }
         format.xml  { render :xml => @lab_vmt, :status => :created, :location => @lab_vmt }
       else
-        format.html { render :action => "new" }
+        format.html { render :action => "index" }
         format.xml  { render :xml => @lab_vmt.errors, :status => :unprocessable_entity }
       end
     end

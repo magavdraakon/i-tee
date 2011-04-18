@@ -20,7 +20,8 @@
 
 <p>
   <b>Description:</b>
-  <%=raw @lab.description %>
+  <%=link_M raw @lab.description %>
+  
 </p>
 <br/>
 <div id="content-table">
@@ -50,7 +51,7 @@
 </p> 
 <%end%>
 <br/>
-<p><%=link_to 'Add VMTs', :controller=>'lab_vmts', :action=>'new', :lab=>@lab %></p></td>
+<p><%=link_to 'Add VMTs', :controller=>'lab_vmts', :action=>'index', :lab=>@lab %></p></td>
 </tr>
 </table>
 </div>

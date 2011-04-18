@@ -2,26 +2,29 @@
   <% if @lab_material.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(@lab_material.errors.count, "error") %> prohibited this lab_material from being saved:</h2>
-
-      <ul>
       <% @lab_material.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
+      <%= msg %><br/>
       <% end %>
-      </ul>
     </div>
   <% end %>
 
   <div class="field">
+  <%materials=Material.all%>
   <%# if a lab is selected let it be as the selected value in the dropbox%>
-    <%@lab_material.lab_id=@lab.id if @lab!=nil%>
+  <%if @lab!=nil then%>
+    <%@lab_material.lab_id=@lab.id
+    materials=@materials if @materials!=nil%>
+    
+    <%end%>
+    
      <%= f.label :lab_id %><br />
-    <%=collection_select(:lab_material, :lab_id, @labs, :id, :name,{:prompt => true})%>
+    <%=collection_select(:lab_material, :lab_id, Lab.all, :id, :name,{:prompt => true})%>
     
    
   </div>
   <div class="field">
     <%= f.label :material_id %><br />
-    <%=collection_select(:lab_material, :material_id, @materials, :id, :name, {:prompt => true})%>
+    <%=collection_select(:lab_material, :material_id, materials, :id, :name, {:prompt => true})%>
 
   </div>
   <div class="field">

@@ -17,7 +17,7 @@
 </thead>
 
 <% @lab_vmts.each do |lab_vmt| %>
-  <tr>
+  <tr class="vmt <%if lab_vmt.lab==@lab then%>current<%end%>">
     <td><%= lab_vmt.name %></td>
     <td><%= lab_vmt.lab.name %></td>
     <td><%= lab_vmt.vmt.image %></td>
@@ -28,14 +28,24 @@
 
 </div>
 <%= form_for(@lab_vmt) do |f| %>
+ <% if @lab_vmt.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@lab_vmt.errors.count, "error") %> prohibited this lab_vmt from being saved:</h2>
+      <% @lab_vmt.errors.full_messages.each do |msg| %>
+      <%= msg %> <br/>
+      <% end %>
+      
+    </div>
+  <% end %>
 <table>
 <tr>
 <td>  <%= f.text_field :name %></td>
 <td>
-<%=collection_select(:lab_vmt, :lab_id, Lab.all, :id, :name)%>
+<%@lab_vmt.lab_id=@lab if @lab!=nil%>
+<%=collection_select(:lab_vmt, :lab_id, Lab.all, :id, :name,{:prompt => true})%>
 </td>
 <td>
-<%=collection_select(:lab_vmt, :vmt_id, Vmt.all, :id, :image)%>
+<%=collection_select(:lab_vmt, :vmt_id, Vmt.all, :id, :image,{:prompt => true})%>
 </td>
 <td><%= f.submit "Add"%> </td>
 </tr>
@@ -48,5 +58,7 @@ VMT in labs
   <%end%>
 <% content_for :sidebar do %>
 <li><%= link_to 'Back', :back %></li>
+<li><a href="#" onclick="$('.vmt').hide(); $('.current').show();">this lab's vmts</a></li>
+<li><a href="#" onclick="$('.vmt').show(); ;">all labs vmts</a></li>
 
 <%end%>
