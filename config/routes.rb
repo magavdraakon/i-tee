@@ -1,21 +1,19 @@
 ITee::Application.routes.draw do
-  
-  
+  # match 'users/sign_up', :to=>'devise/sessions#new'
   resources :lab_users
 
   resources :lab_vmts
 
   resources :vmts
 
-  resources :lab_materials
+  resources :lab_materials  
 
-  devise_for :users
-
+  devise_for :users,  :controllers => { :registrations => "users/registrations", :passwords=>"users/passwords" }
 
   resources :vms
 
   resources :materials
-
+  
   resources :labs
 
   resources :hosts
@@ -42,7 +40,7 @@ ITee::Application.routes.draw do
   match 'running_lab/:id', :to=> 'labs#running_lab'
   match 'running_lab', :to=> 'labs#running_lab'
   match 'add_users', :to=> 'lab_users#add_users'
-  match 'profile', :to=>'home#profile'
+  
   
   match 'courses/:id', :to => 'labs#courses'
   match 'courses', :to =>'labs#courses'
@@ -99,6 +97,14 @@ ITee::Application.routes.draw do
   # just remember to delete public/index.html.
    root :to => "home#index"
 
+  
+  # This is a catch-all for routes that don't exist, visitor is redirected to home page.
+ActionController::Routing::Routes.draw do |map|
+    map.connect ':controller/:action/:id'
+    map.connect '*path', :controller => 'home', :action => 'catcher'
+end
+
+  
   # See how all your routes lay out with "rake routes"
 
   # This is a legacy wild controller route that's not recommended for RESTful applications.

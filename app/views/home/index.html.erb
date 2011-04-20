@@ -1,10 +1,6 @@
 <% content_for :sidebar_head do %>
-  <% if @admin %>
   Dashboard
-  <%else%>
-  Vali labor
-  <%end%>
-  
+ 
 <% end %>
 
 <% content_for :sidebar do %>
@@ -13,7 +9,7 @@
     <li><%=link_to('Template guide', template_path)%></li>
     <li><%=link_to('System guide', system_path)%></li>
   <%else%>
-Something useful
+...
 <%end%>
     
 <% end %>
@@ -23,20 +19,26 @@ Something useful
   <div class="head">Home View</div>
   <div class="hr"></div>
   <div class="text-box round">
-
+<p id="notice"><%= notice %></p>
     
 
     <% if @admin %>
       <div id="adminmenu">
         <p>Sa oled administraator</p>
-        
         <p>Emulated virtualization environment: <%= ITee::Application.config.emulate_virtualization %></p>
         <p>Emulated ldap environment: <%= ITee::Application.config.emulate_ldap %></p>
-        
       </div>
     <%else%>
       <div id="usermenu">
-        Siia tuleb abiinfo, mis räägib i-tee keskkonna kasutamisest
+        <p>Siia tuleb abiinfo, mis räägib i-tee keskkonna kasutamisest</p>
+        <p> valida courses alt labor, vajutada nupul start et laborit alustada, continue et jätkata,
+          restart et käimasolevat uuesti alustada
+        ja view et vaadata lõpetatud sooritust.</p>
+        <p>virtuaalmasinaid saab näha my machines all, või ka neile vastavate laborisoorituste lehtedel.</p>
+        <p>käivitatud virtuaalmasin saab omale IP aadressi, virtuaalmasina kasutamiseks käsureal: 
+          ssh student@IP
+          parool: student
+        </p>
       </div>
     <%end%>
   </div>

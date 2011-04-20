@@ -1,6 +1,6 @@
 class LabsController < ApplicationController  
   #users can see courses, running labs and end their OWN lab
-  before_filter :authorise_as_admin, :except => [:courses, :running_lab, :end_lab]
+  before_filter :authorise_as_admin, :except => [:courses, :running_lab, :end_lab, :restart_lab]
 
       #redirect to index view when trying to see unexisting things
   before_filter :save_from_nil, :only=>[:show, :edit]
