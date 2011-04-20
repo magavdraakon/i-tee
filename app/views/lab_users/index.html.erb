@@ -44,7 +44,7 @@
 <%=collection_select(:lab_user, :lab_id, Lab.all, :id, :name)%>
 </td>
 <td>
-<%=collection_select(:lab_user, :user_id, User.all, :id, :username)%>
+<%=collection_select(:lab_user, :user_id, User.find(:all, :order=>'username'), :id, :username)%>
 </td>
 <td><%= f.submit "Add"%> </td>
 </tr>

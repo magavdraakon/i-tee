@@ -301,3 +301,8 @@ html:first-child caption { /* Opera only */
 .bold {
     font-weight: bold;
 }
+
+.user_li {
+  float:left;
+  padding:5px;
+}

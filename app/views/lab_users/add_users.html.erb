@@ -17,10 +17,9 @@
 </td>
 <td>
   <ul>
-<%User.all.each do |u|%>
-  <li><%# check_box_tag('users[]',u.id, :checked=>@users_in.include?(u))%> 
+<%User.find(:all, :order=>'username').each do |u|%>
+  <li class="user_li"><%# check_box_tag('users[]',u.id, :checked=>@users_in.include?(u))%> 
 <%= check_box_tag('users[]',u.id, @users_in.include?(u))%>
-
 <%=u.username%></li>
 <%end%>
 </ul>
