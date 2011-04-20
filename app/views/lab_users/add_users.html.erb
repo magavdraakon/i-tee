@@ -4,8 +4,13 @@
  <div class="hr"></div>
  <div class="text-box">
 <p id="notice"><%= notice %></p>
-
-
+<%alphabet=[]%>
+<%('a'..'z').each do |l|%>
+  <%alphabet<<l%>
+  <a href="#" onclick="$('.user_li').hide(); $('.letter_<%=l%>').show();"><%=l.upcase%></a> 
+  <%end%>
+  <a href="#" onclick="$('.user_li').hide(); $('.letter_').show();">other</a> 
+  <a href="#" onclick="$('.user_li').show();">all</a>
 <%= form_for(@lab_user) do |f| %>
 <table>
   <tr>
@@ -13,12 +18,11 @@
 <%= f.hidden_field :page, :value=>'bulk_add'%>
 <%= f.hidden_field :lab_id, :value=>@lab.id%>
 <%#collection_select(:lab_user, :lab_id, Lab.all, :id, :name)%>
-
 </td>
 <td>
   <ul>
 <%User.find(:all, :order=>'username').each do |u|%>
-  <li class="user_li"><%# check_box_tag('users[]',u.id, :checked=>@users_in.include?(u))%> 
+  <li class="user_li letter_<%=u.username[0,1] if alphabet.include? u.username[0,1]%>"><%# check_box_tag('users[]',u.id, :checked=>@users_in.include?(u))%> 
 <%= check_box_tag('users[]',u.id, @users_in.include?(u))%>
 <%=u.username%></li>
 <%end%>

@@ -304,5 +304,9 @@ html:first-child caption { /* Opera only */
 
 .user_li {
   float:left;
-  padding:5px;
+  width:125px;
+  display:none;
+}
+.letter_a {
+  display:block;
 }
