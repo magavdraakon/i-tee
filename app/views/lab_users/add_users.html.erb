@@ -23,8 +23,8 @@
   <ul>
 <%User.find(:all, :order=>'username').each do |u|%>
   <li class="user_li letter_<%=u.username[0,1] if alphabet.include? u.username[0,1]%>"><%# check_box_tag('users[]',u.id, :checked=>@users_in.include?(u))%> 
-<%= check_box_tag('users[]',u.id, @users_in.include?(u))%>
-<%=u.username%></li>
+<%= check_box_tag("users[]",u.id, @users_in.include?(u), :id=>u.username)%>
+<%=label_tag(u.username, u.username)%></li>
 <%end%>
 </ul>
 <%#collection_select(:lab_user, :user_id, User.all, :id, :username)%>

@@ -25,5 +25,12 @@ jQuery(function ($) {
     
 });
 
+$('#notice').click(function(){
+$('#notice').slideToggle('slow');
+})
+
+if ($('#notice').text()==''){
+$('#notice').hide();
+}
 //document ready
 });
