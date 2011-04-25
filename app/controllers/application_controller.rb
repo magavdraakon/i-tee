@@ -12,12 +12,14 @@ class ApplicationController < ActionController::Base
     before_filter :admin?
   end
   
-   layout 'main'
+   layout 'new'
   
   def emulate_user
     @admin = true
     @logged_in = true
-    @username = "Test User"
+    @username = "ttanav"
+    current_user.username=@username
+    current_user.id=1
   end
 
   #return true if the current user is a admin
@@ -37,9 +39,11 @@ class ApplicationController < ActionController::Base
   def authorise_as_admin
     unless ITee::Application.config.admins.include?(current_user.username)
       #You don't belong here. Go away.
+     
       flash[:alert]  = "Restricted access!"
         redirect_to(:controller=>'home', :action=>'error_401')
       end
+      
     end
   
 end

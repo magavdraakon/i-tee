@@ -1,9 +1,6 @@
-<% content_for :body do %>
-<div class="head">Listing users in labs</div>
- <div class="hr"></div>
- <div class="text-box">
-<p id="notice"><%= notice %></p>
-    <div id="content-table">
+
+<h3>Listing users in labs</h3>
+<div id="index_t">
 <table>
    <caption >users in labs (<%= @lab_users.count  %>)</caption>
   <thead>
@@ -20,7 +17,6 @@
   </tr>
 </thead>
 
-
 <% @lab_users.each do |lab_user| %>
   <tr>
     <td><%= lab_user.lab.name %></td>
@@ -34,8 +30,7 @@
   </tr>
 <% end %>
 </table>
- </div>
-
+</div>
 <%= form_for(@lab_user) do |f| %>
 <table>
 <tr>
@@ -50,13 +45,4 @@
 </tr>
 </table>
 <%end%>
-  </div>
-<%end%>
-<% content_for :sidebar_head do %>
-Users in Labs
-  <%end%>
-<% content_for :sidebar do %>
-
-  <li><%=link_to 'add users to lab', add_users_path%></li>
-
-<%end%>
+ 

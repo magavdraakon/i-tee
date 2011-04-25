@@ -1,6 +1,6 @@
 class LabsController < ApplicationController  
   #users can see courses, running labs and end their OWN lab
-  before_filter :authorise_as_admin, :except => [:courses, :running_lab, :end_lab, :restart_lab]
+  before_filter :authorise_as_admin, :except => [:courses, :running_lab,:ended_lab, :end_lab, :restart_lab]
 
       #redirect to index view when trying to see unexisting things
   before_filter :save_from_nil, :only=>[:show, :edit]
@@ -123,24 +123,38 @@ class LabsController < ApplicationController
       redirect_to(courses_path)
   end
   
+  def ended_lab
+     get_user_labs
+    @lab=Lab.find_by_id(params[:id])
+     if @lab==nil 
+      @lab=@complete.first
+    end
+    @other=@complete  
+    
+    @lab_user = LabUser.find(:last, :conditions=>["lab_id=? and user_id=?", @lab.id, current_user.id]) if @lab!=nil
+    @note=""
+    
+    if @lab_user==nil && @lab!=nil
+    #the lab is not meant for this user, redirect
+    redirect_to(error_401_path)
+    end
+   render :action=>"running_lab"
+   rescue ActiveRecord::RecordNotFound
+    redirect_to(courses_path)      
+  end
+  
+  
   #view for running or completed labs
   def running_lab
     get_user_labs
-    @lab=Lab.find(params[:id])
+    @lab=Lab.find_by_id(params[:id])
     
-    @other=[]
-    if @started.include?(@lab)
-      @status="running"
-      @started.delete(@lab)
-      @other=@other+@started
-    else
-      @status="ended"
-      @complete.delete(@lab)
-      @other=@other+@complete
+    if @lab==nil 
+      @lab=@started.first
     end
-      
+    @other=@started
     #find the last appearance of the current users lab (repeating a lab made possible)
-    @lab_user = LabUser.find(:last, :conditions=>["lab_id=? and user_id=?", @lab.id, current_user.id])
+    @lab_user = LabUser.find(:last, :conditions=>["lab_id=? and user_id=?", @lab.id, current_user.id]) if @lab!=nil
     @note=""
     @vms=[]
     
@@ -173,7 +187,7 @@ class LabsController < ApplicationController
     end
   else
     #the lab is not meant for this user, redirect
-    redirect_to(error_401_path)
+    redirect_to(error_401_path) if @lab!=nil
   end
   
    rescue ActiveRecord::RecordNotFound
@@ -198,7 +212,7 @@ class LabsController < ApplicationController
         @lab_user.end=Time.now
         @lab_user.save
      end
-    redirect_to(:back)
+    redirect_to(ended_courses_path+"/"+@lab_user.lab.id.to_s)
   else #this lab doesnt belong to this user, permission error
     flash[:alert]  = "Restricted access!"
     redirect_to(error_401_path)
@@ -225,7 +239,7 @@ class LabsController < ApplicationController
     end
         
   end
-     redirect_to(running_lab_path+"/"+@lab.id.to_s)
+     redirect_to(running_courses_path+"/"+@lab.id.to_s)
   rescue ActiveRecord::RecordNotFound
     redirect_to(courses_path)
   end

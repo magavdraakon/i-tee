@@ -1,23 +1,2 @@
-
-
-<% content_for :sidebar_head do %>
-  Virtual Machines
-<% end %>
-
-<% content_for :sidebar do %>
-    <li><%= link_to 'Show', @vm %></li>
-    <li><%= link_to 'Back', vms_path %></li>
-<% end %>
-
- <% if @admin then %>
-<% content_for :body do %>
-  <div class="head">Editing virtual machine</div>
-  <div class="hr"></div>
-  <div class="text-box round">
-    <%= render 'form' %>
-  </div>
-<% end %>
-
-<%else%>
-<%= render :partial => "shared/no_permission" %>
-<%end%>
+<h3>Editing virtual machine</h3>
+<%= render 'form' %> 

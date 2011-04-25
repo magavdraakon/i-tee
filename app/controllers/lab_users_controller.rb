@@ -64,7 +64,7 @@ class LabUsersController < ApplicationController
         format.html { redirect_to(lab_users_url, :notice => 'successful update.') }
         format.xml  { render :xml => @lab_user, :status => :created, :location => @lab_user }
       else
-        format.html { render :action => "new" }
+        format.html { render :action => "index" }
         format.xml  { render :xml => @lab_user.errors, :status => :unprocessable_entity }
       end #end if
     end #end respond_to

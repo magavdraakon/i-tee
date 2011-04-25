@@ -43,15 +43,6 @@ ActiveRecord::Schema.define(:version => 20110228094850) do
     t.datetime "updated_at"
   end
 
-  create_table "lab_materials", :force => true do |t|
-    t.integer  "lab_id"
-    t.integer  "material_id"
-    t.text     "description"
-    t.integer  "sort"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "lab_users", :force => true do |t|
     t.integer  "lab_id"
     t.integer  "user_id"

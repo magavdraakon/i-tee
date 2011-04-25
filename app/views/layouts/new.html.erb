@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ITee</title>
+   <%= stylesheet_link_tag "reset" %>
+  <%= stylesheet_link_tag "newlay"%>
+  <%= javascript_include_tag :all %>
+  <%= javascript_include_tag :ckeditor %>
+  
+  <%= csrf_meta_tag %>
+</head>
+
+<%= yield :javascript %> 
+
+<body>
+ <div id="contain">
+    <div id="right">
+<div id="top">i-tee</div>
+    <div id="m_menu">
+      <%if user_signed_in?%>
+      <% course_actions=["courses","running_lab", "ended_lab"]
+        admin_controllers=["labs","materials","vmts", "hosts","lab_users","lab_vmts"]  
+      %>
+      <div class="hb b_menu <% if controller_name == "home"%>current_tab<%end%>">Home</div>
+      <div class="cb b_menu <% if controller_name == "labs" && course_actions.include?(action_name)%>current_tab<%end%>">Courses</div>
+      <div class="vb b_menu <% if controller_name == "vms"%>current_tab<%end%>">My machines</div>
+     <%if  @admin then  %>
+        <div class="ab b_menu <% if admin_controllers.include?(controller_name) && !course_actions.include?(action_name)%>current_tab<%end%>">Administration</div>
+        <%end%>
+      <div class="logout b_menu">
+      <%# if user_signed_in? %>
+            <%= link_to "Sign out", destroy_user_session_path %>
+            <%# elsif @logged_in %>
+           <%#= link_to "Sign out", destroy_user_session_path %>
+          <%# end %>
+      </div>
+       <%end%>
+    </div>
+   
+    <div id="s_menu"></div>
+ <div id="wrap">
+      <div class="home s_menu <% if controller_name == "home"%>current_tab<%end%>">
+        <%=link_to_unless_current('index', root_path)%>
+        <%=link_to_unless_current('Template guide', template_path) if @admin%>
+        <%=link_to_unless_current('System guide', system_path) if @admin%> 
+      </div>
+      <div class="course s_menu <% if controller_name == "labs" && course_actions.include?(action_name)%>current_tab<%end%>"> 
+        <%= link_to_unless_current 'all courses', courses_path %>
+        
+        <%= link_to_unless_current 'running courses', running_courses_path %>
+        <%= link_to_unless_current 'ended courses', ended_courses_path %>
+        
+      </div>
+      <div class="vms s_menu <% if controller_name == "vms"%>current_tab<%end%>"> 
+        <%= link_to_unless_current 'all vms', vms_path %>
+        <%= link_to_unless_current('vms by state', vms_by_state_path) %>
+        <%= link_to_unless_current('vms by lab', vms_by_lab_path) %>
+        <%= link_to_unless_current 'new vm', new_vm_path if @admin%> 
+      </div>
+      <%if  @admin then  %>
+      <div class="admin s_menu <% if admin_controllers.include?(controller_name) && !course_actions.include?(action_name)%>current_tab<%end%>">
+        <table>
+          <tr>
+            <td>
+              <%= link_to_unless_current 'lab', labs_path %><br/>
+              <%= link_to_unless_current 'new lab', new_lab_path %><br/>
+              <%=link_to_unless_current 'lab users', lab_users_path%><br/>
+              <%=link_to_unless_current 'add users by lab', add_users_path%>
+            </td>
+            <td>
+              <%= link_to_unless_current 'materials', materials_path %><br/>
+              <%= link_to_unless_current 'new material', new_material_path %>
+            </td>
+            <td>
+              <%= link_to_unless_current 'vmts', vmts_path %><br/>
+              <%= link_to_unless_current 'new vmt', new_vmt_path %><br/>
+              <%= link_to_unless_current 'lab vmts', lab_vmts_path %>
+            </td>
+            <td>
+              <%= link_to_unless_current('Hosts', hosts_path) %><br/>
+              <%= link_to_unless_current 'New Host', new_host_path %>
+            </td>
+          </tr>
+        </table>
+
+      </div>
+      <%end%>
+      
+      <div id="c_wrap">
+      <%# sidebar_actions=["vms_by_lab","vms_by_state","courses", "running_lab", "ended_lab"]%>
+      <%#if sidebar_actions.include?(action_name)%> 
+      <div id="sidemenu">
+        <div id="menu-hide"></div>
+        <div id="menu-head"><%= yield :sidebar_head %></div>
+        <ul>
+              <%= yield :sidebar %>
+            </ul>
+      </div>
+      <%#end%>
+      <div id="content"class="side_visible">
+        <div id="menu-show"></div>
+    <p id="notice"><%= notice %></p>
+    <%if !user_signed_in?%>
+    <div id="info"> 
+      <p> EIK kauglaborite süsteemi i-Tee abil saab teha erinevate ainete laboritöid.</p>
+      <ol>
+        <li> Sisene süsteemi kasutades EIK arvutiklassi kasutajanime ja salasõna.</li>
+        <li> Vali laboritöö.</li>
+        <li> Käivita laboritöö ja loe läbi materjalid.</li>
+        <li> Lõpeta labor, kui kõik on tehtud (või salvesta hiljem jätkamiseks)</li>
+      </ol>
+      <p> Küsimuste puhul pöördu Margus Ernits poole (e-posti leiad õppeinfosüsteemist)</p>
+  </div>
+      <%end%> 
+    <%= yield  %>
+    <%if !user_signed_in?%>  
+  <div id="logos">
+  <a href="http://www.struktuurifondid.ee/"><img src="../images/er_regionaalareng.png"/></a>
+  <a href="http://www.eitsa.ee/"><img src="../images/eitsa.png"/></a>
+</div>
+      <%end%>
+     
+      
+    </div>
+    </div>
+  </div>
+</div>
+<div id="footer">i-tee 2011</div>
+</div>
+
+</body>
+</html>

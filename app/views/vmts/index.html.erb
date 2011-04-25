@@ -1,8 +1,4 @@
-<% content_for :body do %>
-<div class="head">Listing Virtual Machine templates</div>
- <div class="hr"></div>
- <div class="text-box">
-    <div id="content-table">
+ <div id="index_t">
 <table>
    <caption >Templates (<%= @vmts.count  %>)</caption>
   <thead>
@@ -15,8 +11,6 @@
   </tr>
 </thead>
 
-
-
 <% @vmts.each do |vmt| %>
   <tr>
     <td><%= vmt.image %></td>
@@ -26,14 +20,5 @@
   </tr>
 <% end %>
 </table>
-<%end%>
-<% content_for :sidebar_head do %>
-Virtual Machine Templates
-  <%end%>
-<% content_for :sidebar do %>
-<li><%= link_to 'New VMT', new_vmt_path %></li>
-<li><%= link_to 'VMTs in labs', lab_vmts_path %></li>
 
-<%end%>
-
-
+</div>

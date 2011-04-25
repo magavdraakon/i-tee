@@ -1,9 +1,5 @@
-
-<% content_for :body do %>
-<div class="head">Add users to '<%= @lab.name%>'</div>
- <div class="hr"></div>
- <div class="text-box">
-<p id="notice"><%= notice %></p>
+<h3>Add users to '<%= @lab.name%>'</h3>
+ 
 <%alphabet=[]%>
 <%('a'..'z').each do |l|%>
   <%alphabet<<l%>
@@ -34,16 +30,18 @@
 <%= f.submit "Add"%> 
 
 <%end%>
-  </div>
-<%end%>
-<% content_for :sidebar_head do %>
-Users in Labs
-  <%end%>
-<% content_for :sidebar do %>
+ 
 
-<li><%=link_to 'back', lab_users_path%></li>
-<% Lab.all.each do |l|%>
+<% content_for :sidebar_head do %>
+ Choose lab
+  <%end%>
+
+<% content_for :sidebar do %>
+ <% Lab.all.each do |l|%>
 <li><%=link_to(l.name, :controller=>"lab_users", :action=>"add_users", :id=>l.id)%></li>
 <%end%>
-
 <%end%>
+
+
+
+

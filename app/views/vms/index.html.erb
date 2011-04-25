@@ -1,10 +1,4 @@
-<% content_for :body do %>
-
-<div class="head">Listing Virtual Machines</div>
- <div class="hr"></div>
- <div class="text-box">
-  <p id="notice"><%= notice %></p>
-    <div id="content-table">
+<div id="index_t">
 <table>
    <caption >Server hosts (<%= @vms.count  %>)</caption>
   <thead>
@@ -24,7 +18,7 @@
  <%state=vm.state %>
 
   <tr class="vm <%if state=="running" || state=="paused" then%>  <%=state%>  <%else%><%state="error: no such vm"%>
-    uninit<%end%>">
+    uninit<%end%> lab<%= vm.lab_vmt.lab.id%>">
     <td><%= vm.name %></td>
     <td><%= vm.lab_vmt.name%> </td>
     <td><%= vm.lab_vmt.lab.name%> </td>
@@ -46,26 +40,32 @@
  
 <% end %>
 </table>
+</div>
 
- </div>
-  </div>
-
-<% end %>
 <% content_for :sidebar_head do %>
-Virtual Machines
-  <%end%>
-<% content_for :sidebar do %>
-<%#tavakasutaja ei saa endale masinaid juurde tekitada!%>
-<%#TODO: lingid näiteks näitamaks ainult aktiivseid masinaid, mitteaktiivseid masinaid etc%>
- 
- <% if @admin then %>
-<li><%= link_to 'New VM', new_vm_path %></li>
+<% if @b_by=='state' then%>Choose state<%end%><%if @b_by=="lab" then%>Choose lab<%end%>
 <%end%>
+
+<% content_for :sidebar do %>
+  <%#TODO mingi parameetri järgi peab tegema kinldaks, mis menüü siia esitada%>
+  <% if @b_by=='state' then%>
 <li><a href="#" onclick="$('.vm').show();">All machines</a></li>
 <li><a href="#" onclick="$('.vm').hide(); $('.running').show();">Running machines</a></li>
 <li><a href="#" onclick="$('.vm').hide(); $('.paused').show();">Paused machines</a></li>
 <li><a href="#" onclick="$('.vm').hide(); $('.uninit').show();">Uninitialized machines</a></li>
 <%end%>
+<% if @b_by=='lab' then%>
+<li><a href="#" onclick="$('.vm').show();">All labs</a></li>
+<% @labs.each do |l| %>
+  <li><a href="#" onclick="$('.vm').hide(); $('.lab<%=l.id%>').show();"><%=l.name%></a></li>
+<%end%>
+<%end%>
+
+ 
+<%end%>
+
+
+
 
 
 

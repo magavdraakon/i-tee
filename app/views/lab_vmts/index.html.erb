@@ -1,9 +1,4 @@
-<% content_for :body do %>
-<div class="head">Listing VMTs in labs</div>
- <div class="hr"></div>
- <div class="text-box">
-  <p id="notice"><%= notice %></p>
-    <div id="content-table">
+<div id="index_t">
 <table>
    <caption >Templates in labs (<%= @lab_vmts.count  %>)</caption>
   <thead>
@@ -25,8 +20,8 @@
   </tr>
 <% end %>
 </table>
-
 </div>
+
 <%= form_for(@lab_vmt) do |f| %>
  <% if @lab_vmt.errors.any? %>
     <div id="error_explanation">
@@ -51,14 +46,13 @@
 </tr>
 </table>
 <%end%>
-</div>
-<%end%>
+
+<%if @lab!=nil%> 
 <% content_for :sidebar_head do %>
-VMT in labs
+View
   <%end%>
 <% content_for :sidebar do %>
-<li><%= link_to 'Back', :back %></li>
 <li><a href="#" onclick="$('.vmt').hide(); $('.current').show();">this lab's vmts</a></li>
 <li><a href="#" onclick="$('.vmt').show(); ;">all labs vmts</a></li>
-
+<%end%>
 <%end%>

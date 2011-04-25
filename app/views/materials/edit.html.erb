@@ -1,19 +1,2 @@
-
-<% content_for :sidebar_head do %>
- Materials
-<% end %>
-
-<% content_for :sidebar do %>
-    <li><%= link_to 'Show', @material %></li>
-    <li><%= link_to 'Back', materials_path %></li>
-<% end %>
-
-
-<% content_for :body do %>
-  <div class="head">Editing material</div>
-  <div class="hr"></div>
-  <div class="text-box round">
+<h3>Editing material</h3>
     <%= render 'form' %>
-  </div>
-<% end %>
-

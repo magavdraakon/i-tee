@@ -12,6 +12,36 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
       redirect_to(vms_path,:notice=>"invalid id.")
     end
   end
+  
+  def vms_by_lab
+    @b_by="lab"
+    
+    if @admin then
+     @vms = Vm.all 
+    else
+      #@vms=Vm.find(:all, :conditions=>["user_id=?",current_user])
+      @vms=current_user.vms
+    end
+    @labs=[]
+    @vms.each do |vm|
+      @labs<< vm.lab_vmt.lab
+    end
+    @labs.uniq!
+    render :action=>'index'
+  end
+  
+   def vms_by_state
+    @b_by="state"
+    if @admin then
+     @vms = Vm.all 
+    else
+      #@vms=Vm.find(:all, :conditions=>["user_id=?",current_user])
+      @vms=current_user.vms
+    end
+    
+    render :action=>'index'
+  end
+  
   # GET /vms
   # GET /vms.xml
   def index
@@ -21,14 +51,7 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
       #@vms=Vm.find(:all, :conditions=>["user_id=?",current_user])
       @vms=current_user.vms
     end
-    @uninitialized=[]
-    @paused=[]
-    @running=[]
-    @vms.each do |vm|
-      @running<< vm if vm.state=="running"
-      @paused<<vm if vm.state=="paused"
-    end
-  
+        
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @vms }

@@ -1,9 +1,4 @@
-<% content_for :body do %>
-<div class="head">Listing materials</div>
- <div class="hr"></div>
- <div class="text-box">
-  <p id="notice"><%= notice %></p>
-    <div id="content-table">
+<div id="index_t">
 <table>
     <caption >Materials (<%= @materials.count  %>)</caption>
   <thead>
@@ -21,14 +16,5 @@
   </tr>
 <% end %>
 </table>
-  </div>
-  </div>
 
-<% end %>
-<% content_for :sidebar_head do %>
-Materials
-  <%end%>
-<% content_for :sidebar do %>
-<li><%= link_to 'New Material', new_material_path %></li>
-<li><%= link_to 'Materials in labs', lab_materials_path %></li>
-<%end%>
+</div>

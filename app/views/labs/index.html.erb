@@ -1,8 +1,4 @@
-<% content_for :body do %>
-<div class="head">Listing labs</div>
- <div class="hr"></div>
- <div class="text-box">
-    <div id="content-table">
+<div id="index_t">
 <table>
    <caption >Server hosts (<%= @labs.count  %>)</caption>
   <thead>
@@ -20,16 +16,5 @@
   </tr>
 <% end %>
 </table>
- </div>
-  </div>
 
-<% end %>
-<% content_for :sidebar_head do %>
-Labs
-  <%end%>
-<% content_for :sidebar do %>
-<li><%= link_to 'New Lab', new_lab_path %></li>
-<li><%= link_to 'Users in labs', lab_users_path %></li>
-<%end%>
-
-
+</div>

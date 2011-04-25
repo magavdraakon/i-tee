@@ -1,18 +1,3 @@
-<% content_for :sidebar_head do %>
-  Labs
-<% end %>
-
-
-<% content_for :sidebar do %>
-    <li><%= link_to 'Edit', edit_lab_path(@lab) %></li>
-    <li><%= link_to 'Back', labs_path %></li>
-<% end %>
-
-<% content_for :body do %>
-<div class="text-box round">
-
-<p id="notice"><%= notice %></p>
-
 <p>
   <b>Name:</b>
   <%= @lab.name %>
@@ -24,26 +9,14 @@
   
 </p>
 <br/>
-<div id="content-table">
+
 <table>
   <thead>
-    <tr> <th>Materials</th>
+    <tr> 
       <th>Machines</th>
     </tr>  
 </thead>
 <tr>
-  <td>
-<%  @lab.lab_materials.sort! { |a,b| a.sort <=> b.sort }%>
-<% @lab.lab_materials.each do |material| %>
-  <p><%=material.sort%>.
-  <%=link_to(material.material.name, :controller=>'materials', :action=>'show', :id=>material.material, :lab=>@lab)%>
-  
- <%= link_to("remove",material, :method=>:delete)%>
-</p> 
-<%end%>
-<br/>
-<p><%=link_to 'Add materials', :controller=>'lab_materials', :action=>'new', :lab=>@lab %></p>
-</td>
 <td><% @lab.lab_vmts.each do |vmt| %>
   <p><%=link_to(vmt.name, :controller=>'vmts', :action=>'show', :id=>vmt.vmt, :lab=>@lab)%>
   
@@ -51,9 +24,6 @@
 </p> 
 <%end%>
 <br/>
-<p><%=link_to 'Add VMTs', :controller=>'lab_vmts', :action=>'index', :lab=>@lab %></p></td>
+<p><%=link_to 'Add VMTs', lab_vmts_path+"?lab="+@lab.id.to_s, :class=> 'add-button button' %></p></td>
 </tr>
 </table>
-</div>
-</div>
-<%end%>

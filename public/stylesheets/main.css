@@ -122,6 +122,10 @@ input[type="submit"] {
     cursor: pointer;
 }  
 
+input[type="password"]:focus, input[type="text"]:focus, textarea:focus {  
+  background:#DAF4F0;
+}  
+
 .action-button {
     display: inline-block;
     width: 16px;
