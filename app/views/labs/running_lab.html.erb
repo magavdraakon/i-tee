@@ -21,7 +21,7 @@
   <p><%=link_to(vm.name, :controller=>'vms', :action=>'show', :id=>vm.id) %> 
   <%state=vm.state %>
   <%if state=="running" || state=="paused" then%>
-    (<%=state%>, IP <%=vm.mac.ip%>) 
+    (<%=state%>, IP <%=vm.mac.ip if vm.mac!=nil%>) 
     <%= link_to('Pause',:controller=>'vms',:action=>'pause_vm', :id=>vm.id) if state=="running"  %>
     <%= link_to('Resume',:controller=>'vms', :action=>'resume_vm', :id=>vm.id) if state=="paused"%>
     <%= link_to('Stop',:controller=>'vms', :action=>'stop_vm', :id=>vm.id) if state=="running"%>
