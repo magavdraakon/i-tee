@@ -1,19 +1,19 @@
 <%if @lab==nil%>
   <p>Sorry, you dont have any such courses</p>
   <%else%>
-<h3>Running lab: <%=@lab.name%></h3>
+  <h3><%=@lab.name%></h3>
  
     <%=link_M raw @lab.description%>
     <br/>
-   
-    started at: <%=@lab_user.start%>
+    
+    <!-- started at: <%#=@lab_user.start%>
         <br/>
-    ended at: <%=@lab_user.end%>
-    <br/>
-    progress: <%= @lab_user.progress%>
-    <br/>
-     result: <%= @lab_user.result%>
-    <br/>
+    ended at: <%#=@lab_user.end%>
+    <br/>-->
+    <%if @lab_user.progress!=nil then %> progress: <%= @lab_user.progress%>
+    <br/><%end%>
+    <%if @lab_user.result!=nil then %> result: <%= @lab_user.result%>
+    <br/><%end%>
     
     
 <%if @lab_user.end==nil then %>
@@ -31,8 +31,7 @@
     
 </p> 
 <%end%>
-<br/>
-<p>start all </p>
+
 <%end%>
 
 <br/>
