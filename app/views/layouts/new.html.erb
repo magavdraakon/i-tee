@@ -34,7 +34,7 @@
         <%end%>
       <div class="logout b_menu">
       <%# if user_signed_in? %>
-            <%= link_to "Sign out", destroy_user_session_path %>
+       <%= link_to "Sign out (#{current_user.username})", destroy_user_session_path %>
             <%# elsif @logged_in %>
            <%#= link_to "Sign out", destroy_user_session_path %>
           <%# end %>
@@ -44,12 +44,12 @@
    
     <div id="s_menu"></div>
  <div id="wrap">
-<%if @admin then%><div class="home s_menu <% if controller_name == "home"%>current_tab<%end%>">
-        <%=link_to_unless_current('index', root_path)%>
-        <%=link_to_unless_current('Template guide', template_path) if @admin%>
-        <%=link_to_unless_current('System guide', system_path) if @admin%> 
+<div class="home s_menu <% if controller_name == "home"%>current_tab<%end%>">
+       <%if @admin then%> <%=link_to_unless_current('index', root_path)%>
+        <%=link_to_unless_current('Template guide', template_path) %>
+        <%=link_to_unless_current('System guide', system_path) %>  <%end%>
       </div>
-      <%end%>
+     
       <div class="course s_menu <% if controller_name == "labs" && course_actions.include?(action_name)%>current_tab<%end%>"> 
         <%= link_to_unless_current 'all courses', courses_path %>
         

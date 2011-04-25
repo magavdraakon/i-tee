@@ -95,6 +95,7 @@ padding:7px;
     -webkit-border-bottom-left-radius: 0px;
     -webkit-border-bottom-right-radius: 0px;
 }
+
 .logout {
 float:right;
 margin-right:0px;
@@ -110,6 +111,7 @@ color:#cbe86b;
 text-decoration:none;
 color:#f2e9e1;
 }
+
 #s_menu{
 clear:both;
 }
@@ -129,13 +131,14 @@ background:#f2e9e1;
 color:#1c140d;
 display:block;
 }
-.hb a
+
+.current_tab a
 {
 text-decoration:none;
 font-weight:bold;
 color:#1c140d;
 }
-.hb a:hover
+.current_tab a:hover
 {
 text-decoration:none;
 color:#000;
