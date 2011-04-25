@@ -85,8 +85,6 @@ $('#sidemenu').hide();
 $('#content').css("margin-left", 0);
 $('#menu-show').hide();
 $('#content').removeClass('side_visible');
-} else {
-
 }
 //document ready
 });
