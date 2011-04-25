@@ -8,6 +8,9 @@
   <%= javascript_include_tag :ckeditor %>
   
   <%= csrf_meta_tag %>
+  
+  <link  href="//fonts.googleapis.com/css?family=Ubuntu:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css" >
+
 </head>
 
 <%= yield :javascript %> 
@@ -21,7 +24,9 @@
       <% course_actions=["courses","running_lab", "ended_lab"]
         admin_controllers=["labs","materials","vmts", "hosts","lab_users","lab_vmts"]  
       %>
-      <div class="hb b_menu <% if controller_name == "home"%>current_tab<%end%>">Home</div>
+      <div class="hb b_menu <% if controller_name == "home"%>current_tab<%end%>">
+      <%if !@admin %><%=link_to 'Home', root_path%><%else%>
+        Home<%end%></div>
       <div class="cb b_menu <% if controller_name == "labs" && course_actions.include?(action_name)%>current_tab<%end%>">Courses</div>
       <div class="vb b_menu <% if controller_name == "vms"%>current_tab<%end%>">My machines</div>
      <%if  @admin then  %>
@@ -39,11 +44,12 @@
    
     <div id="s_menu"></div>
  <div id="wrap">
-      <div class="home s_menu <% if controller_name == "home"%>current_tab<%end%>">
+<%if @admin then%><div class="home s_menu <% if controller_name == "home"%>current_tab<%end%>">
         <%=link_to_unless_current('index', root_path)%>
         <%=link_to_unless_current('Template guide', template_path) if @admin%>
         <%=link_to_unless_current('System guide', system_path) if @admin%> 
       </div>
+      <%end%>
       <div class="course s_menu <% if controller_name == "labs" && course_actions.include?(action_name)%>current_tab<%end%>"> 
         <%= link_to_unless_current 'all courses', courses_path %>
         
@@ -125,7 +131,7 @@
     </div>
   </div>
 </div>
-<div id="footer">i-tee 2011</div>
+<div id="footer"><%= link_to('i-Tee 2011', about_path)%></div>
 </div>
 
 </body>

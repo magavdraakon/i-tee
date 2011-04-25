@@ -2,6 +2,8 @@
 body  {
 background: -moz-linear-gradient(100% 100% 90deg, #f2e9e1, #cbe86b) #f2e9e1 no-repeat;
 background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#cbe86b), to(#f2e9e1)) #f2e9e1 no-repeat;
+  font-family: 'Ubuntu', serif;
+
 }
 #contain  {
 max-width:1200px;
@@ -64,6 +66,7 @@ display:table;
 #footer {
 text-align:center;
 padding:2px;
+margin:10px;
 margin-left:auto;
 margin-right:auto;
 }
@@ -126,7 +129,17 @@ background:#f2e9e1;
 color:#1c140d;
 display:block;
 }
-
+.hb a
+{
+text-decoration:none;
+font-weight:bold;
+color:#1c140d;
+}
+.hb a:hover
+{
+text-decoration:none;
+color:#000;
+}
 .s_menu table {
 margin-left:auto;
 margin-right:auto;
@@ -146,7 +159,7 @@ margin-top: -30px;
     font-size: 1.2em;
     line-height:1.5em;
     font-weight: 500;
-    font-family: Verdana, Helvetica, Arial, sans-serif;
+   /* font-family: Verdana, Helvetica, Arial, sans-serif;*/
 }
 #sidemenu li {
     list-style-type:none;
@@ -155,7 +168,7 @@ margin-top: -30px;
     color: black;
     border-bottom: 1px solid #C2C2C2;
     font-size: 0.8em;
-    font-family: "Helvetica Neue", "Lucida Grande", Helvetica, Arial, Verdana, sans-serif;
+   /* font-family: "Helvetica Neue", "Lucida Grande", Helvetica, Arial, Verdana, sans-serif;*/
 }
 #sidemenu li.between {
  padding-left: 10px;
@@ -168,7 +181,7 @@ margin-top: -30px;
     border-bottom: 1px solid #C2C2C2;
     font-size: 0.8em;
     background:#e0f2dc;
-    font-family: "Helvetica Neue", "Lucida Grande", Helvetica, Arial, Verdana, sans-serif;
+    /*font-family: "Helvetica Neue", "Lucida Grande", Helvetica, Arial, Verdana, sans-serif;*/
 }
 #sidemenu li.ended {
     list-style-type:none;
@@ -176,7 +189,7 @@ margin-top: -30px;
     border-bottom: 1px solid #C2C2C2;
     font-size: 0.8em;
     background:#F8F8FF;
-    font-family: "Helvetica Neue", "Lucida Grande", Helvetica, Arial, Verdana, sans-serif;
+   /* font-family: "Helvetica Neue", "Lucida Grande", Helvetica, Arial, Verdana, sans-serif;*/
 }
 
 #sidemenu li a {
@@ -216,8 +229,8 @@ margin-top: -30px;
  
 #index_t table {
     border-collapse: collapse;
-    font: 1.0em sans-serif, "Century Gothic", "Trebuchet MS", Arial, Helvetica;
-    font-size: .94em;
+   /* font: 1.0em sans-serif, "Century Gothic", "Trebuchet MS", Arial, Helvetica;
+    font-size: .94em;*/
     width: 100%;
 }
 

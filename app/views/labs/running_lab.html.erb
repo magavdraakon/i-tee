@@ -17,6 +17,7 @@
     
     
 <%if @lab_user.end==nil then %>
+<h2>Virtual machines</h2>
 <% @vms.each do |vm| %>
   <p><%=link_to(vm.name, :controller=>'vms', :action=>'show', :id=>vm.id) %> 
   <%state=vm.state %>

@@ -195,7 +195,7 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
     #@vm=Vm.find(params[:id])
       logger.info "käivitame masina pausimise skripti"
       a=@vm.pau_vm #the script is called in the model
-      flash[:notice] = "Successful vm pause." 
+      flash[:notice] = "Successful vm pause.<br/> To resume the machine click on the resume link next to the machine name." 
       logger.info a
       redirect_to(:back) 
   end

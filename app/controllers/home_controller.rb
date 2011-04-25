@@ -11,6 +11,9 @@ class HomeController < ApplicationController
   def system_info
   end
   
+  def about
+  end
+  
   def template_info
   end
   
