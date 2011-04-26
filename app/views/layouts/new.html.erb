@@ -28,9 +28,10 @@
       <%if !@admin %><%=link_to 'Home', root_path%><%else%>
         Home<%end%></div>
       <div class="cb b_menu <% if controller_name == "labs" && course_actions.include?(action_name)%>current_tab<%end%>">Courses</div>
-      <div class="vb b_menu <% if controller_name == "vms"%>current_tab<%end%>">My machines</div>
+      <div class="vb b_menu <% if controller_name == "vms" && action_name!="new"%>current_tab<%end%>">
+      M<%if !@admin%>y m<%end%>achines</div>
      <%if  @admin then  %>
-        <div class="ab b_menu <% if admin_controllers.include?(controller_name) && !course_actions.include?(action_name)%>current_tab<%end%>">Administration</div>
+        <div class="ab b_menu <% if admin_controllers.include?(controller_name) && !course_actions.include?(action_name) || (controller_name == "vms" && action_name=="new")%>current_tab<%end%>">Administration</div>
         <%end%>
       <div class="logout b_menu">
       <%# if user_signed_in? %>
@@ -45,42 +46,48 @@
     <div id="s_menu"></div>
  <div id="wrap">
 <div class="home s_menu <% if controller_name == "home"%>current_tab<%end%>">
-       <%if @admin then%> <%=link_to_unless_current('index', root_path)%>
+       <%if @admin then%> <%=link_to_unless_current('Index', root_path)%>
         <%=link_to_unless_current('Template guide', template_path) %>
         <%=link_to_unless_current('System guide', system_path) %>  <%end%>
       </div>
      
       <div class="course s_menu <% if controller_name == "labs" && course_actions.include?(action_name)%>current_tab<%end%>"> 
-        <%= link_to_unless_current 'all courses', courses_path %>
+        <%= link_to_unless_current 'All courses', courses_path %>
         
-        <%= link_to_unless_current 'running courses', running_courses_path %>
-        <%= link_to_unless_current 'ended courses', ended_courses_path %>
+        <%= link_to_unless_current 'Running courses', running_courses_path %>
+        <%= link_to_unless_current 'Ended courses', ended_courses_path %>
         
       </div>
-      <div class="vms s_menu <% if controller_name == "vms"%>current_tab<%end%>"> 
-        <%= link_to_unless_current 'all vms', vms_path %>
-        <%= link_to_unless_current('vms by state', vms_by_state_path) %>
-        <%= link_to_unless_current('vms by lab', vms_by_lab_path) %>
-        <%= link_to_unless_current 'new vm', new_vm_path if @admin%> 
+      <div class="vms s_menu <% if controller_name == "vms" && action_name!="new"%>current_tab<%end%>"> 
+        <%if @admin%><b>My machines</b><br/><%end%>
+        <%= link_to_unless_current 'All virtual machines', vms_path %>
+        <%= link_to_unless_current('Virtual machines by state', vms_by_state_path) %>
+        <%= link_to_unless_current('Virtual machiness by lab', vms_by_lab_path) %>
+        <%if @admin%><br/><b>All users machines</b><br/>
+          <%= link_to_unless_current 'All virtual machines', vms_path+"?admin=1" %>
+          <%= link_to_unless_current('Virtual machines by state', vms_by_state_path+"?admin=1") %>
+          <%= link_to_unless_current('Virtual machiness by lab', vms_by_lab_path+"?admin=1") %>
+        <%end%>
       </div>
       <%if  @admin then  %>
-      <div class="admin s_menu <% if admin_controllers.include?(controller_name) && !course_actions.include?(action_name)%>current_tab<%end%>">
+      <div class="admin s_menu <% if admin_controllers.include?(controller_name) && !course_actions.include?(action_name) || (controller_name == "vms" && action_name=="new")%>current_tab<%end%>">
         <table>
           <tr>
             <td>
-              <%= link_to_unless_current 'lab', labs_path %><br/>
-              <%= link_to_unless_current 'new lab', new_lab_path %><br/>
-              <%=link_to_unless_current 'lab users', lab_users_path%><br/>
-              <%=link_to_unless_current 'add users by lab', add_users_path%>
+              <%= link_to_unless_current 'Lab', labs_path %><br/>
+              <%= link_to_unless_current 'New lab', new_lab_path %><br/>
+              <%=link_to_unless_current 'Users in labs', lab_users_path%><br/>
+              <%=link_to_unless_current 'Add users by lab', add_users_path%>
             </td>
             <td>
-              <%= link_to_unless_current 'materials', materials_path %><br/>
-              <%= link_to_unless_current 'new material', new_material_path %>
+              <%= link_to_unless_current 'Materials', materials_path %><br/>
+              <%= link_to_unless_current 'New material', new_material_path %>
             </td>
+            <td><%= link_to_unless_current 'New virtual machine', new_vm_path %> </td>
             <td>
-              <%= link_to_unless_current 'vmts', vmts_path %><br/>
-              <%= link_to_unless_current 'new vmt', new_vmt_path %><br/>
-              <%= link_to_unless_current 'lab vmts', lab_vmts_path %>
+              <%= link_to_unless_current 'Virtual machine templates', vmts_path %><br/>
+              <%= link_to_unless_current 'New virtual machine template', new_vmt_path %><br/>
+              <%= link_to_unless_current 'Virtual machine templates in labs', lab_vmts_path %>
             </td>
             <td>
               <%= link_to_unless_current('Hosts', hosts_path) %><br/>

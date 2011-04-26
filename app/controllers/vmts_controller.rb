@@ -4,6 +4,9 @@ class VmtsController < ApplicationController
         #redirect to index view when trying to see unexisting things
   before_filter :save_from_nil, :only=>[:show, :edit]
   
+  
+  
+  
   def save_from_nil
     @vmt = Vmt.find_by_id(params[:id])
     if @vmt==nil 
@@ -91,9 +94,6 @@ class VmtsController < ApplicationController
       format.html { redirect_to(vmts_url) }
       format.xml  { head :ok }
     end
-  end
-  
-  
-  
+  end  
   
 end

@@ -144,6 +144,7 @@ color:#000;
 text-decoration:underline;
 font-weight:normal;
 color:#1c140d;
+padding:0px 10px;
 }
 .s_menu table {
 margin-left:auto;
@@ -302,6 +303,64 @@ table caption {
     background: #f2e9e1;
 }
 
+
+    
+/*forms*/
+input[type="submit"] {  
+     /*increase roundness (for firefox)*/
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 15px;
+    -moz-border-radius-bottomleft: 15px;
+    -moz-border-radius-bottomright: 5px;
+    /*increase roundness (for webkit)*/
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 15px;
+    -webkit-border-bottom-left-radius: 15px;
+    -webkit-border-bottom-right-radius: 5px;
+    border: 2px solid rgba(125, 159, 186, .5);
+    padding-left:25px;
+    padding-right:8px;
+    padding-top:3px;
+    padding-bottom:3px;
+    background: url("../images/submit.png") 6px 2px no-repeat rgba(255, 255, 255, .7);
+    text-decoration:none;;
+    cursor: pointer;
+}  
+
+input[type="submit"].cancel {  
+     /*increase roundness (for firefox)*/
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 15px;
+    -moz-border-radius-bottomleft: 15px;
+    -moz-border-radius-bottomright: 5px;
+    /*increase roundness (for webkit)*/
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 15px;
+    -webkit-border-bottom-left-radius: 15px;
+    -webkit-border-bottom-right-radius: 5px;
+    border: 2px solid rgba(125, 159, 186, .5);
+    padding-left:25px;
+    padding-right:8px;
+    padding-top:3px;
+    padding-bottom:3px;
+    background: url("../images/cancel.png") 6px 2px no-repeat rgba(255, 255, 255, .7);
+    text-decoration:none;;
+    cursor: pointer;
+} 
+
+input[type="password"]:focus, input[type="text"]:focus, textarea:focus {  
+  background:#f2e9e1;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+    -moz-border-radius-bottomleft: 5px;
+    -moz-border-radius-bottomright: 5px;
+    /*increase roundness (for webkit)*/
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -webkit-border-bottom-left-radius: 5px;
+    -webkit-border-bottom-right-radius: 5px;
+}  
+
 /*buttons*/
 .edit-button {background: url("../images/edit.png") 6px 2px no-repeat;}
 
@@ -344,42 +403,6 @@ table caption {
 div.buttons {
     display:inline-block;
 }
-    
-/*forms*/
-input[type="submit"] {  
-     /*increase roundness (for firefox)*/
-    -moz-border-radius-topleft: 5px;
-    -moz-border-radius-topright: 15px;
-    -moz-border-radius-bottomleft: 15px;
-    -moz-border-radius-bottomright: 5px;
-    /*increase roundness (for webkit)*/
-    -webkit-border-top-left-radius: 5px;
-    -webkit-border-top-right-radius: 15px;
-    -webkit-border-bottom-left-radius: 15px;
-    -webkit-border-bottom-right-radius: 5px;
-    border: 2px solid rgba(125, 159, 186, .5);
-    padding-left:25px;
-    padding-right:8px;
-    padding-top:3px;
-    padding-bottom:3px;
-    background: url("../images/submit.png") 6px 2px no-repeat rgba(255, 255, 255, .7);
-    text-decoration:none;;
-    cursor: pointer;
-}  
-
-input[type="password"]:focus, input[type="text"]:focus, textarea:focus {  
-  background:#f2e9e1;
-    -moz-border-radius-topleft: 5px;
-    -moz-border-radius-topright: 5px;
-    -moz-border-radius-bottomleft: 5px;
-    -moz-border-radius-bottomright: 5px;
-    /*increase roundness (for webkit)*/
-    -webkit-border-top-left-radius: 5px;
-    -webkit-border-top-right-radius: 5px;
-    -webkit-border-bottom-left-radius: 5px;
-    -webkit-border-bottom-right-radius: 5px;
-}  
-
 
 /*add_users view */
 .user_li {
@@ -413,7 +436,6 @@ sub             { vertical-align: sub }
 sup             { vertical-align: super }
 s, strike, del  { text-decoration: line-through }
 hr              { border: 1px inset }
-
 
 /*scaffold stuff*/
 #notice {

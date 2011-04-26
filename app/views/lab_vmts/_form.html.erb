@@ -28,6 +28,6 @@
     <%=collection_select(:lab_vmt, :vmt_id, Vmt.all, :id, :image,{:prompt => true})%>
   </div>
   <div class="actions">
-    <%= f.submit %>
+    <%= submit_tag "Cancel" , :class=>"cancel"%>  <%= f.submit %>
   </div>
 <% end %>

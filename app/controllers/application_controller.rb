@@ -14,6 +14,8 @@ class ApplicationController < ActionController::Base
   
    layout 'new'
   
+   before_filter :check_for_cancel, :only => [:create, :update]
+  
   def emulate_user
     @admin = true
     @logged_in = true
@@ -46,4 +48,11 @@ class ApplicationController < ActionController::Base
       
     end
   
+       private
+
+  def check_for_cancel
+    if params[:commit] == "Cancel"
+      redirect_to :action=>"index"
+    end
+  end
 end

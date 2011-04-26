@@ -16,7 +16,7 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
   def vms_by_lab
     @b_by="lab"
     
-    if @admin then
+    if params[:admin]!=nil && @admin then
      @vms = Vm.all 
     else
       #@vms=Vm.find(:all, :conditions=>["user_id=?",current_user])
@@ -32,7 +32,7 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
   
    def vms_by_state
     @b_by="state"
-    if @admin then
+    if params[:admin]!=nil && @admin then
      @vms = Vm.all 
     else
       #@vms=Vm.find(:all, :conditions=>["user_id=?",current_user])
@@ -45,7 +45,7 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
   # GET /vms
   # GET /vms.xml
   def index
-    if @admin then
+    if params[:admin]!=nil && @admin then
      @vms = Vm.all 
     else
       #@vms=Vm.find(:all, :conditions=>["user_id=?",current_user])

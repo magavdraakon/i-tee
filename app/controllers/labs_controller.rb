@@ -163,7 +163,7 @@ class LabsController < ApplicationController
     @lab_user.lab.lab_vmts.each do |template|
       #is there a machine like that already?
       vm=Vm.find(:first, :conditions=>["lab_vmt_id=? and user_id=?", template.id, current_user.id ])
-      if vm==nil && @lab_user.start==nil then
+      if vm==nil then
         #no there is not
         v=Vm.new
         v.name="#{template.name}-#{current_user.username}"
