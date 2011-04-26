@@ -1,7 +1,7 @@
 <%if @lab==nil%>
-  <p>Sorry, you dont have any such courses</p>
+<h4>Sorry, you dont have any such courses</h4>
   <%else%>
-  <h3><%=@lab.name%></h3>
+  <h1><%=@lab.name%></h1>
  
     <%=link_M raw @lab.description%>
     <br/>
@@ -17,7 +17,7 @@
     
     
 <%if @lab_user.end==nil then %>
-<h2>Virtual machines</h2>
+<h3>Virtual machines</h3>
 <% @vms.each do |vm| %>
   <p><%=link_to(vm.name, :controller=>'vms', :action=>'show', :id=>vm.id) %> 
   <%state=vm.state %>
@@ -27,7 +27,7 @@
     <%= link_to('Resume',:controller=>'vms', :action=>'resume_vm', :id=>vm.id) if state=="paused"%>
     <%= link_to('Stop',:controller=>'vms', :action=>'stop_vm', :id=>vm.id) if state=="running"%>
   <%end%>
-    <%= link_to('Init',:controller=>'vms', :action=>'start_vm', :id=>vm.id) if state!="running" && state!="paused"%>
+    <%= link_to('Start',:controller=>'vms', :action=>'start_vm', :id=>vm.id) if state!="running" && state!="paused"%>
     
 </p> 
 <%end%>

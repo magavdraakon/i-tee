@@ -106,7 +106,7 @@ class LabsController < ApplicationController
     #  @complete<<u.lab  if u.start!=nil && u.end!=nil 
     #  end
     get_user_labs
-      @labs=Lab.all if @admin #admins should see them all
+      #@labs=Lab.all if @admin #admins should see them all
       
     # if no course is selected show the first one
     if params[:id]!=nil then
@@ -250,7 +250,8 @@ class LabsController < ApplicationController
     @started=[]
     @complete=[]
     #categorize the labs
-    current_user.lab_users.each do |u|
+    labusers=LabUser.find(:all, :conditions=>["user_id=?", current_user.id], :order => 'end ASC, start ASC')
+    labusers.each do |u|
       @labs<<u.lab        
       @started<<u.lab  if u.start!=nil && u.end==nil 
       @complete<<u.lab  if u.start!=nil && u.end!=nil 

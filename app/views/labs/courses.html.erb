@@ -11,18 +11,22 @@
     </li>
   <% end %>
 <%end%>  
+
 <% content_for :sidebar_head do %>
   All courses
-    <%end%>
+<%end%>
   
-    <%=  @lab.name %>
+  <h1><%=@lab.name %></h1>
     <%=link_M raw @lab.description %>
 <%if @labs!=[] then%>
   <%title="Start"%>
+  <%path=running_courses_path%>
   <% title='Continue' if @started.include?(@lab) %>
   <% title='View' if @complete.include?(@lab) %>  
+  <%path=ended_courses_path if @complete.include?(@lab)%>
   
-  <%= link_to(title,running_courses_path+"/"+@lab.id.to_s, :class=>'add-button button')%>
+  
+  <%= link_to(title, path+"/"+@lab.id.to_s, :class=>'add-button button') %>
   <%if title!='Start' then%>
     <%#if the lab is started or completed, one can reset it anytime%>
     <%= link_to('Restart',restart_lab_path+"/"+@lab.id.to_s, :class=>'add-button button')%>
