@@ -308,15 +308,15 @@ table caption {
 /*forms*/
 input[type="submit"] {  
      /*increase roundness (for firefox)*/
-    -moz-border-radius-topleft: 5px;
-    -moz-border-radius-topright: 15px;
-    -moz-border-radius-bottomleft: 15px;
-    -moz-border-radius-bottomright: 5px;
+    -moz-border-radius-topleft: 10px;
+    -moz-border-radius-topright: 10px;
+    -moz-border-radius-bottomleft: 10px;
+    -moz-border-radius-bottomright: 10px;
     /*increase roundness (for webkit)*/
-    -webkit-border-top-left-radius: 5px;
-    -webkit-border-top-right-radius: 15px;
-    -webkit-border-bottom-left-radius: 15px;
-    -webkit-border-bottom-right-radius: 5px;
+    -webkit-border-top-left-radius: 10px;
+    -webkit-border-top-right-radius: 10px;
+    -webkit-border-bottom-left-radius: 10px;
+    -webkit-border-bottom-right-radius: 10px;
     border: 2px solid rgba(125, 159, 186, .5);
     padding-left:25px;
     padding-right:8px;
@@ -329,15 +329,15 @@ input[type="submit"] {
 
 input[type="submit"].cancel {  
      /*increase roundness (for firefox)*/
-    -moz-border-radius-topleft: 5px;
-    -moz-border-radius-topright: 15px;
-    -moz-border-radius-bottomleft: 15px;
-    -moz-border-radius-bottomright: 5px;
+    -moz-border-radius-topleft: 10px;
+    -moz-border-radius-topright: 10px;
+    -moz-border-radius-bottomleft: 10px;
+    -moz-border-radius-bottomright: 10px;
     /*increase roundness (for webkit)*/
-    -webkit-border-top-left-radius: 5px;
-    -webkit-border-top-right-radius: 15px;
-    -webkit-border-bottom-left-radius: 15px;
-    -webkit-border-bottom-right-radius: 5px;
+    -webkit-border-top-left-radius: 10px;
+    -webkit-border-top-right-radius: 10px;
+    -webkit-border-bottom-left-radius: 10px;
+    -webkit-border-bottom-right-radius: 10px;
     border: 2px solid rgba(125, 159, 186, .5);
     padding-left:25px;
     padding-right:8px;
@@ -363,7 +363,7 @@ input[type="password"]:focus, input[type="text"]:focus, textarea:focus {
 
 /*buttons*/
 .edit-button {background: url("../images/edit.png") 6px 2px no-repeat;}
-
+.show-button {background: url("../images/show.gif") 6px 2px no-repeat;}
 .delete-button {background: url("../images/delete.png") 6px 2px no-repeat;}
 
 .add-button {background: url("../images/add.png") 6px 2px no-repeat;}
@@ -379,20 +379,20 @@ input[type="password"]:focus, input[type="text"]:focus, textarea:focus {
 
 .button {
     /*increase roundness (for firefox)*/
-    -moz-border-radius-topleft: 5px;
-    -moz-border-radius-topright: 15px;
-    -moz-border-radius-bottomleft: 15px;
-    -moz-border-radius-bottomright: 5px;
+    -moz-border-radius-topleft: 10px;
+    -moz-border-radius-topright: 10px;
+    -moz-border-radius-bottomleft: 10px;
+    -moz-border-radius-bottomright: 10px;
     /*increase roundness (for webkit)*/
-    -webkit-border-top-left-radius: 5px;
-    -webkit-border-top-right-radius: 15px;
-    -webkit-border-bottom-left-radius: 15px;
-    -webkit-border-bottom-right-radius: 5px;
+    -webkit-border-top-left-radius: 10px;
+    -webkit-border-top-right-radius: 10px;
+    -webkit-border-bottom-left-radius: 10px;
+    -webkit-border-bottom-right-radius: 10px;
     border: 2px solid rgba(125, 159, 186, .5);
     padding-left:25px;
-    padding-right:8px;
-    padding-top:3px;
-    padding-bottom:3px;
+    padding-right:6px;
+    padding-top:2px;
+    padding-bottom:2px;
     background-color: rgba(255, 255, 255, .7);
     text-decoration:none;
     color: #666666;

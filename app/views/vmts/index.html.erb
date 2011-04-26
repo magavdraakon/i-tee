@@ -17,7 +17,7 @@
     <td><%= vmt.image %></td>
     <td><%= vmt.xml_script %></td>
     <td><%= vmt.private %></td>
-    <td><%= link_to 'Show', vmt,:class=> 'edit-button button' %><%= link_to 'Edit', edit_vmt_path(vmt),:class=> 'edit-button button' %><%= link_to 'Destroy', vmt, :confirm => 'Are you sure?', :method => :delete ,:class=> 'delete-button button'%></td>
+    <td><%= link_to 'View', vmt,:class=> 'show-button button' %><%= link_to 'Edit', edit_vmt_path(vmt),:class=> 'edit-button button' %><%= link_to 'Destroy', vmt, :confirm => 'Are you sure?', :method => :delete ,:class=> 'delete-button button'%></td>
   </tr>
 <% end %>
 </table>
