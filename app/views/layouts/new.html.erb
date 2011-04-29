@@ -57,7 +57,6 @@
         
       </div>
       <div class="vms s_menu <% if @tab== "vms"%>current_tab<%end%>"> 
-        <%if @admin%><b>My machines</b><br/><%end%>
         <%= link_to_unless_current 'All virtual machines', vms_path %>
         <%= link_to_unless_current('Virtual machines by state', vms_by_state_path) %>
         <%= link_to_unless_current('Virtual machiness by lab', vms_by_lab_path) %>
