@@ -4,7 +4,7 @@ class HostsController < ApplicationController
   
   #redirect to index view when trying to see unexisting things
   before_filter :save_from_nil, :only=>[:show, :edit]
-  
+  before_filter :admin_tab
   def save_from_nil
     @host = Host.find_by_id(params[:id])
     if @host==nil 

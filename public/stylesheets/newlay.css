@@ -24,6 +24,7 @@ min-height:500px;
 margin-left:300px;
 }
 #sidemenu{
+
 float:left;
 width: 300px;
 background:#fff;
@@ -221,6 +222,14 @@ margin-top: -30px;
     background: transparent url("../images/menu-hide.png") no-repeat;
     cursor: pointer;
 }
+#sidemenu ul p {
+font-size: 0.8em;
+padding:5px;
+
+}
+#sidemenu ul {
+border-bottom: 1px solid #C2C2C2;
+}
 #menu-show {
     display: none;
     height: 30px;
@@ -360,6 +369,11 @@ input[type="password"]:focus, input[type="text"]:focus, textarea:focus {
     -webkit-border-bottom-left-radius: 5px;
     -webkit-border-bottom-right-radius: 5px;
 }  
+
+.red{
+  color:red;
+  
+}
 
 /*buttons*/
 .edit-button {background: url("../images/edit.png") 6px 2px no-repeat;}

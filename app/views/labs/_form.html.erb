@@ -13,7 +13,7 @@
 
   <div class="field">
     <%= f.label :name %><br />
-    <%= f.text_field :name %>
+    <%= f.text_field :name %> <span class="red" title="Required field">*</span>
   </div>
   <div class="field">
     <%= f.label :description %><br />
@@ -24,3 +24,11 @@
     <%= submit_tag "Cancel" , :class=>"cancel"%> <%= f.submit %>
   </div>
 <% end %>
+
+<% content_for :sidebar_head do %>
+Notes
+  <%end%>
+  
+  <% content_for :sidebar do %>
+  <p>To add a link to a material use the expression #M_<i>&lt;id&gt;</i></p>
+    <%end%>

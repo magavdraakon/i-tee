@@ -6,6 +6,8 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
   before_filter :save_from_nil, :only=>[:show, :edit, :start_vm, :stop_vm, :pause_vm, :resume_vm]
   before_filter :auth_as_owner, :only=>[:show, :start_vm, :stop_vm, :pause_vm, :resume_vm]       
   
+  before_filter :admin_tab, :except=>[:show,:index, :vms_by_lab, :vms_by_state]
+  before_filter :vm_tab, :only=>[:show,:index, :vms_by_lab, :vms_by_state]
   def save_from_nil
     @vm = Vm.find_by_id(params[:id])
     if @vm==nil 
@@ -18,6 +20,7 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
     
     if params[:admin]!=nil && @admin then
      @vms = Vm.all 
+    @tab="admin"
     else
       #@vms=Vm.find(:all, :conditions=>["user_id=?",current_user])
       @vms=current_user.vms
@@ -34,6 +37,7 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
     @b_by="state"
     if params[:admin]!=nil && @admin then
      @vms = Vm.all 
+     @tab="admin"
     else
       #@vms=Vm.find(:all, :conditions=>["user_id=?",current_user])
       @vms=current_user.vms
@@ -47,6 +51,7 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
   def index
     if params[:admin]!=nil && @admin then
      @vms = Vm.all 
+     @tab="admin"
     else
       #@vms=Vm.find(:all, :conditions=>["user_id=?",current_user])
       @vms=current_user.vms

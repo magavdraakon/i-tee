@@ -3,7 +3,7 @@ class LabUsersController < ApplicationController
   before_filter :authorise_as_admin
     #redirect to index view when trying to see unexisting things
   before_filter :save_from_nil, :only=>[:edit]
-  
+  before_filter :admin_tab
   def save_from_nil
     @lab_user = LabUser.find_by_id(params[:id])
     if @lab_user==nil 

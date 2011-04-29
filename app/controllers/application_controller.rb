@@ -49,6 +49,23 @@ class ApplicationController < ActionController::Base
     end
   
        private
+      
+      
+      def home_tab
+        @tab="home"
+      end
+      
+      def course_tab
+        @tab="courses"
+      end
+      
+      def vm_tab
+        @tab="vms"
+      end
+      
+      def admin_tab
+        @tab="admin"
+      end
 
   def check_for_cancel
     if params[:commit] == "Cancel"

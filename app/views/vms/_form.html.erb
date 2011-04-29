@@ -12,18 +12,18 @@
 
   <div class="field">
     <%= f.label :name %><br />
-    <%= f.text_field :name %>
+    <%= f.text_field :name %> <span class="red" title="Required field">*</span>
   </div>
   <div class="field">
     <%= f.label :lab_vmt_id %><br />
     <%# f.text_field :template_id %>
-    <%=collection_select(:vm, :lab_vmt_id,LabVmt.all, :id, :menustr,{:prompt => true})%>
+    <%=collection_select(:vm, :lab_vmt_id,LabVmt.all, :id, :menustr,{:prompt => true})%> <span class="red" title="Required field">*</span>
        <%#TODO add list of templates here? %>
   </div>
   <div class="field">
     <%= f.label :user_id %><br />
     <%# f.text_field :user_id %>
-    <%=collection_select(:vm, :user_id, User.all, :id, :username,{:prompt => true})%>
+    <%=collection_select(:vm, :user_id, User.all, :id, :username,{:prompt => true})%> <span class="red" title="Required field">*</span>
   </div>
   <div class="field">
     <%= f.label :description %><br />

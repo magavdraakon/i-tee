@@ -4,6 +4,9 @@ class LabsController < ApplicationController
 
       #redirect to index view when trying to see unexisting things
   before_filter :save_from_nil, :only=>[:show, :edit]
+  # set the menu tab to show the user
+  before_filter :course_tab, :only=>[:courses, :running_lab, :ended_lab]
+  before_filter :admin_tab, :except=>[:courses, :running_lab, :ended_lab]
   
   def save_from_nil
     @lab = Lab.find_by_id(params[:id])

@@ -4,6 +4,7 @@ class MaterialsController < ApplicationController
    before_filter :authorise_as_admin, :except => [:show]
         #redirect to index view when trying to see unexisting things
   before_filter :save_from_nil, :only=>[:show, :edit]
+  before_filter :admin_tab, :except=>[:show]
   
   def save_from_nil
     @material = Material.find_by_id(params[:id])

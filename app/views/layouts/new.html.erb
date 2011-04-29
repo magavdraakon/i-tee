@@ -21,17 +21,15 @@
 <div id="top">i-tee</div>
     <div id="m_menu">
       <%if user_signed_in?%>
-      <% course_actions=["courses","running_lab", "ended_lab"]
-        admin_controllers=["labs","materials","vmts", "hosts","lab_users","lab_vmts"]  
-      %>
-      <div class="hb b_menu <% if controller_name == "home"%>current_tab<%end%>">
+      
+      <div class="hb b_menu <% if @tab== "home"%>current_tab<%end%>">
       <%if !@admin %><%=link_to 'Home', root_path%><%else%>
         Home<%end%></div>
-      <div class="cb b_menu <% if controller_name == "labs" && course_actions.include?(action_name)%>current_tab<%end%>">Courses</div>
-      <div class="vb b_menu <% if controller_name == "vms" && action_name!="new"%>current_tab<%end%>">
-      M<%if !@admin%>y m<%end%>achines</div>
+      <div class="cb b_menu <% if @tab == "courses"%>current_tab<%end%>">Courses</div>
+      <div class="vb b_menu <% if @tab == "vms" %>current_tab<%end%>">
+      My machines</div>
      <%if  @admin then  %>
-        <div class="ab b_menu <% if admin_controllers.include?(controller_name) && !course_actions.include?(action_name) || (controller_name == "vms" && action_name=="new")%>current_tab<%end%>">Administration</div>
+        <div class="ab b_menu <% if @tab=="admin"%>current_tab<%end%>">Administration</div>
         <%end%>
       <div class="logout b_menu">
       <%# if user_signed_in? %>
@@ -45,32 +43,27 @@
    
     <div id="s_menu"></div>
  <div id="wrap">
-<div class="home s_menu <% if controller_name == "home"%>current_tab<%end%>">
+<div class="home s_menu <% if @tab == "home"%>current_tab<%end%>">
        <%if @admin then%> <%=link_to_unless_current('Index', root_path)%>
         <%=link_to_unless_current('Template guide', template_path) %>
         <%=link_to_unless_current('System guide', system_path) %>  <%end%>
       </div>
      
-      <div class="course s_menu <% if controller_name == "labs" && course_actions.include?(action_name)%>current_tab<%end%>"> 
+      <div class="course s_menu <% if @tab == "courses" %>current_tab<%end%>"> 
         <%= link_to_unless_current 'All courses', courses_path %>
         
         <%= link_to_unless_current 'Running courses', running_courses_path %>
         <%= link_to_unless_current 'Ended courses', ended_courses_path %>
         
       </div>
-      <div class="vms s_menu <% if controller_name == "vms" && action_name!="new"%>current_tab<%end%>"> 
+      <div class="vms s_menu <% if @tab== "vms"%>current_tab<%end%>"> 
         <%if @admin%><b>My machines</b><br/><%end%>
         <%= link_to_unless_current 'All virtual machines', vms_path %>
         <%= link_to_unless_current('Virtual machines by state', vms_by_state_path) %>
         <%= link_to_unless_current('Virtual machiness by lab', vms_by_lab_path) %>
-        <%if @admin%><br/><b>All users machines</b><br/>
-          <%= link_to_unless_current 'All virtual machines', vms_path+"?admin=1" %>
-          <%= link_to_unless_current('Virtual machines by state', vms_by_state_path+"?admin=1") %>
-          <%= link_to_unless_current('Virtual machiness by lab', vms_by_lab_path+"?admin=1") %>
-        <%end%>
       </div>
       <%if  @admin then  %>
-      <div class="admin s_menu <% if admin_controllers.include?(controller_name) && !course_actions.include?(action_name) || (controller_name == "vms" && action_name=="new")%>current_tab<%end%>">
+      <div class="admin s_menu <% if @tab=="admin"%>current_tab<%end%>">
         <table>
           <tr>
             <td>
@@ -83,7 +76,11 @@
               <%= link_to_unless_current 'Materials', materials_path %><br/>
               <%= link_to_unless_current 'New material', new_material_path %>
             </td>
-            <td><%= link_to_unless_current 'New virtual machine', new_vm_path %> </td>
+            <td><%= link_to_unless_current 'New virtual machine', new_vm_path %> <br/>
+          <%= link_to_unless_current 'All virtual machines', vms_path+"?admin=1" %><br/>
+          <%= link_to_unless_current('Virtual machines by state', vms_by_state_path+"?admin=1") %><br/>
+          <%= link_to_unless_current('Virtual machiness by lab', vms_by_lab_path+"?admin=1") %>  
+          </td>
             <td>
               <%= link_to_unless_current 'Virtual machine templates', vmts_path %><br/>
               <%= link_to_unless_current 'New virtual machine template', new_vmt_path %><br/>

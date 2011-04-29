@@ -1,6 +1,6 @@
 class HomeController < ApplicationController
    before_filter :authorise_as_admin, :only=>[:system_info, :template_info]
-  
+  before_filter :home_tab
   def index
   end
 

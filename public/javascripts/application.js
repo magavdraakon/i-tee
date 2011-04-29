@@ -25,9 +25,9 @@ jQuery(function ($) {
     
 });
 
-$('#notice').click(function(){
-$('#notice').slideToggle('slow');
-})
+//$('#notice').click(function(){
+//$('#notice').slideToggle('slow');
+//})
 
 if ($('#notice').text()==''){
 $('#notice').hide();
