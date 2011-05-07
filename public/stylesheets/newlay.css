@@ -236,7 +236,7 @@ border-bottom: 1px solid #C2C2C2;
     width: 15px;
     position: relative;
     left: -10px;
-    top:-20px;
+    top:-10px;
     background: transparent url("../images/menu-show.png") no-repeat 0 0px;
     cursor: pointer;
 }
