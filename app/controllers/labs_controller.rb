@@ -53,14 +53,28 @@ class LabsController < ApplicationController
     #@lab = Lab.find(params[:id])
   end
 
+  def add_all_users
+    User.all.each do |u|
+      l=LabUser.new
+      l.lab_id=@lab.id
+      l.user_id=u.id
+      l.save if LabUser.find(:first, :conditions=>["lab_id=? and user_id=?", l.lab_id, l.user_id])==nil
+    end
+  end
   # POST /labs
   # POST /labs.xml
   def create
     @lab = Lab.new(params[:lab])
-
+    
+    
     respond_to do |format|
       if @lab.save
-        format.html { redirect_to(@lab, :notice => 'Lab was successfully created.') }
+        
+        if params[:add].to_s==1.to_s then
+          add_all_users  
+        end
+        
+        format.html { redirect_to(@lab, :notice => "Lab was successfully created. #{params[:add]}") }
         format.xml  { render :xml => @lab, :status => :created, :location => @lab }
       else
         format.html { render :action => "new" }
@@ -76,6 +90,10 @@ class LabsController < ApplicationController
 
     respond_to do |format|
       if @lab.update_attributes(params[:lab])
+        
+        if params[:add].to_s==1.to_s then
+          add_all_users  
+        end
         format.html { redirect_to(@lab, :notice => 'Lab was successfully updated.') }
         format.xml  { head :ok }
       else

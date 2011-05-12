@@ -20,6 +20,12 @@
     <%# f.text_area :description %>
     <%= ckeditor_textarea(:lab, :description, :width => '90%', :height => '200px') %>
   </div>
+  
+  <div class="field">
+    <%= check_box_tag "add"%>
+    <%=label_tag("add", "add all users")%>
+  </div>
+  
   <div class="actions">
     <%= submit_tag "Cancel" , :class=>"cancel"%> <%= f.submit %>
   </div>
