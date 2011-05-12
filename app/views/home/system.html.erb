@@ -3,5 +3,6 @@
 
 <p>
 
-<%= %x(/var/www/railsapps/i-tee/utils/info.sh 2>&1)%>
+<%output=%x(/var/www/railsapps/i-tee/utils/info.sh 2>&1)%>
+user <%= output.split(" ")[2]%>
 </p>
