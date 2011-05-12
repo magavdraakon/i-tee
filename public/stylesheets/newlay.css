@@ -3,7 +3,7 @@ body  {
 background: -moz-linear-gradient(100% 100% 90deg, #f2e9e1, #cbe86b) #f2e9e1 no-repeat;
 background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#cbe86b), to(#f2e9e1)) #f2e9e1 no-repeat;
   font-family: 'Ubuntu', serif;
-
+  
 }
 #contain  {
 max-width:1200px;

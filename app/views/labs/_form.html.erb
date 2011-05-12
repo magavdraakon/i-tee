@@ -37,4 +37,10 @@ Notes
   
   <% content_for :sidebar do %>
   <p>To add a link to a material use the expression #M_<i>&lt;id&gt;</i></p>
+  <p><b>Materials:</b><br/>
+  <%Material.find(:all, :order=>'name').each do |m|%>
+  <%=m.id%>. <%=m.name%><br/>
+
+    <%end%>
+  </p>
     <%end%>
