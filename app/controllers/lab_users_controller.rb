@@ -34,6 +34,7 @@ class LabUsersController < ApplicationController
   # POST /lab_users
   # POST /lab_users.xml
   def create
+     @lab_users = LabUser.find(:all, :order=>params[:sort_by])
     # logic for when adding/removing multiple users at once to a specific lab
      if params[:lab_user][:page]=='bulk_add' then
       all_users=User.all
@@ -65,7 +66,7 @@ class LabUsersController < ApplicationController
         format.xml  { render :xml => @lab_user, :status => :created, :location => @lab_user }
       else
         format.html { render :action => "index" }
-        format.xml  { render :xml => @lab_user.errors, :status => :unprocessable_entity }
+        format.xml  { render :xml => @lab_user.errors, :status => :unprocessable_entity}
       end #end if
     end #end respond_to
   end #end else

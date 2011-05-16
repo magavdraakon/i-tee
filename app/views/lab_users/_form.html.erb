@@ -13,11 +13,11 @@
 
   <div class="field">
     <%= f.label :lab_id %><br /> 
-     <%=collection_select(:lab_user, :lab_id, Lab.all, :id, :name)%> <span class="red" title="Required field">*</span>
+     <%=collection_select(:lab_user, :lab_id, Lab.all, :id, :name,{:prompt => true})%> <span class="red" title="Required field">*</span>
   </div>
   <div class="field">
     <%= f.label :user_id %><br />
-     <%=collection_select(:lab_user, :user_id, User.all, :id, :username)%> <span class="red" title="Required field">*</span>
+     <%=collection_select(:lab_user, :user_id, User.all, :id, :username,{:prompt => true})%> <span class="red" title="Required field">*</span>
   </div>
   <div class="field">
     <%= f.label :progress %><br />

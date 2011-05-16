@@ -32,14 +32,25 @@
 </table>
 </div>
 <%= form_for(@lab_user) do |f| %>
+<% if @lab_user.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@lab_user.errors.count, "error") %> prohibited this lab_user from being saved:</h2>
+
+      <ul>
+      <% @lab_user.errors.full_messages.each do |msg| %>
+        <%= msg %><br/>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
 <table>
 <tr>
   
 <td>
-<%=collection_select(:lab_user, :lab_id, Lab.all, :id, :name)%>
+<%=collection_select(:lab_user, :lab_id, Lab.all, :id, :name,{:prompt => true})%>
 </td>
 <td>
-<%=collection_select(:lab_user, :user_id, User.find(:all, :order=>'username'), :id, :username)%>
+<%=collection_select(:lab_user, :user_id, User.find(:all, :order=>'username'), :id, :username, {:prompt => true})%>
 </td>
 <td><%= f.submit "Add"%> </td>
 </tr>
