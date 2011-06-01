@@ -25,9 +25,9 @@
       <div class="hb b_menu <% if @tab== "home"%>current_tab<%end%>">
       <%if !@admin %><%=link_to 'Home', root_path%><%else%>
         Home<%end%></div>
-      <div class="cb b_menu <% if @tab == "courses"%>current_tab<%end%>">Courses</div>
+        <div class="cb b_menu <% if @tab == "courses"%>current_tab<%end%>"><%=link_to('Courses', courses_path)%></div>
       <div class="vb b_menu <% if @tab == "vms" %>current_tab<%end%>">
-      My machines</div>
+      <%=link_to 'My machines', vms_path %></div>
      <%if  @admin then  %>
         <div class="ab b_menu <% if @tab=="admin"%>current_tab<%end%>">Administration</div>
         <%end%>

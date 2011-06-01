@@ -2,11 +2,23 @@
 <p>Emulated virtualization environment: <%= ITee::Application.config.emulate_virtualization %></p>
 <p>Emulated ldap environment: <%= ITee::Application.config.emulate_ldap %></p>
 <%end%>
-<p>Siia tuleb abiinfo, mis räägib i-tee keskkonna kasutamisest</p>
-<p> valida courses alt labor, vajutada nupul start et laborit alustada, continue et jätkata,
-    restart et käimasolevat uuesti alustada
-    ja view et vaadata lõpetatud sooritust.</p>
-<p>virtuaalmasinaid saab näha my machines all, või ka neile vastavate laborisoorituste lehtedel.</p>
+<p>Tere <%=current_user.username%>!</p>
+<p>
+  Oled sisenenud EIK virtuaalaborite keskkonda i-Tee.
+</p>
+<p>
+  Keskkonna kasutamiseks:</p>
+<ul>
+  <li>vali <strong>Courses</strong> menüüst kursus;</li>
+  <li>loe läbi õppematerjalid ja tee enesetestid;</li>
+  <li>käivita valitud kursus <strong>Start</strong> abil;</li>
+  <li>käivita labori virtuaalmasinad;</li>
+  <li>sisene käivitatud masinatesse (unix puhul ssh student@labori-ip);</li>
+  <li>tee laboritöö;</li>
+  <li>lõpeta labor kasutades <strong>End Lab</strong> nuppu</li>
+  <li>vajadusel katkesta labori sooritus ja salvesta virtuaalmasinate hetkeseis kasutades <strong>Pause</strong> nuppu</li>
+</ul>
+
 <p>käivitatud virtuaalmasin saab omale IP aadressi, virtuaalmasina kasutamiseks käsureal: 
     ssh student@IP
     parool: student </p>

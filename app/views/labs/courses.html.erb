@@ -22,6 +22,7 @@
 <h1><%=@lab.name %></h1>
 
     <%=link_M raw @lab.description %>
+    <p>
 <%if @labs!=[] then%>
   <%title="Start"%>
   <%path=running_courses_path%>
@@ -45,5 +46,5 @@
 <%end%>
 <%else%>
 <h3>Sorry, you dont have any assigned courses.</h3>
-<%end%>
+<%end%></p>
 
