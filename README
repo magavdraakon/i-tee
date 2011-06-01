@@ -41,7 +41,9 @@ apt-get install uuid
 install Libvirt and KVM
 apt-get install libvirtd kvm
 
-===installing the distance laboratory system
+
+
+=== installing the distance laboratory system
 
 Create the railsapps directory
 mkdir /var/www/railsapps/
@@ -117,7 +119,7 @@ NB! this fills the mac addres table with ip-s from 192.168.13.102 to 192.168.13.
 you can change the seed to match your settings!
 
 
-===installing passenger
+=== installing passenger
 
 install passenger for hosting Rails applications 
 gem install passenger
@@ -185,7 +187,7 @@ reload the web servers configuration files
 /etc/init.d/apache2 reload
 
 
-===configuring Apache to use HTTPS
+=== configuring Apache to use HTTPS
 
 generate a private key
 openssl genrsa -des3 -out project.key 4096
@@ -236,7 +238,7 @@ NameVirtualHost *:443
 
 
 
-===install a DHCP server (ie. on a virtual machine)
+=== install a DHCP server (ie. on a virtual machine)
 make yourself the root user
 sudo -i
 
@@ -289,7 +291,7 @@ restart the DHCP server
 
 
 
-=== configuring the Livbirt virtualization
+=== configuring a network bridge for the Livbirt virtual machines
 
 alter the /etc/network/interfaces file that contains:
 auto eth0
