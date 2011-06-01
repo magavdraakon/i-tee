@@ -17,21 +17,21 @@
     
     
 <%if @lab_user.end==nil then %>
-<h3>Virtual machines</h3>
+<h3>Virtual machines</h3><p>
 <% @vms.each do |vm| %>
-  <p><%=link_to(vm.name, :controller=>'vms', :action=>'show', :id=>vm.id) %> 
+<span class="button info-button" onclick="$('#notice').html('<%=vm.description%>');$('#notice').show(); "><%=vm.name%> </span> 
   <%state=vm.state %>
-  <%if state=="running" || state=="paused" then%>
+  <span class="vm_links"><%if state=="running" || state=="paused" then%>
     (<%=state%>, IP <%=vm.mac.ip if vm.mac!=nil%>) 
     <%= link_to('Pause',:controller=>'vms',:action=>'pause_vm', :id=>vm.id) if state=="running"  %>
     <%= link_to('Resume',:controller=>'vms', :action=>'resume_vm', :id=>vm.id) if state=="paused"%>
     <%= link_to('Stop',:controller=>'vms', :action=>'stop_vm', :id=>vm.id) if state=="running"%>
   <%end%>
     <%= link_to('Start',:controller=>'vms', :action=>'start_vm', :id=>vm.id) if state!="running" && state!="paused"%>
+  </span><br/>   
     
-</p> 
 <%end%>
-
+</p> 
 <%end%>
 
 <br/>

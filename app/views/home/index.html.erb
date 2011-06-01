@@ -1,7 +1,3 @@
-<%if @admin then%><p>Sa oled administraator</p>
-<p>Emulated virtualization environment: <%= ITee::Application.config.emulate_virtualization %></p>
-<p>Emulated ldap environment: <%= ITee::Application.config.emulate_ldap %></p>
-<%end%>
 <p>Tere <%=current_user.username%>!</p>
 <p>
   Oled sisenenud EIK virtuaalaborite keskkonda i-Tee.
@@ -22,3 +18,9 @@
 <p>käivitatud virtuaalmasin saab omale IP aadressi, virtuaalmasina kasutamiseks käsureal: 
     ssh student@IP
     parool: student </p>
+    
+    
+    <%if @admin then%><p>Sa oled administraator</p>
+<p>Emulated virtualization environment: <%= ITee::Application.config.emulate_virtualization %></p>
+<p>Emulated ldap environment: <%= ITee::Application.config.emulate_ldap %></p>
+<%end%>

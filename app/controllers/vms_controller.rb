@@ -174,9 +174,16 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
       logger.info "käivitame masina skripti"
         a=vm.ini_vm #the script is called in the model
         logger.info a
+        
         flash[:notice]=flash[:notice]+"<br/> Initialized machine with IP address of #{@mac.ip}.
         <br/> Create a connection with this machine using 'ssh student@#{@mac.ip}'. 
         The set password for this machine is 'student'."
+        
+        vm.description="machine #{@mac.mac} with IP address of #{@mac.ip}.
+        <br/> Create a connection with this machine using 'ssh student@#{@mac.ip}'. 
+        The set password for this machine is 'student'."
+        vm.save
+        
       end
       
       #VAADATA ÜLE!!!

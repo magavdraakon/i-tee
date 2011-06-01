@@ -188,10 +188,15 @@ class LabsController < ApplicationController
         #no there is not
         v=Vm.new
         v.name="#{template.name}-#{current_user.username}"
-        #TODO mingi muu moodi nimi luua, see ei tule unikaalne
         v.lab_vmt_id=template.id
         v.user_id=current_user.id
-        v.description="generated description"
+        
+        
+        #vm description TODO add login info
+        v.description="Initialize the virtual machine by clicking <strong>Start</strong>."
+        
+        
+        
         v.save
         @note="Machines successfully generated."
         @vms<<v
