@@ -418,7 +418,7 @@ input[type="password"]:focus, input[type="text"]:focus, textarea:focus {
     color: #666666;
     cursor: pointer;
 line-height:2em;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
 
 div.buttons {

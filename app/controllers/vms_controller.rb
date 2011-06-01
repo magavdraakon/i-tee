@@ -96,7 +96,7 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
 
     respond_to do |format|
       if @vm.save
-        format.html { redirect_to(@vm, :notice => 'Vm was successfully created.') }
+        format.html { redirect_to(vms_path+"?admin=1", :notice => 'Vm was successfully created.') }
         format.xml  { render :xml => @vm, :status => :created, :location => @vm }
       else
         format.html { render :action => "new" }
@@ -112,7 +112,7 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
 
     respond_to do |format|
       if @vm.update_attributes(params[:vm])
-        format.html { redirect_to(@vm, :notice => 'Vm was successfully updated.') }
+        format.html { redirect_to(vms_path+"?admin=1", :notice => 'Vm was successfully updated.') }
         format.xml  { head :ok }
       else
         format.html { render :action => "edit" }
@@ -179,9 +179,7 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
         <br/> Create a connection with this machine using 'ssh student@#{@mac.ip}'. 
         The set password for this machine is 'student'."
         
-        vm.description="machine #{@mac.mac} with IP address of #{@mac.ip}.
-        <br/> Create a connection with this machine using 'ssh student@#{@mac.ip}'. 
-        The set password for this machine is 'student'."
+        vm.description="machine #{@mac.mac} with IP address of #{@mac.ip}.<br/>Create a connection with this machine using <strong>ssh student@#{@mac.ip}</strong>.<br/>The set password for this machine is <strong>student</stong>."
         vm.save
         
       end
