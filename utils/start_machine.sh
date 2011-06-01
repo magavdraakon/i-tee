@@ -87,7 +87,7 @@ cat > $XML << LOPP
 LOPP
 
 virsh -c qemu:///system create $XML
-for try in $(seq 1 20): do
+for try in $(seq 1 20); do
   ping -c1 $IP_ADDR
   if [ $? -eq 0]; then
     break
