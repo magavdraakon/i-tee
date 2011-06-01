@@ -95,5 +95,11 @@ for try in $(seq 1 20); do
     echo "Waiting...$try"
   fi
 done
+cat | ssh -i /etc/itcollege/id_dsa -o 'StrictHostKeyChecking=no' root@$IP_ADDR << LOPP
+passwd student
+$PWD
+$PWD
+LOPP
+
 echo "masin loodud"
 
