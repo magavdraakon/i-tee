@@ -1,14 +1,16 @@
 #!/bin/bash
-if [ $# -ne 3 ]
+if [ $# -ne 5 ]
 then 
-echo "anna kolm argumenti (mac template name)"
+echo "anna viis argumenti (mac IP template name passwd)"
 
 exit 1
 fi
 
 MAC=$1
-TEMPLATE=$2
-NAME=$3
+IP_ADDR=$2
+TEMPLATE=$3
+NAME=$4
+PWD=$5
 VIRT_DIR="/var/lib/libvirt/images"
 IMAGE=$VIRT_DIR/$NAME.img
 XML=/etc/libvirt/qemu/$NAME.xml
@@ -85,5 +87,13 @@ cat > $XML << LOPP
 LOPP
 
 virsh -c qemu:///system create $XML
+for try in $(seq 1 20): do
+  ping -c1 $IP_ADDR
+  if [ $? -eq 0]; then
+    break
+  else
+    echo "Ootan...$try"
+  fi
+done
 echo "masin loodud"
 
