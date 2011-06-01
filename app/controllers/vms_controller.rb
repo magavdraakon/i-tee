@@ -174,13 +174,12 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
       logger.info "käivitame masina skripti"
         a=vm.ini_vm #the script is called in the model
         logger.info a
-        
-        flash[:notice]=flash[:notice]+"<br/> Initialized machine with IP address of #{@mac.ip}.
-        <br/> Create a connection with this machine using 'ssh student@#{@mac.ip}'. 
-        The set password for this machine is 'student'."
+       
         
         vm.description="machine #{@mac.mac} with IP address of #{@mac.ip}.<br/>Create a connection with this machine using <strong>ssh student@#{@mac.ip}</strong>.<br/>The set password for this machine is <strong>student</stong>."
         vm.save
+       
+        flash[:notice]=flash[:notice]+"<br/>"+vm.description 
         
       end
       
@@ -205,6 +204,8 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
     #@vm=Vm.find(params[:id])
       logger.info "käivitame masina pausimise skripti"
       a=@vm.pau_vm #the script is called in the model
+      @vm.description="Resume the virtual machine by clicking <strong>Resume</strong>."
+      @vm.save
       flash[:notice] = "Successful vm pause.<br/> To resume the machine click on the resume link next to the machine name." 
       logger.info a
       redirect_to(:back) 
@@ -216,6 +217,8 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
       logger.info "käivitame masina sulgemise skripti"
       a=@vm.del_vm #the script is called in the model
       logger.info a
+      @vm.description="Initialize the virtual machine by clicking <strong>Start</strong>."
+      @vm.save
       flash[:notice] = "Successful vm deletion." 
       @mac= Mac.find(:first, :conditions=>["vm_id=?", @vm.id])
       @mac.vm_id=nil
