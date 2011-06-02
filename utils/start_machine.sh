@@ -63,6 +63,7 @@ cat > $XML << LOPP
     <interface type='bridge'>
       <source bridge='br0'/>
       <mac address='$MAC'/>
+      <model type='e1000'/>
     </interface>
     <serial type='pty'>
       <target port='0'/>
