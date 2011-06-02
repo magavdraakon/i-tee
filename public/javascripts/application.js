@@ -41,39 +41,34 @@ $('#notice').hide();
 //new lay
 
 
-
-$('.hb').click(function(){
-//$('.s_menu').hide(); 
+/*
+$('.hb').click(function(){  
 $('.course').hide();
 $('.admin').hide();
 $('.vms').hide();
 $('.home').show();
 $('.b_menu').removeClass('current_tab');
 $('.hb').addClass('current_tab');
-})
+});
 
-$('.cb').click(function(){
-//$('.s_menu').hide();  
+$('.cb').click(function(){  
 $('.course').show();
 $('.admin').hide();
 $('.vms').hide();
 $('.home').hide();
-//$('.course').slideToggle('slow');
 $('.b_menu').removeClass('current_tab');
 $('.cb').addClass('current_tab');
-})
+});
 
-$('.vb').click(function(){
-//$('.s_menu').hide();  
-//$('.vm').slideToggle('slow');
+$('.vb').click(function(){  
 $('.course').hide();
 $('.admin').hide();
 $('.vms').show();
 $('.home').hide();
 $('.b_menu').removeClass('current_tab');
 $('.vb').addClass('current_tab');
-})
-
+});
+*/
 $('.ab').click(function(){
 //$('.s_menu').hide();  
 //$('.admin').slideToggle('slow');
@@ -83,7 +78,7 @@ $('.vms').hide();
 $('.home').hide();
 $('.b_menu').removeClass('current_tab');
 $('.ab').addClass('current_tab');
-})
+});
 
 if ($.trim($('#menu-head').text())==''){
 $('#sidemenu').hide();
