@@ -402,6 +402,7 @@ input[type="password"]:focus, input[type="text"]:focus, textarea:focus {
 .info-button {background: url("../images/info.png") 6px 2px no-repeat; }
 
 .submit-button {background: url("../images/submit.png") 6px 2px no-repeat;}
+.login-button {background: url("../images/login.gif") 6px 2px no-repeat;}
 
 .cancel-button {background: url("../images/cancel.png") 6px 2px no-repeat;}
 

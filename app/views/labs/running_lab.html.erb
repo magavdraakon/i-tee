@@ -19,13 +19,15 @@
 <%if @lab_user.end==nil then %>
 <h3>Virtual machines</h3><p>
 <% @vms.each do |vm| %>
-<span class="button info-button" onclick="$('#notice').html('<%=vm.description%>');$('#notice').show(); "><%=vm.name%> </span> 
-  <%state=vm.state %>
+<%state=vm.state %>
+<span class="button info-button" onclick="$('#notice').html('<%=vm.description%>');$('#notice').show(); "><%=vm.name%><%if vm.mac!=nil && state=="running"%>, IP <%=vm.mac.ip%><%end%>
+</span> 
+  
   <span class="vm_links"><%if state=="running" || state=="paused" then%>
-    
-    <a href="https://<%=vm.mac.ip%>:4200" title="Login" target='_blank'>Login</a>
-    
-    (<%=state%>, IP <%=vm.mac.ip if vm.mac!=nil%>) 
+    <%if state=="running" && vm.mac!=nil then%>
+    <a href="https://<%=vm.mac.ip%>:4200" title="Login" target='_blank' class="button login-button">Login</a>
+    <%end%>
+    (<%=state%>) 
   <span class="loader"> <%= link_to('Pause',:controller=>'vms',:action=>'pause_vm', :id=>vm.id) if state=="running"  %>
     <%= link_to('Resume',:controller=>'vms', :action=>'resume_vm', :id=>vm.id) if state=="paused"%>
     <%= link_to('Stop',:controller=>'vms', :action=>'stop_vm', :id=>vm.id) if state=="running"%>
