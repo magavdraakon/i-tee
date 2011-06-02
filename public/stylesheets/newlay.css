@@ -72,12 +72,13 @@ margin-right:auto;
 }
 #loading{
 position: absolute;
-left: 0px; 
-bottom:0px; 
-top: 0px; 
-right:0px;
+margin-top:-30%;
+margin-left: 45%; 
+height:200px;
+width:200px;  
+margin-right:45%;
 float:right;
-background: url("../images/ajax-loader.gif") transparent center no-repeat;
+background: url("../images/ajax-loader.gif") white center no-repeat;
 display:none;
 }
 
