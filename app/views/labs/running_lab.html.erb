@@ -25,18 +25,19 @@
   
   <span class="vm_links"><%if state=="running" || state=="paused" && vm.mac!=nil then%>
     <%if state=="running" then%>
-    <a href="https://<%=vm.mac.ip%>:4200" title="Login" target='_blank' class="button login-button">Login</a>
+    <a href="https://<%=vm.mac.ip if vm.mac!=nil%>:4200" title="Login" target='_blank' class="button login-button">Login</a>
     <%end%>
     
-  <span class="loader"><%= link_to('Pause',:controller=>'vms',:action=>'pause_vm', :id=>vm.id) if state=="running"  %>
-    <%= link_to('Resume',:controller=>'vms', :action=>'resume_vm', :id=>vm.id) if state=="paused"%>
-    <%= link_to('Stop',:controller=>'vms', :action=>'stop_vm', :id=>vm.id) if state=="running"%>
+  <span class="loader">
+    <%= link_to('Pause', pause_vm_path+"/"+vm.id.to_s, :class=>'button pause-button') if state=="running"  %>
+    <%= link_to('Resume',resume_vm_path+"/"+vm.id.to_s, :class=>'button start-button') if state=="paused"%>
+    <%= link_to('Stop',stop_vm_path+"/"+vm.id.to_s, :class=>"button stop-button") if state=="running"%>
 
 (<%=state%>) 
  </span>
  <%end%>
 <span class="loader">
-    <%= link_to('Start',:controller=>'vms', :action=>'start_vm', :id=>vm.id) if state!="running" && state!="paused"%>
+    <%= link_to('Start',start_vm_path+"/"+vm.id.to_s, :class=>"button start-button") if state!="running" && state!="paused"%>
  </span> </span><br/>   
     
 <%end%>

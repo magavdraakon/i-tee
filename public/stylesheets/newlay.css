@@ -400,6 +400,9 @@ input[type="password"]:focus, input[type="text"]:focus, textarea:focus {
 
 .add-button {background: url("../images/add.png") 6px 2px no-repeat;}
 .info-button {background: url("../images/info.png") 6px 2px no-repeat; }
+.stop-button {background: url("../images/stop.png") 6px 2px no-repeat; }
+.start-button {background: url("../images/play.png") 6px 2px no-repeat; }
+.pause-button {background: url("../images/pause.png") 6px 2px no-repeat; }
 
 .submit-button {background: url("../images/submit.png") 6px 2px no-repeat;}
 .login-button {background: url("../images/login.gif") 6px 2px no-repeat;}
