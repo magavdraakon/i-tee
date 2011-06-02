@@ -3,7 +3,7 @@ body  {
 background: -moz-linear-gradient(100% 100% 90deg, #f2e9e1, #cbe86b) #f2e9e1 no-repeat;
 background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#cbe86b), to(#f2e9e1)) #f2e9e1 no-repeat;
   font-family: 'Ubuntu', serif;
-  
+
 }
 #contain  {
 max-width:1200px;
@@ -70,6 +70,17 @@ margin:10px;
 margin-left:auto;
 margin-right:auto;
 }
+#loading{
+position: absolute;
+left: 0px; 
+bottom:0px; 
+top: 0px; 
+right:0px;
+float:right;
+background: url("../images/ajax-loader.gif") transparent center no-repeat;
+display:none;
+}
+
 /*menu*/
 #m_menu{
 clear:both;
@@ -245,6 +256,7 @@ border-bottom: 1px solid #C2C2C2;
 .vm_links {
 margin-left:10px;
 }
+
 /*index tables*/
  
 #index_t table {

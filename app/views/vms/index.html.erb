@@ -28,10 +28,10 @@
     <td><%= vm.mac.ip if vm.mac!=nil %></td>
     <td>
     '<%=state%>'
-    <%= link_to('Start', :action=>'start_vm', :id=>vm.id) if state!="running" && state!="paused"%>
+    <span class="loader"><%= link_to('Start', :action=>'start_vm', :id=>vm.id) if state!="running" && state!="paused"%>
     <%= link_to('Pause', :action=>'pause_vm', :id=>vm.id) if state=="running"  %>
     <%= link_to('Resume', :action=>'resume_vm', :id=>vm.id) if state=="paused"%>
-    <%= link_to('Stop', :action=>'stop_vm', :id=>vm.id) if state=="running"%>  
+    <%= link_to('Stop', :action=>'stop_vm', :id=>vm.id) if state=="running"%>  </span>
   </td>
   <%#no delete button, because there is no need to delete the row, it will be deleted either by 
   compleating the lab or when the user is removed from the lab%>

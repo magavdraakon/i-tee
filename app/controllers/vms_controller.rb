@@ -176,7 +176,7 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
         logger.info a
        
         
-        vm.description="machine #{@mac.mac} with IP address of #{@mac.ip}.<br/>Create a connection with this machine using <strong>ssh student@#{@mac.ip}</strong>.<br/>The set password for this machine is <strong>student</stong>."
+        vm.description="machine #{@mac.mac} with IP address of #{@mac.ip}.<br/>Create a connection with this machine using <strong>ssh student@#{@mac.ip}</strong>.<br/>The set password for this machine is <strong>student</strong>."
         vm.save
        
         flash[:notice]=flash[:notice]+"<br/>"+vm.description 
