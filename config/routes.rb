@@ -26,13 +26,20 @@ ITee::Application.routes.draw do
   match 'template', :to => 'home#template'
   match 'system', :to => 'home#system'
   match 'about', :to=> 'home#about'
-  
+  #with id
   match 'start_all/:id', :to=> 'vms#start_all'
    match 'start_vm/:id', :to=> 'vms#start_vm'
     match 'init_vm/:id', :to=> 'vms#init_vm'
     match 'pause_vm/:id', :to=> 'vms#pause_vm'
     match 'resume_vm/:id', :to=> 'vms#resume_vm'
     match 'stop_vm/:id', :to=> 'vms#stop_vm'
+    #no id
+    match 'start_all', :to=> 'vms#start_all'
+   match 'start_vm', :to=> 'vms#start_vm'
+    match 'init_vm', :to=> 'vms#init_vm'
+    match 'pause_vm', :to=> 'vms#pause_vm'
+    match 'resume_vm', :to=> 'vms#resume_vm'
+    match 'stop_vm', :to=> 'vms#stop_vm'
   
   match 'end_lab/:id', :to=>'labs#end_lab'
   match 'end_lab', :to=>'labs#end_lab'

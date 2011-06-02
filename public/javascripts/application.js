@@ -25,6 +25,11 @@ jQuery(function ($) {
     
 });
 
+$(".loader a").click(function() {
+  $('#loading').show();
+});
+
+
 //$('#notice').click(function(){
 //$('#notice').slideToggle('slow');
 //})

@@ -19,16 +19,25 @@
 <%if @lab_user.end==nil then %>
 <h3>Virtual machines</h3><p>
 <% @vms.each do |vm| %>
-<span class="button info-button" onclick="$('#notice').html('<%=vm.description%>');$('#notice').show(); "><%=vm.name%> </span> 
-  <%state=vm.state %>
-  <span class="vm_links"><%if state=="running" || state=="paused" then%>
-    (<%=state%>, IP <%=vm.mac.ip if vm.mac!=nil%>) 
-    <%= link_to('Pause',:controller=>'vms',:action=>'pause_vm', :id=>vm.id) if state=="running"  %>
-    <%= link_to('Resume',:controller=>'vms', :action=>'resume_vm', :id=>vm.id) if state=="paused"%>
-    <%= link_to('Stop',:controller=>'vms', :action=>'stop_vm', :id=>vm.id) if state=="running"%>
-  <%end%>
-    <%= link_to('Start',:controller=>'vms', :action=>'start_vm', :id=>vm.id) if state!="running" && state!="paused"%>
-  </span><br/>   
+<%state=vm.state %>
+<span class="button info-button" onclick="$('#notice').html('<%=vm.description%>');$('#notice').show(); ">
+<%=vm.name%><%if vm.mac!=nil && state=="running"%>, IP <%=vm.mac.ip if vm.mac!=nil%><%end%>
+</span> 
+
+
+ <%if state=="running" && vm.mac!=nil then%>
+   <a href="https://<%=vm.mac.ip if vm.mac!=nil%>:4200" title="Login" target='_blank' class="button login-button">Login</a>
+    <%end%>
+
+ <span class="loader">
+    <%= link_to('Start',start_vm_path+"/"+vm.id.to_s, :class=>"button start-button") if (state!="running" && state!="paused") || vm.mac==nil%>
+    <%= link_to('Pause', pause_vm_path+"/"+vm.id.to_s, :class=>'button pause-button') if state=="running" && vm.mac!=nil %>
+    <%= link_to('Resume',resume_vm_path+"/"+vm.id.to_s, :class=>'button start-button') if state=="paused" && vm.mac!=nil%>
+    <%= link_to('Stop',stop_vm_path+"/"+vm.id.to_s, :class=>"button stop-button") if state=="running" && vm.mac!=nil%>
+  </span>
+    
+<span class="vm_links"><%="("+state+")" if vm.mac!=nil%></span>
+<br/>   
     
 <%end%>
 </p> 
@@ -37,7 +46,7 @@
 <br/>
     <table width="100%">
       <tr>
-        <td><%= link_to('Restart',restart_lab_path+"/"+@lab.id.to_s, :class=>'add-button button')%> </td>
+        <td><%= link_to('Restart lab',restart_lab_path+"/"+@lab.id.to_s, :class=>'add-button button')%> </td>
         <td><%= link_to('End lab', end_lab_path+"/"+@lab_user.id.to_s, :class=>'delete-button button') if @lab_user.end==nil  %> </td>
       </tr>
     </table>

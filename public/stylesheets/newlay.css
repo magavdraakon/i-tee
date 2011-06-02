@@ -3,7 +3,7 @@ body  {
 background: -moz-linear-gradient(100% 100% 90deg, #f2e9e1, #cbe86b) #f2e9e1 no-repeat;
 background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#cbe86b), to(#f2e9e1)) #f2e9e1 no-repeat;
   font-family: 'Ubuntu', serif;
-  
+
 }
 #contain  {
 max-width:1200px;
@@ -70,6 +70,18 @@ margin:10px;
 margin-left:auto;
 margin-right:auto;
 }
+#loading{
+position: absolute;
+margin-top:-30%;
+margin-left: 45%; 
+height:200px;
+width:200px;  
+margin-right:45%;
+float:right;
+background: url("../images/ajax-loader.gif") white center no-repeat;
+display:none;
+}
+
 /*menu*/
 #m_menu{
 clear:both;
@@ -245,6 +257,7 @@ border-bottom: 1px solid #C2C2C2;
 .vm_links {
 margin-left:10px;
 }
+
 /*index tables*/
  
 #index_t table {
@@ -387,8 +400,12 @@ input[type="password"]:focus, input[type="text"]:focus, textarea:focus {
 
 .add-button {background: url("../images/add.png") 6px 2px no-repeat;}
 .info-button {background: url("../images/info.png") 6px 2px no-repeat; }
+.stop-button {background: url("../images/stop.png") 6px 2px no-repeat; }
+.start-button {background: url("../images/play.png") 6px 2px no-repeat; }
+.pause-button {background: url("../images/pause.png") 6px 2px no-repeat; }
 
 .submit-button {background: url("../images/submit.png") 6px 2px no-repeat;}
+.login-button {background: url("../images/login.gif") 6px 2px no-repeat;}
 
 .cancel-button {background: url("../images/cancel.png") 6px 2px no-repeat;}
 
