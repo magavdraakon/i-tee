@@ -25,7 +25,7 @@
       <div class="hb b_menu <% if @tab== "home"%>current_tab<%end%>">
       <%if !@admin %><%=link_to 'Home', root_path%><%else%>
         Home<%end%></div>
-        <div class="cb b_menu <% if @tab == "courses"%>current_tab<%end%>"><%=link_to('Courses', courses_path)%></div>
+        <div class="cb b_menu <% if @tab == "courses"%>current_tab<%end%>"><%=link_to('Labs', courses_path)%></div>
       <div class="vb b_menu <% if @tab == "vms" %>current_tab<%end%>">
       <%=link_to 'My machines', vms_path %></div>
      <%if  @admin then  %>
@@ -50,10 +50,10 @@
       </div>
      
       <div class="course s_menu <% if @tab == "courses" %>current_tab<%end%>"> 
-        <%= link_to_unless_current 'All courses', courses_path %>
+        <%= link_to_unless_current 'All labs', courses_path %>
         
-        <%= link_to_unless_current 'Running courses', running_courses_path %>
-        <%= link_to_unless_current 'Ended courses', ended_courses_path %>
+        <%= link_to_unless_current 'Running labs', running_courses_path %>
+        <%= link_to_unless_current 'Completed labs', ended_courses_path %>
         
       </div>
       <div class="vms s_menu <% if @tab== "vms"%>current_tab<%end%>"> 
