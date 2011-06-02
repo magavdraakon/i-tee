@@ -36,7 +36,7 @@
     <%= link_to('Stop',stop_vm_path+"/"+vm.id.to_s, :class=>"button stop-button") if state=="running" && vm.mac!=nil%>
   </span>
     
-<span class="vm_links">(<%=state if vm.mac!=nil%>) </span>
+<span class="vm_links"><%="("+state+")" if vm.mac!=nil%></span>
 <br/>   
     
 <%end%>
