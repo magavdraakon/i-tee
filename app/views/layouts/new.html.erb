@@ -23,8 +23,7 @@
       <%if user_signed_in?%>
       
       <div class="hb b_menu <% if @tab== "home"%>current_tab<%end%>">
-      <%if !@admin %><%=link_to 'Home', root_path%><%else%>
-        Home<%end%></div>
+      <%=link_to 'Home', root_path%></div>
         <div class="cb b_menu <% if @tab == "courses"%>current_tab<%end%>"><%=link_to('Labs', courses_path)%></div>
       <div class="vb b_menu <% if @tab == "vms" %>current_tab<%end%>">
       <%=link_to 'My machines', vms_path %></div>
