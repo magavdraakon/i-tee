@@ -1,14 +1,14 @@
 <h1><%= @lab.name %></h1>
 
   <%=link_M raw @lab.description %>
-
+  <p>
+<%= link_to 'Edit lab description', edit_lab_path(@lab), :class=>'button edit-button' if @admin%></p>
 <h3>Virtual machine templates</h3>
 <p>
 <% @lab.lab_vmts.each do |vmt| %>
-  <%=link_to(vmt.name, :controller=>'vmts', :action=>'show', :id=>vmt.vmt, :lab=>@lab)%>  
-  <%= link_to("remove", vmt, :method=>:delete)%> <br/>
+  <%=link_to(vmt.name, vmt_path(vmt.vmt),  :target => '_blank', :class=>"button info-button")%>  
+  <%= link_to("remove", vmt, :method=>:delete, :class=>"button delete-button")%> <br/>
 
 <%end%></p> 
-<br/>
-<p><%=link_to 'Add VMTs', lab_vmts_path+"?lab="+@lab.id.to_s, :class=> 'add-button button' %>
-<%= link_to 'Edit lab description', edit_lab_path(@lab), :class=>'button edit-button' if @admin%></p>
+
+<p><%=link_to 'Add VMTs', lab_vmts_path+"?lab="+@lab.id.to_s, :class=> 'add-button button' %></p>

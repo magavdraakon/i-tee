@@ -20,7 +20,9 @@
 <h3>Virtual machines</h3><p>
 <% @vms.each do |vm| %>
 <%state=vm.state %>
-<span class="button info-button" onclick="$('#notice').html('<%=vm.description%>');$('#notice').show(); ">
+<% desc="Initialize the virtual machine by clicking <strong>Start</strong>."
+desc=vm.descritpion if (state=="running" || state=="paused") && vm.mac!=nil%>
+<span class="button info-button" onclick="$('#notice').html('<%=desc%>');$('#notice').show(); ">
 <%=vm.name%><%if vm.mac!=nil && state=="running"%>, IP <%=vm.mac.ip if vm.mac!=nil%><%end%>
 </span> 
 
@@ -36,7 +38,7 @@
     <%= link_to('Stop',stop_vm_path+"/"+vm.id.to_s, :class=>"button stop-button") if state=="running" && vm.mac!=nil%>
   </span>
     
-<span class="vm_links"><%="("+state+")" if vm.mac!=nil%></span>
+<span class="vm_links"><%="("+state+")" if vm.mac!=nil && (state=="running" || state=="paused") %></span>
 <br/>   
     
 <%end%>

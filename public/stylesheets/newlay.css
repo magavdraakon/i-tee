@@ -300,7 +300,7 @@ table caption {
     color: #1c140d;
     text-align: left;
     border: 1px solid #e5eff8;
-    padding: .3em 1em;
+    padding: .3em .3em;
     border: 1px solid #C0C0C0;
 }
 
@@ -318,7 +318,7 @@ table caption {
 #index_t td {
     font-size: 0.8em;
     color: #8E8E8E;
-    padding: .5em 1.5em;
+    padding: .3em .3em;
     text-align: left;
     background: white;
     border: 1px solid #C0C0C0;
