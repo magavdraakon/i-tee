@@ -7,7 +7,7 @@
 <p>
 <% @lab.lab_vmts.each do |vmt| %>
   <%=link_to(vmt.name, vmt_path(vmt.vmt),  :target => '_blank', :class=>"button info-button")%>  
-  <%= link_to("remove", vmt, :method=>:delete, :class=>"button delete-button")%> <br/>
+  <%= link_to("remove", vmt,:confirm => 'Are you sure?', :method=>:delete, :class=>"button delete-button")%> <br/>
 
 <%end%></p> 
 
