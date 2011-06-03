@@ -89,11 +89,12 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
     #@vm = Vm.find(params[:id])
   end
 
+  
   # POST /vms
   # POST /vms.xml
   def create
     @vm = Vm.new(params[:vm])
-
+  
     respond_to do |format|
       if @vm.save
         format.html { redirect_to(vms_path+"?admin=1", :notice => 'Vm was successfully created.') }
@@ -128,7 +129,7 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
     @vm.destroy
 
     respond_to do |format|
-      format.html { redirect_to(vms_url) }
+      format.html { redirect_to(vms_path+"?admin=1") }
       format.xml  { head :ok }
     end
   end
@@ -176,7 +177,7 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
         logger.info a
        
         
-        vm.description="machine #{@mac.mac} with IP address of #{@mac.ip}.<br/>Create a connection with this machine using <strong>ssh student@#{@mac.ip}</strong>.<br/>The set password for this machine is <strong>student</strong>."
+        vm.description="machine #{@mac.mac} with IP address of #{@mac.ip}.<br/>Create a connection with this machine using <strong>ssh #{vm.lab_vmt.vmt.username}@#{@mac.ip}</strong>.<br/>The set password for this machine is <strong>#{vm.password}</strong>."
         vm.save
        
         flash[:notice]=flash[:notice]+"<br/>"+vm.description 

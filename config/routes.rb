@@ -1,4 +1,6 @@
 ITee::Application.routes.draw do
+  resources :operating_systems
+
   # match 'users/sign_up', :to=>'devise/sessions#new'
   resources :lab_users
 
@@ -45,18 +47,18 @@ ITee::Application.routes.draw do
   match 'end_lab', :to=>'labs#end_lab'
   match 'restart_lab/:id', :to=> 'labs#restart_lab'
   match 'restart_lab', :to=> 'labs#restart_lab'
-  match 'running_courses/:id', :to=> 'labs#running_lab'
-  match 'running_courses', :to=> 'labs#running_lab'
-  match 'ended_courses/:id', :to=> 'labs#ended_lab'
-  match 'ended_courses', :to=> 'labs#ended_lab'
+  match 'running_labs/:id', :to=> 'labs#running_lab'
+  match 'running_labs', :to=> 'labs#running_lab'
+  match 'completed_labs/:id', :to=> 'labs#ended_lab'
+  match 'completed_labs', :to=> 'labs#ended_lab'
   
   match 'add_users', :to=> 'lab_users#add_users'
   
   match 'vms_by_lab', :to=>'vms#vms_by_lab'
    match 'vms_by_state', :to=>'vms#vms_by_state'
   
-  match 'courses/:id', :to => 'labs#courses'
-  match 'courses', :to =>'labs#courses'
+  match 'all_labs/:id', :to => 'labs#courses'
+  match 'all_labs', :to =>'labs#courses'
 
   
   # The priority is based upon order of creation:

@@ -68,9 +68,9 @@ desc=vm.description if (state=="running" || state=="paused") && vm.mac!=nil%>
 <% @other.each do |l| %>
   <li>
   <%if @lab_user.end==nil then%>
-      <%=link_to(l.name, running_courses_path+"/"+l.id.to_s) %>
+      <%=link_to(l.name, running_labs_path+"/"+l.id.to_s) %>
       <%else%>
-  <%=link_to(l.name, ended_courses_path+"/"+l.id.to_s) %>
+  <%=link_to(l.name, completed_labs_path+"/"+l.id.to_s) %>
   <%end%></li>  
 <%end%>
 

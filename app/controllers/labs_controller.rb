@@ -7,6 +7,7 @@ class LabsController < ApplicationController
   # set the menu tab to show the user
   before_filter :course_tab, :only=>[:courses, :running_lab, :ended_lab]
   before_filter :admin_tab, :except=>[:courses, :running_lab, :ended_lab]
+    
   
   def save_from_nil
     @lab = Lab.find_by_id(params[:id])
@@ -42,6 +43,7 @@ class LabsController < ApplicationController
   def new
     @lab = Lab.new
     @all_users=false
+    @user_count=0
     respond_to do |format|
       format.html # new.html.erb
       format.xml  { render :xml => @lab }
@@ -131,7 +133,7 @@ class LabsController < ApplicationController
   end
 
   #view of labs that can be started/continued/viewed
-  def courses
+  def courses    
     
     get_user_labs
       
@@ -147,7 +149,7 @@ class LabsController < ApplicationController
      redirect_to(error_401_path)
     end
     rescue ActiveRecord::RecordNotFound
-      redirect_to(courses_path)
+      redirect_to(all_labs_path)
   end
   
   def ended_lab
@@ -167,7 +169,7 @@ class LabsController < ApplicationController
     end
    render :action=>"running_lab"
    rescue ActiveRecord::RecordNotFound
-    redirect_to(courses_path)      
+    redirect_to(all_labs_path)      
   end
   
   
@@ -223,7 +225,7 @@ class LabsController < ApplicationController
   end
   
    rescue ActiveRecord::RecordNotFound
-      redirect_to(courses_path)
+      redirect_to(all_labs_path)
   end
   
   #method for ending a lab, deletes virtual machine db rows and sets the end date for the lab
@@ -244,14 +246,14 @@ class LabsController < ApplicationController
         @lab_user.end=Time.now
         @lab_user.save
      end
-    redirect_to(ended_courses_path+"/"+@lab_user.lab.id.to_s)
+    redirect_to(completed_labs_path+"/"+@lab_user.lab.id.to_s)
   else #this lab doesnt belong to this user, permission error
     flash[:alert]  = "Restricted access!"
     redirect_to(error_401_path)
   end # end- this users lab
   
   rescue ActiveRecord::RecordNotFound
-    redirect_to(courses_path)
+    redirect_to(all_labs_path)
   end
   
   #restarting a lab means deleting virtual machines, removing start/end times and progress/results
@@ -271,9 +273,9 @@ class LabsController < ApplicationController
     end
         
   end
-     redirect_to(running_courses_path+"/"+@lab.id.to_s)
+     redirect_to(running_labs_path+"/"+@lab.id.to_s)
   rescue ActiveRecord::RecordNotFound
-    redirect_to(courses_path)
+    redirect_to(all_labs_path)
   end
   
   private #----------------------------------------------------------------------------------

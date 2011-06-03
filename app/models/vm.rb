@@ -4,6 +4,7 @@ class Vm < ActiveRecord::Base
   belongs_to :lab_vmt
   before_destroy :del_vm
   before_destroy :rel_mac
+  before_create :add_pw
   
   validates_presence_of :name, :lab_vmt_id, :user_id
   
@@ -13,6 +14,12 @@ class Vm < ActiveRecord::Base
       mac.vm_id=nil
       mac.save
     end
+  end
+  
+  def add_pw
+    chars = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+    self.password = ""
+    8.times { |i| self.password << chars[rand(chars.length)] }
   end
 
   def del_vm
@@ -28,7 +35,7 @@ class Vm < ActiveRecord::Base
   end
   
   def ini_vm
-    return %x(/var/www/railsapps/i-tee/utils/start_machine.sh #{mac.mac} #{mac.ip} #{lab_vmt.vmt.image} #{name} demostudent 2>&1)
+    return %x(/var/www/railsapps/i-tee/utils/start_machine.sh #{mac.mac} #{mac.ip} #{lab_vmt.vmt.image} #{name} #{password} 2>&1)
   end
   
   def state

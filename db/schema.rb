@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110228094850) do
+ActiveRecord::Schema.define(:version => 20110603130844) do
 
   create_table "ckeditor_assets", :force => true do |t|
     t.string   "data_file_name",                                 :null => false
@@ -86,6 +86,14 @@ ActiveRecord::Schema.define(:version => 20110228094850) do
     t.datetime "updated_at"
   end
 
+  create_table "operating_systems", :force => true do |t|
+    t.string   "name"
+    t.string   "icon"
+    t.text     "connection_help"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "users", :force => true do |t|
     t.string   "email",                               :default => "", :null => false
     t.string   "encrypted_password",   :limit => 128, :default => "", :null => false
@@ -115,6 +123,7 @@ ActiveRecord::Schema.define(:version => 20110228094850) do
     t.text     "description"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "password"
   end
 
   create_table "vmts", :force => true do |t|
@@ -123,6 +132,9 @@ ActiveRecord::Schema.define(:version => 20110228094850) do
     t.text     "private"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "username"
+    t.integer  "operating_system_id"
+    t.boolean  "shellinabox"
   end
 
 end

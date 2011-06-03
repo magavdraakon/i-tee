@@ -20,12 +20,12 @@
 
 
 <h1><%=@lab.name %></h1>
-
+<%= @pw %>
     <%=link_M raw @lab.description %>
     <p>
 <%if @labs!=[] then%>
   <%title="Start lab"%>
-  <%path=running_courses_path%>
+  <%path=running_labs_path%>
   <%clas="add-button button"%>
   <% if @started.include?(@lab) %>
     <% title='Continue lab' %>
@@ -34,7 +34,7 @@
  
   <% if @complete.include?(@lab) then%>
     <% title='View lab'  %>
-    <% path=ended_courses_path%>
+    <% path=completed_labs_path%>
     <%clas="show-button button"%>
   <%end%>
   

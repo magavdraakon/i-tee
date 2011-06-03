@@ -20,7 +20,7 @@
 
   <tr class="vm <%if state=="running" || state=="paused" then%>  <%=state%>  <%else%><%state="error: no such vm"%>
     uninit<%end%> lab<%= vm.lab_vmt.lab.id%>">
-    <td><%= vm.name %></td>
+    <td><%= vm.name %> pw: <%=vm.password%></td>
     <td><%= vm.lab_vmt.name%> </td>
     <td><%= vm.lab_vmt.lab.name%> </td>
     <td><%= vm.user.username %></td>
@@ -40,7 +40,9 @@
   </td>
   <%#no delete button, because there is no need to delete the row, it will be deleted either by 
   compleating the lab or when the user is removed from the lab%>
-  <td><span class="button info-button" onclick="$('#notice').html('<%=vm.description%>');$('#notice').show();">Info</span><%if state=="running" && vm.mac!=nil then%><a href="https://<%=vm.mac.ip if vm.mac!=nil%>:4200" title="Login" target='_blank' class="button login-button">Login</a><%end%><%= link_to 'Edit', edit_vm_path(vm),:class=> 'edit-button button' if @admin && @tab=="admin"%><%= link_to 'Destroy', vm, :confirm => 'Are you sure?', :method => :delete,:class=> 'delete-button button' if @admin && @tab=="admin"%></td>
+  <% desc="Initialize the virtual machine by clicking <strong>Start</strong>."
+desc=vm.description if (state=="running" || state=="paused") && vm.mac!=nil%>
+  <td><span class="button info-button" onclick="$('#notice').html('<%=desc%>');$('#notice').show();">Info</span><%if state=="running" && vm.mac!=nil then%><a href="https://<%=vm.mac.ip if vm.mac!=nil%>:4200" title="Login" target='_blank' class="button login-button">Login</a><%end%><%= link_to 'Edit', edit_vm_path(vm),:class=> 'edit-button button' if @admin && @tab=="admin"%><%= link_to 'Destroy', vm, :confirm => 'Are you sure?', :method => :delete,:class=> 'delete-button button' if @admin && @tab=="admin"%></td>
   </tr>
   
  

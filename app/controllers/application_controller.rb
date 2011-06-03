@@ -37,6 +37,8 @@ class ApplicationController < ActionController::Base
     end
   end
   
+
+  
   #redirect user if they are not admin but try to see things not meant for them
   def authorise_as_admin
     unless ITee::Application.config.admins.include?(current_user.username)
@@ -49,6 +51,7 @@ class ApplicationController < ActionController::Base
     end
   
        private
+      
       
       
       def home_tab

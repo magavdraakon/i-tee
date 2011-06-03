@@ -5,6 +5,9 @@
   <thead>
     <tr>
     <th>Image</th>
+    <th>OS</th>
+    <th>username</th>
+    <th>ShellInaBox</th>
     <th>Xml script</th>
     <th>Private key</th>
     <th></th>
@@ -15,6 +18,9 @@
 <% @vmts.each do |vmt| %>
   <tr>
     <td><%= vmt.image %></td>
+    <td><%= vmt.operating_system.name%></td>
+    <td><%= vmt.username%></td>
+    <td><%= vmt.shellinabox%></td>
     <td><%= vmt.xml_script %></td>
     <td><%= vmt.private %></td>
     <td><%= link_to 'View', vmt,:class=> 'show-button button' %><%= link_to 'Edit', edit_vmt_path(vmt),:class=> 'edit-button button' %><%= link_to 'Destroy', vmt, :confirm => 'Are you sure?', :method => :delete ,:class=> 'delete-button button'%></td>

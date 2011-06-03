@@ -24,7 +24,7 @@
       
       <div class="hb b_menu <% if @tab== "home"%>current_tab<%end%>">
       <%=link_to 'Home', root_path%></div>
-        <div class="cb b_menu <% if @tab == "courses"%>current_tab<%end%>"><%=link_to('Labs', courses_path)%></div>
+        <div class="cb b_menu <% if @tab == "courses"%>current_tab<%end%>"><%=link_to('Labs', all_labs_path)%></div>
       <div class="vb b_menu <% if @tab == "vms" %>current_tab<%end%>">
       <%=link_to 'My machines', vms_path %></div>
      <%if  @admin then  %>
@@ -49,10 +49,10 @@
       </div>
      
       <div class="course s_menu <% if @tab == "courses" %>current_tab<%end%>"> 
-        <%= link_to_unless_current 'All labs', courses_path %>
+        <%= link_to_unless_current 'All labs', all_labs_path %>
         
-        <%= link_to_unless_current 'Running labs', running_courses_path %>
-        <%= link_to_unless_current 'Completed labs', ended_courses_path %>
+        <%= link_to_unless_current 'Running labs', running_labs_path %>
+        <%= link_to_unless_current 'Completed labs', completed_labs_path %>
         
       </div>
       <div class="vms s_menu <% if @tab== "vms"%>current_tab<%end%>"> 
@@ -86,7 +86,10 @@
             </td>
             <td>
               <%= link_to_unless_current('Hosts', hosts_path) %><br/>
-              <%= link_to_unless_current 'New Host', new_host_path %>
+              <%= link_to_unless_current 'New Host', new_host_path %><br/>
+              <%= link_to_unless_current('Operating systems', operating_systems_path) %><br/>
+              <%= link_to_unless_current 'New operating system', new_operating_system_path %>
+             
             </td>
           </tr>
         </table>

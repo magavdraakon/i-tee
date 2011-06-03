@@ -15,6 +15,20 @@
     <%= f.label :image %><br />
     <%= f.text_field :image %> <span class="red" title="Required field">*</span>
   </div>
+   <div class="field">
+    <%= f.label :username %><br />
+    <%= f.text_field :username %> <span class="red" title="Required field">*</span>
+  </div>
+  <div class="field">
+    <%= f.label :operating_system %> 
+    <%=collection_select(:vmt, :operating_system_id, OperatingSystem.all, :id, :name, {:prompt => true})%>
+   <span class="red" title="Required field">*</span>
+  </div>
+  
+  <div class="field">
+    <%= f.check_box :shellinabox %><%= f.label :shellinabox, "ShellInaBox" %>
+  </div>
+
   <div class="field">
     <%= f.label :xml_script %><br />
     <%= f.text_field :xml_script %>
