@@ -22,8 +22,17 @@
   </div>
   
   <div class="field">
-    <%= check_box_tag "add"%>
-    <%=label_tag("add", "add all users")%>
+  <%if @all_users then%><%#all users have this lab%>
+    <%= check_box_tag("remove", '1')%>
+    <%=label_tag("remove", "Remove all users")%>
+  <%else%><%#some users might have this lab%>
+    <%= check_box_tag("add", '1')%>
+    <%=label_tag("add", "Add all users")%><br/>
+    <%if @user_count>0 then%> <%#no need to show remove if there are no users%>
+      <%= check_box_tag("remove", '1')%>
+      <%=label_tag("remove", "Remove all users")%>
+    <%end%>
+  <%end%>
   </div>
   
   <div class="actions">

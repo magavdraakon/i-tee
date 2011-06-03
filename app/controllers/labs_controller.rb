@@ -3,7 +3,7 @@ class LabsController < ApplicationController
   before_filter :authorise_as_admin, :except => [:courses, :running_lab,:ended_lab, :end_lab, :restart_lab]
 
       #redirect to index view when trying to see unexisting things
-  before_filter :save_from_nil, :only=>[:show, :edit]
+  before_filter :save_from_nil, :only=>[:show, :edit, :update]
   # set the menu tab to show the user
   before_filter :course_tab, :only=>[:courses, :running_lab, :ended_lab]
   before_filter :admin_tab, :except=>[:courses, :running_lab, :ended_lab]
@@ -41,7 +41,7 @@ class LabsController < ApplicationController
   # GET /labs/new.xml
   def new
     @lab = Lab.new
-
+    @all_users=false
     respond_to do |format|
       format.html # new.html.erb
       format.xml  { render :xml => @lab }
@@ -51,8 +51,15 @@ class LabsController < ApplicationController
   # GET /labs/1/edit
   def edit
     #@lab = Lab.find(params[:id])
+    @all_users=false
+    @user_count=all_lab_users.count
+    @all_users=true if User.all.count==@user_count
   end
 
+  def all_lab_users
+    return LabUser.find(:all, :conditions=>["lab_id=?", @lab.id])
+  end
+  
   def add_all_users
     User.all.each do |u|
       l=LabUser.new
@@ -61,6 +68,13 @@ class LabsController < ApplicationController
       l.save if LabUser.find(:first, :conditions=>["lab_id=? and user_id=?", l.lab_id, l.user_id])==nil
     end
   end
+  
+  def remove_all_users
+    all_lab_users.each do |u|
+      u.destroy
+    end
+  end
+  
   # POST /labs
   # POST /labs.xml
   def create
@@ -69,11 +83,11 @@ class LabsController < ApplicationController
     
     respond_to do |format|
       if @lab.save
-        
-        if params[:add].to_s==1.to_s then
-          add_all_users  
-        end
-        
+                
+        add_all_users  if params[:add].to_s==1.to_s
+                
+        remove_all_users if params[:remove].to_s==1.to_s 
+                
         format.html { redirect_to(@lab, :notice => "Lab was successfully created. #{params[:add]}") }
         format.xml  { render :xml => @lab, :status => :created, :location => @lab }
       else
@@ -90,10 +104,11 @@ class LabsController < ApplicationController
 
     respond_to do |format|
       if @lab.update_attributes(params[:lab])
+          
+        add_all_users  if params[:add].to_s==1.to_s
+                
+        remove_all_users if params[:remove].to_s==1.to_s 
         
-        if params[:add].to_s==1.to_s then
-          add_all_users  
-        end
         format.html { redirect_to(@lab, :notice => 'Lab was successfully updated.') }
         format.xml  { head :ok }
       else
@@ -117,17 +132,8 @@ class LabsController < ApplicationController
 
   #view of labs that can be started/continued/viewed
   def courses
-   # @labs=[] #only let the users pick from labs assigned to them
-  #  @started=[]
-  #  @complete=[]
-    #categorize the labs
-    # current_user.lab_users.each do |u|
-    #  @labs<<u.lab        
-    #  @started<<u.lab  if u.start!=nil && u.end==nil 
-    #  @complete<<u.lab  if u.start!=nil && u.end!=nil 
-    #  end
+    
     get_user_labs
-      #@labs=Lab.all if @admin #admins should see them all
       
     # if no course is selected show the first one
     if params[:id]!=nil then
