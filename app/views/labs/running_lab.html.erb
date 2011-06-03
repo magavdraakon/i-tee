@@ -23,11 +23,11 @@
 <% desc="Initialize the virtual machine by clicking <strong>Start</strong>."
 desc=vm.description if (state=="running" || state=="paused") && vm.mac!=nil%>
 <span class="button info-button" onclick="$('#notice').html('<%=desc%>');$('#notice').show(); ">
-<%=vm.name%><%if vm.mac!=nil && state=="running"%>, IP <%=vm.mac.ip if vm.mac!=nil%><%end%>
+<%=vm.name%><%if vm.mac!=nil && state=="running"%>, IP <%=vm.mac.ip if vm.mac!=nil%> PW: <%=vm.password%><%end%>
 </span> 
 
 
- <%if state=="running" && vm.mac!=nil then%>
+ <%if state=="running" && vm.mac!=nil && vm.lab_vmt.vmt.shellinabox then%>
    <a href="https://<%=vm.mac.ip if vm.mac!=nil%>:4200" title="Login" target='_blank' class="button login-button">Login</a>
     <%end%>
 
