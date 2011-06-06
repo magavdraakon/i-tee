@@ -58,7 +58,7 @@
       <div class="vms s_menu <% if @tab== "vms"%>current_tab<%end%>"> 
         <%= link_to_unless_current 'All virtual machines', vms_path %>
         <%= link_to_unless_current('Virtual machines by state', vms_by_state_path) %>
-        <%= link_to_unless_current('Virtual machiness by lab', vms_by_lab_path) %>
+        <%= link_to_unless_current('Virtual machines by lab', vms_by_lab_path) %>
       </div>
       <%if  @admin then  %>
       <div class="admin s_menu <% if @tab=="admin"%>current_tab<%end%>">
@@ -77,7 +77,7 @@
             <td><%= link_to_unless_current 'New virtual machine', new_vm_path %> <br/>
           <%= link_to_unless_current 'All virtual machines', vms_path+"?admin=1" %><br/>
           <%= link_to_unless_current('Virtual machines by state', vms_by_state_path+"?admin=1") %><br/>
-          <%= link_to_unless_current('Virtual machiness by lab', vms_by_lab_path+"?admin=1") %>  
+          <%= link_to_unless_current('Virtual machines by lab', vms_by_lab_path+"?admin=1") %>  
           </td>
             <td>
               <%= link_to_unless_current 'Virtual machine templates', vmts_path %><br/>
@@ -111,6 +111,7 @@
       <div id="content"class="side_visible">
         <div id="menu-show"></div>
     <p id="notice"><%=raw notice %></p>
+     <p id="alert"><%=raw alert %></p>
     <%if !user_signed_in?%>
     <div id="info"> 
       <p> EIK kauglaborite süsteemi i-Tee abil saab teha erinevate ainete laboritöid.</p>

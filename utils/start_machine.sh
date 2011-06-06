@@ -104,5 +104,5 @@ $PWD
 $PWD
 LOPP
 
-echo "masin loodud"
+echo "masin $NAME loodud"
 

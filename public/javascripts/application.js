@@ -38,6 +38,9 @@ if ($('#notice').text()==''){
 $('#notice').hide();
 }
 
+if ($('#alert').text()==''){
+$('#alert').hide();
+}
 //new lay
 
 

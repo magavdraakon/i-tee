@@ -1,4 +1,5 @@
-<h3>Listing virtual machines</h3>
+<%=@a%>
+<h3>Listing <span class="specify">all</span> virtual machines<span class="inlab"></span></h3>
 <div id="index_t">
 <table>
    <caption >Virtual machines (<%= @vms.count  %>)</caption>
@@ -49,6 +50,7 @@ desc=vm.description if (state=="running" || state=="paused") && vm.mac!=nil%>
 <% end %>
 </table>
 </div>
+<span class="startall"></span>
 
 <% content_for :sidebar_head do %>
 <% if @b_by=='state' then%>Choose state<%end%><%if @b_by=="lab" then%>Choose lab<%end%>
@@ -57,15 +59,17 @@ desc=vm.description if (state=="running" || state=="paused") && vm.mac!=nil%>
 <% content_for :sidebar do %>
   <%#TODO mingi parameetri järgi peab tegema kinldaks, mis menüü siia esitada%>
   <% if @b_by=='state' then%>
-<li><a href="#" onclick="$('.vm').show();">All machines</a></li>
-<li><a href="#" onclick="$('.vm').hide(); $('.running').show();">Running machines</a></li>
-<li><a href="#" onclick="$('.vm').hide(); $('.paused').show();">Paused machines</a></li>
-<li><a href="#" onclick="$('.vm').hide(); $('.uninit').show();">Uninitialized machines</a></li>
+<li><a href="#" onclick="$('.vm').show(); $('span.specify').text('all');">All machines</a></li>
+<li><a href="#" onclick="$('.vm').hide(); $('.running').show(); $('span.specify').text('running');">Running machines</a></li>
+<li><a href="#" onclick="$('.vm').hide(); $('.paused').show(); $('span.specify').text('paused');">Paused machines</a></li>
+<li><a href="#" onclick="$('.vm').hide(); $('.uninit').show();$('span.specify').text('uninitialized');">Uninitialized machines</a></li>
 <%end%>
 <% if @b_by=='lab' then%>
-<li><a href="#" onclick="$('.vm').show();">All labs</a></li>
+<li><a href="#" onclick="$('.vm').show(); $('span.specify').text('all'); $('span.startall').html('');">All labs</a></li>
 <% @labs.each do |l| %>
-  <li><a href="#" onclick="$('.vm').hide(); $('.lab<%=l.id%>').show();"><%=l.name%></a></li>
+  <span class="hidden<%=l.id%>" style="display:none;"><%=link_to('Start all machines',start_all_path+"/"+l.id.to_s, :class=>"button start-button")%></span>
+<li><a href="#" onclick="$('.vm').hide(); $('.lab<%=l.id%>').show();$('span.startall').html($('span.hidden<%=l.id%>').html()); $('span.specify').text('');$('span.inlab').text(' in <%=l.name%>');">
+  <%=l.name%></a></li>
 <%end%>
 <%end%>
 

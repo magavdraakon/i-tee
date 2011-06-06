@@ -460,8 +460,8 @@ th              { font-weight: bolder; text-align: center }
 h1              { font-size: 2em; margin: .67em 0 }
 h2              { font-size: 1.5em; margin: .75em 0 }
 h3              { font-size: 1.17em; margin: .83em 0 }
-h4, p, form     { margin: 1.12em 0 }
-p  {line-height:1.25em;}
+h4, p, form     { margin: 1.1em 0 }
+p,ul,ol  {line-height:1.5em;}
 h5              { font-size: .83em; margin: 1.5em 0 }
 h6              { font-size: .75em; margin: 1.67em 0 }
 h1, h2, h3, h4, h5, h6, b, strong { font-weight: bolder }
@@ -482,6 +482,13 @@ hr              { border: 1px inset }
   padding:4px;
   margin-bottom:5px;
   background:#cbe86b;  
+}
+#alert {
+  color: #1c140d;
+  border:#1c140d 1px solid;
+  padding:4px;
+  margin-bottom:5px;
+  background:#ffaa88;  
 }
 
 .field_with_errors {

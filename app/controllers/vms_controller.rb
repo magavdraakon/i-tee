@@ -137,15 +137,40 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
   #TODO: ei tööta
   #start all the machines this user has in a given lab
   def start_all
-    current_user.vms.each do |vm|
-      init_vm(vm) if vm.lab_vmt.lab.id==params[:id]
-      logger.info vm.name
-    end  
+    @lab=Lab.find_by_id(params[:id])
+    @labuser=LabUser.find(:last, :conditions=>["lab_id=? and user_id=?", @lab.id, current_user.id]) if @lab!=nil
+    redirect=:back
+    if (@labuser==nil && @lab!=nil) || @lab==nil #either the lab doesnt exist or the user doesnt have it
+      redirect=error_401_path
+    end
+    if @labuser!=nil #user has this lab
+      flash[:notice]=""
+      current_user.vms.each do |vm|
+        init_vm(vm) if vm.lab_vmt.lab.id==@lab.id
+        logger.info vm.name
+        
+        require 'timeout'
+        status = Timeout::timeout(60) {
+          # Something that should be interrupted if it takes too much time...
+          until @a.include?("masin #{vm.name} loodud")
+            #do nothing, just wait
+          end
+        }
+         flash[:notice]=flash[:notice]+"<br/>"
+      end 
+    end
+    redirect_to(redirect)
+    rescue Timeout::Error
+      flash[:alert]="Starting all virtual machines failed, try starting them one by one."
+      flash[:notice]=""
+      redirect_to(:back)
   end
   
   #start one machine
   def start_vm
+     flash[:notice]=""
     init_vm(@vm)
+  #  flash[:alert]=@a
     redirect_to(:back)
   end
   
@@ -159,7 +184,7 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
        @mac= Mac.find(:first, :conditions=>["vm_id is null"])
         @mac.vm_id=vm.id
        if @mac.save  #save õnnestus, masinal on mac olemas..
-        flash[:notice] = "successful mac assignement."#"Successful vm initialisation." 
+        flash[:notice] = flash[:notice]+"successful mac assignement."#"Successful vm initialisation." 
       #  logger.info "käivitame masina skripti"
       # a=vm.ini_vm #the script is called in the model
       #logger.info a
@@ -167,21 +192,25 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
         end #end -if save
       else
         #the vm had a mac already, dont do anything
-       flash[:notice] = "Vm already had a mac."
+       flash[:notice] = flash[:notice]+"Vm already had a mac."
         #redirect_to(:back)
       end # end if nil
       
       if vm.state!="running" && vm.state!="paused"
       logger.info "käivitame masina skripti"
-        a=vm.ini_vm #the script is called in the model
-        logger.info a
+        @a=vm.ini_vm #the script is called in the model
+        logger.info @a
        
         
         vm.description="machine #{@mac.mac} with IP address of #{@mac.ip}<br/>Create a connection with this machine using <strong>ssh #{vm.lab_vmt.vmt.username}@#{@mac.ip}</strong><br/>The set password for this machine is <strong>#{vm.password}</strong>"
         vm.save
        
-        flash[:notice]=flash[:notice]+"<br/>"+vm.description 
-        
+        if @a.include?("masin #{vm.name} loodud")
+         flash[:notice]=flash[:notice]+"<br/>"+vm.description
+        else  
+          flash[:notice]=""
+         flash[:alert]="machine initialization failed."
+        end
       end
       
       #VAADATA ÜLE!!!
