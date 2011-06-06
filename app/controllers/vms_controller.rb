@@ -145,20 +145,25 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
     end
     if @labuser!=nil #user has this lab
       flash[:notice]=""
+      
       current_user.vms.each do |vm|
-        init_vm(vm) if vm.lab_vmt.lab.id==@lab.id
-        logger.info vm.name
+        if vm.lab_vmt.lab.id==@lab.id
+          init_vm(vm) 
+          logger.info vm.name
         
-        require 'timeout'
-        status = Timeout::timeout(60) {
-          # Something that should be interrupted if it takes too much time...
-          until @a.include?("masin #{vm.name} loodud")
+          require 'timeout'
+          status = Timeout::timeout(60) {
+            # Something that should be interrupted if it takes too much time...
+            if @a!=nil
+            until @a.include?("masin #{vm.name} loodud")
             #do nothing, just wait
+            end
           end
-        }
-         flash[:notice]=flash[:notice]+"<br/>"
-      end 
-    end
+          }
+           flash[:notice]=flash[:notice]+"<br/>"
+        end #end if right lab
+      end #end iterate trough vms
+    end#end if labuser
     redirect_to(redirect)
     rescue Timeout::Error
       flash[:alert]="Starting all virtual machines failed, try starting them one by one."
