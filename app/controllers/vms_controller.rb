@@ -134,7 +134,6 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
     end
   end
 
-  #TODO: ei tööta
   #start all the machines this user has in a given lab
   def start_all
     @lab=Lab.find_by_id(params[:id])
@@ -147,7 +146,7 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
       flash[:notice]=""
       
       current_user.vms.each do |vm|
-        if vm.lab_vmt.lab.id==@lab.id
+        if vm.lab_vmt.lab.id==@lab.id && (vm.state!="running" || vm.state!="paused")
           init_vm(vm) 
           logger.info vm.name
         
