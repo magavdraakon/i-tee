@@ -1,11 +1,11 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 one:
-  mac: MyString
-  ip: MyString
-  vm_id: 1
+  mac: mingimac
+  ip: 192.168.13.129
+  vm: one
 
 two:
-  mac: MyString
-  ip: MyString
-  vm_id: 1
+  mac: mingimac
+  ip: 192.168.13.142
+ # vm_id: nil

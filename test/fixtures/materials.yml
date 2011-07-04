@@ -1,9 +1,9 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
-one:
-  name: MyString
-  source: MyText
+veebiserver:
+  name:  veebiserveri jugend
+  source: veebiserveri juhendi tekst
 
-two:
-  name: MyString
-  source: MyText
+npt:
+  name: ntp seadistamise juhend
+  source: ntp juhendi tekst

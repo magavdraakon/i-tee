@@ -1,19 +1,19 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 one:
-  lab_id: 1
-  user_id: 1
-  progress: MyString
-  result: MyString
-  start: 2011-02-16 13:42:31
-  pause: 2011-02-16 13:42:31
-  end: 2011-02-16 13:42:31
+  lab: ntp
+  user: ttanav
+  progress: 0
+  result: 0
+ # start: 2011-02-16 13:42:31
+#  pause: 2011-02-16 13:42:31
+ # end: 2011-02-16 13:42:31
 
 two:
-  lab_id: 1
-  user_id: 1
-  progress: MyString
-  result: MyString
+  lab: veebiserver
+  user: ttanav
+  progress: 0
+  result: 0
   start: 2011-02-16 13:42:31
-  pause: 2011-02-16 13:42:31
-  end: 2011-02-16 13:42:31
+#  pause: 2011-02-16 13:42:31
+ # end: 2011-02-16 13:42:31

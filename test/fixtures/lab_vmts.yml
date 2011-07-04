@@ -1,11 +1,11 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 one:
-  name: MyString
-  lab_id: 1
-  vmt_id: 1
+  name: one
+  lab: ntp
+  vmt: one
 
 two:
-  name: MyString
-  lab_id: 1
-  vmt_id: 1
+  name: two
+  lab: veebiserver
+  vmt: two

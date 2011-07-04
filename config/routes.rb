@@ -114,12 +114,13 @@ ITee::Application.routes.draw do
 
   
   # This is a catch-all for routes that don't exist, visitor is redirected to home page.
-ActionController::Routing::Routes.draw do |map|
-    map.connect ':controller/:action/:id'
-    map.connect '*path', :controller => 'home', :action => 'catcher'
-end
+  #ActionController::Routing::Routes.draw do |map|
+#    map.connect ':controller/:action/:id'
+#    map.connect '*path', :controller => 'home', :action => 'catcher'
+#end
+match ':controller/:action/:id',  :to=>'home#catcher' 
+match '*path',  :to=>'home#catcher'
 
-  
   # See how all your routes lay out with "rake routes"
 
   # This is a legacy wild controller route that's not recommended for RESTful applications.

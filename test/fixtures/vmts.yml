@@ -1,11 +1,14 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 one:
-  image: MyText
-  xml_script: MyText
-  private: MyText
-
+  image: esimene.img
+  xml_script: esimene.xml
+  private: esimenekey
+  operating_system: ubuntu
+  shellinabox: true
 two:
-  image: MyText
-  xml_script: MyText
-  private: MyText
+  image: teine.img
+  xml_script: teine.xml
+  private: teinekey
+  operating_system: ubuntu
+  shellinabox: false

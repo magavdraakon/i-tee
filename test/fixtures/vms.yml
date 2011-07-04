@@ -1,17 +1,15 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 one:
-  name: MyString
-  image_id: MyString
-  lab_id: 1
-  ram: 1
-  hdd: 1
-  nic_count: 1
+  name: ttanav-one
+  user: ttanav
+  lab_vmt: one 
+  description: something about this machine
+  password: generatedone
 
 two:
-  name: MyString
-  image_id: MyString
-  lab_id: 1
-  ram: 1
-  hdd: 1
-  nic_count: 1
+  name: ttanav-two
+  user: ttanav
+  lab_vmt: two
+  description: something about this machine
+  password: generatedtwo
