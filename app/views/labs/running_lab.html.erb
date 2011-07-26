@@ -27,8 +27,8 @@ desc=vm.description if (state=="running" || state=="paused") && vm.mac!=nil%>
 </span> 
 
 
- <%if state=="running" && vm.mac!=nil && vm.lab_vmt.vmt.shellinabox then%>
-   <a href="https://<%=vm.mac.ip if vm.mac!=nil%>:4200" title="Login" target='_blank' class="button login-button">Login</a>
+ <%if state=="running" && vm.mac!=nil && vm.lab_vmt.vmt.shellinabox then %>
+  <a href="https://<%=request.host+':8'+vm.mac.ip.split('.')[3] if vm.mac!=nil%>" title="Login" target='_blank' class="button login-button">Login</a>
     <%end%>
 
  <span class="loader">
