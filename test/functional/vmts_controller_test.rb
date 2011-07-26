@@ -3,6 +3,9 @@ require 'test_helper'
 class VmtsControllerTest < ActionController::TestCase
   setup do
     @vmt = vmts(:one)
+    sign_in users(:ttanav)
+    #setting a previous page
+    request.env["HTTP_REFERER"] = vmts_path
   end
 
   test "should get index" do
@@ -17,8 +20,12 @@ class VmtsControllerTest < ActionController::TestCase
   end
 
   test "should create vmt" do
+    vmt=Vmt.new
+    vmt.username='student'
+    vmt.image='image'
+    vmt.operating_system=operating_systems(:ubuntu)
     assert_difference('Vmt.count') do
-      post :create, :vmt => @vmt.attributes
+      post :create, :vmt => vmt.attributes
     end
 
     assert_redirected_to vmt_path(assigns(:vmt))
@@ -35,7 +42,11 @@ class VmtsControllerTest < ActionController::TestCase
   end
 
   test "should update vmt" do
-    put :update, :id => @vmt.to_param, :vmt => @vmt.attributes
+    vmt=Vmt.new
+    vmt.username='newstudent'
+    vmt.image='newimage'
+    vmt.operating_system=operating_systems(:windows)
+    put :update, :id => @vmt.to_param, :vmt => vmt.attributes
     assert_redirected_to vmt_path(assigns(:vmt))
   end
 

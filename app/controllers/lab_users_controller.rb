@@ -56,13 +56,13 @@ class LabUsersController < ApplicationController
         l=LabUser.find(:first, :conditions=>["lab_id=? and user_id=?", lab, d.id])
         l.delete if l!=nil
       end
-      redirect_to(lab_users_url, :notice => 'successful update.')
+      redirect_to(lab_users_path, :notice => 'successful update.')
     else
       #adding a single user to a lab
       @lab_user = LabUser.new(params[:lab_user])
       respond_to do |format|
         if @lab_user.save
-        format.html { redirect_to(lab_users_url, :notice => 'successful update.') }
+        format.html { redirect_to(lab_users_path, :notice => 'successful update.') }
         format.xml  { render :xml => @lab_user, :status => :created, :location => @lab_user }
       else
         format.html { render :action => "index" }
@@ -79,7 +79,7 @@ end
     
     respond_to do |format|
       if @lab_user.update_attributes(params[:lab_user])
-        format.html { redirect_to(lab_users_url, :notice => 'successful update.') }
+        format.html { redirect_to(lab_users_path, :notice => 'successful update.') }
         format.xml  { head :ok }
       else
         format.html { render :action => "edit" }
@@ -101,7 +101,7 @@ end
     @lab_user.destroy
 
     respond_to do |format|
-      format.html { redirect_to(lab_users_url) }
+      format.html { redirect_to(lab_users_path) }
       format.xml  { head :ok }
     end
   end

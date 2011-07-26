@@ -2,7 +2,10 @@ require 'test_helper'
 
 class MaterialsControllerTest < ActionController::TestCase
   setup do
-    @material = materials(:one)
+    @material = materials(:veebiserver)
+    sign_in users(:ttanav)
+    #setting a previous page
+    request.env["HTTP_REFERER"] = materials_path
   end
 
   test "should get index" do

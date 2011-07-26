@@ -2,7 +2,10 @@ require 'test_helper'
 
 class LabsControllerTest < ActionController::TestCase
   setup do
-    @lab = labs(:one)
+    sign_in users(:ttanav)
+    @lab = labs(:ntp)
+    #setting a previous page
+    request.env["HTTP_REFERER"] = labs_path
   end
 
   test "should get index" do

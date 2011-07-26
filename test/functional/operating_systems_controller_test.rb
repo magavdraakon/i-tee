@@ -2,7 +2,10 @@ require 'test_helper'
 
 class OperatingSystemsControllerTest < ActionController::TestCase
   setup do
-    @operating_system = operating_systems(:one)
+    @operating_system = operating_systems(:ubuntu)
+    sign_in users(:ttanav)
+    #setting a previous page
+    request.env["HTTP_REFERER"] = root_path
   end
 
   test "should get index" do
