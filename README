@@ -318,6 +318,10 @@ bridge_ports eth0
 bridge_fd 9
 bridge_maxage 12
 
+#enable port forwarding using iptables
+pre-up /var/www/railsapps/i-tee/utils/port-forward.sh
+
+
 activate the bridge
 ifup br0
 
