@@ -425,8 +425,12 @@ please refer to the system guide (/system) page to enable working with virtual m
 
 # Authors
 Tiia Tänav
+
 Margus Ernits
+
 Carolyn Fischer (retired)
+
 Aivar Guitar (retired)
+
 Madis Toom (retired)
 
