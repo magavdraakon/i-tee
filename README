@@ -1,8 +1,8 @@
-== About i-tee
+# About i-tee
 i-tee is a distance laboratory system, that is based on ruby on rails and uses virtualization technologies like libvirt.
 i-tee is developed by the Estonian IT College.
 
-== Application Config
+# Application Config
 Configuration files are needed as following with sample files included:
 
 - config/environments/development.rb
@@ -13,7 +13,7 @@ Configuration files are needed as following with sample files included:
 - config/database.yml
 
 
-== Installation
+# Installation
 
 make yourself the root user
 sudo -i
@@ -43,7 +43,7 @@ apt-get install libvirtd kvm
 
 
 
-=== installing the distance laboratory system
+## installing the distance laboratory system
 
 Create the railsapps directory
 mkdir /var/www/railsapps/
@@ -119,7 +119,7 @@ NB! this fills the mac addres table with ip-s from 192.168.13.102 to 192.168.13.
 you can change the seed to match your settings!
 
 
-=== installing passenger
+## installing passenger
 
 install passenger for hosting Rails applications 
 gem install passenger
@@ -187,7 +187,7 @@ reload the web servers configuration files
 /etc/init.d/apache2 reload
 
 
-=== configuring Apache to use HTTPS
+## configuring Apache to use HTTPS
 
 generate a private key
 openssl genrsa -des3 -out project.key 4096
@@ -238,7 +238,7 @@ NameVirtualHost *:443
 
 
 
-=== install a DHCP server (ie. on a virtual machine)
+## install a DHCP server (ie. on a virtual machine)
 make yourself the root user
 sudo -i
 
@@ -291,7 +291,7 @@ restart the DHCP server
 
 
 
-=== configuring a network bridge for the Livbirt virtual machines
+## configuring a network bridge for the Livbirt virtual machines
 
 alter the /etc/network/interfaces file that contains:
 auto eth0
@@ -355,7 +355,7 @@ http://localhost
 
 please refer to the system guide (/system) page to enable working with virtual machines from the user interface
 
-== Authors
+# Authors
 Tiia Tänav
 Margus Ernits
 Carolyn Fischer (retired)
