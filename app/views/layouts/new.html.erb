@@ -18,7 +18,7 @@
 <body>
  <div id="contain">
     <div id="right">
-<div id="top">i-tee</div>
+<div id="top"><%=link_to 'I-Tee', root_path%></div>
     <div id="m_menu">
       <%if user_signed_in?%>
       
@@ -112,7 +112,7 @@
         <div id="menu-show"></div>
     <p id="notice"><%=raw notice %></p>
      <p id="alert"><%=raw alert if user_signed_in?%></p>
-    <%if !user_signed_in?%>
+    <%if !user_signed_in? && controller.action_name!="about"%>
     <div id="info"> 
       <p> EIK kauglaborite süsteemi i-Tee abil saab teha erinevate ainete laboritöid.</p>
       <ol>
@@ -125,7 +125,7 @@
   </div>
       <%end%> 
     <%= yield  %>
-    <%if !user_signed_in?%>  
+    <%if !user_signed_in? && controller.action_name!="about"%>  
   <div id="logos">
   <a href="http://www.struktuurifondid.ee/"><img src="../images/logo-euroopa-sotsiaalfond.jpg" alt="Euroopa Liidu struktuuritoetus"/></a>
   <a href="http://www.eitsa.ee/"><img src="../images/eitsa.png" alt="Eesti Infotehnoloogia SA"/></a>

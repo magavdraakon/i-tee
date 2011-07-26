@@ -8,7 +8,7 @@ class ApplicationController < ActionController::Base
   if ITee::Application.config.emulate_ldap then
     before_filter :emulate_user
   else
-    before_filter :authenticate_user!
+    before_filter :authenticate_user!, :except=>[:about]
     before_filter :admin?
   end
   
@@ -50,25 +50,25 @@ class ApplicationController < ActionController::Base
       
     end
   
-       private
+  private#-------------------------------------------------------------------
       
       
       
-      def home_tab
-        @tab="home"
-      end
+  def home_tab
+    @tab="home"
+  end
       
-      def course_tab
-        @tab="courses"
-      end
+  def course_tab
+    @tab="courses"
+  end
       
-      def vm_tab
-        @tab="vms"
-      end
+  def vm_tab
+    @tab="vms"
+  end
       
-      def admin_tab
-        @tab="admin"
-      end
+  def admin_tab
+    @tab="admin"
+  end
 
   def check_for_cancel
     if params[:commit] == "Cancel"

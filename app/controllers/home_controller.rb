@@ -1,6 +1,6 @@
 class HomeController < ApplicationController
    before_filter :authorise_as_admin, :only=>[:system_info, :template_info]
-  before_filter :home_tab
+  before_filter :home_tab, :except=>[:about]
   def index
   end
 
@@ -12,6 +12,7 @@ class HomeController < ApplicationController
   end
   
   def about
+    @tab="home" if user_signed_in?
   end
   
   def template_info
