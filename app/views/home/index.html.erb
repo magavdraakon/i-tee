@@ -1,9 +1,6 @@
 <p>Tere <%=current_user.username%>!</p>
-<p>
-  Oled sisenenud EIK virtuaalaborite keskkonda i-Tee.
-</p>
-<p>
-  Keskkonna kasutamiseks:</p>
+<p>Oled sisenenud EIK virtuaalaborite keskkonda i-Tee.</p>
+<p>Keskkonna kasutamiseks:</p>
 <ul>
   <li>vali <strong>Labs</strong> menüüst kursus;</li>
   <li>loe läbi õppematerjalid ja tee enesetestid;</li>
@@ -15,12 +12,13 @@
   <li>vajadusel katkesta labori sooritus ja salvesta virtuaalmasinate hetkeseis kasutades <strong>Pause</strong> nuppu</li>
 </ul>
 
-<p>käivitatud virtuaalmasin saab omale IP aadressi, virtuaalmasina kasutamiseks käsureal: 
-    ssh student@IP
+<p>käivitatud virtuaalmasin saab omale IP aadressi, virtuaalmasina kasutamiseks käsureal: <br/>
+    ssh student@IP<br/>
     parool: student </p>
     
     
-    <%if @admin then%><p>Sa oled administraator</p>
-<p>Emulated virtualization environment: <%= ITee::Application.config.emulate_virtualization %></p>
-<p>Emulated ldap environment: <%= ITee::Application.config.emulate_ldap %></p>
+<%if @admin then%>
+  <p>Sa oled administraator</p>
+  <p>Emulated virtualization environment: <%= ITee::Application.config.emulate_virtualization %></p>
+  <p>Emulated ldap environment: <%= ITee::Application.config.emulate_ldap %></p>
 <%end%>

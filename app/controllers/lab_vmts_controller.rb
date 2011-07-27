@@ -1,7 +1,7 @@
 class LabVmtsController < ApplicationController
   #restricted to admins
   before_filter :authorise_as_admin
-      #redirect to index view when trying to see unexisting things
+  #redirect to index view when trying to see unexisting things
   before_filter :save_from_nil, :only=>[:edit]
   before_filter :admin_tab
   def save_from_nil

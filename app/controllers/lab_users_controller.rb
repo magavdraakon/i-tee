@@ -1,7 +1,7 @@
 class LabUsersController < ApplicationController
   #restricted to admins 
   before_filter :authorise_as_admin
-    #redirect to index view when trying to see unexisting things
+  #redirect to index view when trying to see unexisting things
   before_filter :save_from_nil, :only=>[:edit]
   before_filter :admin_tab
   def save_from_nil
@@ -34,9 +34,9 @@ class LabUsersController < ApplicationController
   # POST /lab_users
   # POST /lab_users.xml
   def create
-     @lab_users = LabUser.find(:all, :order=>params[:sort_by])
+    @lab_users = LabUser.find(:all, :order=>params[:sort_by])
     # logic for when adding/removing multiple users at once to a specific lab
-     if params[:lab_user][:page]=='bulk_add' then
+    if params[:lab_user][:page]=='bulk_add' then
       all_users=User.all
       checked_users=get_users_from(params[:users])
       removed_users=all_users-checked_users
@@ -57,7 +57,7 @@ class LabUsersController < ApplicationController
         l.delete if l!=nil
       end
       redirect_to(lab_users_path, :notice => 'successful update.')
-    else
+      elese
       #adding a single user to a lab
       @lab_user = LabUser.new(params[:lab_user])
       respond_to do |format|

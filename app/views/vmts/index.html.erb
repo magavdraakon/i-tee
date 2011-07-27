@@ -1,31 +1,28 @@
 <h3>Listing virtual machine templates</h3>
 <div id="index_t">
-<table>
-   <caption >Templates (<%= @vmts.count  %>)</caption>
-  <thead>
-    <tr>
-    <th>Image</th>
-    <th>OS</th>
-    <th>username</th>
-    <th>ShellInaBox</th>
-    <th>Xml script</th>
-    <th>Private key</th>
-    <th></th>
-   
-  </tr>
-</thead>
-
-<% @vmts.each do |vmt| %>
-  <tr>
-    <td><%= vmt.image %></td>
-    <td><%= vmt.operating_system.name if vmt.operating_system!=nil%></td>
-    <td><%= vmt.username%></td>
-    <td><%= vmt.shellinabox%></td>
-    <td><%= vmt.xml_script %></td>
-    <td><%= vmt.private %></td>
-    <td><%= link_to 'View', vmt,:class=> 'show-button button' %><%= link_to 'Edit', edit_vmt_path(vmt),:class=> 'edit-button button' %><%= link_to 'Destroy', vmt, :confirm => 'Are you sure?', :method => :delete ,:class=> 'delete-button button'%></td>
-  </tr>
-<% end %>
-</table>
-
+  <table>
+    <caption >Templates (<%= @vmts.count  %>)</caption>
+    <thead>
+      <tr>
+        <th>Image</th>
+        <th>OS</th>
+        <th>username</th>
+        <th>ShellInaBox</th>
+        <th>Xml script</th>
+        <th>Private key</th>
+        <th></th>
+      </tr>
+    </thead>
+    <% @vmts.each do |vmt| %>
+      <tr>
+        <td><%= vmt.image %></td>
+        <td><%= vmt.operating_system.name if vmt.operating_system!=nil%></td>
+        <td><%= vmt.username%></td>
+        <td><%= vmt.shellinabox%></td>
+        <td><%= vmt.xml_script %></td>
+        <td><%= vmt.private %></td>
+        <td><%= link_to 'View', vmt,:class=> 'show-button button' %><%= link_to 'Edit', edit_vmt_path(vmt),:class=> 'edit-button button' %><%= link_to 'Destroy', vmt, :confirm => 'Are you sure?', :method => :delete ,:class=> 'delete-button button'%></td>
+      </tr>
+    <% end %>
+  </table>
 </div>

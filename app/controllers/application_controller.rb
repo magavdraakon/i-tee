@@ -5,16 +5,17 @@ class ApplicationController < ActionController::Base
   
   Time.zone='Tallinn'
   protect_from_forgery
+  
+  layout 'new'
+  
+  before_filter :check_for_cancel, :only => [:create, :update]
+
   if ITee::Application.config.emulate_ldap then
     before_filter :emulate_user
   else
     before_filter :authenticate_user!, :except=>[:about]
     before_filter :admin?
-  end
-  
-   layout 'new'
-  
-   before_filter :check_for_cancel, :only => [:create, :update]
+  end  
   
   def emulate_user
     @admin = true

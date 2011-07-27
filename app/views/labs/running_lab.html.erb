@@ -1,82 +1,75 @@
 <%if @lab==nil%>
-<h4>Sorry, you dont have any such labs</h4>
-  <%else%>
+  <h4>Sorry, you dont have any such labs</h4>
+<%else%>
   <h1><%=@lab.name%></h1>
  
-    <%=link_M raw @lab.description%>
-    <br/>
+  <%=link_M raw @lab.description%><br/>
     
-    <!-- started at: <%#=@lab_user.start%>
-        <br/>
-    ended at: <%#=@lab_user.end%>
-    <br/>-->
-    <%if @lab_user.progress!=nil then %> progress: <%= @lab_user.progress%>
-    <br/><%end%>
-    <%if @lab_user.result!=nil then %> result: <%= @lab_user.result%>
-    <br/><%end%>
-    
-    
-<%if @lab_user.end==nil then %>
-<h3>Virtual machines</h3><p>
-<% @vms.each do |vm| %>
-<%state=vm.state %>
-<% desc="Initialize the virtual machine by clicking <strong>Start</strong>."
-desc=vm.description if (state=="running" || state=="paused") && vm.mac!=nil%>
-<span class="button info-button" onclick="$('#notice').html('<%=desc%>');$('#notice').show(); ">
-<%=vm.name%><%if vm.mac!=nil && state=="running"%>, IP <%=vm.mac.ip if vm.mac!=nil%> PW: <%=vm.password%><%end%>
-</span> 
+  <!-- started at: <%#=@lab_user.start%><br/>
+    ended at: <%#=@lab_user.end%><br/>-->
+  <%if @lab_user.progress!=nil then %> progress: <%= @lab_user.progress%><br/><%end%>
+  <%if @lab_user.result!=nil then %> result: <%= @lab_user.result%>    <br/><%end%>
+      
+  <%if @lab_user.end==nil then %>
+    <h3>Virtual machines</h3>
+    <p>
+      <% @vms.each do |vm| %>
+        <%state=vm.state %>
+        <% desc="Initialize the virtual machine by clicking <strong>Start</strong>."
+        desc=vm.description if (state=="running" || state=="paused") && vm.mac!=nil%>
+        <span class="button info-button" onclick="$('#notice').html('<%=desc%>');$('#notice').show(); ">
+          <%=vm.name%>
+          <%if vm.mac!=nil && state=="running"%>,
+            IP <%=vm.mac.ip if vm.mac!=nil%>,
+            PW: <%=vm.password%>
+          <%end%>
+        </span> 
+        <%if state=="running" && vm.mac!=nil && vm.lab_vmt.vmt.shellinabox then %>
+          <a href="https://<%=request.host+':8'+vm.mac.ip.split('.')[3] if vm.mac!=nil%>" title="Login" target='_blank' class="button login-button">Login</a>
+        <%end%>
 
-
- <%if state=="running" && vm.mac!=nil && vm.lab_vmt.vmt.shellinabox then %>
-  <a href="https://<%=request.host+':8'+vm.mac.ip.split('.')[3] if vm.mac!=nil%>" title="Login" target='_blank' class="button login-button">Login</a>
-    <%end%>
-
- <span class="loader">
-    <%= link_to('Start',start_vm_path+"/"+vm.id.to_s, :class=>"button start-button") if (state!="running" && state!="paused") || vm.mac==nil%>
-    <%= link_to('Pause', pause_vm_path+"/"+vm.id.to_s, :class=>'button pause-button') if state=="running" && vm.mac!=nil %>
-    <%= link_to('Resume',resume_vm_path+"/"+vm.id.to_s, :class=>'button start-button') if state=="paused" && vm.mac!=nil%>
-    <%= link_to('Stop',stop_vm_path+"/"+vm.id.to_s, :class=>"button stop-button") if state=="running" && vm.mac!=nil%>
-  </span>
+        <span class="loader">
+          <%= link_to('Start',start_vm_path+"/"+vm.id.to_s, :class=>"button start-button") if (state!="running" && state!="paused") || vm.mac==nil%>
+          <%= link_to('Pause', pause_vm_path+"/"+vm.id.to_s, :class=>'button pause-button') if state=="running" && vm.mac!=nil %>
+          <%= link_to('Resume',resume_vm_path+"/"+vm.id.to_s, :class=>'button start-button') if state=="paused" && vm.mac!=nil%>
+          <%= link_to('Stop',stop_vm_path+"/"+vm.id.to_s, :class=>"button stop-button") if state=="running" && vm.mac!=nil%>
+        </span>
     
-<span class="vm_links"><%="("+state+")" if vm.mac!=nil && (state=="running" || state=="paused") %></span>
-<br/>   
-    
-<%end%>
-</p> 
-<%end%>
-<span class="loader">
-<%= link_to('Start all machines',start_all_path+"/"+@lab.id.to_s, :class=>"button start-button") if @lab_user.end==nil %>
-</span>
-<br/>
-    <table width="100%">
-      <tr>
-        <td><%= link_to('Restart lab',restart_lab_path+"/"+@lab.id.to_s, :class=>'add-button button')%> </td>
-        <td><%= link_to('End lab', end_lab_path+"/"+@lab_user.id.to_s, :class=>'delete-button button') if @lab_user.end==nil  %> </td>
-      </tr>
-    </table>
-    
+        <span class="vm_links">
+          <%="("+state+")" if vm.mac!=nil && (state=="running" || state=="paused") %>
+        </span><br/>   
+      <%end%>
+    </p> 
+  <%end%>
+  <span class="loader">
+    <%= link_to('Start all machines',start_all_path+"/"+@lab.id.to_s, :class=>"button start-button") if @lab_user.end==nil %>
+  </span><br/>
+  <table width="100%">
+    <tr>
+      <td><%= link_to('Restart lab',restart_lab_path+"/"+@lab.id.to_s, :class=>'add-button button')%> </td>
+      <td><%= link_to('End lab', end_lab_path+"/"+@lab_user.id.to_s, :class=>'delete-button button') if @lab_user.end==nil  %> </td>
+    </tr>
+  </table>
 
-
-<% content_for :sidebar_head do %>
- <%if @lab_user.end==nil then%>
+  <% content_for :sidebar_head do %>
+    <%if @lab_user.end==nil then%>
       Running
-      <%else%>
-  Completed
-  <%end%> labs
+    <%else%>
+      Completed
+    <%end%> labs
   <%end%>
 
-<% content_for :sidebar do %>
-  <%#TODO mingi parameetri järgi peab tegema kinldaks, mis menüü siia esitada%>
-<% @other.each do |l| %>
-  <li>
-  <%if @lab_user.end==nil then%>
-      <%=link_to(l.name, running_labs_path+"/"+l.id.to_s) %>
-      <%else%>
-  <%=link_to(l.name, completed_labs_path+"/"+l.id.to_s) %>
-  <%end%></li>  
-<%end%>
 
- 
-<%end%>
+  <% content_for :sidebar do %>
+    <% @other.each do |l| %>
+      <li>
+        <%if @lab_user.end==nil then%>
+          <%=link_to(l.name, running_labs_path+"/"+l.id.to_s) %>
+        <%else%>
+          <%=link_to(l.name, completed_labs_path+"/"+l.id.to_s) %>
+        <%end%>
+      </li>  
+    <%end%>
+  <%end%>
 <%end%>
 

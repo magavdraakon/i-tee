@@ -1,59 +1,56 @@
 
 <h3>Listing users in labs</h3>
 <div id="index_t">
-<table>
-   <caption >users in labs (<%= @lab_users.count  %>)</caption>
-  <thead>
-  <tr>
-    <th><%=link_to("Lab", :controller=>"lab_users",:action=>"index", :sort_by=>"lab_id")%></th>
-    <th><%=link_to("User", :controller=>"lab_users",:action=>"index", :sort_by=>"user_id")%></th>
-    <th>Progress</th>
-    <th>Result</th>
-    <th>Start</th>
-    <th>Pause</th>
-    <th>End</th>
-    <th></th>
-   
-  </tr>
-</thead>
+  <table>
+    <caption >users in labs (<%= @lab_users.count  %>)</caption>
+    <thead>
+      <tr>
+        <th><%=link_to("Lab", :controller=>"lab_users",:action=>"index", :sort_by=>"lab_id")%></th>
+        <th><%=link_to("User", :controller=>"lab_users",:action=>"index", :sort_by=>"user_id")%></th>
+        <th>Progress</th>
+        <th>Result</th>
+        <th>Start</th>
+        <th>Pause</th>
+        <th>End</th>
+        <th></th> 
+      </tr>
+    </thead>
 
-<% @lab_users.each do |lab_user| %>
-  <tr>
-    <td><%= lab_user.lab.name %></td>
-    <td><%= lab_user.user.username %></td>
-    <td><%= lab_user.progress %></td>
-    <td><%= lab_user.result %></td>
-    <td><%= lab_user.start %></td>
-    <td><%= lab_user.pause %></td>
-    <td><%= lab_user.end %></td>
-    <td><%# link_to 'Show', lab_user,:class=> 'show-button button' %><%= link_to 'Edit', edit_lab_user_path(lab_user) ,:class=> 'edit-button button'%><%= link_to 'Destroy', lab_user, :confirm => 'Are you sure?', :method => :delete,:class=> 'delete-button button' %></td>
-  </tr>
-<% end %>
-</table>
+    <% @lab_users.each do |lab_user| %>
+      <tr>
+        <td><%= lab_user.lab.name %></td>
+        <td><%= lab_user.user.username %></td>
+        <td><%= lab_user.progress %></td>
+        <td><%= lab_user.result %></td>
+        <td><%= lab_user.start %></td>
+        <td><%= lab_user.pause %></td>
+        <td><%= lab_user.end %></td>
+        <td><%= link_to 'Edit', edit_lab_user_path(lab_user) ,:class=> 'edit-button button'%><%= link_to 'Destroy', lab_user, :confirm => 'Are you sure?', :method => :delete,:class=> 'delete-button button' %></td>
+      </tr>
+    <% end %>
+  </table>
 </div>
 <%= form_for(@lab_user) do |f| %>
-<% if @lab_user.errors.any? %>
+  <% if @lab_user.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(@lab_user.errors.count, "error") %> prohibited this lab_user from being saved:</h2>
-
       <ul>
-      <% @lab_user.errors.full_messages.each do |msg| %>
-        <%= msg %><br/>
-      <% end %>
+        <% @lab_user.errors.full_messages.each do |msg| %>
+          <%= msg %><br/>
+        <% end %>
       </ul>
     </div>
   <% end %>
-<table>
-<tr>
-  
-<td>
-<%=collection_select(:lab_user, :lab_id, Lab.all, :id, :name,{:prompt => true})%>
-</td>
-<td>
-<%=collection_select(:lab_user, :user_id, User.find(:all, :order=>'username'), :id, :username, {:prompt => true})%>
-</td>
-<td><%= f.submit "Add"%> </td>
-</tr>
-</table>
+  <table>
+    <tr>
+      <td>
+        <%=collection_select(:lab_user, :lab_id, Lab.all, :id, :name,{:prompt => true})%>
+      </td>
+      <td>
+        <%=collection_select(:lab_user, :user_id, User.find(:all, :order=>'username'), :id, :username, {:prompt => true})%>
+      </td>
+      <td><%= f.submit "Add"%> </td>
+    </tr>
+  </table>
 <%end%>
  

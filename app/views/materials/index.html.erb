@@ -1,21 +1,20 @@
 <h3>Listing materials</h3>
 <div id="index_t">
-<table>
+  <table>
     <caption >Materials (<%= @materials.count  %>)</caption>
-  <thead>
-  <tr>
-    <th>Name</th>
-    <th>Source</th>
-    <th></th>
-  </tr>
-</thead>
-<% @materials.each do |material| %>
-  <tr>
-    <td><%= material.name %></td>
-    <td><%=truncate(material.source, :length => 100, :separator =>"...") %></td>
-    <td><%= link_to 'View', material,:class=> 'show-button button' %><%= link_to 'Edit', edit_material_path(material),:class=> 'edit-button button' %><%= link_to 'Destroy', material, :confirm => 'Are you sure?', :method => :delete, :class=> 'delete-button button' %></td>
-  </tr>
-<% end %>
-</table>
-
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Source</th>
+        <th></th>
+      </tr>
+    </thead>
+    <% @materials.each do |material| %>
+      <tr>
+        <td><%= material.name %></td>
+        <td><%=truncate(material.source, :length => 100, :separator =>"...") %></td>
+        <td><%= link_to 'View', material,:class=> 'show-button button' %><%= link_to 'Edit', edit_material_path(material),:class=> 'edit-button button' %><%= link_to 'Destroy', material, :confirm => 'Are you sure?', :method => :delete, :class=> 'delete-button button' %></td>
+      </tr>
+    <% end %>
+  </table>
 </div>

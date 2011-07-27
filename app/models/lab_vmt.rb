@@ -6,7 +6,7 @@ class LabVmt < ActiveRecord::Base
   validates_presence_of :lab_id, :vmt_id, :name
   validates_format_of :name, :with => /^[A-Za-z\d-]+$/, :message => "can only be alphanumeric with no spaces"
   
-   def menustr
+  def menustr
     "#{name} - #{lab.name}"
   end
   

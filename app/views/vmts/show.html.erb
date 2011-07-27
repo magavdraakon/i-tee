@@ -1,15 +1,12 @@
-<p>
-  <b>Image:</b>
+<p><b>Image:</b>
   <%= @vmt.image %>
 </p>
 
-<p>
-  <b>Xml script:</b>
+<p><b>Xml script:</b>
   <%= @vmt.xml_script %>
 </p>
 
-<p>
-  <b>Private:</b>
+<p><b>Private:</b>
   <%= @vmt.private %>
 </p>
 <%= link_to 'Edit Virtual machine template', edit_vmt_path(@vmt), :class=>'button edit-button' if @admin%>

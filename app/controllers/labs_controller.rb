@@ -2,7 +2,7 @@ class LabsController < ApplicationController
   #users can see courses, running labs and end their OWN lab
   before_filter :authorise_as_admin, :except => [:courses, :running_lab,:ended_lab, :end_lab, :restart_lab]
 
-      #redirect to index view when trying to see unexisting things
+  #redirect to index view when trying to see unexisting things
   before_filter :save_from_nil, :only=>[:show, :edit, :update]
   # set the menu tab to show the user
   before_filter :course_tab, :only=>[:courses, :running_lab, :ended_lab]
@@ -82,7 +82,6 @@ class LabsController < ApplicationController
   def create
     @lab = Lab.new(params[:lab])
     
-    
     respond_to do |format|
       if @lab.save
                 
@@ -153,9 +152,9 @@ class LabsController < ApplicationController
   end
   
   def ended_lab
-     get_user_labs
+    get_user_labs
     @lab=Lab.find_by_id(params[:id])
-     if @lab==nil 
+    if @lab==nil 
       @lab=@complete.first
     end
     @other=@complete  
@@ -164,12 +163,12 @@ class LabsController < ApplicationController
     @note=""
     
     if @lab_user==nil && @lab!=nil
-    #the lab is not meant for this user, redirect
-    redirect_to(error_401_path)
+      #the lab is not meant for this user, redirect
+      redirect_to(error_401_path)
     end
-   render :action=>"running_lab"
-   rescue ActiveRecord::RecordNotFound
-    redirect_to(all_labs_path)      
+    render :action=>"running_lab"
+    rescue ActiveRecord::RecordNotFound
+      redirect_to(all_labs_path)      
   end
   
   
@@ -188,44 +187,41 @@ class LabsController < ApplicationController
     @vms=[]
     
     if @lab_user!=nil then #this user has this lab
-    # generating vm info if needed
-    @lab_user.lab.lab_vmts.each do |template|
-      #is there a machine like that already?
-      vm=Vm.find(:first, :conditions=>["lab_vmt_id=? and user_id=?", template.id, current_user.id ])
-      if vm==nil then
-        #no there is not
-        v=Vm.new
-        v.name="#{template.name}-#{current_user.username}"
-        v.lab_vmt_id=template.id
-        v.user_id=current_user.id
-        
-        
-        #vm description TODO add login info
-        v.description="Initialize the virtual machine by clicking <strong>Start</strong>."
-        
-        
-        
-        v.save
-        @note="Machines successfully generated."
-        @vms<<v
-      else
-        @vms<<vm
+      # generating vm info if needed
+      @lab_user.lab.lab_vmts.each do |template|
+        #is there a machine like that already?
+        vm=Vm.find(:first, :conditions=>["lab_vmt_id=? and user_id=?", template.id, current_user.id ])
+        if vm==nil then
+          #no there is not
+          v=Vm.new
+          v.name="#{template.name}-#{current_user.username}"
+          v.lab_vmt_id=template.id
+          v.user_id=current_user.id
+                
+          #vm description TODO add login info
+          v.description="Initialize the virtual machine by clicking <strong>Start</strong>."
+  
+          v.save
+          @note="Machines successfully generated."
+          @vms<<v
+        else
+          @vms<<vm
+        end
+      end #end of making vms based of templates
+      if @lab_user.start==nil then
+        @lab_user.start=Time.now
+        @lab_user.save
+        #first time access to the lab
+        @status="running"
+        @other=@other+@started
       end
-    end #end of making vms based of templates
-    if @lab_user.start==nil then
-      @lab_user.start=Time.now
-      @lab_user.save
-      #first time access to the lab
-      @status="running"
-      @other=@other+@started
-    end
-  else
-    #the lab is not meant for this user, redirect
-    redirect_to(error_401_path) if @lab!=nil
+    else
+      #the lab is not meant for this user, redirect
+      redirect_to(error_401_path) if @lab!=nil
   end
   
-   rescue ActiveRecord::RecordNotFound
-      redirect_to(all_labs_path)
+  rescue ActiveRecord::RecordNotFound
+    redirect_to(all_labs_path)
   end
   
   #method for ending a lab, deletes virtual machine db rows and sets the end date for the lab
@@ -236,24 +232,24 @@ class LabsController < ApplicationController
     if current_user==@lab_user.user 
       @lab_user.lab.lab_vmts.each do |template|
         template.vms.each do |t|
-        if t.user==current_user
-          t.destroy
-          @note="Machines successfully deleted."
+          if t.user==current_user
+            t.destroy
+            @note="Machines successfully deleted."
+          end
         end
-      end
-    end #end of deleting vms for this lab
-     if @note!="" then
+      end #end of deleting vms for this lab
+      if @note!="" then
         @lab_user.end=Time.now
         @lab_user.save
-     end
-    redirect_to(completed_labs_path+"/"+@lab_user.lab.id.to_s)
-  else #this lab doesnt belong to this user, permission error
-    flash[:alert]  = "Restricted access!"
-    redirect_to(error_401_path)
-  end # end- this users lab
+      end
+      redirect_to(completed_labs_path+"/"+@lab_user.lab.id.to_s)
+    else #this lab doesnt belong to this user, permission error
+      flash[:alert]  = "Restricted access!"
+      redirect_to(error_401_path)
+    end # end- this users lab
   
-  rescue ActiveRecord::RecordNotFound
-    redirect_to(all_labs_path)
+    rescue ActiveRecord::RecordNotFound
+      redirect_to(all_labs_path)
   end
   
   #restarting a lab means deleting virtual machines, removing start/end times and progress/results
@@ -261,21 +257,20 @@ class LabsController < ApplicationController
     @lab=Lab.find(params[:id])
     @lab_user=LabUser.find(:last, :conditions=>["lab_id=? and user_id=?", @lab.id, current_user.id])
     if @lab_user!=nil 
-     @lab_user.update_attributes(:progress =>nil, :result =>nil, :start=>nil, :pause=>nil, :end=>nil) 
+      @lab_user.update_attributes(:progress =>nil, :result =>nil, :start=>nil, :pause=>nil, :end=>nil) 
     
-    @lab_user.lab.lab_vmts.each do |template|
-    template.vms.each do |t|
-      if t.user==current_user
-        t.destroy
-        @note="Machines successfully deleted."
-      end
-     end
-    end
-        
-  end
-     redirect_to(running_labs_path+"/"+@lab.id.to_s)
-  rescue ActiveRecord::RecordNotFound
-    redirect_to(all_labs_path)
+      @lab_user.lab.lab_vmts.each do |template|
+        template.vms.each do |t|
+          if t.user==current_user
+            t.destroy
+            @note="Machines successfully deleted."
+          end
+        end
+      end    
+    end#lab user exists
+    redirect_to(running_labs_path+"/"+@lab.id.to_s)
+    rescue ActiveRecord::RecordNotFound
+      redirect_to(all_labs_path)
   end
   
   private #----------------------------------------------------------------------------------

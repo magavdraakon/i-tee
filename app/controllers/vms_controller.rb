@@ -19,8 +19,8 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
     @b_by="lab"
     
     if params[:admin]!=nil && @admin then
-     @vms = Vm.all 
-    @tab="admin"
+      @vms = Vm.all 
+      @tab="admin"
     else
       #@vms=Vm.find(:all, :conditions=>["user_id=?",current_user])
       @vms=current_user.vms
@@ -36,8 +36,8 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
    def vms_by_state
     @b_by="state"
     if params[:admin]!=nil && @admin then
-     @vms = Vm.all 
-     @tab="admin"
+      @vms = Vm.all 
+      @tab="admin"
     else
       #@vms=Vm.find(:all, :conditions=>["user_id=?",current_user])
       @vms=current_user.vms
@@ -50,8 +50,8 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
   # GET /vms.xml
   def index
     if params[:admin]!=nil && @admin then
-     @vms = Vm.all 
-     @tab="admin"
+      @vms = Vm.all 
+      @tab="admin"
     else
       #@vms=Vm.find(:all, :conditions=>["user_id=?",current_user])
       @vms=current_user.vms
@@ -172,7 +172,7 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
   
   #start one machine
   def start_vm
-     flash[:notice]=""
+    flash[:notice]=""
     init_vm(@vm)
   #  flash[:alert]=@a
     redirect_to(:back)
@@ -181,43 +181,42 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
   #assign mac and start machine
   def init_vm(vm)
     #@vm=Vm.find(params[:id])
-     #find out if there is a mac address bound with this vm already
-     @mac= Mac.find(:first, :conditions=>["vm_id=?", vm.id])
-      # binding a unused mac address with the vm if there is no mac
-     if @mac==nil then
-       @mac= Mac.find(:first, :conditions=>["vm_id is null"])
-        @mac.vm_id=vm.id
-       if @mac.save  #save õnnestus, masinal on mac olemas..
+    #find out if there is a mac address bound with this vm already
+    @mac= Mac.find(:first, :conditions=>["vm_id=?", vm.id])
+    # binding a unused mac address with the vm if there is no mac
+    if @mac==nil then
+      @mac= Mac.find(:first, :conditions=>["vm_id is null"])
+      @mac.vm_id=vm.id
+      if @mac.save  #save õnnestus, masinal on mac olemas..
         flash[:notice] = flash[:notice]+"successful mac assignement."#"Successful vm initialisation." 
-      #  logger.info "käivitame masina skripti"
-      # a=vm.ini_vm #the script is called in the model
-      #logger.info a
-        # redirect_to(:back)
-        end #end -if save
-      else
-        #the vm had a mac already, dont do anything
-       flash[:notice] = flash[:notice]+"Vm already had a mac."
+        #logger.info "käivitame masina skripti"
+        #a=vm.ini_vm #the script is called in the model
+        #logger.info a
         #redirect_to(:back)
-      end # end if nil
+      end #end -if save
+    else
+      #the vm had a mac already, dont do anything
+      flash[:notice] = flash[:notice]+"Vm already had a mac."
+      #redirect_to(:back)
+    end # end if nil
       
-      if vm.state!="running" && vm.state!="paused"
+    if vm.state!="running" && vm.state!="paused"
       logger.info "käivitame masina skripti"
-        @a=vm.ini_vm #the script is called in the model
-        logger.info @a
+      @a=vm.ini_vm #the script is called in the model
+      logger.info @a
+              
+      vm.description="machine #{@mac.mac} with IP address of #{@mac.ip}<br/>Create a connection with this machine using <strong>ssh #{vm.lab_vmt.vmt.username}@#{@mac.ip}</strong><br/>The set password for this machine is <strong>#{vm.password}</strong>"
+      vm.save
        
-        
-        vm.description="machine #{@mac.mac} with IP address of #{@mac.ip}<br/>Create a connection with this machine using <strong>ssh #{vm.lab_vmt.vmt.username}@#{@mac.ip}</strong><br/>The set password for this machine is <strong>#{vm.password}</strong>"
-        vm.save
-       
-        if @a.include?("masin #{vm.name} loodud")
-         flash[:notice]=flash[:notice]+"<br/>"+vm.description
-        else  
-          flash[:notice]=""
-         flash[:alert]="machine initialization failed."
-        end
+      if @a.include?("masin #{vm.name} loodud")
+        flash[:notice]=flash[:notice]+"<br/>"+vm.description
+      else  
+        flash[:notice]=""
+        flash[:alert]="machine initialization failed."
       end
+    end
       
-      #VAADATA ÜLE!!!
+    #VAADATA ÜLE!!!
     rescue ActiveRecord::StaleObjectError # to resque from conflict, go on a new round of init?
       logger.info "Mac address conflict"
       redirect_to(:action=>'start_vm', :id=>vm.id)
@@ -226,37 +225,37 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
   #resume machine from pause
   def resume_vm
     #@vm=Vm.find(params[:id])
-      logger.info "käivitame masina taastamise skripti"
-      a=@vm.res_vm # the script is called in the model
-      flash[:notice] = "Successful vm resume." 
-      logger.info a
-      redirect_to(:back)
+    logger.info "käivitame masina taastamise skripti"
+    a=@vm.res_vm # the script is called in the model
+    flash[:notice] = "Successful vm resume." 
+    logger.info a
+    redirect_to(:back)
   end
   
   #pause a machine
   def pause_vm
     #@vm=Vm.find(params[:id])
-      logger.info "käivitame masina pausimise skripti"
-      a=@vm.pau_vm #the script is called in the model
+    logger.info "käivitame masina pausimise skripti"
+    a=@vm.pau_vm #the script is called in the model
       
-      flash[:notice] = "Successful vm pause.<br/> To resume the machine click on the resume link next to the machine name." 
-      logger.info a
-      redirect_to(:back) 
+    flash[:notice] = "Successful vm pause.<br/> To resume the machine click on the resume link next to the machine name." 
+    logger.info a
+    redirect_to(:back) 
   end
   
   #stop the machine, do not delete the vm row from the db (release mac, but allow reinitialization)
   def stop_vm
     #@vm=Vm.find(params[:id])
-      logger.info "käivitame masina sulgemise skripti"
-      a=@vm.del_vm #the script is called in the model
-      logger.info a
-      @vm.description="Initialize the virtual machine by clicking <strong>Start</strong>."
-      @vm.save
-      flash[:notice] = "Successful vm deletion." 
-      @mac= Mac.find(:first, :conditions=>["vm_id=?", @vm.id])
-      @mac.vm_id=nil
-      @mac.save
-      redirect_to(:back)
+    logger.info "käivitame masina sulgemise skripti"
+    a=@vm.del_vm #the script is called in the model
+    logger.info a
+    @vm.description="Initialize the virtual machine by clicking <strong>Start</strong>."
+    @vm.save
+    flash[:notice] = "Successful vm deletion." 
+    @mac= Mac.find(:first, :conditions=>["vm_id=?", @vm.id])
+    @mac.vm_id=nil
+    @mac.save
+    redirect_to(:back)
   end
   
   
@@ -264,12 +263,12 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
    #redirect user if they are not admin or the machine owner but try to modify a machine
   def auth_as_owner
     #@vm=Vm.find(params[:id])
-   #is this vm this users?
+    #is this vm this users?
     unless current_user==@vm.user || @admin
       #You don't belong here. Go away.
       flash[:notice]  = "Sorry, this machine doesnt belong to you!"
-        redirect_to(vms_path)
-      end
+      redirect_to(vms_path)
     end
+  end
   
 end

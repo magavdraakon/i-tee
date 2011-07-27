@@ -1,6 +1,6 @@
 class HostsController < ApplicationController
   #restricted to admins
-   before_filter :authorise_as_admin
+  before_filter :authorise_as_admin
   
   #redirect to index view when trying to see unexisting things
   before_filter :save_from_nil, :only=>[:show, :edit]

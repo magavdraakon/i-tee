@@ -1,4 +1,3 @@
 <h1><%= @material.name %></h1>
 <%= raw @material.source %>
-<p>
-<%= link_to 'Edit material', edit_material_path(@material), :class=>'button edit-button' if @admin%></p>
+<p><%= link_to 'Edit material', edit_material_path(@material), :class=>'button edit-button' if @admin%></p>

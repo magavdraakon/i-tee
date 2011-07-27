@@ -1,145 +1,137 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>ITee</title>
-   <%= stylesheet_link_tag "reset" %>
-  <%= stylesheet_link_tag "newlay"%>
-  <%= javascript_include_tag :all %>
-  <%= javascript_include_tag :ckeditor %>
+  <head>
+    <title>ITee</title>
+    <%= stylesheet_link_tag "reset" %>
+    <%= stylesheet_link_tag "newlay"%>
+    <%= javascript_include_tag :all %>
+    <%= javascript_include_tag :ckeditor %>
   
-  <%= csrf_meta_tag %>
-  
-  <link  href="//fonts.googleapis.com/css?family=Ubuntu:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css" >
-
-</head>
-
-<%= yield :javascript %> 
-
-<body>
- <div id="contain">
-    <div id="right">
-<div id="top"><%=link_to 'I-Tee', root_path%></div>
-    <div id="m_menu">
-      <%if user_signed_in?%>
-      
-      <div class="hb b_menu <% if @tab== "home"%>current_tab<%end%>">
-      <%=link_to 'Home', root_path%></div>
-        <div class="cb b_menu <% if @tab == "courses"%>current_tab<%end%>"><%=link_to('Labs', all_labs_path)%></div>
-      <div class="vb b_menu <% if @tab == "vms" %>current_tab<%end%>">
-      <%=link_to 'My machines', vms_path %></div>
-     <%if  @admin then  %>
-        <div class="ab b_menu <% if @tab=="admin"%>current_tab<%end%>">Administration</div>
-        <%end%>
-      <div class="logout b_menu">
-      <%# if user_signed_in? %>
-       <%= link_to "Sign out (#{current_user.username})", destroy_user_session_path %>
-            <%# elsif @logged_in %>
-           <%#= link_to "Sign out", destroy_user_session_path %>
-          <%# end %>
-      </div>
-       <%end%>
-    </div>
+    <%= csrf_meta_tag %>
+    <link  href="//fonts.googleapis.com/css?family=Ubuntu:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css" >
+    <%= yield :javascript %> 
+  </head>
+  <body>
+    <div id="contain">
+      <div id="right">
+        <div id="top"><%=link_to 'I-Tee', root_path%></div>
+        <div id="m_menu">
+          <%if user_signed_in?%>  
+            <div class="hb b_menu <% if @tab== "home"%>current_tab<%end%>">
+              <%=link_to 'Home', root_path%>
+            </div>
+            <div class="cb b_menu <% if @tab == "courses"%>current_tab<%end%>">
+              <%=link_to('Labs', all_labs_path)%>
+            </div>
+            <div class="vb b_menu <% if @tab == "vms" %>current_tab<%end%>">
+              <%=link_to 'My machines', vms_path %>
+            </div>
+            <%if  @admin then  %>
+              <div class="ab b_menu <% if @tab=="admin"%>current_tab<%end%>">Administration</div>
+            <%end%>
+            <div class="logout b_menu">
+              <%# if user_signed_in? %>
+              <%= link_to "Sign out (#{current_user.username})", destroy_user_session_path %>
+              <%# elsif @logged_in %>
+              <%#= link_to "Sign out", destroy_user_session_path %>
+              <%# end %>
+            </div>
+          <%end%>
+        </div>
    
-    <div id="s_menu"></div>
- <div id="wrap">
-<div class="home s_menu <% if @tab == "home"%>current_tab<%end%>">
-       <%if @admin then%> <%=link_to_unless_current('Index', root_path)%>
-        <%=link_to_unless_current('Template guide', template_path) %>
-        <%=link_to_unless_current('System guide', system_path) %>  <%end%>
-      </div>
-     
-      <div class="course s_menu <% if @tab == "courses" %>current_tab<%end%>"> 
-        <%= link_to_unless_current 'All labs', all_labs_path %>
+        <div id="s_menu"></div>
+        <div id="wrap">
+          <div class="home s_menu <% if @tab == "home"%>current_tab<%end%>">
+            <%if @admin then%> 
+              <%=link_to_unless_current('Index', root_path)%>
+              <%=link_to_unless_current('Template guide', template_path) %>
+              <%=link_to_unless_current('System guide', system_path) %>  
+            <%end%>
+          </div>
+          <div class="course s_menu <% if @tab == "courses" %>current_tab<%end%>"> 
+            <%= link_to_unless_current 'All labs', all_labs_path %>  
+            <%= link_to_unless_current 'Running labs', running_labs_path %>
+            <%= link_to_unless_current 'Completed labs', completed_labs_path %>
+          </div>
+          <div class="vms s_menu <% if @tab== "vms"%>current_tab<%end%>"> 
+            <%= link_to_unless_current 'All virtual machines', vms_path %>
+            <%= link_to_unless_current('Virtual machines by state', vms_by_state_path) %>
+            <%= link_to_unless_current('Virtual machines by lab', vms_by_lab_path) %>
+          </div>
+          <%if  @admin then  %>
+            <div class="admin s_menu <% if @tab=="admin"%>current_tab<%end%>">
+              <table>
+                <tr>
+                  <td>
+                    <%= link_to_unless_current 'Lab', labs_path %><br/>
+                    <%= link_to_unless_current 'New lab', new_lab_path %><br/>
+                    <%=link_to_unless_current 'Users in labs', lab_users_path%><br/>
+                    <%=link_to_unless_current 'Add users by lab', add_users_path%>
+                  </td>
+                  <td>
+                    <%= link_to_unless_current 'Materials', materials_path %><br/>
+                    <%= link_to_unless_current 'New material', new_material_path %>
+                  </td>
+                  <td>
+                    <%= link_to_unless_current 'New virtual machine', new_vm_path %> <br/>
+                    <%= link_to_unless_current 'All virtual machines', vms_path+"?admin=1" %><br/>
+                    <%= link_to_unless_current('Virtual machines by state', vms_by_state_path+"?admin=1") %><br/>
+                    <%= link_to_unless_current('Virtual machines by lab', vms_by_lab_path+"?admin=1") %>  
+                  </td>
+                  <td>
+                    <%= link_to_unless_current 'Virtual machine templates', vmts_path %><br/>
+                    <%= link_to_unless_current 'New virtual machine template', new_vmt_path %><br/>
+                    <%= link_to_unless_current 'Virtual machine templates in labs', lab_vmts_path %>
+                  </td>
+                  <td>
+                    <%= link_to_unless_current('Hosts', hosts_path) %><br/>
+                    <%= link_to_unless_current 'New Host', new_host_path %><br/>
+                    <%= link_to_unless_current('Operating systems', operating_systems_path) %><br/>
+                    <%= link_to_unless_current 'New operating system', new_operating_system_path %>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          <%end%>
         
-        <%= link_to_unless_current 'Running labs', running_labs_path %>
-        <%= link_to_unless_current 'Completed labs', completed_labs_path %>
+          <div id="c_wrap">
+            <div id="sidemenu">
+              <div id="menu-hide"></div>
+              <div id="menu-head"><%= yield :sidebar_head %></div>
+              <ul>
+                <%= yield :sidebar %>
+              </ul>
+            </div>
         
+            <div id="content"class="side_visible">
+              <div id="menu-show"></div>
+              <p id="notice"><%=raw notice %></p>
+              <p id="alert"><%=raw alert if user_signed_in?%></p>
+              <%if !user_signed_in? && controller.action_name!="about"%>
+                <div id="info"> 
+                  <p> EIK kauglaborite süsteemi i-Tee abil saab teha erinevate ainete laboritöid.</p>
+                  <ol>
+                    <li> Sisene süsteemi kasutades EIK arvutiklassi kasutajanime ja salasõna.</li>
+                    <li> Vali laboritöö.</li>
+                    <li> Käivita laboritöö ja loe läbi materjalid.</li>
+                    <li> Lõpeta labor, kui kõik on tehtud (või salvesta hiljem jätkamiseks)</li>
+                  </ol>
+                  <p> Küsimuste puhul pöördu Margus Ernits poole (e-posti leiad õppeinfosüsteemist)</p>
+                </div>
+              <%end%> 
+              <%= yield  %>
+              <%if !user_signed_in? && controller.action_name!="about"%>  
+                <div id="logos">
+                  <a href="http://www.struktuurifondid.ee/"><img src="../images/logo-euroopa-sotsiaalfond.jpg" alt="Euroopa Liidu struktuuritoetus"/></a>
+                  <a href="http://www.eitsa.ee/"><img src="../images/eitsa.png" alt="Eesti Infotehnoloogia SA"/></a>
+                </div>
+              <%end%>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="vms s_menu <% if @tab== "vms"%>current_tab<%end%>"> 
-        <%= link_to_unless_current 'All virtual machines', vms_path %>
-        <%= link_to_unless_current('Virtual machines by state', vms_by_state_path) %>
-        <%= link_to_unless_current('Virtual machines by lab', vms_by_lab_path) %>
-      </div>
-      <%if  @admin then  %>
-      <div class="admin s_menu <% if @tab=="admin"%>current_tab<%end%>">
-        <table>
-          <tr>
-            <td>
-              <%= link_to_unless_current 'Lab', labs_path %><br/>
-              <%= link_to_unless_current 'New lab', new_lab_path %><br/>
-              <%=link_to_unless_current 'Users in labs', lab_users_path%><br/>
-              <%=link_to_unless_current 'Add users by lab', add_users_path%>
-            </td>
-            <td>
-              <%= link_to_unless_current 'Materials', materials_path %><br/>
-              <%= link_to_unless_current 'New material', new_material_path %>
-            </td>
-            <td><%= link_to_unless_current 'New virtual machine', new_vm_path %> <br/>
-          <%= link_to_unless_current 'All virtual machines', vms_path+"?admin=1" %><br/>
-          <%= link_to_unless_current('Virtual machines by state', vms_by_state_path+"?admin=1") %><br/>
-          <%= link_to_unless_current('Virtual machines by lab', vms_by_lab_path+"?admin=1") %>  
-          </td>
-            <td>
-              <%= link_to_unless_current 'Virtual machine templates', vmts_path %><br/>
-              <%= link_to_unless_current 'New virtual machine template', new_vmt_path %><br/>
-              <%= link_to_unless_current 'Virtual machine templates in labs', lab_vmts_path %>
-            </td>
-            <td>
-              <%= link_to_unless_current('Hosts', hosts_path) %><br/>
-              <%= link_to_unless_current 'New Host', new_host_path %><br/>
-              <%= link_to_unless_current('Operating systems', operating_systems_path) %><br/>
-              <%= link_to_unless_current 'New operating system', new_operating_system_path %>
-             
-            </td>
-          </tr>
-        </table>
-
-      </div>
-      <%end%>
-      
-      <div id="c_wrap">
-      <%# sidebar_actions=["vms_by_lab","vms_by_state","courses", "running_lab", "ended_lab"]%>
-      <%#if sidebar_actions.include?(action_name)%> 
-      <div id="sidemenu">
-        <div id="menu-hide"></div>
-        <div id="menu-head"><%= yield :sidebar_head %></div>
-        <ul>
-              <%= yield :sidebar %>
-            </ul>
-      </div>
-      <%#end%>
-      <div id="content"class="side_visible">
-        <div id="menu-show"></div>
-    <p id="notice"><%=raw notice %></p>
-     <p id="alert"><%=raw alert if user_signed_in?%></p>
-    <%if !user_signed_in? && controller.action_name!="about"%>
-    <div id="info"> 
-      <p> EIK kauglaborite süsteemi i-Tee abil saab teha erinevate ainete laboritöid.</p>
-      <ol>
-        <li> Sisene süsteemi kasutades EIK arvutiklassi kasutajanime ja salasõna.</li>
-        <li> Vali laboritöö.</li>
-        <li> Käivita laboritöö ja loe läbi materjalid.</li>
-        <li> Lõpeta labor, kui kõik on tehtud (või salvesta hiljem jätkamiseks)</li>
-      </ol>
-      <p> Küsimuste puhul pöördu Margus Ernits poole (e-posti leiad õppeinfosüsteemist)</p>
-  </div>
-      <%end%> 
-    <%= yield  %>
-    <%if !user_signed_in? && controller.action_name!="about"%>  
-  <div id="logos">
-  <a href="http://www.struktuurifondid.ee/"><img src="../images/logo-euroopa-sotsiaalfond.jpg" alt="Euroopa Liidu struktuuritoetus"/></a>
-  <a href="http://www.eitsa.ee/"><img src="../images/eitsa.png" alt="Eesti Infotehnoloogia SA"/></a>
-</div>
-      <%end%>
-     
-    
+      <div id="footer"><%= link_to('i-Tee 2011', about_path)%></div>
     </div>
-    </div>
-  </div>
-</div>
-<div id="footer"><%= link_to('i-Tee 2011', about_path)%></div>
-
-</div>
-<div id="loading"></div>
-</body>
+    <div id="loading"></div>
+  </body>
 </html>

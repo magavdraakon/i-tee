@@ -4,7 +4,7 @@
       <h2><%= pluralize(@lab_vmt.errors.count, "error") %> prohibited this lab_vmt from being saved:</h2>
 
       <% @lab_vmt.errors.full_messages.each do |msg| %>
-      <%= msg %><br/>
+        <%= msg %><br/>
       <% end %>
     </div>
   <% end %>
@@ -14,17 +14,12 @@
     <%= f.text_field :name %> <span class="red" title="Required field">*</span>
   </div>
   <div class="field">
-     <%@lab_vmt.lab_id=@lab.id if @lab!=nil%>
-   
-    <%# f.text_field :lab_id %>
-     <%= f.label :lab_id %><br />
+    <%@lab_vmt.lab_id=@lab.id if @lab!=nil%>
+    <%= f.label :lab_id %><br />
     <%=collection_select(:lab_vmt, :lab_id, Lab.all, :id, :name,{:prompt => true})%> <span class="red" title="Required field">*</span>
-    
-    
   </div>
   <div class="field">
     <%= f.label :vmt_id %><br />
-    <%# f.text_field :vmt_id %>
     <%=collection_select(:lab_vmt, :vmt_id, Vmt.all, :id, :image,{:prompt => true})%> <span class="red" title="Required field">*</span>
   </div>
   <div class="actions">

@@ -2,11 +2,9 @@
   <% if @material.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(@material.errors.count, "error") %> prohibited this material from being saved:</h2>
-
       <% @material.errors.full_messages.each do |msg| %>
-      <%= msg %><br/>
+        <%= msg %><br/>
       <% end %>
-      
     </div>
   <% end %>
 
@@ -16,10 +14,8 @@
   </div>
   <div class="field">
     <%= f.label :source %><br />
-    <%# f.text_area :source %>
-      <%# model, method, size%>
-      
-      <%= ckeditor_textarea(:material, :source, :width => '90%', :height => '200px') %>
+    <%# model, method, size%>
+    <%= ckeditor_textarea(:material, :source, :width => '90%', :height => '200px') %>
   </div>
   <div class="actions">
      <%= submit_tag "Cancel" , :class=>"cancel"%> <%= f.submit %>

@@ -2,12 +2,9 @@
   <% if @lab.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(@lab.errors.count, "error") %> prohibited this lab from being saved:</h2>
-
-
       <% @lab.errors.full_messages.each do |msg| %>
-      <%= msg %><br/>
+        <%= msg %><br/>
       <% end %>
-
     </div>
   <% end %>
 
@@ -17,22 +14,21 @@
   </div>
   <div class="field">
     <%= f.label :description %><br />
-    <%# f.text_area :description %>
     <%= ckeditor_textarea(:lab, :description, :width => '90%', :height => '200px') %>
   </div>
   
   <div class="field">
-  <%if @all_users then%><%#all users have this lab%>
-    <%= check_box_tag("remove", '1')%>
-    <%=label_tag("remove", "Remove all users")%>
-  <%else%><%#some users might have this lab%>
-    <%= check_box_tag("add", '1')%>
-    <%=label_tag("add", "Add all users")%><br/>
-    <%if @user_count>0 then%> <%#no need to show remove if there are no users%>
+    <%if @all_users then%><%#all users have this lab%>
       <%= check_box_tag("remove", '1')%>
       <%=label_tag("remove", "Remove all users")%>
+    <%else%><%#some users might have this lab%>
+      <%= check_box_tag("add", '1')%>
+      <%=label_tag("add", "Add all users")%><br/>
+      <%if @user_count>0 then%> <%#no need to show remove if there are no users%>
+        <%= check_box_tag("remove", '1')%>
+        <%=label_tag("remove", "Remove all users")%>
+      <%end%>
     <%end%>
-  <%end%>
   </div>
   
   <div class="actions">
@@ -41,15 +37,14 @@
 <% end %>
 
 <% content_for :sidebar_head do %>
-Notes
-  <%end%>
+  Notes
+<%end%>
   
-  <% content_for :sidebar do %>
+<% content_for :sidebar do %>
   <p>To add a link to a material use the expression #M_<i>&lt;id&gt;</i></p>
   <p><b>Materials:</b><br/>
   <%Material.find(:all, :order=>'name').each do |m|%>
-  <%=m.id%>. <%=m.name%><br/>
-
-    <%end%>
+    <%=m.id%>. <%=m.name%><br/>
+  <%end%>
   </p>
-    <%end%>
+<%end%>

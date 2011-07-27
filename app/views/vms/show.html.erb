@@ -1,40 +1,32 @@
-<p>
-  <b>Name:</b>
+<p><b>Name:</b>
   <%= @vm.name %>
 </p>
 
-<p>
-  <b>Password:</b>
+<p><b>Password:</b>
   <%= @vm.password %>
 </p>
 
-<p>
-  <b>Template:</b>
+<p><b>Template:</b>
   <%= @vm.lab_vmt.name %>
 </p>
 
-<p>
-  <b>Lab:</b>
+<p><b>Lab:</b>
   <%= @vm.lab_vmt.lab.name %>
 </p>
 
-<p>
-  <b>IP:</b>
+<p><b>IP:</b>
   <%= @vm.mac.ip if @vm.mac!=nil%>
 </p>
 
-<p>
-  <b>Mac:</b>
+<p><b>Mac:</b>
   <%= @vm.mac.mac if @vm.mac!=nil %>
 </p>
 
-<p>
-  <b>User:</b>
+<p><b>User:</b>
   <%= @vm.user.username %>
 </p>
 
-<p>
-  <b>Description:</b>
+<p><b>Description:</b>
   <%= @vm.description %>
 </p>
 <%= link_to 'Edit Virtual machine', edit_lab_path(@vm), :class=>'button edit-button' if @admin%>

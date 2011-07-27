@@ -2,12 +2,9 @@
   <% if @operating_system.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(@operating_system.errors.count, "error") %> prohibited this operating_system from being saved:</h2>
-
-      <ul>
       <% @operating_system.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
+        <%= msg %><br/>
       <% end %>
-      </ul>
     </div>
   <% end %>
 

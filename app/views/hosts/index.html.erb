@@ -1,34 +1,34 @@
 <h3>Listing hosts</h3>
 <div id="index_t">
-<table>
-  <caption >Server hosts (<%= @hosts.count  %>)</caption>
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Ip</th>
-      <!-- <th>Publickey</th>
-      <th>Privatekey</th>
-      <th>Ram</th>
-      <th>Cpu cores</th>
-      <th>Hdd</th>-->
-      <th>Priority</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @hosts.each do |host| %>
+  <table>
+    <caption >Server hosts (<%= @hosts.count  %>)</caption>
+    <thead>
       <tr>
-        <td><%= host.name %></td>
-        <td><%= host.ip %></td>
-        <!--  <td><%#= truncate(host.publickey, :length => 10) %></td>
-        <td><%#= truncate(host.privatekey, :length => 10) %></td>
-        <td><%#= host.ram %></td>
-        <td><%#= host.cpu_cores %></td>
-        <td><%#= host.hdd %></td>-->
-        <td><%= host.priority %></td>
-        <td><%= link_to 'View', host, :class=> 'show-button button' %><%= link_to 'Edit', edit_host_path(host), :class=> 'edit-button button' %><%= link_to 'Destroy', host, :confirm => 'Are you sure?', :method => :delete, :class=> 'delete-button button' %></td>
+        <th>Name</th>
+        <th>Ip</th>
+        <!-- <th>Publickey</th>
+        <th>Privatekey</th>
+        <th>Ram</th>
+        <th>Cpu cores</th>
+        <th>Hdd</th>-->
+        <th>Priority</th>
+        <th></th>
       </tr>
-    <% end %>
-  </tbody>
-</table>
+    </thead>
+    <tbody>
+      <% @hosts.each do |host| %>
+        <tr>
+          <td><%= host.name %></td>
+          <td><%= host.ip %></td>
+          <!--  <td><%#= truncate(host.publickey, :length => 10) %></td>
+          <td><%#= truncate(host.privatekey, :length => 10) %></td>
+          <td><%#= host.ram %></td>
+          <td><%#= host.cpu_cores %></td>
+          <td><%#= host.hdd %></td>-->
+          <td><%= host.priority %></td>
+          <td><%= link_to 'View', host, :class=> 'show-button button' %><%= link_to 'Edit', edit_host_path(host), :class=> 'edit-button button' %><%= link_to 'Destroy', host, :confirm => 'Are you sure?', :method => :delete, :class=> 'delete-button button' %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
 </div>

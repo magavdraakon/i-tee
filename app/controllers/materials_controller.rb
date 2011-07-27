@@ -1,8 +1,8 @@
 class MaterialsController < ApplicationController
   
   #restricted to admins, users can only view the material
-   before_filter :authorise_as_admin, :except => [:show]
-        #redirect to index view when trying to see unexisting things
+  before_filter :authorise_as_admin, :except => [:show]
+  #redirect to index view when trying to see unexisting things
   before_filter :save_from_nil, :only=>[:show, :edit]
   before_filter :admin_tab, :except=>[:show]
   

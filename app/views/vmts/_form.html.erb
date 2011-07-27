@@ -2,22 +2,21 @@
   <% if @vmt.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(@vmt.errors.count, "error") %> prohibited this vmt from being saved:</h2>
-
-
       <% @vmt.errors.full_messages.each do |msg| %>
         <%= msg %><br/>
       <% end %>
-      
     </div>
   <% end %>
 
   <div class="field">
     <%= f.label :image %><br />
-    <%= f.text_field :image %> <span class="red" title="Required field">*</span>
+    <%= f.text_field :image %> 
+    <span class="red" title="Required field">*</span>
   </div>
    <div class="field">
     <%= f.label :username %><br />
-    <%= f.text_field :username %> <span class="red" title="Required field">*</span>
+    <%= f.text_field :username %> 
+    <span class="red" title="Required field">*</span>
   </div>
   <div class="field">
     <%= f.label :operating_system %> 
