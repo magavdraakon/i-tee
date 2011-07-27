@@ -19,10 +19,12 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
     @b_by="lab"
     
     if params[:admin]!=nil && @admin then
-      @vms = Vm.all 
+      @vms=Vm.find(:all, :joins=>["vms inner join 
+lab_vmts as l on vms.lab_vmt_id=l.id"], :order=>params[:sort_by])
+      #@vms = Vm.all 
       @tab="admin"
     else
-      #@vms=Vm.find(:all, :conditions=>["user_id=?",current_user])
+      #@vms=Vm.find(:all, :conditions=>["user_id=?",current_user.id], :order=>params[:sort_by])
       @vms=current_user.vms
     end
     @labs=[]
@@ -36,10 +38,12 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
    def vms_by_state
     @b_by="state"
     if params[:admin]!=nil && @admin then
-      @vms = Vm.all 
+       @vms=Vm.find(:all, :joins=>["vms inner join 
+lab_vmts as l on vms.lab_vmt_id=l.id"], :order=>params[:sort_by])
+      #@vms = Vm.all 
       @tab="admin"
     else
-      #@vms=Vm.find(:all, :conditions=>["user_id=?",current_user])
+      #@vms=Vm.find(:all, :conditions=>["user_id=?",current_user.id], :order=>params[:sort_by])
       @vms=current_user.vms
     end
     
@@ -50,10 +54,12 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
   # GET /vms.xml
   def index
     if params[:admin]!=nil && @admin then
-      @vms = Vm.all 
+      @vms=Vm.find(:all, :joins=>["vms inner join 
+lab_vmts as l on vms.lab_vmt_id=l.id"], :order=>params[:sort_by])
+      #@vms = Vm.all 
       @tab="admin"
     else
-      #@vms=Vm.find(:all, :conditions=>["user_id=?",current_user])
+      #@vms=Vm.find(:all, :conditions=>["user_id=?",current_user.id], :order=>params[:sort_by])
       @vms=current_user.vms
     end
         

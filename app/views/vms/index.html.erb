@@ -6,9 +6,15 @@
     <thead>
       <tr>
         <th>Name</th>
-        <th>Template</th>
-        <th>Lab</th>
-        <th>User</th>
+        <th><%if @admin && @tab=='admin' then%>
+              <%=link_to('Template',:controller=>'vms', :action=>controller.action_name, :admin=>'1', :sort_by=>'lab_vmt_id')%>
+            <%else%>Template<%end%></th>
+        <th><%if @admin && @tab=='admin' then%>
+              <%=link_to('Lab',:controller=>'vms', :action=>controller.action_name, :admin=>'1', :sort_by=>'lab_id')%>
+            <%else%>Lab<%end%></th>
+        <th><%if @admin && @tab=='admin' then%>
+              <%=link_to('User',:controller=>'vms', :action=>controller.action_name, :admin=>'1', :sort_by=>'user_id')%>
+            <%else%>User<%end%></th>
         <th>IP</th>
         <th>state</th>
         <th></th>
@@ -57,7 +63,7 @@
 <%end%>
 
 <% content_for :sidebar do %>
-  <%#TODO mingi parameetri järgi peab tegema kinldaks, mis menüü siia esitada%>
+ 
   <% if @b_by=='state' then%>
     <li><a href="#" onclick="$('.vm').show(); $('span.specify').text('all');">All machines</a></li>
     <li><a href="#" onclick="$('.vm').hide(); $('.running').show(); $('span.specify').text('running');">Running machines</a></li>
