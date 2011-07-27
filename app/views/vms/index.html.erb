@@ -1,20 +1,21 @@
 <%#=@a%><%#this is a variable that holds the response from the init script%>
+
 <h3>Listing <span class="specify">all</span> virtual machines<span class="inlab"></span></h3>
 <div id="index_t">
   <table>
-    <caption >Virtual machines (<%= @vms.count  %>)</caption>
+    <caption >Virtual machines (<span class="vms_count"><%= @vms.count %></span>)</caption>
     <thead>
       <tr>
         <th>Name</th>
-        <th><%if @admin && @tab=='admin' then%>
-              <%=link_to('Template',:controller=>'vms', :action=>controller.action_name, :admin=>'1', :sort_by=>'lab_vmt_id')%>
-            <%else%>Template<%end%></th>
+        <%if @admin && @tab=='admin' then%>
+          <th><%=link_to('Template',:controller=>'vms', :action=>controller.action_name, :admin=>'1', :sort_by=>'lab_vmt_id')%>
+          </th><%end%>
         <th><%if @admin && @tab=='admin' then%>
               <%=link_to('Lab',:controller=>'vms', :action=>controller.action_name, :admin=>'1', :sort_by=>'lab_id')%>
             <%else%>Lab<%end%></th>
-        <th><%if @admin && @tab=='admin' then%>
-              <%=link_to('User',:controller=>'vms', :action=>controller.action_name, :admin=>'1', :sort_by=>'user_id')%>
-            <%else%>User<%end%></th>
+        <%if @admin && @tab=='admin' then%>
+          <th><%=link_to('User',:controller=>'vms', :action=>controller.action_name, :admin=>'1', :sort_by=>'user_id')%>
+          </th><%end%>
         <th>IP</th>
         <th>state</th>
         <th></th>
@@ -27,17 +28,17 @@
                 <%if state=="running" || state=="paused" then%>  
                   <%=state%>  
                 <%else%>
-                  <%state="error: no such vm"%>
+                  <%state="error"%>
                    uninit
                 <%end%> 
                 lab<%= vm.lab_vmt.lab.id%>">
         <td><%= vm.name %> pw: <%=vm.password%></td>
-        <td><%= vm.lab_vmt.name%> </td>
+        <%if @admin && @tab=='admin' then%><td><%= vm.lab_vmt.name%> </td><%end%>
         <td><%= vm.lab_vmt.lab.name%> </td>
-        <td><%= vm.user.username %></td>
+        <%if @admin && @tab=='admin' then%><td><%= vm.user.username %></td><%end%>
         <td><%= vm.mac.ip if vm.mac!=nil %></td>
         <td>
-          <%="("+state+")" if vm.mac!=nil%>
+          <%="("+state+")" unless vm.mac==nil || state=="error"%>
           <span class="loader">
             <%= link_to('Start',start_vm_path+"/"+vm.id.to_s, :class=>"button start-button") if (state!="running" && state!="paused") || vm.mac==nil%>
             <%= link_to('Pause', pause_vm_path+"/"+vm.id.to_s, :class=>'button pause-button') if state=="running" && vm.mac!=nil %>
@@ -55,6 +56,7 @@
       </tr>
     <% end %>
   </table>
+  
 </div>
 <span class="startall"></span>
 
@@ -65,16 +67,16 @@
 <% content_for :sidebar do %>
  
   <% if @b_by=='state' then%>
-    <li><a href="#" onclick="$('.vm').show(); $('span.specify').text('all');">All machines</a></li>
-    <li><a href="#" onclick="$('.vm').hide(); $('.running').show(); $('span.specify').text('running');">Running machines</a></li>
-    <li><a href="#" onclick="$('.vm').hide(); $('.paused').show(); $('span.specify').text('paused');">Paused machines</a></li>
-    <li><a href="#" onclick="$('.vm').hide(); $('.uninit').show();$('span.specify').text('uninitialized');">Uninitialized machines</a></li>
+    <li><a href="#" onclick="$('.vm').show(); $('span.specify').text('all'); $('span.vms_count').text('<%= @vms.count %>');">All machines</a></li>
+    <li><a href="#" onclick="$('.vm').hide(); $('.running').show(); $('span.specify').text('running'); $('span.vms_count').text($('.running').length);">Running machines</a></li>
+    <li><a href="#" onclick="$('.vm').hide(); $('.paused').show(); $('span.specify').text('paused'); $('span.vms_count').text($('.paused').length);">Paused machines</a></li>
+    <li><a href="#" onclick="$('.vm').hide(); $('.uninit').show();$('span.specify').text('uninitialized'); $('span.vms_count').text($('.uninit').length);">Uninitialized machines</a></li>
   <%end%>
   <% if @b_by=='lab' then%>
     <li><a href="#" onclick="$('.vm').show(); $('span.specify').text('all'); $('span.startall').html('');">All labs</a></li>
     <% @labs.each do |l| %>
-      <span class="hidden<%=l.id%>" style="display:none;"><%=link_to('Start all machines',start_all_path+"/"+l.id.to_s, :class=>"button start-button")%></span>
-      <li><a href="#" onclick="$('.vm').hide(); $('.lab<%=l.id%>').show();$('span.startall').html($('span.hidden<%=l.id%>').html()); $('span.specify').text('');$('span.inlab').text(' in <%=l.name%>');">
+      <span class="hidden<%=l.id%>" style="display:none;"><%=link_to('Start all machines',start_all_path+"/"+l.id.to_s, :class=>"button start-button") unless @tab=="admin"%></span>
+      <li><a href="#" onclick="$('.vm').hide(); $('.lab<%=l.id%>').show(); $('span.vms_count').text($('.lab<%=l.id%>').length); $('span.startall').html($('span.hidden<%=l.id%>').html()); $('span.specify').text('');$('span.inlab').text(' in <%=l.name%>');">
           <%=l.name%></a>
       </li>
     <%end%>

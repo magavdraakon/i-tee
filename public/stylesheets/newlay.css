@@ -347,12 +347,12 @@ input[type="submit"] {
     -webkit-border-bottom-left-radius: 10px;
     -webkit-border-bottom-right-radius: 10px;
     border: 2px solid rgba(125, 159, 186, .5);
-    padding-left:25px;
-    padding-right:8px;
-    padding-top:3px;
-    padding-bottom:3px;
-    background: url("../images/submit.png") 6px 2px no-repeat rgba(255, 255, 255, .7);
-    text-decoration:none;;
+    padding-left:18px;
+    padding-right:4px;
+    padding-top:2px;
+    padding-bottom:2px;
+    background: url("../images/submit.png") 0px 1px no-repeat rgba(255, 255, 255, .7);
+    text-decoration:none;
     cursor: pointer;
 }  
 
@@ -368,11 +368,11 @@ input[type="submit"].cancel {
     -webkit-border-bottom-left-radius: 10px;
     -webkit-border-bottom-right-radius: 10px;
     border: 2px solid rgba(125, 159, 186, .5);
-    padding-left:25px;
-    padding-right:8px;
-    padding-top:3px;
-    padding-bottom:3px;
-    background: url("../images/cancel.png") 6px 2px no-repeat rgba(255, 255, 255, .7);
+    padding-left:18px;
+    padding-right:4px;
+    padding-top:2px;
+    padding-bottom:2px;
+    background: url("../images/cancel.png") 3px 3px no-repeat rgba(255, 255, 255, .7);
     text-decoration:none;;
     cursor: pointer;
 } 
@@ -396,20 +396,20 @@ input[type="password"]:focus, input[type="text"]:focus, textarea:focus {
 }
 
 /*buttons*/
-.edit-button {background: url("../images/edit.png") 6px 2px no-repeat;}
-.show-button {background: url("../images/show.gif") 6px 2px no-repeat;}
-.delete-button {background: url("../images/delete.png") 6px 2px no-repeat;}
+.edit-button {background: url("../images/edit.png") 4px 3px no-repeat;}
+.show-button {background: url("../images/show.gif") 6px 3px no-repeat;}
+.delete-button {background: url("../images/delete.png") 4px 3px no-repeat;}
 
-.add-button {background: url("../images/add.png") 6px 2px no-repeat;}
-.info-button {background: url("../images/info.png") 6px 2px no-repeat; }
-.stop-button {background: url("../images/stop.png") 6px 2px no-repeat; }
-.start-button {background: url("../images/play.png") 6px 2px no-repeat; }
-.pause-button {background: url("../images/pause.png") 6px 2px no-repeat; }
+.add-button {background: url("../images/add.png") 4px 3px no-repeat;}
+.info-button {background: url("../images/info.png") 4px 3px no-repeat; }
+.stop-button {background: url("../images/stop.png") 4px 3px no-repeat; }
+.start-button {background: url("../images/play.png") 4px 3px no-repeat; }
+.pause-button {background: url("../images/pause.png") 4px 3px no-repeat; }
 
-.submit-button {background: url("../images/submit.png") 6px 2px no-repeat;}
-.login-button {background: url("../images/login.gif") 6px 2px no-repeat;}
+.submit-button {background: url("../images/submit.png") 4px 3px no-repeat;}
+.login-button {background: url("../images/login.gif") 4px 3px no-repeat;}
 
-.cancel-button {background: url("../images/cancel.png") 6px 2px no-repeat;}
+.cancel-button {background: url("../images/cancel.png") 6px 3px no-repeat;}
 
 .button:hover {
   background-color: rgba(255, 255, 255, 1.0);
@@ -428,17 +428,19 @@ input[type="password"]:focus, input[type="text"]:focus, textarea:focus {
     -webkit-border-bottom-left-radius: 10px;
     -webkit-border-bottom-right-radius: 10px;
     border: 2px solid rgba(125, 159, 186, .5);
-    padding-left:25px;
-    padding-right:6px;
-    padding-top:2px;
-    padding-bottom:2px;
+    padding-left:22px;
+    padding-right:4px;
+    padding-top:3px;
+    padding-bottom:3px;
     background-color: rgba(255, 255, 255, .7);
     text-decoration:none;
     color: #666666;
     cursor: pointer;
-line-height:2em;
+    line-height:2em;
     margin-bottom: 5px;
+    
 }
+
 
 div.buttons {
     display:inline-block;
