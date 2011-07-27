@@ -73,7 +73,7 @@
     <li><a href="#" onclick="$('.vm').hide(); $('.uninit').show();$('span.specify').text('uninitialized'); $('span.vms_count').text($('.uninit').length);">Uninitialized machines</a></li>
   <%end%>
   <% if @b_by=='lab' then%>
-    <li><a href="#" onclick="$('.vm').show(); $('span.specify').text('all'); $('span.startall').html(''); $('span.vms_count').text('<%= @vms.count %>');">All labs</a></li>
+    <li><a href="#" onclick="$('.vm').show(); $('span.specify').text('all'); $('span.startall').html(''); $('span.vms_count').text('<%= @vms.count %>'); $('span.inlab').text('');">All labs</a></li>
     <% @labs.each do |l| %>
       <span class="hidden<%=l.id%>" style="display:none;"><%=link_to('Start all machines',start_all_path+"/"+l.id.to_s, :class=>"button start-button") unless @tab=="admin"%></span>
       <li><a href="#" onclick="$('.vm').hide(); $('.lab<%=l.id%>').show(); $('span.vms_count').text($('.lab<%=l.id%>').length); $('span.startall').html($('span.hidden<%=l.id%>').html()); $('span.specify').text('');$('span.inlab').text(' in <%=l.name%>');">
