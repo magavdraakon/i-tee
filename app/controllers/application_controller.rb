@@ -14,7 +14,7 @@ class ApplicationController < ActionController::Base
     before_filter :emulate_user
   else
     before_filter :authenticate_user!, :except=>[:about, :getprogress]
-    before_filter :admin?, :except=>[:progress]
+    before_filter :admin?
   end  
   
   def emulate_user

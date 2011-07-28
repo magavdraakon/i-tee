@@ -1,6 +1,6 @@
 class LabUsersController < ApplicationController
   #restricted to admins 
-  before_filter :authorise_as_admin
+  before_filter :authorise_as_admin, :except=>[:progress]
   #redirect to index view when trying to see unexisting things
   before_filter :save_from_nil, :only=>[:edit]
   before_filter :admin_tab
@@ -124,8 +124,12 @@ end
   end
   
   def progress
+    
     @lab_user=LabUser.find_by_id(params[:id])
-   render :partial => 'shared/lab_progress'
+    unless @lab_user.user.id==current_user.id || @admin then 
+      @lab_user=LabUser.new#dummy
+    end
+    render :partial => 'shared/lab_progress' 
   end
   
   private #-----------------------------------------------
