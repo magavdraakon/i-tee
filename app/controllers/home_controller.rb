@@ -46,7 +46,9 @@ class HomeController < ApplicationController
           if @lab_user!=nil then
             #the vm helped find its lab_user
             @lab_user.progress=@progress
-            if @lab_user.save() then flash[:notice]="successful progress update"
+            if @lab_user.save() then 
+              flash[:notice]="successful progress update" 
+            end
             
           end#end labuser exists
         end#end vm exists
@@ -54,8 +56,6 @@ class HomeController < ApplicationController
         flash[:alert]="cant send progress for another machine"
       end#end the target sent the progress
     end
-    
-    
   end
   
   def template_info
