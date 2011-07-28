@@ -1,2 +1,10 @@
 Your IP address is <%= @client_ip %>  <br/>
 AG IP address is <%= @remote_ip %> <br/>
+
+<br/>
+the machine the test was run on: <br/><%= @target_ip%>
+<br/>
+your progress input:<br/><%= raw @progress%>
+
+
+<p>labuser.username <%= @lab_user.user.username if @lab_user!=nil%></p>

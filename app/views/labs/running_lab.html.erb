@@ -7,7 +7,17 @@
     
   <!-- started at: <%#=@lab_user.start%><br/>
     ended at: <%#=@lab_user.end%><br/>-->
-  <%if @lab_user.progress!=nil then %> progress: <%= @lab_user.progress%><br/><%end%>
+    <script>
+      function update(){ 
+        $.get('/lab_users/progress/'+<%=@lab_user.id%>, function(data) {
+          $('#updated_progress').html(data);
+        });
+      }
+      $(document).ready(function($){
+        window.setInterval('update()', 10*1000);
+      });
+    </script>
+    <div id="updated_progress"><%= render :partial => 'shared/lab_progress' %></div>
   <%if @lab_user.result!=nil then %> result: <%= @lab_user.result%>    <br/><%end%>
       
   <%if @lab_user.end==nil then %>

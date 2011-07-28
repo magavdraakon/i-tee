@@ -54,7 +54,7 @@ ITee::Application.routes.draw do
   match 'completed_labs', :to=> 'labs#ended_lab'
   
   match 'add_users', :to=> 'lab_users#add_users'
-  
+  match 'lab_users/progress/:id', :to=> 'lab_users#progress'
   match 'vms_by_lab', :to=>'vms#vms_by_lab'
    match 'vms_by_state', :to=>'vms#vms_by_state'
   

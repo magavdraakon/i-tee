@@ -57,7 +57,7 @@ class LabUsersController < ApplicationController
         l.delete if l!=nil
       end
       redirect_to(lab_users_path, :notice => 'successful update.')
-      elese
+    else
       #adding a single user to a lab
       @lab_user = LabUser.new(params[:lab_user])
       respond_to do |format|
@@ -122,6 +122,12 @@ end
       @users_in<<u.user
     end
   end
+  
+  def progress
+    @lab_user=LabUser.find_by_id(params[:id])
+   render :partial => 'shared/lab_progress'
+  end
+  
   private #-----------------------------------------------
   # return a array of users based on the input (list of checked checkboxes)
   def get_users_from(u_list)
