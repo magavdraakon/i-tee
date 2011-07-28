@@ -15,6 +15,22 @@ class HomeController < ApplicationController
     @tab="home" if user_signed_in?
   end
   
+  #this is a method that updates a lab_users progress
+  #input parameters: ip (the machine, the report is about)
+  #           progress (the progress for the machine)
+  def getprogress
+    render :layout => false
+    #who sent the info?
+    @client_ip = request.remote_ip
+    @remote_ip = request.env["HTTP_X_FORWARDED_FOR"]
+    
+    #get the lab_user based on the ip aadress- get the vm with the given ip, get the vm-s lab_user
+    # update the labuser.progress based on the input
+    ip=params[:ip]
+    progress=params[:progress]
+    
+  end
+  
   def template_info
   end
   

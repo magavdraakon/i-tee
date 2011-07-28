@@ -28,6 +28,7 @@ ITee::Application.routes.draw do
   match 'template', :to => 'home#template'
   match 'system', :to => 'home#system'
   match 'about', :to=> 'home#about'
+  match 'getprogress', :to=> 'home#getprogress'
   #with id
   match 'start_all/:id', :to=> 'vms#start_all'
    match 'start_vm/:id', :to=> 'vms#start_vm'
