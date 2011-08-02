@@ -9,12 +9,19 @@
     ended at: <%#=@lab_user.end%><br/>-->
     <script>
       function update(){ 
-        $.get('/lab_users/progress/'+<%=@lab_user.id%>, function(data) {
-          $('#updated_progress').html(data);
-        });
+        //temporarily disable the lab_user automatic updating, because it's not really used
+        //$.get('/lab_users/progress/'+<%=@lab_user.id%>, function(data) {
+        //  $('#updated_progress').html(data);
+        //});
+        <% @vms.each do |vm| %>
+          <%if vm.state=="running" || vm.state=="paused" then%>
+            $.get('/vms/get_progress/'+<%=vm.id%>, function(data) {
+            $('#vm_progress<%=vm.id%>').html(data);});
+          <%end%>
+        <%end%>
       }
       $(document).ready(function($){
-        window.setInterval('update()', 10*1000);
+        window.setInterval('update()', 15*1000);
       });
     </script>
     <div id="updated_progress"><%= render :partial => 'shared/lab_progress' %></div>
@@ -22,8 +29,8 @@
       
   <%if @lab_user.end==nil then %>
     <h3>Virtual machines</h3>
-    <p>
-      <% @vms.each do |vm| %>
+    <% @vms.each do |vm| %>
+      <p>
         <%state=vm.state %>
         <% desc="Initialize the virtual machine by clicking <strong>Start</strong>."
         desc=vm.description if (state=="running" || state=="paused") && vm.mac!=nil%>
@@ -47,13 +54,20 @@
     
         <span class="vm_links">
           <%="("+state+")" if vm.mac!=nil && (state=="running" || state=="paused") %>
-        </span><br/>   
-      <%end%>
-    </p> 
+        </span><br/>
+      </p>
+      <div id="vm_progress<%=vm.id%>">
+        <%if state=="running" || state=="paused" then%>
+          <h3>Progress:</h3>
+          <%= raw vm.progress%>
+        <%end%>
+      </div>
+     
+    <%end%>
   <%end%>
-  <span class="loader">
+  <p class="loader">
     <%= link_to('Start all machines',start_all_path+"/"+@lab.id.to_s, :class=>"button start-button") if @lab_user.end==nil %>
-  </span><br/>
+  </p>
   <table width="100%">
     <tr>
       <td><%= link_to('Restart lab',restart_lab_path+"/"+@lab.id.to_s, :class=>'add-button button')%> </td>

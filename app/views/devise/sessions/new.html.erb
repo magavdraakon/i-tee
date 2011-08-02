@@ -1,4 +1,15 @@
-<div id="sign_in"><h2>Sign in</h2>
+<div id="info"> 
+  <p> EIK kauglaborite süsteemi i-Tee abil saab teha erinevate ainete laboritöid.</p>
+  <ol>
+    <li> Sisene süsteemi kasutades EIK arvutiklassi kasutajanime ja salasõna.</li>
+    <li> Vali laboritöö.</li>
+    <li> Käivita laboritöö ja loe läbi materjalid.</li>
+    <li> Lõpeta labor, kui kõik on tehtud (või salvesta hiljem jätkamiseks)</li>
+  </ol>
+  <p> Küsimuste puhul pöördu Margus Ernits poole (e-posti leiad õppeinfosüsteemist)</p>
+</div>
+<div id="sign_in">
+  <h2>Sign in</h2>
 
 <%= form_for(resource, :as => resource_name, :url => session_path(resource_name)) do |f| %>
   <p><%= f.label :username %><br />
@@ -15,3 +26,7 @@
 <% end %>
 </div>
 <%# render :partial => "devise/shared/links" %>
+<div id="logos">
+  <a href="http://www.struktuurifondid.ee/"><img src="../images/logo-euroopa-sotsiaalfond.jpg" alt="Euroopa Liidu struktuuritoetus"/></a>
+  <a href="http://www.eitsa.ee/"><img src="../images/eitsa.png" alt="Eesti Infotehnoloogia SA"/></a>
+</div>

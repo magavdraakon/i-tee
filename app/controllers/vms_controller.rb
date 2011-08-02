@@ -264,7 +264,47 @@ lab_vmts as l on vms.lab_vmt_id=l.id"], :order=>params[:sort_by])
     redirect_to(:back)
   end
   
-  
+  #this is a method that updates a vms progress
+  #input parameters: ip (the machine, the report is about)
+  #           progress (the progress for the machine)
+  def set_progress
+    #who sent the info? 
+    @client_ip = request.remote_ip
+    @remote_ip = request.env["HTTP_X_FORWARDED_FOR"]
+    
+    #get the vms based on the ip aadress and update the vm.progress based on the input
+    @target_ip=params[:ip]
+    if @target_ip==nil then 
+      @target_ip="error" 
+    else
+      #check if the param was actually in a form of a ip
+      @check=@target_ip.split('.')
+      if @target_ip==@client_ip && ((Integer(@check[0]) rescue nil) && (Integer(@check[1]) rescue nil) && (Integer(@check[2]) rescue nil) && (Integer(@check[3]) rescue nil)) then#TODO- once the allowed ip range is known, update
+        @progress=params[:progress]
+        if @progress!=nil then
+          @progress.gsub!(/_/) do
+            "<br/>"
+          end
+        end
+        @mac=Mac.find(:first, :conditions=>['ip=?', @target_ip])
+        @vm=@mac.vm
+        if @vm!=nil then
+          #the mac exists and has a vm
+          @vm.progress=@progress
+          @vm.save() 
+        end#end vm exists        
+      end#end the target sent the progress
+    end#end the ip parameter is set
+  end
+   
+  def get_progress
+    
+    @vm=Vm.find_by_id(params[:id])
+    unless @vm.user.id==current_user.id || @admin then 
+      @vm=Vm.new#dummy
+    end
+    render :partial => 'shared/vm_progress' 
+  end
   
    #redirect user if they are not admin or the machine owner but try to modify a machine
   def auth_as_owner

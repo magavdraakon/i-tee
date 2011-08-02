@@ -13,7 +13,7 @@ class ApplicationController < ActionController::Base
   if ITee::Application.config.emulate_ldap then
     before_filter :emulate_user
   else
-    before_filter :authenticate_user!, :except=>[:about, :getprogress]
+    before_filter :authenticate_user!, :except=>[:about, :getprogress, :set_progress]
     before_filter :admin?
   end  
   

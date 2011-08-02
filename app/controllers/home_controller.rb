@@ -20,7 +20,7 @@ class HomeController < ApplicationController
   #           progress (the progress for the machine)
   def getprogress
     #render :layout => false
-    #who sent the info? TODO fix it! this doesnt return anything!
+    #who sent the info? 
     @client_ip = request.remote_ip
     @remote_ip = request.env["HTTP_X_FORWARDED_FOR"]
     
@@ -46,17 +46,16 @@ class HomeController < ApplicationController
           if @lab_user!=nil then
             #the vm helped find its lab_user
             @lab_user.progress=@progress
-            if @lab_user.save() then 
-              flash[:notice]="successful progress update" 
-            end
+            @lab_user.save() 
             
           end#end labuser exists
         end#end vm exists
       else
-        flash[:alert]="cant send progress for another machine"
       end#end the target sent the progress
     end
   end
+  
+  
   
   def template_info
   end

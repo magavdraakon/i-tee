@@ -31,18 +31,20 @@ ITee::Application.routes.draw do
   match 'getprogress', :to=> 'home#getprogress'
   #with id
   match 'start_all/:id', :to=> 'vms#start_all'
-   match 'start_vm/:id', :to=> 'vms#start_vm'
-    match 'init_vm/:id', :to=> 'vms#init_vm'
-    match 'pause_vm/:id', :to=> 'vms#pause_vm'
-    match 'resume_vm/:id', :to=> 'vms#resume_vm'
-    match 'stop_vm/:id', :to=> 'vms#stop_vm'
+  match 'start_vm/:id', :to=> 'vms#start_vm'
+  match 'init_vm/:id', :to=> 'vms#init_vm'
+  match 'pause_vm/:id', :to=> 'vms#pause_vm'
+  match 'resume_vm/:id', :to=> 'vms#resume_vm'
+  match 'stop_vm/:id', :to=> 'vms#stop_vm'
+  match 'set_progress', :to=> 'vms#set_progress'
+   match 'vms/get_progress/:id', :to=> 'vms#get_progress'
     #no id
-    match 'start_all', :to=> 'vms#start_all'
-   match 'start_vm', :to=> 'vms#start_vm'
-    match 'init_vm', :to=> 'vms#init_vm'
-    match 'pause_vm', :to=> 'vms#pause_vm'
-    match 'resume_vm', :to=> 'vms#resume_vm'
-    match 'stop_vm', :to=> 'vms#stop_vm'
+  match 'start_all', :to=> 'vms#start_all'
+  match 'start_vm', :to=> 'vms#start_vm'
+  match 'init_vm', :to=> 'vms#init_vm'
+  match 'pause_vm', :to=> 'vms#pause_vm'
+  match 'resume_vm', :to=> 'vms#resume_vm'
+  match 'stop_vm', :to=> 'vms#stop_vm'
   
   match 'end_lab/:id', :to=>'labs#end_lab'
   match 'end_lab', :to=>'labs#end_lab'
@@ -55,6 +57,7 @@ ITee::Application.routes.draw do
   
   match 'add_users', :to=> 'lab_users#add_users'
   match 'lab_users/progress/:id', :to=> 'lab_users#progress'
+  
   match 'vms_by_lab', :to=>'vms#vms_by_lab'
    match 'vms_by_state', :to=>'vms#vms_by_state'
   
