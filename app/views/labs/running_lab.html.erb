@@ -13,11 +13,13 @@
         //$.get('/lab_users/progress/'+<%=@lab_user.id%>, function(data) {
         //  $('#updated_progress').html(data);
         //});
-        <% @vms.each do |vm| %>
-          <%if vm.state=="running" || vm.state=="paused" then%>
-            $.get('/vms/get_progress/'+<%=vm.id%>, function(data) {
-            $('#vm_progress<%=vm.id%>').html(data);});
-          <%end%>
+        <% if @lab_user.end==nil then %>
+          <%@vms.each do |vm| %>
+            <%if vm.state=="running" || vm.state=="paused" then%>
+              $.get('/vms/get_progress/'+<%=vm.id%>, function(data) {
+              $('#vm_progress<%=vm.id%>').html(data);});
+            <%end%>
+         <%end%>
         <%end%>
       }
       $(document).ready(function($){
