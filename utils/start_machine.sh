@@ -17,8 +17,30 @@ XML=/etc/libvirt/qemu/$NAME.xml
 
 echo "tekitan virtuaalmasina $NAME template-ist $TEMPLATE Mac aadressiga $MAC"
 #luua TEMPLATE põhjal koopia IMAGE
+
+NR=1
+LETTER=('a' 'b' 'c' 'd' 'e')
+KETTAD=""
+for i in $(basename $TEMPLATE | cut -d'.' -f1){1,2,3,4}.img; do 
+  echo $i; 
+  if [ -f $(dirname $TEMPLATE)/$i ]; then
+    echo 'exists';
+    j=$VIRT_DIR/$NAME$NR.img
+    cp $(dirname $TEMPLATE)/$i $j
+    chgrp libvirtd $j
+    KETTAD=$KETTAD"<disk device='disk' type='file'>
+      <driver name='qemu' type='qcow2'/>
+      <source file='$j'/>
+      <target bus='virtio' dev='vd"${LETTER[$NR]}"'/>
+      <address bus='0x00' domain='0x0000' type='pci' function='0x0' slot='0x1$NR'/>
+    </disk>"
+  fi
+  NR=$(($NR+1))
+done
+
+
 echo "alustan kopeerimist"
-cp $TEMPLATE $IMAGE
+cp $TEMPLATE $IMAGE 
 chgrp libvirtd $IMAGE
 #chown libvirt-qemu:kvm $IMAGE 
 echo "masin kopeeritud"
@@ -51,6 +73,7 @@ cat > $XML << LOPP
       <target bus='virtio' dev='vda'/>
       <address bus='0x00' domain='0x0000' type='pci' function='0x0' slot='0x05'/>
     </disk>
+    $KETTAD
     <disk device='cdrom' type='block'>
       <driver name='qemu' type='raw'/>
       <target bus='ide' dev='hdc'/>
