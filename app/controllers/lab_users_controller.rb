@@ -123,6 +123,48 @@ end
     end
   end
   
+  def import
+    @lab=Lab.find_by_id(params[:lab_id])
+    if (params[:txtsbs].present? && @lab!=nil)
+      @upload_text = params[:txtsbs].read
+      users=@upload_text.split('\n')
+      
+      notice=""
+      @upload_text.each_line do |u| 
+        
+      #users.each do |u|
+      #while u = params[:txtsbs].readline        
+        u.chomp!
+        user=u.split(',')#username,realname, email, pw hash, salt
+        @user=User.find(:first, :conditions=>["username=?", user[0]])
+        if (@user==nil) then #user doesnt exist
+          email=user[2]
+          email=user[0]+"@itcollege.ee" if email!=nil
+
+          @user=User.create!(:email=>email ,:username=>user[0], :name=>user[1] ,:password=>'password')
+        end
+        labuser=LabUser.find(:first, :conditions=>["user_id=? and lab_id=?", @user.id, @lab.id])
+        # by now we surely have a user, add it to the lab
+        if labuser==nil then
+          labuser=LabUser.new
+          labuser.lab=@lab
+          labuser.user=@user
+          if labuser.save 
+            notice=notice+user[0]+" added successfully<br/>"
+          else
+            notice=notice+user[0]+" adding failed<br/>"
+          end
+        else
+          notice=notice+user[0]+" was already in the lab<br/>"
+        end
+      end
+        
+      redirect_to(:back, :notice=>notice)
+    else
+      redirect_to(:back, :alert=>"No import file specified.")
+    end
+  end
+  
   def progress
     
     @lab_user=LabUser.find_by_id(params[:id])

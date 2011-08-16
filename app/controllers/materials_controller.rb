@@ -55,7 +55,6 @@ class MaterialsController < ApplicationController
   # POST /materials.xml
   def create
     @material = Material.new(params[:material])
-
     respond_to do |format|
       if @material.save
         format.html { redirect_to(@material, :notice => 'Material was successfully created.') }
@@ -67,6 +66,7 @@ class MaterialsController < ApplicationController
     end
   end
 
+  
   # PUT /materials/1
   # PUT /materials/1.xml
   def update

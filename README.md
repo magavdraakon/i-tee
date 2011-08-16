@@ -28,6 +28,21 @@ if you dont have ruby installed:
 
 	apt-get install ruby
 
+download the newest RubyGems (http://rubygems.org)
+
+    wget http://production.cf.rubygems.org/rubygems/rubygems-1.4.1.tgz
+    tar zxf rubygems-1.4.1.tgz
+
+to install RubyGems run setup.rb in the rubygems-1.4.1/ folder
+
+    cd rubygems-1.4.1/
+    ruby setup.rb
+    
+make the installed RubyGem as a default
+
+    update-alternatives --install /usr/bin/gem gem /usr/bin/gem1.8 1
+
+
 check the version:
 
 	rails -v
@@ -35,7 +50,7 @@ check the version:
 
 if you dont have rails installed:
 
-	gem install rails-v=3.0.4
+	gem install rails -v=3.0.4
 
 Have git installed:
 

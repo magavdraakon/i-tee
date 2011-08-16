@@ -1,4 +1,4 @@
-<h3>Add users to '<%= @lab.name%>'</h3>
+<h3>Add users to '<%= @lab.name%>' by selecting them</h3>
  
 <%alphabet=[]%>
 <%('a'..'z').each do |l|%>
@@ -32,8 +32,13 @@
   <%= f.submit "Add"%> 
 
 <%end%>
- 
-
+<h3>Or importing</h3>
+<%= form_tag('/lab_users/import' , :multipart => true) do %>  
+  <input type="file" id="examsendbutton" name="txtsbs"/><br/>
+  <input type="hidden" name="lab_id" value="<%= @lab.id%>"/>
+  <input type="submit" value="import">
+  
+<% end %>
 <% content_for :sidebar_head do %>
   Choose lab
 <%end%>
