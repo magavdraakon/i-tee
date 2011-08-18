@@ -135,14 +135,15 @@ end
       #users.each do |u|
       #while u = params[:txtsbs].readline        
         u.chomp!
-        user=u.split(',')#username,realname, email, pw hash, salt
+        user=u.split(',')#username,realname, email, token
         @user=User.find(:first, :conditions=>["username=?", user[0]])
         if (@user==nil) then #user doesnt exist
           email=user[2]
           email=user[0]+"@itcollege.ee" if email!=nil
 
-          @user=User.create!(:email=>email ,:username=>user[0], :name=>user[1] ,:password=>'password')
+          @user=User.create!(:email=>email ,:username=>user[0], :name=>user[1] ,:password=>'password', :authentication_token=>user[3])
         end
+        #TODO do we update the existing user? to add a token for example?
         labuser=LabUser.find(:first, :conditions=>["user_id=? and lab_id=?", @user.id, @lab.id])
         # by now we surely have a user, add it to the lab
         if labuser==nil then

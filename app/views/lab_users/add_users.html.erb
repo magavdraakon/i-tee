@@ -32,7 +32,10 @@
   <%= f.submit "Add"%> 
 
 <%end%>
-<h3>Or importing</h3>
+<h3>Or importing (users that dont exist will be created)</h3>
+<p>NB! The expected file format is: <br/>
+  username,real name,email,token<br/>
+  username,real name,email,token</p>
 <%= form_tag('/lab_users/import' , :multipart => true) do %>  
   <input type="file" id="examsendbutton" name="txtsbs"/><br/>
   <input type="hidden" name="lab_id" value="<%= @lab.id%>"/>

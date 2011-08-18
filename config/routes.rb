@@ -12,6 +12,8 @@ ITee::Application.routes.draw do
 
   devise_for :users,  :controllers => { :registrations => "users/registrations", :passwords=>"users/passwords" }
 
+  match 'users/edit', :to=>'devise/registrations#edit'
+  
   resources :vms
 
   resources :materials
@@ -20,6 +22,7 @@ ITee::Application.routes.draw do
 
   resources :hosts
 
+  resources :token_authentications, :only => [:create, :destroy]
 
   # route, :to => 'controller#action'
   
