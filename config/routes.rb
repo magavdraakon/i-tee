@@ -27,6 +27,7 @@ ITee::Application.routes.draw do
   # route, :to => 'controller#action'
   
   match 'lab_users/import', :to=>'lab_users#import'
+  match 'manage_tokens', :to=>'lab_users#user_token'
   
   match 'error_401', :to => 'home#error_401'
   match 'template', :to => 'home#template'

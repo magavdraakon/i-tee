@@ -175,6 +175,10 @@ end
     render :partial => 'shared/lab_progress' 
   end
   
+  def user_token
+    @users=User.find(:all, :order=>'username')
+  end
+  
   private #-----------------------------------------------
   # return a array of users based on the input (list of checked checkboxes)
   def get_users_from(u_list)
