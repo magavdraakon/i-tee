@@ -10,7 +10,7 @@
 <%@users.each do |u|%>
 <li class="token_li letter_<%=u.username[0,1] if alphabet.include? u.username[0,1]%>">
   <%=u.username%>- <% host=request.host
-        host=host+":3000" if host="localhost"%>
+        host=host+":3000" if host=="localhost" %>
 	  <%=u.authentication_token.blank? ? "No token" : link_to("#{host}#{root_path(:auth_token => u.authentication_token)}", root_path(:auth_token => u.authentication_token)) %></p>
 	  <%= link_to "Generate", token_authentications_path(:user_id => u.id), :class=>'button add-button', :method => :post, :confirm => "Are you sure?"  %>
 </li>
