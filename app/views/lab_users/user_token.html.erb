@@ -12,6 +12,6 @@
   <%=u.username%>- <% host=request.host
         host=host+":3000" if host=="localhost" %>
 	  <%=u.authentication_token.blank? ? "No token" : link_to("#{host}#{root_path(:auth_token => u.authentication_token)}", root_path(:auth_token => u.authentication_token)) %></p>
-	  <%= link_to "Generate", token_authentications_path(:user_id => u.id), :class=>'button add-button', :method => :post, :confirm => "Are you sure?"  %>
+	  <%= link_to "Generate", token_authentications_path(:user_id => u.id), :class=>'button add-button', :method => :post, :confirm => "Are you sure?"  %><%= link_to "Delete", token_authentication_path(:id => u.id),:class=>'button delete-button', :method => :delete, :confirm => "Are you sure?" if !u.authentication_token.blank? %>
 </li>
 <%end%>
