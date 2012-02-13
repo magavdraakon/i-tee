@@ -2,13 +2,22 @@ source 'http://rubygems.org'
 
 gem 'rails', '3.0.4'
 
+group :development, :test do
+    gem 'railroady'
+    gem 'sqlite3-ruby', :require => 'sqlite3'
+
+end
+
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 
-gem 'sqlite3-ruby', :require => 'sqlite3'
 gem 'ckeditor', '3.4.2.pre'
 #gem "right_aws"
-gem 'mysql'
+
+group :production do
+    gem 'mysql'
+end
+
 gem 'paperclip'
 
 gem "devise"

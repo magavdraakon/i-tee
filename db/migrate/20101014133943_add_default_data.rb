@@ -5,7 +5,7 @@ class AddDefaultData < ActiveRecord::Migration
     :description=>'Firmale on vaja luua kaks veebilehte: 
     www.firma.ee 
     sales.firma.ee 
-    Mõlemal lehel saab kasutada phpd
+    M6lemal lehel saab kasutada phpd
     Lisaks tuleb konfigureerida mysql ja phpMyAdmin andmebaaside seadistamiseks ')
     
     Host.create(:name=>'elab.itcollege.ee', :ip=>'192.168.13.13', 

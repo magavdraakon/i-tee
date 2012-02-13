@@ -1,3 +1,4 @@
+# encoding: utf-8
 class VmsController < ApplicationController
 before_filter :authorise_as_admin, :only => [:new, :edit ]
   
