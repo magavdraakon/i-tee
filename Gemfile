@@ -4,7 +4,7 @@ gem 'rails', '3.0.4'
 
 group :development, :test do
     gem 'railroady'
-    gem 'sqlite3-ruby', :require => 'sqlite3'
+    gem 'sqlite3', :require => 'sqlite3'
 
 end
 
