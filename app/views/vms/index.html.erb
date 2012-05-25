@@ -51,7 +51,7 @@
         <% desc="Initialize the virtual machine by clicking <strong>Start</strong>."
           desc=vm.description if (state=="running" || state=="paused") && vm.mac!=nil%>
         <td>
-          <span class="button info-button" onclick="$('#notice').html('<%=desc%>');$('#notice').show();">Info</span><%if state=="running" && vm.mac!=nil then %><a href="https://<%=request.host+':8'+vm.mac.ip.split('.')[3] if vm.mac!=nil%>" title="Login" target='_blank' class="button login-button">Login</a><%end%><%= link_to 'Edit', edit_vm_path(vm),:class=> 'edit-button button' if @admin && @tab=="admin"%><%= link_to 'Destroy', vm, :confirm => 'Are you sure?', :method => :delete,:class=> 'delete-button button' if @admin && @tab=="admin"%>
+          <span class="button info-button" onclick="$('#notice').html('<%=desc%>');$('#notice').show();">Info</span><%if state=="running" && vm.mac!=nil then %><a href="https://vm.mac.ip.split if vm.mac!=nil%>" title="Login" target='_blank' class="button login-button">Login</a><%end%><%= link_to 'Edit', edit_vm_path(vm),:class=> 'edit-button button' if @admin && @tab=="admin"%><%= link_to 'Destroy', vm, :confirm => 'Are you sure?', :method => :delete,:class=> 'delete-button button' if @admin && @tab=="admin"%>
         </td>
       </tr>
     <% end %>
