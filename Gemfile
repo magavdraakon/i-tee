@@ -18,7 +18,7 @@ group :production do
     gem 'mysql'
 end
 
-gem 'paperclip'
+gem 'paperclip', '2.7'
 
 gem "devise"
 gem "devise_ldap_authenticatable", "0.4.5"
