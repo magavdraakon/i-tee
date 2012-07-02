@@ -16,6 +16,8 @@ class Vm < ActiveRecord::Base
     end
   end
   
+  
+
   def add_pw
     chars = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789"
     self.password = ""
@@ -39,6 +41,6 @@ class Vm < ActiveRecord::Base
   end
   
   def state
-    return %x(virsh -c qemu:///system domstate #{name} 2>&1).rstrip
+    return %x(virsh -c qemu:///system domstate #{name} 2>&1).split(' ').first.rstrip
   end
 end

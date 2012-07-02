@@ -97,7 +97,11 @@ font-weight:bold;
 text-shadow: 0px -1px 0px #374683;
 filter: dropshadow(color=#374683,offX=0,offY=-1);
 padding:7px;
-/*increase roundness (for firefox)*/
+border-top-left-radius:5px;
+border-top-right-radius:5px;
+border-bottom-left-radius:0px;
+border-bottom-right-radius:0px;
+/*increase roundness (for older firefox)*/
     -moz-border-radius-topleft: 5px;
     -moz-border-radius-topright: 5px;
     -moz-border-radius-bottomleft: 0px;
@@ -174,7 +178,7 @@ ul.no-bullet {list-style-type:none; margin-left:0px;}
 #menu-head {
 margin-top: -30px;
     height: 30px;
- background: -moz-linear-gradient(100% 100% 90deg, #f2e9e1, #fff);
+    background: -moz-linear-gradient(100% 100% 90deg, #f2e9e1, #fff);
     background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#f2e9e1), to(#fff));
     /*background: transparent url("../images/sidemenu-header.png") repeat-x top left;*/
     border-bottom: 1px solid #C2C2C2;
@@ -274,7 +278,11 @@ margin-left:10px;
 
 table caption {
     padding: 4px 15px;
-    /*increase roundness (for firefox)*/
+    border-top-left-radius:5px;
+    border-top-right-radius:5px;
+    border-bottom-left-radius:0px;
+    border-bottom-right-radius:0px;
+    /*increase roundness (for older firefox)*/
     -moz-border-radius-topleft: 5px;
     -moz-border-radius-topright: 5px;
     -moz-border-radius-bottomleft: 0px;
@@ -339,7 +347,11 @@ table caption {
     
 /*forms*/
 input[type="submit"] {  
-     /*increase roundness (for firefox)*/
+    border-top-left-radius:10px;
+    border-top-right-radius:10px;
+    border-bottom-left-radius:10px;
+    border-bottom-right-radius:10px;
+     /*increase roundness (for older firefox)*/
     -moz-border-radius-topleft: 10px;
     -moz-border-radius-topright: 10px;
     -moz-border-radius-bottomleft: 10px;
@@ -359,8 +371,12 @@ input[type="submit"] {
     cursor: pointer;
 }  
 
-input[type="submit"].cancel {  
-     /*increase roundness (for firefox)*/
+input[type="submit"].cancel { 
+    border-top-left-radius:10px;
+    border-top-right-radius:10px;
+    border-bottom-left-radius:10px;
+    border-bottom-right-radius:10px;
+     /*increase roundness (for older firefox)*/
     -moz-border-radius-topleft: 10px;
     -moz-border-radius-topright: 10px;
     -moz-border-radius-bottomleft: 10px;
@@ -382,6 +398,10 @@ input[type="submit"].cancel {
 
 input[type="password"]:focus, input[type="text"]:focus, textarea:focus {  
   background:#f2e9e1;
+    border-top-left-radius:5px;
+    border-top-right-radius:5px;
+    border-bottom-left-radius:5px;
+    border-bottom-right-radius:5px;
     -moz-border-radius-topleft: 5px;
     -moz-border-radius-topright: 5px;
     -moz-border-radius-bottomleft: 5px;
@@ -420,6 +440,10 @@ input[type="password"]:focus, input[type="text"]:focus, textarea:focus {
 }
 
 .button {
+    border-top-left-radius:10px;
+    border-top-right-radius:10px;
+    border-bottom-left-radius:10px;
+    border-bottom-right-radius:10px;
     /*increase roundness (for firefox)*/
     -moz-border-radius-topleft: 10px;
     -moz-border-radius-topright: 10px;
@@ -448,6 +472,52 @@ input[type="password"]:focus, input[type="text"]:focus, textarea:focus {
 div.buttons {
     display:inline-block;
 }
+
+
+/* pagination classes */
+.pagination, .page_info {
+  font-size:0.8em;
+  text-align:right;
+  color: #666666;
+}
+
+.pagination a, .previous_page, .next_page, .current {
+    border-top-left-radius:10px;
+    border-top-right-radius:10px;
+    border-bottom-left-radius:10px;
+    border-bottom-right-radius:10px;
+    /*increase roundness (for firefox)*/
+    -moz-border-radius-topleft: 10px;
+    -moz-border-radius-topright: 10px;
+    -moz-border-radius-bottomleft: 10px;
+    -moz-border-radius-bottomright: 10px;
+    /*increase roundness (for webkit)*/
+    -webkit-border-top-left-radius: 10px;
+    -webkit-border-top-right-radius: 10px;
+    -webkit-border-bottom-left-radius: 10px;
+    -webkit-border-bottom-right-radius: 10px;
+    border: 2px solid rgba(125, 159, 186, .5);
+    padding:2px;
+    padding-left:4px;
+    padding-right:4px;
+    text-decoration:none;
+    color: #666666;
+    cursor: pointer;
+    line-height:2em;
+    background-color: rgba(255, 255, 255, .7);
+}
+
+.disabled, .current {
+  cursor:default;
+  color:#c0c0c0;
+  
+}
+.current {
+  color:#000;
+  font-weight:bold;
+}
+
+
 
 /*add_users view */
 .user_li {

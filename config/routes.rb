@@ -42,7 +42,7 @@ ITee::Application.routes.draw do
   match 'resume_vm/:id', :to=> 'vms#resume_vm'
   match 'stop_vm/:id', :to=> 'vms#stop_vm'
   match 'set_progress', :to=> 'vms#set_progress'
-   match 'vms/get_progress/:id', :to=> 'vms#get_progress'
+  match 'vms/get_progress/:id', :to=> 'vms#get_progress'
     #no id
   match 'start_all', :to=> 'vms#start_all'
   match 'start_vm', :to=> 'vms#start_vm'
@@ -64,7 +64,9 @@ ITee::Application.routes.draw do
   match 'lab_users/progress/:id', :to=> 'lab_users#progress'
   
   match 'vms_by_lab', :to=>'vms#vms_by_lab'
-   match 'vms_by_state', :to=>'vms#vms_by_state'
+  match 'vms_by_lab/:id', :to=>'vms#vms_by_lab'
+  match 'vms_by_state', :to=>'vms#vms_by_state'
+  match 'vms_by_state/:state', :to=>'vms#vms_by_state'
   
   match 'all_labs/:id', :to => 'labs#courses'
   match 'all_labs', :to =>'labs#courses'

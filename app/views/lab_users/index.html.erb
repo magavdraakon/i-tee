@@ -29,6 +29,8 @@
       </tr>
     <% end %>
   </table>
+  
+  <%= will_paginate @lab_users %><div class="page_info"><%= page_entries_info @lab_users %></div>
 </div>
 <%= form_for(@lab_user) do |f| %>
   <% if @lab_user.errors.any? %>

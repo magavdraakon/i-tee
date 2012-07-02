@@ -16,7 +16,9 @@ class LabUsersController < ApplicationController
   # GET /lab_users.xml
   #index and new view are merged
   def index
-    @lab_users = LabUser.find(:all, :order=>params[:sort_by])
+    #@lab_users = LabUser.find(:all, :order=>params[:sort_by])
+
+    @lab_users = LabUser.paginate(:page => params[:page], :per_page => 10).order(params[:sort_by])
     @lab_user = LabUser.new
     
     respond_to do |format|

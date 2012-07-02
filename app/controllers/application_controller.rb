@@ -7,22 +7,24 @@ class ApplicationController < ActionController::Base
   protect_from_forgery
   
   layout 'new'
-  
+  require 'will_paginate/array'
   before_filter :check_for_cancel, :only => [:create, :update]
 
   if ITee::Application.config.emulate_ldap then
-    before_filter :emulate_user
+     @admin = true
+    @logged_in = true
+    @username = "ttanav"
+    #current_user = User.find(:first, :conditions=>["username=?", @username])
+    current_user = User.first
+
+    before_filter :emulate_user    
   else
     before_filter :authenticate_user!, :except=>[:about, :getprogress, :set_progress]
     before_filter :admin?
   end  
   
   def emulate_user
-    @admin = true
-    @logged_in = true
-    @username = "ttanav"
-    current_user.username=@username
-    current_user.id=1
+   
   end
 
   #return true if the current user is a admin

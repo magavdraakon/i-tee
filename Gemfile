@@ -13,6 +13,7 @@ end
 
 gem 'ckeditor', '3.4.2.pre'
 #gem "right_aws"
+gem 'will_paginate', '~> 3.0'
 
 group :production do
     gem 'mysql'
