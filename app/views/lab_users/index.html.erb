@@ -2,7 +2,6 @@
 <h3>Listing users in labs</h3>
 <div id="index_t">
   <table>
-    <caption >users in labs (<%= @lab_users.count  %>)</caption>
     <thead>
       <tr>
         <th><%=link_to("Lab", :controller=>"lab_users",:action=>"index", :sort_by=>"lab_id")%></th>

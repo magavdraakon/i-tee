@@ -22,12 +22,15 @@ ITee::Application.routes.draw do
 
   resources :hosts
 
-  resources :token_authentications, :only => [:create, :destroy]
+  resources :token_authentications, :only => [:update, :destroy]
 
   # route, :to => 'controller#action'
   
   match 'lab_users/import', :to=>'lab_users#import'
   match 'manage_tokens', :to=>'lab_users#user_token'
+  match 'edit_token', :to=>'token_authentications#edit'
+  match 'edit_token/:id', :to=>'token_authentications#edit'
+  
   
   match 'error_401', :to => 'home#error_401'
   match 'template', :to => 'home#template'

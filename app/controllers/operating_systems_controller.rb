@@ -6,7 +6,7 @@ class OperatingSystemsController < ApplicationController
   # GET /operating_systems
   # GET /operating_systems.xml
   def index
-    @operating_systems = OperatingSystem.all
+    @operating_systems = OperatingSystem.paginate(:page=>params[:page], :per_page=>10)
 
     respond_to do |format|
       format.html # index.html.erb

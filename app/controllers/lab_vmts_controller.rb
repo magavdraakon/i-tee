@@ -16,6 +16,7 @@ class LabVmtsController < ApplicationController
   #index and new view are merged, but there is also a separate view for new 
   def index
     @lab_vmts = LabVmt.find(:all, :order=>params[:sort_by])
+    @lab_vmts = @lab_vmts.paginate(:page=>params[:page], :per_page=>10)
     @lab_vmt = LabVmt.new
     @lab = Lab.find_by_id(params[:lab]) if params[:lab]!=nil
     respond_to do |format|

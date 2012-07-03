@@ -19,7 +19,7 @@ class LabsController < ApplicationController
   # GET /labs
   # GET /labs.xml
   def index
-    @labs = Lab.all
+    @labs = Lab.paginate(:page=>params[:page], :per_page=>10)
 
     respond_to do |format|
       format.html # index.html.erb

@@ -1,7 +1,6 @@
 <h3>Listing virtual machine templates</h3>
 <div id="index_t">
   <table>
-    <caption >Templates (<%= @vmts.count  %>)</caption>
     <thead>
       <tr>
         <th>Image</th>
@@ -25,4 +24,5 @@
       </tr>
     <% end %>
   </table>
+   <%= will_paginate @vmts %><div class="page_info"><%= page_entries_info @vmts %></div>
 </div>

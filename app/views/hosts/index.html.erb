@@ -1,11 +1,10 @@
-<h3>Listing hosts</h3>
+<h3>Listing Server hosts</h3>
 <div id="index_t">
   <table>
-    <caption >Server hosts (<%= @hosts.count  %>)</caption>
     <thead>
       <tr>
         <th>Name</th>
-        <th>Ip</th>
+        <th>IP</th>
         <!-- <th>Publickey</th>
         <th>Privatekey</th>
         <th>Ram</th>
@@ -31,4 +30,5 @@
       <% end %>
     </tbody>
   </table>
+   <%= will_paginate @hosts %><div class="page_info"><%= page_entries_info @hosts %></div>
 </div>

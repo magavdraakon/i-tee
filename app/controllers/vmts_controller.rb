@@ -17,7 +17,7 @@ class VmtsController < ApplicationController
   # GET /vmts
   # GET /vmts.xml
   def index
-    @vmts = Vmt.all
+    @vmts = Vmt.paginate(:page=>params[:page], :per_page=>10)
 
     respond_to do |format|
       format.html # index.html.erb

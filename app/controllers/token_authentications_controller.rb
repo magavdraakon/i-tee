@@ -1,11 +1,37 @@
 class TokenAuthenticationsController < ApplicationController
    #at the moment, only allow admins to reset the tokens
-  before_filter :authorise_as_admin
-   def create
-	    @user = User.find_by_id(params[:user_id])
-	    @user.reset_authentication_token!
-	    redirect_to :back
-	  end
+  before_filter :authorise_as_manager
+  before_filter :manager_tab
+  def edit
+    @user = User.find_by_id(params[:id])
+    
+  end
+  
+  
+  
+  def update
+    if params[:commit]=="cancel" then
+      redirect_to manage_tokens_path 
+    else
+      
+	    @user = User.find(params[:id])
+      @user.reset_authentication_token!
+      @user.token_expires=DateTime.new( params[:user]["token_expires(1i)"].to_i,
+                                      params[:user]["token_expires(2i)"].to_i,
+                                      params[:user]["token_expires(3i)"].to_i,
+                                      params[:user]["token_expires(4i)"].to_i,
+                                      params[:user]["token_expires(5i)"].to_i)
+      respond_to do |format|
+        if @user.save
+         format.html { redirect_to(manage_tokens_path, :notice => 'successful update.') }
+         format.xml  { head :ok }
+        else
+         format.html { render :action => "edit" }
+         format.xml  { render :xml => @user.errors, :status => :unprocessable_entity }
+       end
+      end
+    end
+	end
 	 
 	  def destroy
 	    @user = User.find_by_id(params[:id])

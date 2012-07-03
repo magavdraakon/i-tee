@@ -1,7 +1,6 @@
 <h3>Listing materials</h3>
 <div id="index_t">
   <table>
-    <caption >Materials (<%= @materials.count  %>)</caption>
     <thead>
       <tr>
         <th>Name</th>
@@ -17,4 +16,5 @@
       </tr>
     <% end %>
   </table>
+   <%= will_paginate @materials %><div class="page_info"><%= page_entries_info @materials %></div>
 </div>

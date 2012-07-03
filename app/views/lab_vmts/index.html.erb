@@ -1,7 +1,6 @@
 <h3>Listing virtual machine templates in labs</h3>
 <div id="index_t">
   <table>
-    <caption >Templates in labs (<%= @lab_vmts.count  %>)</caption>
     <thead>
       <tr>
         <th>Name</th>
@@ -20,6 +19,7 @@
       </tr>
     <% end %>
   </table>
+   <%= will_paginate @lab_vmts %><div class="page_info"><%= page_entries_info @lab_vmts %></div>
 </div>
 
 <%= form_for(@lab_vmt) do |f| %>

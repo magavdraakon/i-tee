@@ -41,47 +41,7 @@ $('#notice').hide();
 if ($('#alert').text()==''){
 $('#alert').hide();
 }
-//new lay
 
-
-/*
-$('.hb').click(function(){  
-$('.course').hide();
-$('.admin').hide();
-$('.vms').hide();
-$('.home').show();
-$('.b_menu').removeClass('current_tab');
-$('.hb').addClass('current_tab');
-});
-
-$('.cb').click(function(){  
-$('.course').show();
-$('.admin').hide();
-$('.vms').hide();
-$('.home').hide();
-$('.b_menu').removeClass('current_tab');
-$('.cb').addClass('current_tab');
-});
-
-$('.vb').click(function(){  
-$('.course').hide();
-$('.admin').hide();
-$('.vms').show();
-$('.home').hide();
-$('.b_menu').removeClass('current_tab');
-$('.vb').addClass('current_tab');
-});
-*/
-$('.ab').click(function(){
-//$('.s_menu').hide();  
-//$('.admin').slideToggle('slow');
-$('.course').hide();
-$('.admin').show();
-$('.vms').hide();
-$('.home').hide();
-$('.b_menu').removeClass('current_tab');
-$('.ab').addClass('current_tab');
-});
 
 if ($.trim($('#menu-head').text())==''){
 $('#sidemenu').hide();

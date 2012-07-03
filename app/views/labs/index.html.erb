@@ -1,7 +1,6 @@
 <h3>Listing labs</h3>
 <div id="index_t">
   <table>
-    <caption >Labs (<%= @labs.count  %>)</caption>
     <thead>
       <tr>
         <th>Name</th>
@@ -17,4 +16,5 @@
       </tr>
     <% end %>
   </table>
+   <%= will_paginate @labs %><div class="page_info"><%= page_entries_info @labs %></div>
 </div>

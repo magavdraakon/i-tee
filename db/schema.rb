@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110818130533) do
+ActiveRecord::Schema.define(:version => 20120703111010) do
 
   create_table "ckeditor_assets", :force => true do |t|
     t.string   "data_file_name",                                 :null => false
@@ -112,6 +112,7 @@ ActiveRecord::Schema.define(:version => 20110818130533) do
     t.string   "name"
     t.boolean  "keypair"
     t.string   "authentication_token"
+    t.datetime "token_expires"
   end
 
   add_index "users", ["reset_password_token"], :name => "index_users_on_reset_password_token", :unique => true

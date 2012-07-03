@@ -1,9 +1,9 @@
 class LabUsersController < ApplicationController
   #restricted to admins 
-  before_filter :authorise_as_admin, :except=>[:progress]
+  before_filter :authorise_as_manager, :except=>[:progress]
   #redirect to index view when trying to see unexisting things
   before_filter :save_from_nil, :only=>[:edit]
-  before_filter :admin_tab
+  before_filter :manager_tab
   def save_from_nil
     @lab_user = LabUser.find_by_id(params[:id])
     if @lab_user==nil 
@@ -178,7 +178,8 @@ end
   end
   
   def user_token
-    @users=User.find(:all, :order=>'username')
+    @users=User.find(:all, :order=>params[:sort_by])
+    @users= @users.paginate(:page=>params[:page], :per_page=>10)
   end
   
   private #-----------------------------------------------

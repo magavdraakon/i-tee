@@ -15,7 +15,7 @@ class HostsController < ApplicationController
   # GET /hosts
   # GET /hosts.xml
   def index
-    @hosts = Host.all
+    @hosts = Host.paginate(:page=>params[:page], :per_page=>10)
 
     respond_to do |format|
       format.html # index.html.erb

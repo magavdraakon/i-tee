@@ -1,0 +1,24 @@
+<h3>Manage <%=@user.username %>'s token</h3>
+
+<%= form_tag(token_authentication_path , :method => :put) do  %>
+  <% if @user.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@user.errors.count, "error") %> prohibited this token from being saved:</h2>
+      <ul>
+        <% @user.errors.full_messages.each do |msg| %>
+          <%= msg %><br/>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <%= hidden_field_tag 'id', @user.id %>
+  <% if @user.token_expires==nil %>
+    Select  
+  <% else %>
+    Current token expiry time: <%=@user.token_expires%><br/> New 
+  <% end %>
+  token expiry time: <%=datetime_select("user", "token_expires", :default => 3.days.from_now) %>
+  <br/>
+  <%= submit_tag "cancel" , :class=>"cancel"%> <%= submit_tag "Submit", :confirm => "Are you sure?"%> 
+   
+<%end%>

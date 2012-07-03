@@ -27,7 +27,14 @@
               <%=link_to 'My machines', vms_path %>
             </div>
             <%if  @admin then  %>
-              <div class="ab b_menu <% if @tab=="admin"%>current_tab<%end%>">Administration</div>
+              <div class="ab b_menu <% if @tab=="admin"%>current_tab<%end%>">
+                <%=link_to 'Manage labs', labs_path %>
+              </div>
+            <%end%>
+            <%if @manager || @admin then %>
+              <div class="mb b_menu <%if @tab=="manager"%>current_tab<%end%>">
+                <%=link_to 'Manage users', lab_users_path %>
+              </div>
             <%end%>
             <div class="logout b_menu">
               <%# if user_signed_in? %>
@@ -58,20 +65,16 @@
             <%= link_to_unless_current('Virtual machines by state', vms_by_state_path) %>
             <%= link_to_unless_current('Virtual machines by lab', vms_by_lab_path) %>
           </div>
+          
           <%if  @admin then  %>
             <div class="admin s_menu <% if @tab=="admin"%>current_tab<%end%>">
               <table>
                 <tr>
                   <td>
-                    <%= link_to_unless_current 'Lab', labs_path %><br/>
+                    <%= link_to_unless_current 'Labs', labs_path %><br/>
                     <%= link_to_unless_current 'New lab', new_lab_path %><br/>
-                    <%=link_to_unless_current 'Users in labs', lab_users_path%><br/>
-                    <%=link_to_unless_current 'Add users by lab', add_users_path%>
-                  </td>
-                  <td>
                     <%= link_to_unless_current 'Materials', materials_path %><br/>
-                    <%= link_to_unless_current 'New material', new_material_path %><br/>
-                    <%= link_to_unless_current 'Manage user tokens',  manage_tokens_path %>
+                    <%= link_to_unless_current 'New material', new_material_path %>
                   </td>
                   <td>
                     <%= link_to_unless_current 'New virtual machine', new_vm_path %> <br/>
@@ -94,7 +97,21 @@
               </table>
             </div>
           <%end%>
-        
+          <% if @manager || @admin then%>
+            <div class="manager s_menu <% if @tab=="manager"%>current_tab<%end%>">
+              <table>
+                <tr>
+                  <td>
+                    <%=link_to_unless_current 'Users in labs', lab_users_path%><br/>
+                    <%=link_to_unless_current 'Add users by lab', add_users_path%>
+                  </td>
+                  <td>
+                    <%= link_to_unless_current 'Manage user tokens',  manage_tokens_path %>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          <% end %>
           <div id="c_wrap">
             <div id="sidemenu">
               <div id="menu-hide"></div>

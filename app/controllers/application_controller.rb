@@ -21,6 +21,7 @@ class ApplicationController < ActionController::Base
   else
     before_filter :authenticate_user!, :except=>[:about, :getprogress, :set_progress]
     before_filter :admin?
+    before_filter :manager?
   end  
   
   def emulate_user
@@ -40,18 +41,36 @@ class ApplicationController < ActionController::Base
     end
   end
   
+  def manager?
+     if current_user == nil then
+      @manager = false
+      return
+    end
+    if  ITee::Application.config.managers.include?(current_user.username) then
+      @manager = true
+    else
+      @manager = false
+    end
+  end
 
   
   #redirect user if they are not admin but try to see things not meant for them
   def authorise_as_admin
     unless ITee::Application.config.admins.include?(current_user.username)
       #You don't belong here. Go away.
-     
       flash[:alert]  = "Restricted access!"
-        redirect_to(:controller=>'home', :action=>'error_401')
+      redirect_to(:controller=>'home', :action=>'error_401')
       end
-      
+   end
+  
+    #redirect user if they are not manager or admin but try to see things not meant for them
+  def authorise_as_manager
+    unless ITee::Application.config.managers.include?(current_user.username) || ITee::Application.config.admins.include?(current_user.username)
+      #You don't belong here. Go away.
+      flash[:alert]  = "Restricted access!"
+      redirect_to(:controller=>'home', :action=>'error_401')       
     end
+   end
   
   private#-------------------------------------------------------------------
       
@@ -71,6 +90,10 @@ class ApplicationController < ActionController::Base
       
   def admin_tab
     @tab="admin"
+  end
+  
+  def manager_tab
+    @tab="manager"
   end
 
   def check_for_cancel
