@@ -1,0 +1,29 @@
+<h3>Listing users</h3>
+<div id="index_t">
+  <table>
+    <thead>
+      <tr>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Last sign in</th>
+        <th>Last IP</th>
+        <th>LDAP user</th>
+        <th></th>
+      </tr>
+    </thead>
+    <% @users.each do |user| %>
+      <tr>
+        <td><%= user.username %></td>
+        <td><%= user.email %></td>
+        <td><%= user.last_sign_in_at %></td>
+        <td><%= user.last_sign_in_ip %></td>
+        <td><%= user.ldap %></td>
+        
+        <td><%= link_to 'Edit', users_edit_path+"/"+user.id.to_s, :class=> 'edit-button button' %>
+            <%= link_to 'Destroy', users_path+"/"+user.id.to_s, :method=>:delete, :confirm => 'Are you sure?', :class=> 'delete-button button' %>
+        </td>
+      </tr>
+    <% end %>
+  </table>
+   <%= will_paginate @users %><div class="page_info"><%= page_entries_info @users %></div>
+</div>

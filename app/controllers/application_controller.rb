@@ -9,6 +9,7 @@ class ApplicationController < ActionController::Base
   layout 'new'
   require 'will_paginate/array'
   before_filter :check_for_cancel, :only => [:create, :update]
+  before_filter :check_token
 
   if ITee::Application.config.emulate_ldap then
      @admin = true
@@ -101,4 +102,24 @@ class ApplicationController < ActionController::Base
       redirect_to :action=>"index"
     end
   end
+  
+  def check_token
+    if params[:auth_token]!=nil then
+      # is tehre a token?
+      user=User.find(:first, :conditions=>["authentication_token=?", params[:auth_token]])
+      if user==nil then
+        #there is no such user. we dont need to do anything, devise will do it for us
+      else 
+        expiretime=user.token_expires
+        logger.debug "the user: #{expiretime.inspect}"
+        logger.debug "the time: #{DateTime.now().inspect}"
+        # check if the token is still valid 
+        if expiretime.to_datetime < DateTime.now() then
+          #the token has expired already, deny the user access
+          redirect_to destroy_user_session_path
+        end  
+      end
+    end
+  end
+  
 end

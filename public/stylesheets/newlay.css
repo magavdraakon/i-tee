@@ -553,14 +553,14 @@ s, strike, del  { text-decoration: line-through }
 hr              { border: 1px inset }
 
 /*scaffold stuff*/
-#notice {
+#notice, #flash_notice {
   color: #1c140d;
   border:#1c140d 1px solid;
   padding:4px;
   margin-bottom:5px;
   background:#cbe86b;  
 }
-#alert {
+#alert, #flash_alert {
   color: #1c140d;
   border:#1c140d 1px solid;
   padding:4px;

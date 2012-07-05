@@ -12,13 +12,19 @@
     </div>
   <% end %>
   <%= hidden_field_tag 'id', @user.id %>
-  <% if @user.token_expires==nil %>
-    Select  
-  <% else %>
-    Current token expiry time: <%=@user.token_expires%><br/> New 
-  <% end %>
-  token expiry time: <%=datetime_select("user", "token_expires", :default => 3.days.from_now) %>
-  <br/>
+   <div class="field">
+    <label for="reset"><%=@user.authentication_token.blank? ? "Create token" : "Create a new token" %>
+    </label>  
+    <%= check_box_tag :reset, 'yes' %>
+   </div>
+    <div class="field">
+    <% if @user.token_expires==nil %>
+      Select  
+    <% else %>
+      Current token expiry time: <%=@user.token_expires%><br/> New 
+    <% end %>
+    token expiry time: <%=datetime_select("user", "token_expires", :default => 3.days.from_now) %>
+  </div>
   <%= submit_tag "cancel" , :class=>"cancel"%> <%= submit_tag "Submit", :confirm => "Are you sure?"%> 
    
 <%end%>

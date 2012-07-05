@@ -106,6 +106,11 @@
                     <%=link_to_unless_current 'Add users by lab', add_users_path%>
                   </td>
                   <td>
+                    <%=link_to 'Users', users_path %><br/>
+                    <%=link_to 'New user', new_user_path%>
+                    
+                  </td>
+                  <td>
                     <%= link_to_unless_current 'Manage user tokens',  manage_tokens_path %>
                   </td>
                 </tr>
@@ -123,7 +128,9 @@
         
             <div id="content"class="side_visible">
               <div id="menu-show"></div>
-              <p id="notice"><%=raw notice %></p>
+              <%= content_tag(:div, flash[:error], :id => "flash_error") if flash[:error] %>
+              <%= content_tag(:div, flash[:notice], :id => "flash_notice") if flash[:notice] %>
+              <%= content_tag(:div, flash[:alert], :id => "flash_alert") if flash[:alert] %>
               <p id="alert"><%=raw alert if user_signed_in?%></p>
               
               <%= yield  %>

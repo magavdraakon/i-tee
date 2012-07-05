@@ -2,4 +2,16 @@
 # See http://github.com/svenfuchs/rails-i18n/tree/master/rails%2Flocale for starting points.
 
 en:
-  hello: "Hello world"
+  will_paginate:
+    page_entries_info:
+      single_page:
+        zero:  "No %{model}s found"
+        one:   "Displaying 1 %{model}"
+        other: "Displaying all %{count} %{model}s"
+      single_page_html:
+        zero:  "No %{model}s found"
+        one:   "Displaying <b>1</b> %{model}"
+        other: "Displaying <b>all&nbsp;%{count}</b> %{model}s"
+
+      multi_page: "Displaying %{model}s %{from} - %{to} of %{count} in total"
+      multi_page_html: "Displaying %{model}s <b>%{from}&nbsp;-&nbsp;%{to}</b> of <b>%{count}</b> in total"

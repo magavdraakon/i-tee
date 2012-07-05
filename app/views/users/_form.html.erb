@@ -1,0 +1,37 @@
+<%= form_for(@user) do |f| %>
+  <% if @user.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@user.errors.count, "error") %> prohibited this user from being saved:</h2>
+      <% @user.errors.full_messages.each do |msg| %>
+        <%= msg %><br/>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :username %><br />
+    <%= f.text_field :username %> <span class="red" title="Required field">*</span>
+  </div>
+  <div class="field">
+    <%= f.label :email %><br />
+    <%= f.text_field :email %>  <span class="red" title="Required field">*</span>
+  </div>
+  <div class="field">
+    <%= label_tag :ldap_user %>
+    <%= check_box_tag :ldap_user, "yes", @user.ldap %> 
+  </div>
+  <div class="field">
+    <%= label_tag :generate_token %>
+    <%= check_box_tag :generate_token, 'yes' %>
+  </div>
+  <div class="field">
+    Token expiry time: <%=datetime_select("token", "expires", :default => 3.days.from_now) %>
+  </div>
+   
+
+
+  <div class="actions">
+     <%= submit_tag "Cancel" , :class=>"cancel"%> <%= f.submit %>
+  </div>
+<% end %>
+

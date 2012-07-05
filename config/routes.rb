@@ -1,7 +1,7 @@
 ITee::Application.routes.draw do
   resources :operating_systems
 
-  # match 'users/sign_up', :to=>'devise/sessions#new'
+  #match 'users/sign_up', :to=>'devise/registrations#new'
   resources :lab_users
 
   resources :lab_vmts
@@ -12,8 +12,9 @@ ITee::Application.routes.draw do
 
   devise_for :users,  :controllers => { :registrations => "users/registrations", :passwords=>"users/passwords" }
 
-  match 'users/edit', :to=>'devise/registrations#edit'
-  
+  #match 'users/edit', :to=>'devise/registrations#edit'
+
+  resources :users
   resources :vms
 
   resources :materials
@@ -31,6 +32,8 @@ ITee::Application.routes.draw do
   match 'edit_token', :to=>'token_authentications#edit'
   match 'edit_token/:id', :to=>'token_authentications#edit'
   
+  match 'users/edit', :to=>'users#edit'
+  match 'users/edit/:id', :to=>'users#edit'
   
   match 'error_401', :to => 'home#error_401'
   match 'template', :to => 'home#template'
