@@ -7,8 +7,9 @@ ITee::Application.configure do
   config.use_libvirt = true
 
 
-  #Administrator usernames
-  config.admins = ['mernits','matoom','ttanav','admin']
+  #Administrator and manager usernames
+  config.admins = ['admin']
+  config.managers = ['manager']
 
   # In the development environment your application's code is reloaded on
   # every request.  This slows down response time but is perfect for development

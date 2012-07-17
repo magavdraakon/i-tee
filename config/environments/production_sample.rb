@@ -13,6 +13,10 @@ ITee::Application.configure do
   # Specifies the header that your server uses for sending files
   config.action_dispatch.x_sendfile_header = "X-Sendfile"
 
+   #Administrator and manager usernames
+  config.admins = ['admin']
+  config.managers = ['manager']
+  
   # For nginx:
   # config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect'
 

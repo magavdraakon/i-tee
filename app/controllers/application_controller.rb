@@ -116,6 +116,7 @@ class ApplicationController < ActionController::Base
         # check if the token is still valid 
         if expiretime.to_datetime < DateTime.now() then
           #the token has expired already, deny the user access
+          
           redirect_to destroy_user_session_path
         end  
       end

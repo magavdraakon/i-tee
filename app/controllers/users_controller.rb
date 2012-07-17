@@ -19,10 +19,19 @@ class UsersController < ApplicationController
   def create
     @user = User.new(params[:user])
     @user.password="randomness"
+    @user.ldap=false
+    @user.ldap=true if params[:ldap_user]=="yes"
     respond_to do |format|
       if @user.save
         if params[:token] then
-          
+          #TODO:  Tokeni loomine
+          @user.reset_authentication_token!
+          @user.token_expires=DateTime.new( params[:token]["expires(1i)"].to_i,
+                                      params[:token]["expires(2i)"].to_i,
+                                      params[:token]["expires(3i)"].to_i,
+                                      params[:token]["expires(4i)"].to_i,
+                                      params[:token]["expires(5i)"].to_i)
+          @user.save
         end
         format.html { redirect_to(users_path, :notice => 'User was successfully created.') }
         format.xml  { render :xml => @user, :status => :created, :location => @user }
