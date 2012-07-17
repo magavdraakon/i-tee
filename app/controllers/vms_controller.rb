@@ -23,7 +23,7 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
       @lab=Lab.find(params[:id]) if params[:id]# try to get the selected lab
       @lab=Lab.first if !params[:id] # but if the parameter is not set, take the first lab
       #@vms=Vm.find(:all, :joins=>["vms inner join lab_vmts as l on vms.lab_vmt_id=l.id"], :order=>params[:sort_by])
-      sql= "select * from vms, lab_vmts where vms.lab_vmt_id=lab_vmts.id and lab_id=#{@lab.id} #{order}"
+      sql= "select vms.*, lab_vmts.lab_id from vms, lab_vmts where vms.lab_vmt_id=lab_vmts.id and lab_id=#{@lab.id} #{order}"
       @tab="admin"
       @labs=Lab.find(:all).uniq
     else
@@ -62,10 +62,10 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
   def index
     order=" order by #{params[:sort_by]}" if params[:sort_by]
     if params[:admin]!=nil && @admin then
-      sql= "select * from vms, lab_vmts where vms.lab_vmt_id=lab_vmts.id #{order}"
+      sql= "select vms.*, lab_vmts.lab_id from vms, lab_vmts where vms.lab_vmt_id=lab_vmts.id #{order}"
       @tab="admin"
     else  
-      sql= "select * from vms, lab_vmts where vms.lab_vmt_id=lab_vmts.id and user_id=#{current_user.id} #{order}"
+      sql= "select vms.*, lab_vmts.lab_id from vms, lab_vmts where vms.lab_vmt_id=lab_vmts.id and user_id=#{current_user.id} #{order}"
     end
     @vms= Vm.paginate_by_sql(sql, :page => params[:page], :per_page => 10)
     

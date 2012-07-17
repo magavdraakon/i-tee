@@ -4,7 +4,7 @@
   <table>
     <thead>
       <tr>
-        <th><%=link_to("User",manage_tokens_path+"?sort_by=id")%></th>
+        <th><%=link_to("User",manage_tokens_path+"?sort_by=username")%></th>
         <th><%= link_to("Token",manage_tokens_path+"?sort_by=authentication_token")%></th>
         <th><%= link_to("Expiry time",manage_tokens_path+"?sort_by=token_expires")%></th>
         <th></th> 
@@ -16,8 +16,8 @@
         <td><%=u.authentication_token.blank? ? "No token" : link_to("#{host}#{root_path(:auth_token => u.authentication_token)}", root_path(:auth_token => u.authentication_token)) %></td>
         <td><%=u.token_expires%></td>
         <td>
-          <%= link_to "Create", edit_token_path+"/"+u.id.to_s, :class=>'button add-button' if u.token_expires==nil %>
-          <%= link_to "Edit", edit_token_path+"/"+u.id.to_s, :class=>'button edit-button' if u.token_expires!=nil %>
+          <%= link_to "Create", edit_token_path+"/"+u.id.to_s, :class=>'button add-button' if u.authentication_token.blank? %>
+          <%= link_to "Edit", edit_token_path+"/"+u.id.to_s, :class=>'button edit-button' if !u.authentication_token.blank? %>
           <%= link_to "Delete", token_authentication_path(:id => u.id),:class=>'button delete-button', :method => :delete, :confirm => "Are you sure?" if !u.authentication_token.blank? %>
         </td>
       </tr>
