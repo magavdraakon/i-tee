@@ -4,5 +4,5 @@ class Lab < ActiveRecord::Base
   has_many :lab_vmts, :dependent => :destroy
   has_many :lab_users, :dependent => :destroy
   
-  validates_presence_of :name
+  validates_presence_of :name, :short_description
 end

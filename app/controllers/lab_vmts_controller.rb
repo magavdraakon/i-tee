@@ -18,7 +18,6 @@ class LabVmtsController < ApplicationController
     @lab_vmts = LabVmt.find(:all, :order=>params[:sort_by])
     @lab_vmts = @lab_vmts.paginate(:page=>params[:page], :per_page=>10)
     @lab_vmt = LabVmt.new
-    @lab = Lab.find_by_id(params[:lab]) if params[:lab]!=nil
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @lab_vmts }
@@ -38,13 +37,24 @@ class LabVmtsController < ApplicationController
   # POST /lab_vmts.xml
   def create
     @lab_vmt = LabVmt.new(params[:lab_vmt])
-    @lab_vmts=LabVmt.all
+    
+    if params[:from]=="labs/show"
+      # if we go to the lab, we need lab info
+      @lab = Lab.find(params[:lab_vmt][:lab_id])
+      redirect_path=lab_path(@lab.id)
+    else
+      # if we go to the list, we need the list items.
+      @lab_vmts = LabVmt.find(:all, :order=>params[:sort_by])
+      @lab_vmts = @lab_vmts.paginate(:page=>params[:page], :per_page=>10)
+      redirect_path=lab_vmts_path
+    end
+    
     respond_to do |format|
       if @lab_vmt.save
-        format.html { redirect_to(lab_vmts_url, :notice => 'Lab vmt was successfully created.') }
+        format.html { redirect_to(redirect_path, :notice => 'Lab vmt was successfully created.') }
         format.xml  { render :xml => @lab_vmt, :status => :created, :location => @lab_vmt }
       else
-        format.html { render :action => "index" }
+        format.html { render params[:from] }
         format.xml  { render :xml => @lab_vmt.errors, :status => :unprocessable_entity }
       end
     end

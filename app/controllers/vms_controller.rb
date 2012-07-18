@@ -178,7 +178,7 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
     redirect_to(redirect)
     rescue Timeout::Error
       flash[:alert]="Starting all virtual machines failed, try starting them one by one."
-      flash[:notice]=""
+      flash[:notice]=nil
       redirect_to(:back)
   end
   
@@ -192,7 +192,6 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
   
   #assign mac and start machine
   def init_vm(vm)
-    #@vm=Vm.find(params[:id])
     #find out if there is a mac address bound with this vm already
     @mac= Mac.find(:first, :conditions=>["vm_id=?", vm.id])
     # binding a unused mac address with the vm if there is no mac
@@ -201,10 +200,6 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
       @mac.vm_id=vm.id
       if @mac.save  #save õnnestus, masinal on mac olemas..
         flash[:notice] = flash[:notice]+"successful mac assignement."#"Successful vm initialisation." 
-        #logger.info "käivitame masina skripti"
-        #a=vm.ini_vm #the script is called in the model
-        #logger.info a
-        #redirect_to(:back)
       end #end -if save
     else
       #the vm had a mac already, dont do anything
@@ -216,14 +211,15 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
       logger.info "käivitame masina skripti"
       @a=vm.ini_vm #the script is called in the model
       logger.info @a
-              
       vm.description="machine #{@mac.mac} with IP address of #{@mac.ip}<br/>Create a connection with this machine using <strong>ssh #{vm.lab_vmt.vmt.username}@#{@mac.ip}</strong><br/>The set password for this machine is <strong>#{vm.password}</strong>"
       vm.save
        
       if @a.include?("masin #{vm.name} loodud")
         flash[:notice]=flash[:notice]+"<br/>"+vm.description
       else  
-        flash[:notice]=""
+        @mac.vm_id=nil
+        @mac.save
+        flash[:notice]=nil
         flash[:alert]="machine initialization failed."
       end
     end

@@ -4,14 +4,14 @@
     <thead>
       <tr>
         <th>Name</th>
-        <th>Description</th>
+        <th>Short description</th>
         <th></th>
       </tr>
     </thead>
     <% @labs.each do |lab| %>
       <tr>
         <td><%= lab.name %></td>
-        <td><%= lab.description %></td>
+        <td><%= lab.short_description %></td>
         <td><%= link_to 'View', lab,:class=> 'show-button button' %><%= link_to 'Edit', edit_lab_path(lab) ,:class=> 'edit-button button'%><%= link_to 'Destroy', lab, :confirm => 'Are you sure?', :method => :delete,:class=> 'delete-button button' %></td>
       </tr>
     <% end %>

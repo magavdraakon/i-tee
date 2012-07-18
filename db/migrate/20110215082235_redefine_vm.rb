@@ -2,7 +2,7 @@ class RedefineVm < ActiveRecord::Migration
   def self.up
       drop_table :vms #drop old table and create the new one
     create_table :vms do |t|
-      t.string :name, :unique => true #specific virtual machine name
+      t.string :name, :unique => true #specific virtual machine name must be unique
       t.integer :lab_vmt_id #template from lab_vmts
      # t.integer :lab_id #this can be acessed trough template_id
       #t.string :mac

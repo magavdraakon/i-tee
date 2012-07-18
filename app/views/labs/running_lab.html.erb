@@ -1,6 +1,7 @@
 <%if @lab==nil%>
   <h4>Sorry, you dont have any such labs</h4>
 <%else%>
+<span id="vm_info" class="hidden block notice"></span>
   <h1><%=@lab.name%></h1>
  
   <%=link_M raw @lab.description%><br/>
@@ -36,7 +37,7 @@
         <%state=vm.state %>
         <% desc="Initialize the virtual machine by clicking <strong>Start</strong>."
         desc=vm.description if (state=="running" || state=="paused") && vm.mac!=nil%>
-        <span class="button info-button" onclick="$('#notice').html('<%=desc%>');$('#notice').show(); ">
+        <span class="button info-button" onclick="$('#vm_info').html('<%=desc%>');$('#vm_info').show(); ">
           <%=vm.name%>
           <%if vm.mac!=nil && state=="running"%>,
             IP <%=vm.mac.ip if vm.mac!=nil%>,
@@ -72,8 +73,8 @@
   </p>
   <table width="100%">
     <tr>
-      <td><%= link_to('Restart lab',restart_lab_path+"/"+@lab.id.to_s, :class=>'add-button button')%> </td>
-      <td><%= link_to('End lab', end_lab_path+"/"+@lab_user.id.to_s, :class=>'delete-button button') if @lab_user.end==nil  %> </td>
+      <td><%= link_to('Restart lab',restart_lab_path+"/"+@lab.id.to_s, :class=>'add-button button', :confirm => "Are you sure?")%> </td>
+      <td><%= link_to('End lab', end_lab_path+"/"+@lab_user.id.to_s, :class=>'delete-button button', :confirm => "Are you sure?" ) if @lab_user.end==nil  %> </td>
     </tr>
   </table>
 
@@ -88,7 +89,7 @@
 
   <% content_for :sidebar do %>
     <% @other.each do |l| %>
-      <li>
+      <li class="<%='bold' if l.id==@lab.id %>">
         <%if @lab_user.end==nil then%>
           <%=link_to(l.name, running_labs_path+"/"+l.id.to_s) %>
         <%else%>

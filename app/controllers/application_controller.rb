@@ -99,7 +99,12 @@ class ApplicationController < ActionController::Base
 
   def check_for_cancel
     if params[:commit] == "Cancel"
-      redirect_to :action=>"index"
+      if params[:controller]=="vms" then
+        # special behaiviour because users cant edit their vms but they can see them
+        redirect_to :action=>"index", :admin=>"1"
+      else 
+        redirect_to :action=>"index"
+      end
     end
   end
   

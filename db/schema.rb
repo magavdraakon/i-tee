@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120704131701) do
+ActiveRecord::Schema.define(:version => 20120718105529) do
 
   create_table "ckeditor_assets", :force => true do |t|
     t.string   "data_file_name",                                 :null => false
@@ -68,6 +68,7 @@ ActiveRecord::Schema.define(:version => 20120704131701) do
     t.text     "description"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "short_description"
   end
 
   create_table "macs", :force => true do |t|

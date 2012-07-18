@@ -1,7 +1,7 @@
 ITee::Application.routes.draw do
   resources :operating_systems
 
-  #match 'users/sign_up', :to=>'devise/registrations#new'
+  match 'users/sign_up', :to=>'home#catcher'
   resources :lab_users
 
   resources :lab_vmts

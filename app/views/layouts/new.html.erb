@@ -2,10 +2,10 @@
 <html>
   <head>
     <title>ITee</title>
-    <%= stylesheet_link_tag "reset" %>
+    <%= stylesheet_link_tag "reset", :cache=>true %>
     <%= stylesheet_link_tag "newlay"%>
-    <%= javascript_include_tag :all %>
-    <%= javascript_include_tag :ckeditor %>
+    <%= javascript_include_tag :all, :cache=>true %>
+    <%= javascript_include_tag :ckeditor, :cache=>true %>
   
     <%= csrf_meta_tag %>
     <link  href="//fonts.googleapis.com/css?family=Ubuntu:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css" >
@@ -128,10 +128,10 @@
         
             <div id="content"class="side_visible">
               <div id="menu-show"></div>
-              <%= content_tag(:div, flash[:error], :id => "flash_error") if flash[:error] %>
-              <%= content_tag(:div, flash[:notice], :id => "flash_notice") if flash[:notice] %>
-              <%= content_tag(:div, flash[:alert], :id => "flash_alert") if flash[:alert] %>
-              <p id="alert"><%=raw alert if user_signed_in?%></p>
+              <%= content_tag(:div, flash[:error], :id => "flash_error", :escape=>false) if flash[:error] %>
+              <%= content_tag(:div, flash[:notice], :id => "flash_notice", :escape=>false) if flash[:notice] %>
+              <%= content_tag(:div, flash[:alert], :id => "flash_alert", :escape=>false) if flash[:alert] %>
+             
               
               <%= yield  %>
              

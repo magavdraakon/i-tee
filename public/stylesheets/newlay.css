@@ -415,7 +415,15 @@ input[type="password"]:focus, input[type="text"]:focus, textarea:focus {
 
 .red{
   color:red;
-  
+}
+.grey{
+  color:gray;
+}
+.bold {
+  font-weight:bold;
+}
+.hidden{
+  display:none;
 }
 
 /*buttons*/
@@ -553,14 +561,14 @@ s, strike, del  { text-decoration: line-through }
 hr              { border: 1px inset }
 
 /*scaffold stuff*/
-#notice, #flash_notice {
+.notice, #flash_notice {
   color: #1c140d;
   border:#1c140d 1px solid;
   padding:4px;
   margin-bottom:5px;
   background:#cbe86b;  
 }
-#alert, #flash_alert {
+.alert, #flash_alert {
   color: #1c140d;
   border:#1c140d 1px solid;
   padding:4px;
@@ -570,19 +578,44 @@ hr              { border: 1px inset }
 
 .field_with_errors {
   padding: 2px;
-  border:solid #1c140d 2px;
-  display: table;
+  color:red;
+  /*border:solid #1c140d 2px;
+ display: table;*/
+display: inline;
 }
 
 #error_explanation {
   width: 450px;
-  border: 2px solid #1c140d;
+  //border: 2px solid #1c140d;
+  border-top-left-radius:10px;
+    border-top-right-radius:10px;
+    border-bottom-left-radius:10px;
+    border-bottom-right-radius:10px;
+    /*increase roundness (for firefox)*/
+    -moz-border-radius-topleft: 10px;
+    -moz-border-radius-topright: 10px;
+    -moz-border-radius-bottomleft: 10px;
+    -moz-border-radius-bottomright: 10px;
+    /*increase roundness (for webkit)*/
+    -webkit-border-top-left-radius: 10px;
+    -webkit-border-top-right-radius: 10px;
+    -webkit-border-bottom-left-radius: 10px;
+    -webkit-border-bottom-right-radius: 10px;
+    border: 2px solid #cbe86b;
   padding: 7px;
   margin-bottom: 20px;
   background-color: #f0f0f0;
 }
 
 #error_explanation h2 {
+    border-top-left-radius:10px;
+    border-top-right-radius:10px;
+    /*increase roundness (for firefox)*/
+    -moz-border-radius-topleft: 10px;
+    -moz-border-radius-topright: 10px;
+    /*increase roundness (for webkit)*/
+    -webkit-border-top-left-radius: 10px;
+    -webkit-border-top-right-radius: 10px;
   text-align: left;
   font-weight: bold;
   padding: 5px 5px 5px 15px;

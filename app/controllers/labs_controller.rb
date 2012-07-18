@@ -31,7 +31,7 @@ class LabsController < ApplicationController
   # GET /labs/1.xml
   def show
     #@lab = Lab.find(params[:id])
-
+    @lab_vmt=LabVmt.new
     respond_to do |format|
       format.html # show.html.erb
       format.xml  { render :xml => @lab }
@@ -54,7 +54,9 @@ class LabsController < ApplicationController
   def edit
     #@lab = Lab.find(params[:id])
     @all_users=false
-    @user_count=all_lab_users.count
+    all_users=all_lab_users
+    @user_count=0;
+    @user_count=all_users.count if all_users!=nil 
     @all_users=true if User.all.count==@user_count
   end
 
@@ -81,7 +83,8 @@ class LabsController < ApplicationController
   # POST /labs.xml
   def create
     @lab = Lab.new(params[:lab])
-    
+    @all_users=false
+    @user_count=0
     respond_to do |format|
       if @lab.save
                 
@@ -102,7 +105,13 @@ class LabsController < ApplicationController
   # PUT /labs/1.xml
   def update
     @lab = Lab.find(params[:id])
-
+    
+    @all_users=false
+    all_users=all_lab_users
+    @user_count=0;
+    @user_count=all_users.count if all_users!=nil 
+    @all_users=true if User.all.count==@user_count
+    
     respond_to do |format|
       if @lab.update_attributes(params[:lab])
           
@@ -213,7 +222,7 @@ class LabsController < ApplicationController
         @lab_user.save
         #first time access to the lab
         @status="running"
-        @other=@other+@started
+        @other=@other+[@lab_user.lab]
       end
     else
       #the lab is not meant for this user, redirect
