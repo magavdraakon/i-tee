@@ -50,11 +50,14 @@ $('#menu-show').hide();
 $('#content').removeClass('side_visible');
 }
 
-// validate lab short description lenght
-var character_limit = 255;
-var description = $('#lab_short_description');
-var left = (character_limit-description.val().length);
-$('#charleft').text(left);
+if ($("#lab_short_description").length > 0){
+  // validate lab short description lenght only if there is such div
+  var character_limit = 255;
+  var description = $('#lab_short_description');
+  var left = (character_limit-description.val().length);
+  $('#charleft').text(left);
+}
+
 
 $('#lab_short_description').keydown(function(){
        
@@ -73,3 +76,10 @@ $('#lab_short_description').keydown(function(){
     });
 //document ready
 });
+
+
+function shownotice(html){
+// override the messages div content. all other notices will be removed
+  $("#messages").html("<div escape=\"false\" id=\"flash_notice\"></div>");
+  $("#flash_notice").html(html);
+}

@@ -175,6 +175,7 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
         end #end if right lab
       end #end iterate trough vms
     end#end if labuser
+    flash[:notice]=flash[:notice].html_safe
     redirect_to(redirect)
     rescue Timeout::Error
       flash[:alert]="Starting all virtual machines failed, try starting them one by one."
@@ -216,11 +217,12 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
        
       if @a.include?("masin #{vm.name} loodud")
         flash[:notice]=flash[:notice]+"<br/>"+vm.description
+        flash[:notice]=flash[:notice].html_safe
       else  
         @mac.vm_id=nil
         @mac.save
         flash[:notice]=nil
-        flash[:alert]="machine initialization failed."
+        flash[:alert]="Machine initialization <strong>failed</strong>.".html_safe
       end
     end
       
@@ -246,7 +248,7 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
     logger.info "käivitame masina pausimise skripti"
     a=@vm.pau_vm #the script is called in the model
       
-    flash[:notice] = "Successful vm pause.<br/> To resume the machine click on the resume link next to the machine name." 
+    flash[:notice] = "Successful vm pause.<br/> To resume the machine click on the resume link next to the machine name.".html_safe 
     logger.info a
     redirect_to(:back) 
   end
