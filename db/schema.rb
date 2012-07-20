@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120718105529) do
+ActiveRecord::Schema.define(:version => 20120720102704) do
 
   create_table "ckeditor_assets", :force => true do |t|
     t.string   "data_file_name",                                 :null => false
@@ -62,6 +62,8 @@ ActiveRecord::Schema.define(:version => 20120718105529) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "lab_vmts", ["name"], :name => "index_lab_vmts_on_name", :unique => true
 
   create_table "labs", :force => true do |t|
     t.string   "name"
@@ -130,6 +132,8 @@ ActiveRecord::Schema.define(:version => 20120718105529) do
     t.string   "password"
     t.text     "progress"
   end
+
+  add_index "vms", ["name"], :name => "index_vms_on_name", :unique => true
 
   create_table "vmts", :force => true do |t|
     t.string   "image"

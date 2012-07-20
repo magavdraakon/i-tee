@@ -7,7 +7,7 @@ class Vm < ActiveRecord::Base
   before_create :add_pw
   
   validates_presence_of :name, :lab_vmt_id, :user_id
-  
+  validates_uniqueness_of :name
   def rel_mac
     mac=Mac.find(:first, :conditions=>["vm_id=?", id])
     if mac!=nil
