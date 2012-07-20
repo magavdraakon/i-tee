@@ -1,24 +1,22 @@
-<p>Tere <%=current_user.username%>!</p>
-<p>Oled sisenenud EIK virtuaalaborite keskkonda i-Tee.</p>
-<p>Keskkonna kasutamiseks:</p>
-<ul>
-  <li>vali <strong>Labs</strong> menüüst kursus;</li>
-  <li>loe läbi õppematerjalid ja tee enesetestid;</li>
-  <li>käivita valitud kursus <strong>Start</strong> abil;</li>
-  <li>käivita labori virtuaalmasinad;</li>
-  <li>sisene käivitatud masinatesse (unix puhul ssh student@labori-ip);</li>
-  <li>tee laboritöö;</li>
-  <li>lõpeta labor kasutades <strong>End Lab</strong> nuppu</li>
-  <li>vajadusel katkesta labori sooritus ja salvesta virtuaalmasinate hetkeseis kasutades <strong>Pause</strong> nuppu</li>
-</ul>
-
-<p>käivitatud virtuaalmasin saab omale IP aadressi, virtuaalmasina kasutamiseks käsureal: <br/>
-    ssh student@IP<br/>
-    parool: student </p>
-    
-    
+<p>Hello, <%=current_user.username%>!</p>
+<p>You have logged into the IT College distance laboratory system i-Tee.</p>
 <%if @admin then%>
-  <p>Sa oled administraator</p>
-  <p>Emulated virtualization environment: <%= ITee::Application.config.emulate_virtualization %></p>
-  <p>Emulated ldap environment: <%= ITee::Application.config.emulate_ldap %></p>
+  <p>You are an administrator</p>
 <%end%>
+<%if @manager then%>
+  <p>You are a moderator</p>
+<%end%>
+
+<p>Using this system:</p>
+<ul>
+  <li>choose a lab from the <strong>Labs</strong> menu;</li>
+  <li>read trough the materials and do the tests;</li>
+  <li>start the chosen lab with the <strong>Start</strong> button;</li>
+  <li>start the virtual machines in the lab;</li>
+  <li>log into the machines (in case of unix: ssh given_username@given_ip );</li>
+  <li>do the lab;</li>
+  <li>end the lab by using the <strong>End Lab</strong> button</li>
+  <li>You can suspend the lab by pausing the machines by using the <strong>Pause</strong> button and continue the lab later</li>
+</ul>
+  
+    
