@@ -21,7 +21,7 @@
               <%=link_to 'Home', root_path%>
             </div>
             <div class="cb b_menu <% if @tab == "courses"%>current_tab<%end%>">
-              <%=link_to('Labs', all_labs_path)%>
+              <%=link_to('Labs', my_labs_path)%>
             </div>
             <div class="vb b_menu <% if @tab == "vms" %>current_tab<%end%>">
               <%=link_to 'My machines', vms_path %>
@@ -33,7 +33,7 @@
             <%end%>
             <%if @manager || @admin then %>
               <div class="mb b_menu <%if @tab=="manager"%>current_tab<%end%>">
-                <%=link_to 'Manage users', lab_users_path %>
+                <%=link_to 'Manage users', users_path %>
               </div>
             <%end%>
             <div class="logout b_menu">
@@ -56,9 +56,6 @@
             <%end%>
           </div>
           <div class="course s_menu <% if @tab == "courses" %>current_tab<%end%>"> 
-            <%= link_to_unless_current 'All labs', all_labs_path %>  
-            <%= link_to_unless_current 'Running labs', running_labs_path %>
-            <%= link_to_unless_current 'Completed labs', completed_labs_path %>
           </div>
           <div class="vms s_menu <% if @tab== "vms"%>current_tab<%end%>"> 
             <%= link_to_unless_current 'All virtual machines', vms_path %>
@@ -102,16 +99,15 @@
               <table>
                 <tr>
                   <td>
-                    <%=link_to_unless_current 'Users in labs', lab_users_path%><br/>
-                    <%=link_to_unless_current 'Add users by lab', add_users_path%>
-                  </td>
-                  <td>
                     <%=link_to 'Users', users_path %><br/>
                     <%=link_to 'New user', new_user_path%>
-                    
                   </td>
                   <td>
                     <%= link_to_unless_current 'Manage user tokens',  manage_tokens_path %>
+                  </td>
+                  <td>
+                    <%=link_to_unless_current 'Users in labs', lab_users_path%><br/>
+                    <%=link_to_unless_current 'Add users by lab', add_users_path%>
                   </td>
                 </tr>
               </table>

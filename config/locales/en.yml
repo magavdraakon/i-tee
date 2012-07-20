@@ -5,11 +5,11 @@ en:
   will_paginate:
     page_entries_info:
       single_page:
-        zero:  "No %{model}s found"
+        zero:  "No %{model} found"
         one:   "Displaying 1 %{model}"
         other: "Displaying all %{count} %{model}s"
       single_page_html:
-        zero:  "No %{model}s found"
+        zero:  "No %{model} found"
         one:   "Displaying <b>1</b> %{model}"
         other: "Displaying <b>all&nbsp;%{count}</b> %{model}s"
 

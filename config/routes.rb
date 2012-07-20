@@ -59,12 +59,11 @@ ITee::Application.routes.draw do
   
   match 'end_lab/:id', :to=>'labs#end_lab'
   match 'end_lab', :to=>'labs#end_lab'
+  match 'start_lab/:id', :to=>'labs#start_lab'
+  match 'start_lab', :to=>'labs#start_lab'
   match 'restart_lab/:id', :to=> 'labs#restart_lab'
   match 'restart_lab', :to=> 'labs#restart_lab'
-  match 'running_labs/:id', :to=> 'labs#running_lab'
-  match 'running_labs', :to=> 'labs#running_lab'
-  match 'completed_labs/:id', :to=> 'labs#ended_lab'
-  match 'completed_labs', :to=> 'labs#ended_lab'
+
   
   match 'add_users', :to=> 'lab_users#add_users'
   match 'lab_users/progress/:id', :to=> 'lab_users#progress'
@@ -74,8 +73,8 @@ ITee::Application.routes.draw do
   match 'vms_by_state', :to=>'vms#vms_by_state'
   match 'vms_by_state/:state', :to=>'vms#vms_by_state'
   
-  match 'all_labs/:id', :to => 'labs#courses'
-  match 'all_labs', :to =>'labs#courses'
+  match 'my_labs/:id', :to => 'labs#labs'
+  match 'my_labs', :to =>'labs#labs'
 
   
   # The priority is based upon order of creation:
