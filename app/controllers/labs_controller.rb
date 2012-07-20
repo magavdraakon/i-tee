@@ -161,9 +161,11 @@ class LabsController < ApplicationController
       # get the latest lab_user and all the needed info to show the lab
       @lab_user = LabUser.find(:last, :conditions=>["lab_id=? and user_id=?", @lab.id, current_user.id])
       @vms=Vm.find_by_sql(["select * from vms where user_id=? and lab_vmt_id in (select id from lab_vmts where lab_id=?)", current_user.id, @lab_user.lab_id])
-     
     end
-    
+    if @complete.include?(@lab) then
+      # get the latest lab_user and all the lab info with it
+      @lab_user = LabUser.find(:last, :conditions=>["lab_id=? and user_id=?", @lab.id, current_user.id])
+    end
     
     rescue ActiveRecord::RecordNotFound
       redirect_to(my_labs_path)
