@@ -10,4 +10,6 @@ class User < ActiveRecord::Base
   
   has_many :vms, :dependent => :destroy
   has_many :lab_users, :dependent => :destroy
+  validates_format_of :username, :with => /^[[:alnum:]]+$/, :message => "can only be alphanumeric with no spaces"
+  
 end
