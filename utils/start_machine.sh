@@ -113,7 +113,8 @@ LOPP
 
 #removing old instance
 virsh -c qemu:///system undefine $NAME || echo "No old instance...GOOD"
-virsh -c qemu:///system create $XML ||  echi "Creating instance $NAME filed" && exit 1
+#creating new instance
+virsh -c qemu:///system create $XML ||  echo "Creating instance $NAME filed" && exit 1
 
 for try in $(seq 1 20); do
   ping -c1 $IP_ADDR
