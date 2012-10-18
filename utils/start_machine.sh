@@ -42,7 +42,7 @@ done
 
 echo "alustan kopeerimist"
 cp $TEMPLATE $IMAGE || exit 1
-chgrp libvirtd $IMAGE
+chgrp libvirtd $IMAGE || exit 1
 #chown libvirt-qemu:kvm $IMAGE 
 echo "masin kopeeritud"
 
