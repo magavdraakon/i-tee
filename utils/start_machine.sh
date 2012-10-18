@@ -1,4 +1,5 @@
 #!/bin/bash
+#this script needs some error handling (if image does not exists or can't be copied to new location) - Margus Ernits
 if [ $# -ne 5 ]
 then 
 echo "anna viis argumenti (mac IP template name passwd)"
@@ -40,7 +41,7 @@ done
 
 
 echo "alustan kopeerimist"
-cp $TEMPLATE $IMAGE 
+cp $TEMPLATE $IMAGE || exit 1
 chgrp libvirtd $IMAGE
 #chown libvirt-qemu:kvm $IMAGE 
 echo "masin kopeeritud"
