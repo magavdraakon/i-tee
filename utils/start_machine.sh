@@ -111,7 +111,7 @@ cat > $XML << LOPP
 </domain>
 LOPP
 
-virsh -c qemu:///system create $XML || exit 1
+virsh -c qemu:///system create $XML || virsh -c qemu:///system undef $XML && virsh -c qemu:///system create $XML || exit 1
 for try in $(seq 1 20); do
   ping -c1 $IP_ADDR
   if [ $? -eq 0 ]; then
