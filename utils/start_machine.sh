@@ -122,9 +122,13 @@ cat > $XML << LOPP
 LOPP
 
 #removing old instance
-virsh -c qemu:///system undefine $NAME || echo "No old instance...GOOD"
+#virsh -c qemu:///system undefine $NAME || echo "No old instance...GOOD"
+
 #creating new instance
-virsh -c qemu:///system create $XML ||  (echo "Creating instance $NAME filed";exit 1) 
+virsh -c qemu:///system create $XML || {
+  echo "Creating instance $NAME filed"
+  exit 1
+}
 
 for try in $(seq 1 20); do
   ping -c1 $IP_ADDR
@@ -141,6 +145,14 @@ passwd student
 $PWD
 $PWD
 LOPP
+
+ssh -i /etc/itcollege/id_dsa -o 'StrictHostKeyChecking=no' root@$IP_ADDR uptime
+
+if [ $? -ne 0 ]
+then
+  echo "Problem connecting to the host"
+  exit 1
+fi
 
 echo "masin $NAME loodud"
 
