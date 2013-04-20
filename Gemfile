@@ -1,6 +1,6 @@
 source 'http://rubygems.org'
 
-gem 'rails', '3.2.13'
+gem 'rails', '3.1.12'
 
 group :development, :test do
     gem 'railroady'
