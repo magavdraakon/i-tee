@@ -1,6 +1,6 @@
 source 'http://rubygems.org'
 
-gem 'rails', '3.0.4'
+gem 'rails', '3.2.13'
 
 group :development, :test do
     gem 'railroady'
@@ -12,7 +12,7 @@ end
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 
 gem 'ckeditor', '3.4.2.pre'
-#gem "right_aws"
+
 gem 'will_paginate', '~> 3.0'
 
 group :production do
