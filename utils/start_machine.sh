@@ -2,10 +2,11 @@
 #this script needs some error handling (if image does not exists or can't be copied to new location) - Margus Ernits
 if [ $# -ne 5 ]
 then 
-echo "anna viis argumenti (mac IP template name passwd)"
-
+echo "Five arguments as mac IP template name password"
 exit 1
 fi
+
+ADMIN=mernits@itcollege.ee
 
 MAC=$1
 IP_ADDR=$2
@@ -15,6 +16,14 @@ PWD=$5
 VIRT_DIR="/var/lib/libvirt/images"
 IMAGE=$VIRT_DIR/$NAME.img
 XML=/etc/libvirt/qemu/$NAME.xml
+
+
+#check that imaged directory are owned by libvirt group
+ls -dl /var/lib/libvirt/images/ | awk '{ print $4 }' | grep libvirtd > /dev/null || {
+  echo "/var/lib/libvirt/images/ ownership is wrong"
+  echo "/var/lib/libvirt/images/ directory is not owned by libvirtd group" | mail $ADMIN -s ${hostname -f}
+  exit 2
+}
 
 echo "tekitan virtuaalmasina $NAME template-ist $TEMPLATE Mac aadressiga $MAC"
 #luua TEMPLATE põhjal koopia IMAGE
@@ -27,6 +36,7 @@ for i in $(basename $TEMPLATE | cut -d'.' -f1){1,2,3,4}.img; do
   if [ -f $(dirname $TEMPLATE)/$i ]; then
     echo 'exists';
     j=$VIRT_DIR/$NAME$NR.img
+    test -f $j && rm $j
     cp $(dirname $TEMPLATE)/$i $j
     chgrp libvirtd $j
     KETTAD=$KETTAD"<disk device='disk' type='file'>
@@ -114,7 +124,7 @@ LOPP
 #removing old instance
 virsh -c qemu:///system undefine $NAME || echo "No old instance...GOOD"
 #creating new instance
-virsh -c qemu:///system create $XML ||  echo "Creating instance $NAME filed" && exit 1
+virsh -c qemu:///system create $XML ||  (echo "Creating instance $NAME filed";exit 1) 
 
 for try in $(seq 1 20); do
   ping -c1 $IP_ADDR
