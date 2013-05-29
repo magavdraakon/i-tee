@@ -1,9 +1,15 @@
 <h1><%= @lab.name %></h1>
 <h3>Short description</h3>
-<%=@lab.short_description%>
+<div class="marked">
+  <%= @lab.short_description%>
+</div>
 <h3>Description visible to users</h3>
-<%=link_M raw @lab.description %>
+<div class="marked">
+  <%= link_M @lab.description %>
+</div>
 <p><%= link_to 'Edit lab', edit_lab_path(@lab), :class=>'button edit-button' if @admin%></p>
+
+
 <h3>Virtual machine templates in this lab</h3>
 <p>
   <% @lab.lab_vmts.each do |vmt| %>

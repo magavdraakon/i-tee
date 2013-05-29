@@ -18,7 +18,9 @@
 
 
 <h1><%=@lab.name %></h1>
-<%=link_M raw @lab.description %>
+<div class="marked">
+  <%=link_M @lab.description %>
+</div>
 <p>
   <%if @labs!=[] then%>
     <%title="Start lab"%>

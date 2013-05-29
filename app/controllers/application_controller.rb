@@ -11,8 +11,10 @@ class ApplicationController < ActionController::Base
   before_filter :check_for_cancel, :only => [:create, :update]
   before_filter :check_token
 
+  @per_page=ITee::Application.config.per_page
+
   if ITee::Application.config.emulate_ldap then
-     @admin = true
+    @admin = true
     @logged_in = true
     @username = "ttanav"
     #current_user = User.find(:first, :conditions=>["username=?", @username])
@@ -31,42 +33,39 @@ class ApplicationController < ActionController::Base
 
   #return true if the current user is a admin
   def admin?
-    if current_user == nil then
+    # if there is no logged in user, there is no admin
+    unless current_user then
       @admin = false
       return
     end
-    if  ITee::Application.config.admins.include?(current_user.username) then
-      @admin = true
-    else
-      @admin = false
-    end
+    # check config to see if the user is an admin (true/false)
+    @admin = current_user.admin? 
   end
   
+
   def manager?
-     if current_user == nil then
+    # if there is no logged in user, there is no manager
+    unless current_user then
       @manager = false
       return
     end
-    if  ITee::Application.config.managers.include?(current_user.username) then
-      @manager = true
-    else
-      @manager = false
-    end
+    # check config to see if the user is a manager (true/false)
+    @manager = current_user.manager?
   end
 
   
-  #redirect user if they are not admin but try to see things not meant for them
+   # redirect user if they are not admin but try to see things not meant for them
   def authorise_as_admin
-    unless ITee::Application.config.admins.include?(current_user.username)
+    unless @admin
       #You don't belong here. Go away.
       flash[:alert]  = "Restricted access!"
       redirect_to(:controller=>'home', :action=>'error_401')
       end
    end
   
-    #redirect user if they are not manager or admin but try to see things not meant for them
+   # redirect user if they are not manager (or admin) but try to see things not meant for them
   def authorise_as_manager
-    unless ITee::Application.config.managers.include?(current_user.username) || ITee::Application.config.admins.include?(current_user.username)
+    unless @manager || @admin
       #You don't belong here. Go away.
       flash[:alert]  = "Restricted access!"
       redirect_to(:controller=>'home', :action=>'error_401')       
@@ -109,19 +108,17 @@ class ApplicationController < ActionController::Base
   end
   
   def check_token
-    if params[:auth_token]!=nil then
-      # is tehre a token?
-      user=User.find(:first, :conditions=>["authentication_token=?", params[:auth_token]])
-      if user==nil then
-        #there is no such user. we dont need to do anything, devise will do it for us
-      else 
-        expiretime=user.token_expires
+    if params[:auth_token] then
+      # get the user with the given token
+      user=User.find_by_token(params[:auth_token])
+      # if there is such a user
+      if user then 
+        expiretime = user.token_expires
         logger.debug "the user: #{expiretime.inspect}"
         logger.debug "the time: #{DateTime.now().inspect}"
         # check if the token is still valid 
         if expiretime.to_datetime < DateTime.now() then
           #the token has expired already, deny the user access
-          
           redirect_to destroy_user_session_path
         end  
       end

@@ -262,7 +262,7 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
     @vm.description="Initialize the virtual machine by clicking <strong>Start</strong>."
     @vm.save
     flash[:notice] = "Successful vm deletion." 
-    @mac= Mac.find(:first, :conditions=>["vm_id=?", @vm.id])
+    @mac = Mac.find(:first, :conditions=>["vm_id=?", @vm.id])
     @mac.vm_id=nil
     @mac.save
     redirect_to(:back)

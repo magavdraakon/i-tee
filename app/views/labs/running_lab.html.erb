@@ -4,7 +4,9 @@
 
   <h1><%=@lab.name%></h1>
  
-  <%=link_M raw @lab.description%><br/>
+  <div class="marked">
+    <%=link_M @lab.description%>
+  </div>
     
   <!-- started at: <%#=@lab_user.start%><br/>
     ended at: <%#=@lab_user.end%><br/>-->

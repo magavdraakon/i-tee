@@ -58,7 +58,7 @@ if ($("#lab_short_description").length > 0){
   $('#charleft').text(left);
 }
 
-
+// validate input lenght
 $('#lab_short_description').keydown(function(){
        
         var characters_left = (character_limit-description.val().length);
@@ -74,6 +74,51 @@ $('#lab_short_description').keydown(function(){
             return false;
         }
     });
+
+
+
+
+marked.setOptions({
+  gfm: true,
+  tables: true,
+  breaks: false,
+  pedantic: false,
+  sanitize: true,
+  smartLists: true,
+  langPrefix: 'language-',
+  highlight: function(code, lang) {
+    if (lang === 'js') {
+      return highlighter.javascript(code);
+    }
+    return code;
+  }
+});
+//console.log(marked('i am using __markdown__.'));
+
+
+
+
+// go over all marked class elements
+$(".marked").each(function(){
+  //console.log($(this).text());
+  $(this).html(marked($(this).text()));
+
+});
+
+// go over all the code examples, add classes depending on where it is situated at
+$(".marked code").each(function(){
+  // all code should use the prettyprint lib
+  $(this).addClass("prettyprint");
+
+  //console.log($(this).parent()[0].tagName);
+  // but only code with multiple lines should have line numbers
+  if ($(this).parent()[0].tagName!="P"){
+    $(this).addClass("linenums");
+    $(this).parent().css('background','black');
+  }
+});
+
+prettyPrint();
 //document ready
 });
 

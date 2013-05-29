@@ -326,11 +326,10 @@ class LabsController < ApplicationController
         @note="Machine #{vm.name} successfully deleted."
       end
       #end of deleting vms for this lab
-   
-      if @note!="" then
-        @lab_user.end=Time.now
-        @lab_user.save
-      end
+  
+      @lab_user.end=Time.now
+      @lab_user.save 
+      
       redirect_to(my_labs_path+"/"+@lab_user.lab.id.to_s)
     else #this lab doesnt belong to this user, permission error
       flash[:alert]  = "Restricted access!"
@@ -361,6 +360,7 @@ class LabsController < ApplicationController
       redirect_to(my_labs_path)
   end
   
+
   private #----------------------------------------------------------------------------------
    def get_user_labs
     @labs=[] #only let the users pick from labs assigned to them

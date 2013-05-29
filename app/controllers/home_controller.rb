@@ -1,6 +1,8 @@
 class HomeController < ApplicationController
   before_filter :authorise_as_admin, :only=>[:system_info, :template_info]
   before_filter :home_tab, :except=>[:about]
+
+
   def index
   end
 
@@ -17,7 +19,7 @@ class HomeController < ApplicationController
   
   #this is a method that updates a lab_users progress
   #input parameters: ip (the machine, the report is about)
-  #           progress (the progress for the machine)
+  #                  progress (the progress for the machine)
   def getprogress
     #render :layout => false
     #who sent the info? 

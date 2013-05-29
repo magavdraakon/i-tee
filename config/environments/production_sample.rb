@@ -16,6 +16,9 @@ ITee::Application.configure do
    #Administrator and manager usernames
   config.admins = ['admin']
   config.managers = ['manager']
+
+   # determine how many instances are shown per page
+  config.per_page=15
   
   # For nginx:
   # config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect'
