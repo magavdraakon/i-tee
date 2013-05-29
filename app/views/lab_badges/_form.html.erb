@@ -1,0 +1,34 @@
+<%= form_for(@lab_badge) do |f| %>
+  <% if @lab_badge.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@lab_badge.errors.count, "error") %> prohibited this lab_badge from being saved:</h2>
+
+      <ul>
+      <% @lab_badge.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :lab_id %><br />
+    <%= f.number_field :lab_id %>
+    <%=collection_select(:lab_vmt, :lab_id, Lab.all, :id, :name,{:prompt => true})%> 
+  </div>
+  <div class="field">
+    <%= f.label :badge_id %><br />
+    <%= f.number_field :badge_id %>
+  </div>
+  <div class="field">
+    <%= f.label :name %><br />
+    <%= f.text_field :name %>
+  </div>
+   <div class="field">
+    <%= f.label :description %><br />
+    <%= f.text_area :description %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

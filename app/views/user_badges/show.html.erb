@@ -1,0 +1,15 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>User:</b>
+  <%= @user_badge.user_id %>
+</p>
+
+<p>
+  <b>Lab badge:</b>
+  <%= @user_badge.lab_badge_id %>
+</p>
+
+
+<%= link_to 'Edit', edit_user_badge_path(@user_badge) %> |
+<%= link_to 'Back', user_badges_path %>

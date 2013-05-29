@@ -10,7 +10,14 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120720102704) do
+ActiveRecord::Schema.define(:version => 20131014133943) do
+
+  create_table "badges", :force => true do |t|
+    t.string   "icon"
+    t.string   "placeholder"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "ckeditor_assets", :force => true do |t|
     t.string   "data_file_name",                                 :null => false
@@ -42,6 +49,17 @@ ActiveRecord::Schema.define(:version => 20120720102704) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "lab_badges", :force => true do |t|
+    t.integer  "lab_id"
+    t.integer  "badge_id"
+    t.string   "name"
+    t.text     "description"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "lab_badges", ["lab_id", "name"], :name => "index_lab_badges_on_lab_id_and_name", :unique => true
 
   create_table "lab_users", :force => true do |t|
     t.integer  "lab_id"
@@ -93,6 +111,13 @@ ActiveRecord::Schema.define(:version => 20120720102704) do
     t.string   "name"
     t.string   "icon"
     t.text     "connection_help"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "user_badges", :force => true do |t|
+    t.integer  "user_id"
+    t.integer  "lab_badge_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

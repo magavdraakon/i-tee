@@ -1,4 +1,10 @@
 ITee::Application.routes.draw do
+  resources :user_badges
+
+  resources :lab_badges
+
+  resources :badges
+
   resources :operating_systems
 
   match 'users/sign_up', :to=>'home#catcher'

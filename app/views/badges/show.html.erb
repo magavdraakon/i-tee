@@ -1,0 +1,15 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Icon:</b>
+  <%= @badge.icon %>
+</p>
+
+<p>
+  <b>Placeholder:</b>
+  <%= @badge.placeholder %>
+</p>
+
+
+<%= link_to 'Edit', edit_badge_path(@badge) %> |
+<%= link_to 'Back', badges_path %>

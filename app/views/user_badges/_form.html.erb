@@ -1,0 +1,25 @@
+<%= form_for(@user_badge) do |f| %>
+  <% if @user_badge.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@user_badge.errors.count, "error") %> prohibited this user_badge from being saved:</h2>
+
+      <ul>
+      <% @user_badge.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :user_id %><br />
+    <%= f.number_field :user_id %>
+  </div>
+  <div class="field">
+    <%= f.label :lab_badge_id %><br />
+    <%= f.number_field :lab_badge_id %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

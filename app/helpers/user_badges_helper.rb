@@ -1,0 +1,2 @@
+module UserBadgesHelper
+end

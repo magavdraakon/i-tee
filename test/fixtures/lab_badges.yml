@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  lab_id: 1
+  badge_id: 1
+  name: MyString
+
+two:
+  lab_id: 1
+  badge_id: 1
+  name: MyString
