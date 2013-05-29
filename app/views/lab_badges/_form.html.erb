@@ -13,12 +13,11 @@
 
   <div class="field">
     <%= f.label :lab_id %><br />
-    <%= f.number_field :lab_id %>
-    <%=collection_select(:lab_vmt, :lab_id, Lab.all, :id, :name,{:prompt => true})%> 
+    <%=collection_select(:lab_badge, :lab_id, Lab.all, :id, :name,{:prompt => true})%> 
   </div>
   <div class="field">
     <%= f.label :badge_id %><br />
-    <%= f.number_field :badge_id %>
+    <%=collection_select(:lab_badge, :badge_id, Badge.all, :id, :icon,{:prompt => true})%> 
   </div>
   <div class="field">
     <%= f.label :name %><br />

@@ -1,2 +1,15 @@
 <h2><%= @user.username %></h2>
 
+<% @user.lab_users.each do |u_lab| %>
+<div> 
+	<span class="labname">
+		<%=u_lab.lab.name%>
+	</span>
+	<% u_lab.lab.lab_badges.each do |l_badge| %>
+		<%= image_tag( l_badge.badge.icon, :size => "40x30", :alt => l_badge.name ) if @user.has_badge(l_badge.id) %>
+		<%= image_tag( l_badge.badge.placeholder, :size => "40x30", :alt => l_badge.name ) unless @user.has_badge(l_badge.id) %>
+	<%end%>
+</div>
+
+
+<% end %>
