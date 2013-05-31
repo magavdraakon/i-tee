@@ -1,25 +1,23 @@
-<h1>Listing badges</h1>
-
+<h3>Listing badges</h3>
+<div id="index_t">
 <table>
+  <thead>
   <tr>
     <th>Icon</th>
     <th>Placeholder</th>
     <th></th>
-    <th></th>
-    <th></th>
+  
   </tr>
-
+</thead>
 <% @badges.each do |badge| %>
   <tr>
-    <td><%= badge.icon %></td>
-    <td><%= badge.placeholder %></td>
-    <td><%= link_to 'Show', badge %></td>
-    <td><%= link_to 'Edit', edit_badge_path(badge) %></td>
-    <td><%= link_to 'Destroy', badge, :confirm => 'Are you sure?', :method => :delete %></td>
+    <td><%= image_tag badge.icon , :size => "25x30", :alt=>"icon" %></td>
+    <td><%= image_tag badge.placeholder , :size => "25x30", :alt=>"placeholder"%></td>
+    <td><%= link_to 'Show', badge, :class=> 'show-button button' %><%= link_to 'Edit', edit_badge_path(badge) ,:class=> 'edit-button button'%><%= link_to 'Destroy', badge, :confirm => 'Are you sure?', :method => :delete , :class=> 'delete-button button'%></td>
   </tr>
 <% end %>
 </table>
 
-<br />
+</div>
 
 <%= link_to 'New Badge', new_badge_path %>

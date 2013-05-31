@@ -96,6 +96,10 @@ class ApplicationController < ActionController::Base
     @tab="manager"
   end
 
+  def user_tab
+    @tab="user"
+  end
+
   def check_for_cancel
     if params[:commit] == "Cancel"
       if params[:controller]=="vms" then

@@ -1,4 +1,6 @@
 class BadgesController < ApplicationController
+
+   before_filter :admin_tab
   # GET /badges
   # GET /badges.json
   def index

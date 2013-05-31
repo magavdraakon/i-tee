@@ -1,6 +1,7 @@
 class UsersController < ApplicationController
-  before_filter :authorise_as_manager
-  before_filter :manager_tab
+  before_filter :authorise_as_manager, :except=>['show']
+  before_filter :manager_tab, :except=>['show']
+  before_filter :user_tab, :only=>['show']
   
   def index
     @users= User.find_by_sql("select id, username, last_sign_in_at, ldap, email, last_sign_in_ip from users")

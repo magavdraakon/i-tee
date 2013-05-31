@@ -48,7 +48,7 @@
 <h3>Badges in this lab</h3>
 <p>
   <% @lab.lab_badges.each do |lab_badge| %>
-    <%= image_tag( lab_badge.badge.icon, :size => "40x30", :alt=> lab_badge.name) %>
+    <%= image_tag( lab_badge.badge.icon, :size => "50x60", :alt=> lab_badge.name) %>
     <%=link_to("edit", edit_lab_badge_path(lab_badge.id), :class=>"button edit-button", :title=>"Edit the badge in this lab")%>  
     <%= link_to("remove", lab_badge ,:confirm => 'Are you sure?', :method=>:delete, :class=>"button delete-button", :title=>"Remove the template from this lab")%> <br/>
   <%end%>

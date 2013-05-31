@@ -1,27 +1,25 @@
-<h1>Listing lab_badges</h1>
-
+<h3>Listing lab_badges</h3>
+<div id="index_t">
 <table>
+  <thead>
   <tr>
     <th>Lab</th>
     <th>Badge</th>
     <th>Name</th>
     <th></th>
-    <th></th>
-    <th></th>
+    
   </tr>
-
+</thead>
 <% @lab_badges.each do |lab_badge| %>
   <tr>
-    <td><%= lab_badge.lab_id %></td>
-    <td><%= lab_badge.badge_id %></td>
+    <td><%= lab_badge.lab.name %></td>
+    <td><%= image_tag lab_badge.badge.icon, :size => "25x30", :alt=> lab_badge.name %></td>
     <td><%= lab_badge.name %></td>
-    <td><%= link_to 'Show', lab_badge %></td>
-    <td><%= link_to 'Edit', edit_lab_badge_path(lab_badge) %></td>
-    <td><%= link_to 'Destroy', lab_badge, :confirm => 'Are you sure?', :method => :delete %></td>
+    <td><%= link_to 'Show', lab_badge, :class=> 'show-button button' %><%= link_to 'Edit', edit_lab_badge_path(lab_badge),:class=> 'edit-button button' %><%= link_to 'Destroy', lab_badge, :confirm => 'Are you sure?', :method => :delete, :class=> 'delete-button button' %></td>
   </tr>
 <% end %>
 </table>
 
-<br />
+</div>
 
 <%= link_to 'New Lab badge', new_lab_badge_path %>

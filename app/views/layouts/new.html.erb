@@ -39,9 +39,16 @@
                 <%=link_to 'Manage users', users_path %>
               </div>
             <%end%>
-            <div class="logout b_menu">
+            <div class="r_menu b_menu">
               <%# if user_signed_in? %>
-              <%= link_to "Sign out (#{current_user.username})", destroy_user_session_path %>
+              <%= link_to "Sign out", destroy_user_session_path %>
+              <%# elsif @logged_in %>
+              <%#= link_to "Sign out", destroy_user_session_path %>
+              <%# end %>
+            </div>
+             <div class="r_menu b_menu <%if @tab=="user"%>current_tab<%end%>">
+              <%# if user_signed_in? %>
+              <%= link_to "#{current_user.username}", current_user %>
               <%# elsif @logged_in %>
               <%#= link_to "Sign out", destroy_user_session_path %>
               <%# end %>
@@ -58,14 +65,13 @@
               <%=link_to_unless_current('System guide', system_path) %>  
             <%end%>
           </div>
-          <div class="course s_menu <% if @tab == "courses" %>current_tab<%end%>"> 
-          </div>
-          <div class="vms s_menu <% if @tab== "vms"%>current_tab<%end%>"> 
+          <div class="course s_menu <% if @tab == "courses" %>current_tab<%end%>"></div>
+          <div class="vms s_menu <% if @tab== "vms"%>current_tab<%end%>">
             <%= link_to_unless_current 'All virtual machines', vms_path %>
             <%= link_to_unless_current('Virtual machines by state', vms_by_state_path) %>
             <%= link_to_unless_current('Virtual machines by lab', vms_by_lab_path) %>
           </div>
-          
+          <div class="course s_menu <% if @tab == "user" %>current_tab<%end%>"> </div>
           <%if  @admin then  %>
             <div class="admin s_menu <% if @tab=="admin"%>current_tab<%end%>">
               <table>
@@ -92,6 +98,11 @@
                     <%= link_to_unless_current 'New Host', new_host_path %><br/>
                     <%= link_to_unless_current('Operating systems', operating_systems_path) %><br/>
                     <%= link_to_unless_current 'New operating system', new_operating_system_path %>
+                  </td>
+                   <td>
+                    <%= link_to_unless_current('Badges', badges_path) %><br/>
+                    <%= link_to_unless_current 'Lab badges', lab_badges_path %><br/>
+                    <%= link_to_unless_current('User badges', user_badges_path) %><br/>
                   </td>
                 </tr>
               </table>
