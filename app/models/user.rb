@@ -28,7 +28,7 @@ class User < ActiveRecord::Base
   end
 
   def has_badge(lab_badge_id)
-    ub=UserBadge.find(:all, :conditions=>["lab_badge_id=? and id=?", lab_badge_id, id])
+    ub=UserBadge.find(:all, :conditions=>["lab_badge_id=? and user_id=?", lab_badge_id, id])
     return ub.count>0
   end
 

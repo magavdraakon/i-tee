@@ -539,6 +539,14 @@ div.buttons {
   display:block;
 }
 
+/* PROFILE */
+.ProfileLabname {
+  font-size: 1.3em;
+}
+.ProfileBadge{
+    vertical-align: middle;
+}
+
 /* overall text */
 
 
