@@ -21,7 +21,7 @@ XML=/etc/libvirt/qemu/$NAME.xml
 #check that imaged directory are owned by libvirt group
 ls -dl /var/lib/libvirt/images/ | awk '{ print $4 }' | grep libvirtd > /dev/null || {
   echo "/var/lib/libvirt/images/ ownership is wrong"
-  echo "/var/lib/libvirt/images/ directory is not owned by libvirtd group" | mail $ADMIN -s ${hostname -f}
+  echo "/var/lib/libvirt/images/ directory is not owned by libvirtd group" | mail $ADMIN -s $(hostname -f)
   exit 2
 }
 
