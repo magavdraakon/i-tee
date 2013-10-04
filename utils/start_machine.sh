@@ -124,7 +124,7 @@ LOPP
 #removing old instance
 virsh -c qemu:///system undefine $NAME || echo "No old instance...GOOD"
 
-[ test -f $XML ] && {
+[[ -f $XML ]] && {
   echo "Removing old XML file" 
   rm "$XML"
 }
