@@ -77,7 +77,7 @@
           <a href="https://<%= request.host if vm.mac!=nil%>:8<%= vm.mac.ip.split('.').last %>" title="Login" target='_blank' class="button login-button">Login</a>
         <%end%>
 
-        <%=  %>
+        
         <span class="loader">
           <%= link_to('Start',start_vm_path+"/"+vm.id.to_s, :class=>"button start-button") if (state!="running" && state!="paused") || vm.mac==nil%>
           <%= link_to('Pause', pause_vm_path+"/"+vm.id.to_s, :class=>'button pause-button') if state=="running" && vm.mac!=nil %>
