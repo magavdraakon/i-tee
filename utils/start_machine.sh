@@ -122,8 +122,12 @@ cat > $XML << LOPP
 LOPP
 
 #removing old instance
-#virsh -c qemu:///system undefine $NAME || echo "No old instance...GOOD"
+virsh -c qemu:///system undefine $NAME || echo "No old instance...GOOD"
 
+[ test -f $XML ] && {
+  echo "Removing old XML file" 
+  rm "$XML"
+}
 #creating new instance
 virsh -c qemu:///system create $XML || {
   echo "Creating instance $NAME filed"
