@@ -56,6 +56,14 @@ chgrp libvirtd $IMAGE || exit 1
 #chown libvirt-qemu:kvm $IMAGE 
 echo "masin kopeeritud"
 
+#removing old instance
+virsh -c qemu:///system undefine $NAME || echo "No old instance...GOOD"
+
+[[ -f $XML ]] && {
+  echo "Removing old XML file" 
+  rm "$XML"
+}
+
 cat > $XML << LOPP
 <domain type='kvm'>
   <name>$NAME</name>
@@ -121,13 +129,7 @@ cat > $XML << LOPP
 </domain>
 LOPP
 
-#removing old instance
-virsh -c qemu:///system undefine $NAME || echo "No old instance...GOOD"
 
-[[ -f $XML ]] && {
-  echo "Removing old XML file" 
-  rm "$XML"
-}
 #creating new instance
 virsh -c qemu:///system create $XML || {
   echo "Creating instance $NAME filed"
