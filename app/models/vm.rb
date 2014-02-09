@@ -37,7 +37,7 @@ class Vm < ActiveRecord::Base
   end
   
   def ini_vm
-    return %x(/var/www/railsapps/i-tee/utils/start_machine.sh #{mac.mac} #{mac.ip} #{lab_vmt.vmt.image} #{name} #{password} 2>&1)
+    return %x(sudo -u vbox /var/www/railsapps/i-tee/utils/start_machine.sh #{mac.mac} #{mac.ip} #{lab_vmt.vmt.image} #{name} #{password} 2>&1)
   end
   
   def state
