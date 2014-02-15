@@ -438,6 +438,11 @@ To see the site go to
 
 please refer to the system guide (/system) page to enable working with virtual machines from the user interface
 
+#TODO
+
+	www-data ALL=(vbox) NOPASSWD: /var/www/railsapps/i-tee/utils/start_machine.sh
+
+
 # Authors
 Tiia Tänav
 
