@@ -1,13 +1,28 @@
 #!/bin/bash
 #this script needs some error handling (if image does not exists or can't be copied to new location) - Margus Ernits
+#TODO get important paremeters from config (ADMIN, VIRT_DIR, XML, etc)
 if [ $# -ne 5 ]
 then 
 echo "Five arguments as mac IP template name password"
 exit 1
 fi
 
-echo "Kasutaja $(id -a)"
-exit 1
+id | grep vboxusers > /dev/null
+
+
+if [ $? -eq 0 ]
+then
+    echo "Using $(id) to execute virtual machines"
+else
+    echo "Script is started with user $(id)"
+    echo "Please add user to vboxusers group or use other user who able to start VirtualBox machines"
+    exit 1
+fi
+
+echo "script ended"
+
+
+#TODO SSH pordi suunamine VBoxManage abil
 
 ADMIN=mernits@itcollege.ee
 
@@ -20,124 +35,29 @@ VIRT_DIR="/var/lib/libvirt/images"
 IMAGE=$VIRT_DIR/$NAME.img
 XML=/etc/libvirt/qemu/$NAME.xml
 
-
-#check that imaged directory are owned by libvirt group
-ls -dl /var/lib/libvirt/images/ | awk '{ print $4 }' | grep libvirtd > /dev/null || {
-  echo "/var/lib/libvirt/images/ ownership is wrong"
-  echo "/var/lib/libvirt/images/ directory is not owned by libvirtd group" | mail $ADMIN -s $(hostname -f)
-  exit 2
-}
-
 echo "tekitan virtuaalmasina $NAME template-ist $TEMPLATE Mac aadressiga $MAC"
-#luua TEMPLATE põhjal koopia IMAGE
+#TODO test if --name exists then remove old one
+time VBoxManage clonevm $TEMPLATE --name $NAME --register
 
-NR=1
-LETTER=('a' 'b' 'c' 'd' 'e')
-KETTAD=""
-for i in $(basename $TEMPLATE | cut -d'.' -f1){1,2,3,4}.img; do 
-  echo $i; 
-  if [ -f $(dirname $TEMPLATE)/$i ]; then
-    echo 'exists';
-    j=$VIRT_DIR/$NAME$NR.img
-    test -f $j && rm $j
-    cp $(dirname $TEMPLATE)/$i $j
-    chgrp libvirtd $j
-    KETTAD=$KETTAD"<disk device='disk' type='file'>
-      <driver name='qemu' type='qcow2'/>
-      <source file='$j'/>
-      <target bus='virtio' dev='vd"${LETTER[$NR]}"'/>
-      <address bus='0x00' domain='0x0000' type='pci' function='0x0' slot='0x1$NR'/>
-    </disk>"
-  fi
-  NR=$(($NR+1))
-done
+if [ $? -ne 0 ]
+then
+#echo "Clone VM failed"
+echo "Virtual Machine clonig fails $TEMPLATE $NAME" 
+#| mail $ADMIN -s $(hostname -f)
+exit 1
+fi
 
+VBoxHeadless --startvm $NAME
+if [ $? -ne 0 ]
+then
+#echo "Starting VM failed"
+echo "Virtual Machine start from $TEMPLATE with name: $NAME Failed" 
+#| mail $ADMIN -s $(hostname -f)
+exit 1
+fi
 
-echo "alustan kopeerimist"
-cp $TEMPLATE $IMAGE || exit 1
-chgrp libvirtd $IMAGE || exit 1
-#chown libvirt-qemu:kvm $IMAGE 
-echo "masin kopeeritud"
-
-#removing old instance
-virsh -c qemu:///system undefine $NAME || echo "No old instance...GOOD"
-
-[[ -f $XML ]] && {
-  echo "Removing old XML file" 
-  rm "$XML"
-}
-
-cat > $XML << LOPP
-<domain type='kvm'>
-  <name>$NAME</name>
-  <uuid>$(uuid)</uuid>
-  <memory>524288</memory>
-  <currentMemory>524288</currentMemory>
-  <vcpu>1</vcpu>
-  <os>
-    <type machine='pc-0.12' arch='x86_64'>hvm</type>
-    <boot dev='hd'/>
-  </os>
-  <features>
-    <acpi/>
-    <apic/>
-    <pae/>
-  </features>
-  <clock offset='utc'/>
-  <on_poweroff>destroy</on_poweroff>
-  <on_reboot>restart</on_reboot>
-  <on_crash>restart</on_crash>
-  <devices>
-    <emulator>/usr/bin/kvm</emulator>
-    <disk device='disk' type='file'>
-      <driver name='qemu' type='qcow2'/>
-      <source file='$IMAGE'/>
-      <target bus='virtio' dev='vda'/>
-      <address bus='0x00' domain='0x0000' type='pci' function='0x0' slot='0x05'/>
-    </disk>
-    $KETTAD
-    <disk device='cdrom' type='block'>
-      <driver name='qemu' type='raw'/>
-      <target bus='ide' dev='hdc'/>
-      <readonly/>
-      <address bus='1' type='drive' unit='0' controller='0'/>
-    </disk>
-    <controller type='ide' index='0'>
-      <address bus='0x00' domain='0x0000' type='pci' function='0x1' slot='0x01'/>
-    </controller>
-    <interface type='bridge'>
-      <source bridge='br0'/>
-      <mac address='$MAC'/>
-      <model type='e1000'/>
-    </interface>
-    <serial type='pty'>
-      <target port='0'/>
-    </serial>
-    <console type='pty'>
-      <target port='0' type='serial'/>
-    </console>
-    <input bus='ps2' type='mouse'/>
-    <graphics port='-1' type='vnc' autoport='yes'/>
-    <sound model='ac97'>
-      <address bus='0x00' domain='0x0000' type='pci' function='0x0' slot='0x04'/>
-    </sound>
-    <video>
-      <model type='cirrus' heads='1' vram='9216'/>
-      <address bus='0x00' domain='0x0000' type='pci' function='0x0' slot='0x02'/>
-    </video>
-    <memballoon model='virtio'>
-      <address bus='0x00' domain='0x0000' type='pci' function='0x0' slot='0x06'/>
-    </memballoon>
-  </devices>
-</domain>
-LOPP
-
-
-#creating new instance
-virsh -c qemu:///system create $XML || {
-  echo "Creating instance $NAME filed"
-  exit 1
-}
+echo "END!"
+exit 0
 
 for try in $(seq 1 20); do
   ping -c1 $IP_ADDR
