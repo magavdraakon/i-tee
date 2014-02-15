@@ -47,7 +47,7 @@ echo "Virtual Machine clonig fails $TEMPLATE $NAME"
 exit 1
 fi
 
-VBoxHeadless --startvm $NAME
+nohup VBoxHeadless --startvm $NAME &
 if [ $? -ne 0 ]
 then
 #echo "Starting VM failed"
