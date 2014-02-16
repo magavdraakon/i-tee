@@ -44,9 +44,13 @@ class Vm < ActiveRecord::Base
     #TODO - state is libvirt specific
     #retunr values are running, paused, 
     #return %x(virsh -c qemu:///system domstate #{name} 2>&1).split(' ').first.rstrip
-    state = %x(VBoxManage showvminfo ubuntu-server-mernits|grep -E '^State:').split(' ')[1].lstrip
     #state  powered off, running, paused
-    case state
+    ret = %x[sudo -u vbox /usr/bin/VBoxManage showvminfo #{name}|grep -E '^State:']
+    r = "#{ret}".split(' ')[1]
+
+    #Rails.logger.warn ret.split(' ')[1]
+    Rails.logger.warn "VM #{name} state is: #{r}"
+    case r
     when 'running'
       return 'running'
     when 'paused'
@@ -57,4 +61,5 @@ class Vm < ActiveRecord::Base
       return 'stopped'
     end
   end
+
 end
