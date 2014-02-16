@@ -41,6 +41,20 @@ class Vm < ActiveRecord::Base
   end
   
   def state
-    return %x(virsh -c qemu:///system domstate #{name} 2>&1).split(' ').first.rstrip
+    #TODO - state is libvirt specific
+    #retunr values are running, paused, 
+    #return %x(virsh -c qemu:///system domstate #{name} 2>&1).split(' ').first.rstrip
+    state = %x(VBoxManage showvminfo ubuntu-server-mernits|grep -E '^State:').split(' ')[1].lstrip
+    #state  powered off, running, paused
+    case state
+    when 'running'
+      return 'running'
+    when 'paused'
+      return 'paused'
+    when 'powered off'
+      return 'stopped'
+    else
+      return 'stopped'
+    end
   end
 end
