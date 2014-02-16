@@ -25,15 +25,15 @@ class Vm < ActiveRecord::Base
   end
 
   def del_vm
-    return %x(/var/www/railsapps/i-tee/utils/stop_machine.sh #{name}  2>&1)
+    return %x(sudo -u vbox /var/www/railsapps/i-tee/utils/stop_machine.sh #{name}  2>&1)
   end
   
   def res_vm
-    return %x(/var/www/railsapps/i-tee/utils/resume_machine.sh #{name}  2>&1)
+    return %x(sudo -u vbox /var/www/railsapps/i-tee/utils/resume_machine.sh #{name}  2>&1)
   end
   
   def pau_vm
-    return %x(/var/www/railsapps/i-tee/utils/pause_machine.sh #{name}  2>&1)
+    return %x(sudo -u vbox /var/www/railsapps/i-tee/utils/pause_machine.sh #{name}  2>&1)
   end
   
   def ini_vm
