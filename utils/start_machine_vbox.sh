@@ -57,7 +57,9 @@ echo "Virtual Machine start from $TEMPLATE with name: $NAME Failed"
 exit 1
 fi
 
-echo "END!"
+echo "masin $NAME loodud"
+
+
 exit 0
 
 for try in $(seq 1 20); do
