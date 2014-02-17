@@ -212,7 +212,12 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
       logger.info "käivitame masina skripti"
       @a=vm.ini_vm #the script is called in the model
       logger.info @a
-      vm.description="machine #{@mac.mac} with IP address of #{@mac.ip}<br/>Create a connection with this machine using <strong>ssh #{vm.lab_vmt.vmt.username}@#{@mac.ip}</strong><br/>The set password for this machine is <strong>#{vm.password}</strong>"
+      #vm.description="machine #{@mac.mac} with IP address of #{@mac.ip}<br/>Create a connection with this machine using <strong>ssh #{vm.lab_vmt.vmt.username}@#{@mac.ip}</strong><br/>The set password for this machine is <strong>#{vm.password}</strong>"
+      port=@mac.ip.split('.').last
+      vm.description="
+      To create a connection with this machine using linux/unix use 
+      <strong>rdesktop -5 -u #{current_user.id} -p#{vm.password} -N -a 16   elab.itcollege.ee:#{port}</strong>"
+      
       vm.save
        
       if @a.include?("masin #{vm.name} loodud")
