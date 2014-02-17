@@ -215,8 +215,8 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
       #vm.description="machine #{@mac.mac} with IP address of #{@mac.ip}<br/>Create a connection with this machine using <strong>ssh #{vm.lab_vmt.vmt.username}@#{@mac.ip}</strong><br/>The set password for this machine is <strong>#{vm.password}</strong>"
       port=@mac.ip.split('.').last
       vm.description="
-      To create a connection with this machine using linux/unix use 
-      <strong>rdesktop -u#{@labuser} -p#{vm.password} -N -a16 elab.itcollege.ee:10#{port}</strong>"
+      To create a connection with this machine using linux/unix use<br/> 
+      <strong>rdesktop -u#{current_user.username} -p#{vm.password} -N -a16 elab.itcollege.ee:10#{port}</strong>"
       
       vm.save
        
