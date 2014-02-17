@@ -35,6 +35,9 @@ VIRT_DIR="/var/lib/libvirt/images"
 IMAGE=$VIRT_DIR/$NAME.img
 XML=/etc/libvirt/qemu/$NAME.xml
 
+
+
+
 echo "tekitan virtuaalmasina $NAME template-ist $TEMPLATE Mac aadressiga $MAC"
 #TODO test if --name exists then remove old one
 time VBoxManage clonevm $TEMPLATE --name $NAME --register
@@ -47,10 +50,19 @@ echo "Virtual Machine clonig fails $TEMPLATE $NAME"
 exit 1
 fi
 
+
+echo "PWDHASH=$(VBoxManage internalcommands passwordhash $PWD)"
+echo "VBoxManage setextradata $NAME  "VBoxAuthSimple/users/${NAME##*-}" $PWDHASH"
+
+PWDHASH=$(VBoxManage internalcommands passwordhash $PWD)
+VBoxManage setextradata $NAME  "VBoxAuthSimple/users/${NAME##*-}" $PWDHASH
+
+
 #VBoxManage modifyvm ubuntu-server-mernits  --intnet2 "2014mernits"
 
 INTERNALNETNAME=$(date +%Y)${NAME##*-}
-VBoxManage modifyvm $NAME  --intnet2 $INTERNALNAME
+
+VBoxManage modifyvm $NAME  --intnet2 $INTERNALNETNAME
 VBoxManage startvm $NAME --type headless
 
 if [ $? -ne 0 ]
