@@ -8,6 +8,11 @@ fi
 
 NAME=$1
 
-echo "pausin virtuaalmasina $NAME"
-virsh -c qemu:///system suspend $NAME
+#TODO ensure that VM exists
 
+echo "pausin virtuaalmasina $NAME"
+#for libvirt 
+#virsh -c qemu:///system suspend $NAME
+
+#for VirtualBox
+sudo -u vbox VBoxManage controlvm  pause $NAME

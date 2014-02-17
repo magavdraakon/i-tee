@@ -9,5 +9,8 @@ fi
 NAME=$1
 
 echo "taastan virtuaalmasina $NAME"
-virsh -c qemu:///system resume $NAME
+#For libvirt
+#virsh -c qemu:///system resume $NAME
 
+#For VirtualBox
+sudo -u vbox VBoxManage controlvm  resume $NAME
