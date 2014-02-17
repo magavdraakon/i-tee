@@ -51,10 +51,10 @@ exit 1
 fi
 
 
-echo "PWDHASH=$(VBoxManage internalcommands passwordhash $PWD)"
+echo "PWDHASH=$(VBoxManage internalcommands passwordhash $PWD|cut -f3 -d' ')"
 echo "VBoxManage setextradata $NAME  "VBoxAuthSimple/users/${NAME##*-}" $PWDHASH"
 
-PWDHASH=$(VBoxManage internalcommands passwordhash $PWD)
+PWDHASH=$(VBoxManage internalcommands passwordhash $PWD|cut -f3 -d' ')
 VBoxManage setextradata $NAME  "VBoxAuthSimple/users/${NAME##*-}" $PWDHASH
 
 
