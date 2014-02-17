@@ -47,6 +47,10 @@ echo "Virtual Machine clonig fails $TEMPLATE $NAME"
 exit 1
 fi
 
+#VBoxManage modifyvm ubuntu-server-mernits  --intnet2 "2014mernits"
+
+INTERNALNETNAME=$(date +%Y)${NAME##*-}
+VBoxManage modifyvm $NAME  --intnet2 $INTERNALNAME
 VBoxManage startvm $NAME --type headless
 
 if [ $? -ne 0 ]
