@@ -69,9 +69,9 @@
         <span class="button info-button" onclick="shownotice('<%=desc%>');">
           <%=vm.name%>
           <%if vm.mac!=nil && state=="running"%>,
-            RDP address:port elab.itcollege.ee:10<%=vm.mac.ip.split('.').last if vm.mac!=nil%>,
-            RDP username: <%=current_user.username%>,
-            PDP password: <%=vm.password%>
+            RDP info: elab.itcollege.ee:10<%=vm.mac.ip.split('.').last if vm.mac!=nil%>,
+            user: <%=current_user.username%>,
+            pwd: <%=vm.password%>
           <%end%>
         </span> 
         <%if state=="running" && vm.mac!=nil && vm.lab_vmt.vmt.shellinabox then %>
