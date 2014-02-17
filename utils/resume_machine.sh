@@ -13,4 +13,5 @@ echo "taastan virtuaalmasina $NAME"
 #virsh -c qemu:///system resume $NAME
 
 #For VirtualBox
-sudo -u vbox VBoxManage controlvm  resume $NAME
+/usr/bin/VBoxManage controlvm $NAME resume
+

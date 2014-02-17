@@ -15,4 +15,4 @@ echo "pausin virtuaalmasina $NAME"
 #virsh -c qemu:///system suspend $NAME
 
 #for VirtualBox
-sudo -u vbox VBoxManage controlvm  pause $NAME
+/usr/bin/VBoxManage controlvm $NAME pause
