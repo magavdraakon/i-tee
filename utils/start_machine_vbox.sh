@@ -51,9 +51,6 @@ exit 1
 fi
 
 
-echo "PWDHASH=$(VBoxManage internalcommands passwordhash $PWD|cut -f3 -d' ')"
-echo "VBoxManage setextradata $NAME  "VBoxAuthSimple/users/${NAME##*-}" $PWDHASH"
-
 PWDHASH=$(VBoxManage internalcommands passwordhash $PWD|cut -f3 -d' ')
 VBoxManage setextradata $NAME  "VBoxAuthSimple/users/${NAME##*-}" $PWDHASH
 
@@ -63,6 +60,10 @@ VBoxManage setextradata $NAME  "VBoxAuthSimple/users/${NAME##*-}" $PWDHASH
 INTERNALNETNAME=$(date +%Y)${NAME##*-}
 
 VBoxManage modifyvm $NAME  --intnet2 $INTERNALNETNAME
+
+RDP_PORT=${IP_ADDR##*.}
+VBoxManage modifyvm $NAME --vrdeport 10$RDP_PORT
+
 VBoxManage startvm $NAME --type headless
 
 if [ $? -ne 0 ]
