@@ -216,7 +216,7 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
       port=@mac.ip.split('.').last
       vm.description="
       To create a connection with this machine using linux/unix use 
-      <strong>rdesktop -5 -u #{current_user.id} -p#{vm.password} -N -a 16   elab.itcollege.ee:#{port}</strong>"
+      <strong>rdesktop -u#{@labuser} -p#{vm.password} -N -a16 elab.itcollege.ee:10#{port}</strong>"
       
       vm.save
        
