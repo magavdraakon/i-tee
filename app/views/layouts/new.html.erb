@@ -5,10 +5,7 @@
     <%= stylesheet_link_tag "reset", :cache=>true %>
     <%= stylesheet_link_tag "../javascripts/prettify/sons-of-obsidian", :cache=>true %>
     <%= stylesheet_link_tag "newlay"%>
-    <%= javascript_include_tag :all, :cache=>true %>
-    <%# javascript_include_tag :ckeditor, :cache=>true %>
-    <%= javascript_include_tag "Marked/lib/marked", :cache=>true %>
-    <%= javascript_include_tag "prettify/prettify", :cache=>true %>
+    <%= javascript_include_tag :all, :recursive => true, :cache => true %>
   
     <%= csrf_meta_tag %>
     <link  href="//fonts.googleapis.com/css?family=Ubuntu:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css" >
