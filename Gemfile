@@ -24,6 +24,8 @@ gem 'paperclip', '2.7'
 gem "devise"
 gem "devise_ldap_authenticatable", "0.4.5"
 
+gem 'marked-rails'
+
 # Use unicorn as the web server
 # gem 'unicorn'
 
