@@ -25,7 +25,17 @@ class Vm < ActiveRecord::Base
   end
 
   def del_vm
+    return %x(sudo -u vbox /var/www/railsapps/i-tee/utils/delete_machine.sh #{name}  2>&1)
+  end
+  
+  def poweroff_vm
+    #TODO script .. pooleli
     return %x(sudo -u vbox /var/www/railsapps/i-tee/utils/stop_machine.sh #{name}  2>&1)
+  end
+  
+  def poweron_vm
+    #TODO script .. pooleli
+    return %x(sudo -u vbox /var/www/railsapps/i-tee/utils/poweron_machine.sh #{name}  2>&1)
   end
   
   def res_vm

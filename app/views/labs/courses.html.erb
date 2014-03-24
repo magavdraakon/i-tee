@@ -41,7 +41,7 @@
     <%= link_to(title, path+"/"+@lab.id.to_s, :class=>clas) %>
     <%if title!='Start lab' then%>
       <%#if the lab is started or completed, one can reset it anytime%>
-      <%= link_to('Restart lab',restart_lab_path+"/"+@lab.id.to_s, :class=>'add-button button', :confirm => "Are you sure?")%>
+      <%= link_to('Restart lab',restart_lab_path+"/"+@lab.id.to_s, :class=>'add-button button', :confirm => "This will delete all saved data. Are you sure?")%>
     <%end%>
   <%end%>
   <%else%>

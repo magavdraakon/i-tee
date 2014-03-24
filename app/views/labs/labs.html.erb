@@ -107,8 +107,8 @@
     
     
     
-      <%= link_to('Restart lab',restart_lab_path+"/"+@lab.id.to_s, :class=>'add-button button', :confirm => "Are you sure?") if @lab_user.start %> 
-      <%= link_to('End lab', end_lab_path+"/"+@lab_user.id.to_s, :class=>'delete-button button', :confirm => "Are you sure?" ) unless @lab_user.end  %>
+      <%= link_to('Restart lab',restart_lab_path+"/"+@lab.id.to_s, :class=>'add-button button', :confirm => "This will delete all saved data. Are you sure?") if @lab_user.start %> 
+      <%= link_to('End lab', end_lab_path+"/"+@lab_user.id.to_s, :class=>'delete-button button', :confirm => "This will delete all saved data. Are you sure?" ) unless @lab_user.end  %>
     <%end%>
   <%end%>
   <%else%>

@@ -260,11 +260,11 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
   def stop_vm
     #@vm=Vm.find(params[:id])
     logger.info "käivitame masina sulgemise skripti"
-    a=@vm.del_vm #the script is called in the model
+    a=@vm.poweroff_vm #the script is called in the model
     logger.info a
-    @vm.description="Initialize the virtual machine by clicking <strong>Start</strong>."
+    @vm.description="Power on the virtual machine by clicking <strong>Start</strong>."
     @vm.save
-    flash[:notice] = "Successful vm deletion." 
+    flash[:notice] = "Successful shutdown" 
     @mac = Mac.find(:first, :conditions=>["vm_id=?", @vm.id])
     @mac.vm_id=nil
     @mac.save
