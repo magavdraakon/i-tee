@@ -11,6 +11,6 @@ NAME=$1
 #TODO ensure that VM with that name exists
 time VBoxManage controlvm $NAME poweroff 
 
-time VBoxManage unregistervm $NAME --delete
-echo "haltin virtuaalmasina $NAME"
+#time VBoxManage unregistervm $NAME --delete
+#echo "haltin virtuaalmasina $NAME"
 
