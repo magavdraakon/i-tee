@@ -65,7 +65,7 @@ class Vm < ActiveRecord::Base
       return 'running'
     when 'paused'
       return 'paused'
-    when 'powered off'
+    when 'powered'
       return 'stopped'
     else
       return 'stopped'
