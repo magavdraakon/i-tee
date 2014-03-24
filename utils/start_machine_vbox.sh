@@ -40,7 +40,14 @@ XML=/etc/libvirt/qemu/$NAME.xml
 
 echo "tekitan virtuaalmasina $NAME template-ist $TEMPLATE Mac aadressiga $MAC"
 #TODO test if --name exists then remove old one
-time VBoxManage clonevm $TEMPLATE --name $NAME --register
+if [ $(VBoxManage list vms | cut -f1 -d' '| tr -d '"'| grep $NAME ) ]
+then
+	echo "machine already exists. Starting old instance of $NAME"
+	#time VBoxManage start $NAME
+else
+	echo "cloning $NAME"
+	time VBoxManage clonevm $TEMPLATE --name $NAME --register
+fi
 
 if [ $? -ne 0 ]
 then
