@@ -8,20 +8,3 @@
     user: <%= user%><br/>
   group: <%= group%>
 </p>
-
-<p>To enable activating scripts from the user-interface:<br/>
-  <i>addgroup <%= user%> libvirtd</i>
-</p>
-<p>Change the group of /etc/libvirt/qemu to libvirtd and allow writing<br/>
-  <i>chgrp libvirtd /etc/libvirt/qemu<br/>
-  chmod g+w /etc/libvirt/qemu/</i>
-</p>
-<p>Change the group of /etc/libvirt/images to libvirtd and allow writing<br/>
-  <i>chgrp libvirtd /var/lib/libvirt/images<br/>
-  chmod g+w /var/lib/libvirt/images/</i>
-</p>
-
-<p>Change the ownership of the &lt;template directory&gt; path (where you store the template *.img files) and allow writing for the user and group<br/>
-  <i>chown libvirt-qemu:kvm &lt;template directory&gt; -R<br/>
-  chmod ug+w &lt;template directory&gt;</i>
-</p>
