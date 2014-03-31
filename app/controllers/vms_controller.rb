@@ -18,7 +18,15 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
   
   def vms_by_lab
     @b_by="lab"
-    order=" order by #{params[:sort_by]}" if params[:sort_by]
+    if params[:dir]=="asc" then
+      dir = "ASC"
+      @dir = "&dir=desc"
+    else 
+      dir = "DESC"
+      @dir = "&dir=asc"
+    end
+    order = params[:sort_by]!=nil ? " order by #{params[:sort_by]} #{dir}" : ""
+    logger.debug "ORDER #{order}"
     if params[:admin]!=nil && @admin then
       @lab=Lab.find(params[:id]) if params[:id]# try to get the selected lab
       @lab=Lab.first if !params[:id] # but if the parameter is not set, take the first lab
@@ -42,7 +50,16 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
     @state=params[:state] if params[:state]
     state=@state
     state="error:" if state=="uninitialized"
-    order=" order by #{params[:sort_by]}" if params[:sort_by]
+    # TODO! turn it into DRY
+    if params[:dir]=="asc" then
+      dir = "ASC"
+      @dir = "&dir=desc"
+    else 
+      dir = "DESC"
+      @dir = "&dir=asc"
+    end
+    order = params[:sort_by] ? " order by #{params[:sort_by]} #{dir}" : ""
+  
     if params[:admin]!=nil && @admin then
       @tab="admin"
       vms=Vm.find_by_sql("select vms.*, lab_vmts.lab_id from vms, lab_vmts where vms.lab_vmt_id=lab_vmts.id #{order}")
@@ -60,7 +77,15 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
   # GET /vms
   # GET /vms.xml
   def index
-    order=" order by #{params[:sort_by]}" if params[:sort_by]
+    if params[:dir]=="asc" then
+      dir = "ASC"
+      @dir = "&dir=desc"
+    else 
+      dir = "DESC"
+      @dir = "&dir=asc"
+    end
+    order = params[:sort_by] ? " order by #{params[:sort_by]} #{dir}" : ""
+
     if params[:admin]!=nil && @admin then
       sql= "select vms.*, lab_vmts.lab_id from vms, lab_vmts where vms.lab_vmt_id=lab_vmts.id #{order}"
       @tab="admin"

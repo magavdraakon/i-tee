@@ -17,8 +17,15 @@ class LabUsersController < ApplicationController
   #index and new view are merged
   def index
     #@lab_users = LabUser.find(:all, :order=>params[:sort_by])
-
-    @lab_users = LabUser.paginate(:page => params[:page], :per_page => 10).order(params[:sort_by])
+    if params[:dir]=="asc" then
+      dir = "ASC"
+      @dir = "desc"
+    else 
+      dir = "DESC"
+      @dir = "asc"
+    end
+    order = params[:sort_by]!=nil ? "#{params[:sort_by]} #{dir}" : "" 
+    @lab_users = LabUser.order(order).paginate(:page => params[:page], :per_page => 10)
     @lab_user = LabUser.new
     
     respond_to do |format|
@@ -36,7 +43,14 @@ class LabUsersController < ApplicationController
   # POST /lab_users
   # POST /lab_users.xml
   def create
-    @lab_users = LabUser.find(:all, :order=>params[:sort_by])
+    if params[:dir]=="asc" then
+      dir = "ASC"
+      @dir = "&dir=desc"
+    else 
+      dir = "DESC"
+      @dir = "&dir=asc"
+    end
+    @lab_users = LabUser.find(:all).order("#{params[:sort_by]} #{dir}")
     # logic for when adding/removing multiple users at once to a specific lab
     if params[:lab_user][:page]=='bulk_add' then
       all_users=User.all

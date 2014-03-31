@@ -4,13 +4,13 @@
   <table>
     <thead>
       <tr>
-        <th><%=link_to("Lab", :controller=>"lab_users",:action=>"index", :sort_by=>"lab_id")%></th>
-        <th><%=link_to("User", :controller=>"lab_users",:action=>"index", :sort_by=>"user_id")%></th>
+        <th><%=link_to("Lab", :controller=>"lab_users",:action=>"index", :sort_by=>"lab_id", :dir=>@dir)%></th>
+        <th><%=link_to("User", :controller=>"lab_users",:action=>"index", :sort_by=>"user_id", :dir=>@dir)%></th>
         <th>Progress</th>
         <th>Result</th>
-        <th>Start</th>
-        <th>Pause</th>
-        <th>End</th>
+        <th><%=link_to("Start", :controller=>"lab_users",:action=>"index", :sort_by=>"start", :dir=>@dir)%></th>
+        <th><%=link_to("Pause", :controller=>"lab_users",:action=>"index", :sort_by=>"pause", :dir=>@dir)%></th>
+        <th><%=link_to("End", :controller=>"lab_users",:action=>"index", :sort_by=>"end", :dir=>@dir)%></th>
         <th></th> 
       </tr>
     </thead>

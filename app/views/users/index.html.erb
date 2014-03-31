@@ -3,11 +3,11 @@
   <table>
     <thead>
       <tr>
-        <th>Username</th>
+        <th><%=link_to("Username", :controller=>"users",:action=>"index", :sort_by=>"username", :dir=>@dir)%></th>
         <th>Email</th>
-        <th>Last sign in</th>
+        <th><%=link_to("Last sign in", :controller=>"users",:action=>"index", :sort_by=>"last_sign_in_at", :dir=>@dir)%></th>
         <th>Last IP</th>
-        <th>LDAP user</th>
+        <th><%=link_to("LDAP user", :controller=>"users",:action=>"index", :sort_by=>"ldap", :dir=>@dir)%></th>
         <th></th>
       </tr>
     </thead>

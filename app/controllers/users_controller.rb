@@ -4,9 +4,17 @@ class UsersController < ApplicationController
   before_filter :user_tab, :only=>['show']
   
   def index
-    @users= User.find_by_sql("select id, username, last_sign_in_at, ldap, email, last_sign_in_ip from users")
-    @users=@users.paginate(:page=>params[:page], :per_page=>10)
-    
+    if params[:dir]=="asc" then
+      dir = "ASC"
+      @dir = "desc"
+    else 
+      dir = "DESC"
+      @dir = "asc"
+    end
+    order = params[:sort_by]!=nil ? "#{params[:sort_by]} #{dir}" : "" 
+    #@users= User.find_by_sql("select id, username, last_sign_in_at, ldap, email, last_sign_in_ip from users")
+    #@users= @users.paginate(:page=>params[:page], :per_page=>10).order(order)
+    @users = User.select("id, username, last_sign_in_ip, last_sign_in_at, ldap, email").order(order).paginate(:page=>params[:page], :per_page=>10)
   end
   
   def show
