@@ -192,8 +192,15 @@ end
   end
   
   def user_token
-    @users=User.find(:all, :order=>params[:sort_by])
-    @users= @users.paginate(:page=>params[:page], :per_page=>10)
+     if params[:dir]=="asc" then
+      dir = "ASC"
+      @dir = "desc"
+    else 
+      dir = "DESC"
+      @dir = "asc"
+    end
+    order = params[:sort_by]!=nil ? "#{params[:sort_by]} #{dir}" : "" 
+    @users= User.order(order).paginate(:page=>params[:page], :per_page=>10)
   end
   
   private #-----------------------------------------------

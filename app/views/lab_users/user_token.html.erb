@@ -4,9 +4,9 @@
   <table>
     <thead>
       <tr>
-        <th><%=link_to("User",manage_tokens_path+"?sort_by=username")%></th>
-        <th><%= link_to("Token",manage_tokens_path+"?sort_by=authentication_token")%></th>
-        <th><%= link_to("Expiry time",manage_tokens_path+"?sort_by=token_expires")%></th>
+        <th><%=link_to("User",manage_tokens_path+"?sort_by=username&dir="+@dir)%></th>
+        <th><%= link_to("Token",manage_tokens_path+"?sort_by=authentication_token&dir="+@dir)%></th>
+        <th><%= link_to("Expiry time",manage_tokens_path+"?sort_by=token_expires&dir="+@dir)%></th>
         <th></th> 
       </tr>
     </thead>
