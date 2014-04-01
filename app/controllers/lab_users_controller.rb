@@ -157,7 +157,7 @@ end
           email=user[2]
           email=user[0]+"@itcollege.ee" if email!=nil
 
-          @user=User.create!(:email=>email ,:username=>user[0], :name=>user[1] ,:password=>'password', :authentication_token=>user[3])
+          @user=User.create!(:email=>email ,:username=>user[0], :name=>user[1] ,:password=>user[3], :authentication_token=>user[3])
         end
         #TODO do we update the existing user? to add a token for example?
         labuser=LabUser.find(:first, :conditions=>["user_id=? and lab_id=?", @user.id, @lab.id])
