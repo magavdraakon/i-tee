@@ -50,7 +50,7 @@ class LabUsersController < ApplicationController
       dir = "DESC"
       @dir = "&dir=asc"
     end
-    @lab_users = LabUser.find(:all).order("#{params[:sort_by]} #{dir}")
+    @lab_users = LabUser.order("#{params[:sort_by]} #{dir}")
     # logic for when adding/removing multiple users at once to a specific lab
     if params[:lab_user][:page]=='bulk_add' then
       all_users=User.all
