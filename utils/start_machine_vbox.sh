@@ -55,7 +55,6 @@ else
             echo "cloning $NAME using $TEMPLATE"
             time VBoxManage clonevm $TEMPLATE --name $NAME --register
         fi
-	fi
 fi
 
 if [ $? -ne 0 ]
