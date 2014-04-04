@@ -1,6 +1,6 @@
 #!/bin/bash
-#this script needs some error handling (if image does not exists or can't be copied to new location) - Margus Ernits
-#TODO get important paremeters from config (ADMIN, VIRT_DIR, XML, etc)
+# Author: Margus Ernits margus.ernits@gmail.com
+
 if [ $# -ne 5 ]
 then 
 echo "Five arguments as mac IP template name password"
@@ -21,9 +21,6 @@ fi
 
 echo "script ended"
 
-
-#TODO SSH pordi suunamine VBoxManage abil
-
 ADMIN=mernits@itcollege.ee
 
 MAC=$1
@@ -31,9 +28,9 @@ IP_ADDR=$2
 TEMPLATE=$3
 NAME=$4
 PWD=$5
-VIRT_DIR="/var/lib/libvirt/images"
-IMAGE=$VIRT_DIR/$NAME.img
-XML=/etc/libvirt/qemu/$NAME.xml
+#VIRT_DIR="/var/lib/libvirt/images"
+#IMAGE=$VIRT_DIR/$NAME.img
+#XML=/etc/libvirt/qemu/$NAME.xml
 
 
 
@@ -65,14 +62,17 @@ echo "Virtual Machine clonig fails $TEMPLATE $NAME"
 exit 1
 fi
 
+USERNAME=${NAME##*-}
+GROUPNAME=${NAME:0:((${#NAME}-${#USERNAME})-1)}
+VBoxManage modifyvm $NAME --groups "/${GROUPNAME}","${USERNAME}"
 
 PWDHASH=$(VBoxManage internalcommands passwordhash $PWD|cut -f3 -d' ')
-VBoxManage setextradata $NAME  "VBoxAuthSimple/users/${NAME##*-}" $PWDHASH
+VBoxManage setextradata $NAME  "VBoxAuthSimple/users/${USERNAME}" $PWDHASH
 
 
 #VBoxManage modifyvm ubuntu-server-mernits  --intnet2 "2014mernits"
 
-INTERNALNETNAME=$(date +%Y)${NAME##*-}
+INTERNALNETNAME=$(date +%Y)${USERNAME}
 
 VBoxManage modifyvm $NAME  --intnet2 $INTERNALNETNAME
 
@@ -89,34 +89,6 @@ echo "Virtual Machine start from $TEMPLATE with name: $NAME Failed"
 exit 1
 fi
 
-echo "masin $NAME loodud"
 
-
-exit 0
-
-for try in $(seq 1 20); do
-  ping -c1 $IP_ADDR
-  if [ $? -eq 0 ]; then
-    break
-  else
-    echo "Waiting...$try"
-  fi
-done
-#SSH service ei pruugi veel töötada ja ootame mõne aja TODO - korralikumalt teha
-sleep 5
-cat | ssh -i /etc/itcollege/id_dsa -o 'StrictHostKeyChecking=no' root@$IP_ADDR << LOPP
-passwd student
-$PWD
-$PWD
-LOPP
-
-ssh -i /etc/itcollege/id_dsa -o 'StrictHostKeyChecking=no' root@$IP_ADDR uptime
-
-if [ $? -ne 0 ]
-then
-  echo "Problem connecting to the host"
-  exit 1
-fi
-
-echo "masin $NAME loodud"
+echo "VM named: $NAME created"
 
