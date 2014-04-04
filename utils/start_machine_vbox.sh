@@ -64,13 +64,12 @@ fi
 
 USERNAME=${NAME##*-}
 GROUPNAME=${NAME:0:((${#NAME}-${#USERNAME})-1)}
-VBoxManage modifyvm $NAME --groups "/${GROUPNAME}","${USERNAME}"
+VBoxManage modifyvm $NAME --groups "/${GROUPNAME}","/${USERNAME}"
+
 
 PWDHASH=$(VBoxManage internalcommands passwordhash $PWD|cut -f3 -d' ')
 VBoxManage setextradata $NAME  "VBoxAuthSimple/users/${USERNAME}" $PWDHASH
 
-
-#VBoxManage modifyvm ubuntu-server-mernits  --intnet2 "2014mernits"
 
 INTERNALNETNAME=$(date +%Y)${USERNAME}
 
@@ -89,6 +88,6 @@ echo "Virtual Machine start from $TEMPLATE with name: $NAME Failed"
 exit 1
 fi
 
-
-echo "VM named: $NAME created"
+echo "masin $NAME loodud"
+#echo "VM named: $NAME created"
 
