@@ -44,14 +44,17 @@ then
 	echo "machine already exists. Starting old instance of $NAME"
 	#time VBoxManage start $NAME
 else
-	SNAPSHOT=$(vboxmanage snapshot $TEMPLATE list|grep '*'|grep template)
-	if [ $SNAPSHOT ]
-	then
-		echo "Cloning $NAME using $TEMPLATE"
-		echo time VBoxManage clonevm  $TEMPLATE --snapshot $SNAPSHOT --options link --name $NAME --register
-	else
-		echo "cloning $NAME"
-		time VBoxManage clonevm $TEMPLATE --name $NAME --register
+    SNAPSHOT=$(vboxmanage snapshot $TEMPLATE list|grep '*'|grep template|awk '{print $2}')
+    echo $(vboxmanage snapshot $TEMPLATE list|grep '*'|grep template)
+    if [ $SNAPSHOT ]
+        then
+            echo "Cloning $NAME using $TEMPLATE and snapshot $SNAPSHOT"
+            #echo "time VBoxManage clonevm  $TEMPLATE --snapshot $SNAPSHOT --options link --name $NAME --register"
+            time VBoxManage clonevm  $TEMPLATE --snapshot $SNAPSHOT --options link --name $NAME --register
+        else
+            echo "cloning $NAME using $TEMPLATE"
+            time VBoxManage clonevm $TEMPLATE --name $NAME --register
+        fi
 	fi
 fi
 
