@@ -206,6 +206,11 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
       flash[:alert]="Starting all virtual machines failed, try starting them one by one."
       flash[:notice]=nil
       redirect_to(:back)
+
+    rescue ActionController::RedirectBackError # cant redirect back? go to the lab instead
+      logger.info "\nNo :back error\n"
+      redirect_to(my_labs_path+"/"+@lab.id.to_s)
+    
   end
   
   #start one machine
@@ -214,6 +219,9 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
     init_vm(@vm)
   #  flash[:alert]=@a
     redirect_to(:back)
+    rescue ActionController::RedirectBackError  # cant redirect back? go to the lab instead
+      logger.info "\nNo :back error\n"
+      redirect_to(my_labs_path+"/"+@vm.lab_vmt.lab.id.to_s)
   end
   
   #assign mac and start machine
