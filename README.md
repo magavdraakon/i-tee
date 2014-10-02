@@ -1,7 +1,96 @@
 # About i-tee
-i-tee is a distance laboratory system, that is based on ruby on rails and uses virtualization technologies like libvirt.
+i-tee is a distance laboratory system, that is based on ruby on rails and uses VirtualBox headless virtualization.
 
 i-tee is developed by the Estonian IT College.
+
+
+# Preparing for installation of i-tee
+
+Before installing i-tee system the Ubuntu server with VirtualBox headless is needed.
+
+
+* Install Ubuntu Server 14.04 LTS 64bit with separate /var directory
+* Choose btrfs filesystem for /var
+* Configure network
+
+Do system upgrade
+
+	sudo apt-get update
+
+	sudo apt-get dist-upgrade
+
+	sudo apt-get install linux-headers-$(uname -r) build-essential dkms
+
+	sudo apt-get install unzip
+
+
+Install GIT: 
+
+	sudo apt-get install git
+
+
+Install optional packages:
+
+	sudo apt-get install htop
+
+# Installing virtualization layer
+
+For virtualization layer the VirtualBox headless mode is used with phpVirtualBox web interface.
+
+
+## Installing VirtualBox headless
+
+VirtualBox headless installation guide is based on [HowtoForge - Linux Tutorials](http://www.howtoforge.com) article:
+[VBoxHeadless - Running Virtual Machines With VirtualBox 4.3 On A Headless Ubuntu 14.04 LTS Server - Author: Falko Timme, updated by Srijan Kishore](http://www.howtoforge.com/vboxheadless-running-virtual-machines-with-virtualbox-4.3-on-a-headless-ubuntu-14.04-lts-server)
+
+All commands followed must be entered as a root user. To get interactive root shell:
+
+	sudo -i
+	
+Add virtualbox apt source to software sources list:
+
+	echo "deb http://download.virtualbox.org/virtualbox/debian trusty contrib" \
+	 > /etc/apt/sources.list.d/virtualbox.list
+
+Download and import Oracle VirtualBox public key:
+
+	wget -q http://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc \
+	 -O- | sudo apt-key add -
+
+Upgrade local repository cache:
+	
+	apt-get update
+
+Install VirtualBox 4.3 package:
+
+	apt-get install virtualbox-4.3
+
+If everything is successful 
+ lsmod |grep vboxdrv
+vboxdrv               409815  3 vboxnetadp,vboxnetflt,vboxpci
+
+
+Download and install VirtualBox Extension Pack that corresponds to your version of VirtualBox:
+
+	wget http://download.virtualbox.org/virtualbox/4.3.16/Oracle_VM_VirtualBox_Extension_Pack-4.3.16-95972.vbox-extpack
+
+
+
+## Installing phpVirtualBox 
+
+Download latest version of phpVirtualBox http://sourceforge.net/projects/phpvirtualbox/files/?source=navbar
+VirtualBox and phpVirtualBox versions must match. For example, for VirtualBox-4.3 series you need phpvirtualbox-4.3-x.zip:
+
+	cd /root
+
+	wget http://sourceforge.net/projects/phpvirtualbox/files/phpvirtualbox-4.3-1.zip/download \
+	 -O phpvirtualbox-4.3-1.zip
+
+	unzip phpvirtualbox-4.3-1.zip
+
+
+	update-rc.d vboxweb-service defaults
+
 
 # Application Config
 Configuration files are needed as following with sample files included:
@@ -154,7 +243,7 @@ Add default data to the tables
 
 	rake db:seed RAILS_ENV="production" 
 
-NB! this fills the mac addres table with ip-s from 192.168.13.102 to 192.168.13.220,
+NB! this fills the mac address table with ip-s from 192.168.13.102 to 192.168.13.220,
 you can change the seed to match your settings!
 
 
@@ -443,6 +532,14 @@ VirualBox permissions
 User vbox (group vboxusers)
 
 	www-data ALL=(vbox) NOPASSWD: /var/www/railsapps/i-tee/utils/start_machine.sh
+Integration with btrfs deduplication tool: https://github.com/g2p/bedup
+
+##For developers
+
+For documentation:
+
+	gimli -f ./README.md -s documentation.css
+
 #Guest setup
 -Virtualbox additions
 
