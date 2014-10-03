@@ -9,8 +9,8 @@ i-tee is developed by the Estonian IT College.
 Before installing i-tee system the Ubuntu server with VirtualBox headless is needed.
 
 
-* Install Ubuntu Server 14.04 LTS 64bit with separate /var directory
-* Choose btrfs filesystem for /var
+* Install Ubuntu Server 14.04 LTS 64bit with separate /var directory (enough room for virtual machines)
+* Choose btrfs filesystem for /var for virtual machines
 * Configure network
 
 Do system upgrade
@@ -65,8 +65,12 @@ Install VirtualBox 4.3 package:
 
 	apt-get install virtualbox-4.3
 
-If everything is successful 
- lsmod |grep vboxdrv
+If everything is successful then module list should contain vboxdrv module. Test it using lsmod:
+	
+	lsmod |grep vboxdrv
+
+The result should look like:
+
 vboxdrv               409815  3 vboxnetadp,vboxnetflt,vboxpci
 
 
@@ -74,9 +78,65 @@ Download and install VirtualBox Extension Pack that corresponds to your version 
 
 	wget http://download.virtualbox.org/virtualbox/4.3.16/Oracle_VM_VirtualBox_Extension_Pack-4.3.16-95972.vbox-extpack
 
+Install the extension pack using vboxmanage:
+
+	VBoxManage extpack install Oracle_VM_VirtualBox_Extension_Pack-4.3.16-95972.vbox-extpack
+
+List extension packs using vboxmanage:
+
+	VBoxManage list extpacks
+
+The result should contain
+	
+	Oracle VM VirtualBox Extension Pack
+
+Create user ***vbox*** for virtualbox with strong password:
+
+	adduser vbox
+
+Add user ***vbox*** to group ***vboxusers***:
+
+	adduser vbox vboxusers
+
+Change ***vbox*** user home directory to ***/var/labs*** and move dotfiles into it:
+
+	usermod -d /var/labs -m vbox
+
+
+### Creating autostart files and configuring vbox user
+To create complete virtual laboratory environment you need DNS server for fake zones, DHCP server for lab VMs and probably firewall for filtering.
+For some VMs such as nameserver, DHCP server, Fitewall etc the autostart is needed.
+
+```
+cat >> /etc/default/virtualbox << EOF
+VBOXWEB_USER=vbox
+VBOXAUTOSTART_DB=/etc/vbox
+VBOXAUTOSTART_CONFIG=/etc/vbox/auto.cfg
+EOF
+```
+
+```
+cat >> /etc/vbox/auto.cfg << EOF
+default_policy = deny
+vbox = {
+        allow = true
+        startup_delay = 10
+}
+EOF
+```
+
 
 
 ## Installing phpVirtualBox 
+
+Ensure that user ***vbox*** is configured as ***VBOXWEB_USER***
+
+	grep vbox /etc/default/virtualbox
+
+Enable ***vboxweb service*** autostart:
+
+	update-rc.d vboxweb-service defaults
+	service vboxweb-service start
 
 Download latest version of phpVirtualBox http://sourceforge.net/projects/phpvirtualbox/files/?source=navbar
 VirtualBox and phpVirtualBox versions must match. For example, for VirtualBox-4.3 series you need phpvirtualbox-4.3-x.zip:
@@ -534,9 +594,16 @@ User vbox (group vboxusers)
 	www-data ALL=(vbox) NOPASSWD: /var/www/railsapps/i-tee/utils/start_machine.sh
 Integration with btrfs deduplication tool: https://github.com/g2p/bedup
 
+http://www.vionblog.com/virtualbox-4-3-autostart-debian-wheezy/
+
+
+https://gist.github.com/mikedevita/7461832
+
 ##For developers
 
 For documentation:
+
+	wget http://github.github.com/github-flavored-markdown/shared/css/documentation.css
 
 	gimli -f ./README.md -s documentation.css
 
