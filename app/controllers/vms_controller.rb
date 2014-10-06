@@ -18,6 +18,7 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
   
   def vms_by_lab
     @b_by="lab"
+    sql=[]
     if params[:dir]=="asc" then
       dir = "ASC"
       @dir = "&dir=desc"
@@ -31,16 +32,19 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
       @lab=Lab.find(params[:id]) if params[:id]# try to get the selected lab
       @lab=Lab.first if !params[:id] # but if the parameter is not set, take the first lab
       #@vms=Vm.find(:all, :joins=>["vms inner join lab_vmts as l on vms.lab_vmt_id=l.id"], :order=>params[:sort_by])
-      sql= "select vms.*, lab_vmts.lab_id from vms, lab_vmts where vms.lab_vmt_id=lab_vmts.id and lab_id=#{@lab.id} #{order}"
+      sql= Vm.find_by_sql("select vms.*, lab_vmts.lab_id from vms, lab_vmts where vms.lab_vmt_id=lab_vmts.id and lab_id=#{@lab.id} #{order}")
       @tab="admin"
       @labs=Lab.find(:all).uniq
     else
-      @lab=Lab.find(:first, :joins=>["labs inner join lab_users on lab_users.lab_id=labs.id"], :conditions=>["lab_id=? and user_id=?",params[:id], current_user.id]) if params[:id]# try to get the selected lab
-      @lab=Lab.find(:first, :joins=>["labs inner join lab_users on lab_users.lab_id=labs.id"], :conditions=>["user_id=?", current_user.id]) if !params[:id] || @lab==nil # but if the parameter is not set, take the first lab this user has      
-      sql= "select * from vms, lab_vmts where vms.lab_vmt_id=lab_vmts.id and lab_id=#{@lab.id} and user_id=#{current_user.id} #{order}"
+      if params[:id]!=nil then # try to get the selected lab 
+         @lab=Lab.find(:first, :joins=>["labs inner join lab_users on lab_users.lab_id=labs.id"], :conditions=>["lab_id=? and user_id=?",params[:id], current_user.id])
+      else # but if the parameter is not set, take the first lab this user has   
+         @lab=Lab.find(:first, :joins=>["labs inner join lab_users on lab_users.lab_id=labs.id"], :conditions=>["user_id=?", current_user.id])  
+      end
+       sql= Vm.find_by_sql("select * from vms, lab_vmts where vms.lab_vmt_id=lab_vmts.id and lab_id=#{@lab.id} and user_id=#{current_user.id} #{order}") if @lab # only try to get the vms if there is a lab
       @labs=Lab.find(:all, :joins=>["labs inner join lab_users on lab_users.lab_id=labs.id"], :conditions=>["user_id=?", current_user.id]).uniq
     end
-    @vms= Vm.paginate_by_sql(sql, :page => params[:page], :per_page => 10)
+    @vms= sql.paginate( :page => params[:page], :per_page => 10)
     render :action=>'index'
   end
   

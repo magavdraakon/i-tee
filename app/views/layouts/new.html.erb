@@ -78,26 +78,20 @@
                 <tr>
                   <td>
                     <%= link_to_unless_current 'Labs', labs_path %><br/>
-                    <%= link_to_unless_current 'New lab', new_lab_path %><br/>
-                    <%= link_to_unless_current 'Materials', materials_path %><br/>
-                    <%= link_to_unless_current 'New material', new_material_path %>
+                    <%= link_to_unless_current 'Materials', materials_path %>
                   </td>
                   <td>
-                    <%= link_to_unless_current 'New virtual machine', new_vm_path %> <br/>
                     <%= link_to_unless_current 'All virtual machines', vms_path+"?admin=1" %><br/>
                     <%= link_to_unless_current('Virtual machines by state', vms_by_state_path+"?admin=1") %><br/>
                     <%= link_to_unless_current('Virtual machines by lab', vms_by_lab_path+"?admin=1") %>  
                   </td>
                   <td>
                     <%= link_to_unless_current 'Virtual machine templates', vmts_path %><br/>
-                    <%= link_to_unless_current 'New virtual machine template', new_vmt_path %><br/>
                     <%= link_to_unless_current 'Virtual machine templates in labs', lab_vmts_path %>
                   </td>
                   <td>
                     <%= link_to_unless_current('Hosts', hosts_path) %><br/>
-                    <%= link_to_unless_current 'New Host', new_host_path %><br/>
-                    <%= link_to_unless_current('Operating systems', operating_systems_path) %><br/>
-                    <%= link_to_unless_current 'New operating system', new_operating_system_path %>
+                    <%= link_to_unless_current('Operating systems', operating_systems_path) %>
                   </td>
                    <td>
                     <%= link_to_unless_current('Badges', badges_path) %><br/>
