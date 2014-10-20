@@ -1,7 +1,7 @@
 <%#=@a%><%#this is a variable that holds the response from the init script%>
 <%#debug @vms%>
 
-<h3>Listing <span class="specify">all<%=" "+@state if @state!=nil%></span> virtual machines <span class="inlab"><%="in "+@lab.name if @b_by=="lab"%></span></h3>
+<h3>Listing <span class="specify">all<%=" "+@state if @state!=nil%></span> virtual machines <span class="inlab"><%="in "+@lab.name if @b_by=="lab" && @lab %></span></h3>
 <div id="index_t">
   <table>
     <thead>
@@ -66,6 +66,9 @@
   <%= will_paginate @vms %><div class="page_info"><%= page_entries_info @vms %></div>
 </div>
 <span class="startall"><%=link_to('Start all machines',start_all_path+"/"+@lab.id.to_s, :class=>"button start-button") unless @tab=="admin" || @vms.empty? || @b_by!="lab" %></span>
+
+<br/>
+<%= link_to 'New virtual machine', new_vm_path, :class=>"add-button button"  if @admin && @tab=="admin" %> 
 
 <% content_for :sidebar_head do %>
   <% if @b_by=='state' then%>Choose state<%end%><%if @b_by=="lab" then%>Choose lab<%end%>
