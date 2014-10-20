@@ -266,7 +266,7 @@ Create new virtualhost for phpVirtualBox
 		}
 
 	}
-	END
+	EOF
 
 uurida - http://www.iodigitalsec.com/nginx-ssl-php5-fpm-on-debian-wheezy/
 
