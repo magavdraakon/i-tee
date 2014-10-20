@@ -164,15 +164,23 @@ Generate certificate request
 
 
 Country Name (2 letter code) [AU]: < -- Enter Country Code (example EE)
+
 State or Province Name (full name) [Some-State]: < -- Enter your state name (example Harjumaa)
 
 Locality Name (eg, city) []: < -- Enter City Name (example Tallinn)
+
 Organization Name (eg, company) [Internet Widgits Pty Ltd]: < -- Enter Organization name (example Estonian IT College)
+
 Organizational Unit Name (eg, section) []: < -- Hit enter
+
 Common Name (e.g. server FQDN or YOUR name) []: < -- YOUR-FQDN (example i-tee.itcollege.ee)
+
 Email Address []:< -- Hit enter
+
 A challenge password []:< -- Hit enter
+
 An optional company name []:< -- Hit enter
+
 
 To check certificate data:
 	
@@ -202,6 +210,12 @@ VirtualBox and phpVirtualBox versions must match. For example, for VirtualBox-4.
 
 	unzip phpvirtualbox-4.3-1.zip
 
+	cp /root/phpvirtualbox-4.3-1 /usr/share/nginx/
+
+	ln -s /usr/share/nginx/phpvirtualbox-4.3-1 /usr/share/nginx/phpvirtualbox
+
+	chown www-data:www-data /usr/share/nginx/phpvirtualbox -R
+
 
 Create new virtualhost for phpVirtualBox
 
@@ -210,51 +224,26 @@ Create new virtualhost for phpVirtualBox
 	#
 	server {
 		listen 4433;
-	#       server_name localhost;
-	#
-	#       root html;
-	#       index index.html index.htm;
-	#
-		root /usr/share/nginx/www/phpvirtualbox;
+
+		root /usr/share/nginx/phpvirtualbox;
 		index index.php index.html index.htm;
 
 		ssl on;
 		ssl_certificate /etc/ssl/certs/YOUR-FQDN.pem;
 		ssl_certificate_key /etc/ssl/private/YOUR-FQDN.key;
-	#
-	# TODO TO Test
-	#      ssl_session_timeout 5m;
-	#
-	#      ssl_protocols SSLv3 TLSv1 TLSv1.1 TLSv1.2;
-	#      ssl_ciphers "HIGH:!aNULL:!MD5 or HIGH:!aNULL:!MD5:!3DES";
-	#      ssl_prefer_server_ciphers on;
+	
 		ssl_session_timeout 5m;
-	#
+	
 		ssl_protocols SSLv3 TLSv1;
 		ssl_ciphers ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv3:+EXP;
 		ssl_prefer_server_ciphers on;
-	#
+	
 		location / {
 		        try_files $uri $uri/ /index.html;
 		}
-		# pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
-		#
-	#        location ~ \.php$ {
-	#                try_files $uri =404;
-	#                fastcgi_split_path_info ^(.+\.php)(/.+)$;
-	#                fastcgi_pass 127.0.0.1:9000;
-	#                fastcgi_index index.php;
-	#                include fastcgi_params;
-	#        }
-		# pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
-		#
 		location ~ \.php$ {
 		       fastcgi_split_path_info ^(.+\.php)(/.+)$;
 		       # NOTE: You should have "cgi.fix_pathinfo = 0;" in php.ini
-
-		       # With php5-cgi alone:
-		       #fastcgi_pass 127.0.0.1:9000;
-		       # With php5-fpm:
 		       fastcgi_pass unix:/var/run/php5-fpm.sock;
 		       fastcgi_index index.php;
 		       include fastcgi_params;
@@ -268,11 +257,38 @@ Create new virtualhost for phpVirtualBox
 	}
 	EOF
 
+Insdtall php support for nginx
+
+	apt-get install php5-fpm
+
+Enable virtualhost i-tee
+
+	ln -s /etc/nginx/sites-available/i-tee /etc/nginx/sites-enabled/
+
+Reload nginx web server
+
+	service nginx reload
+
+
 uurida - http://www.iodigitalsec.com/nginx-ssl-php5-fpm-on-debian-wheezy/
 
 
+Change vbox user password to the same vbox system user
+	
+	cp /usr/share/nginx/phpvirtualbox/config.php-example \
+	/usr/share/nginx/phpvirtualbox/config.php
+
+	vim /usr/share/nginx/phpvirtualbox/config.php
 
 
+Configure virtualbox RDP authenticaton
+
+	su - vbox -c'VBoxManage setproperty vrdeauthlibrary "VBoxAuthSimple"'
+
+
+##Links
+
+	http://www.vionblog.com/virtualbox-4-3-phpvirtualbox-debian-wheezy/
 
 
 # Application Config
@@ -285,9 +301,12 @@ Configuration files are needed as following with sample files included:
 - config/database.yml
 
 
-# Installation
+# Installation of i-tee
 
-make yourself the root user
+Make sure that virtualization layer works and VMs can be created using phpVboxManage interface.
+
+
+Make yourself the root user
 
 	sudo -i
 
