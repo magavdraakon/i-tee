@@ -125,7 +125,11 @@ vbox = {
 EOF
 ```
 
+Enable autostartpath
 
+	su - vbox -c'VBoxManage setproperty autostartdbpath /etc/vbox'
+	chgrp vboxusers /etc/vbox
+	
 
 ## Installing phpVirtualBox 
 
@@ -323,7 +327,7 @@ if you dont have ruby installed:
 	apt-get install libyaml-dev libsqlite3-dev sqlite3 libxml2-dev 
 	apt-get install libxslt1-dev libcurl4-openssl-dev 
 
-#python-software-properties
+Do we need python-software-properties?
 
 
 Check the version of ruby and rails installed:
@@ -557,10 +561,21 @@ reload the web servers configuration files
 VirualBox permissions
 User vbox (group vboxusers)
 
-	www-data ALL=(vbox) NOPASSWD: /var/www/railsapps/i-tee/utils/start_machine.sh
 
+'''
+cat >/etc/sudoers.d/itee.sh<<END
+
+www-data ALL=(vbox) NOPASSWD: /var/www/railsapps/i-tee/utils/start_machine.sh 
+www-data ALL=(vbox) NOPASSWD: /var/www/railsapps/i-tee/utils/stop_machine.sh
+www-data ALL=(vbox) NOPASSWD: /var/www/railsapps/i-tee/utils/resume_machine.sh
+www-data ALL=(vbox) NOPASSWD: /var/www/railsapps/i-tee/utils/pause_machine.sh
+www-data ALL=(vbox) NOPASSWD: /var/www/railsapps/i-tee/utils/delete_machine.sh
+www-data ALL=(vbox) NOPASSWD: /usr/bin/VBoxManage
+END
+'''
 	
-
+Eemaldada kommentaar järgmiselt realt /etc/sudoers failist
+#includedir /etc/sudoers.d
 
 
 
