@@ -105,10 +105,10 @@ Change ***vbox*** user home directory to ***/var/labs*** and move dotfiles into 
 
 ### Creating autostart files and configuring vbox user
 To create complete virtual laboratory environment you need DNS server for fake zones, DHCP server for lab VMs and probably firewall for filtering.
-For some VMs such as nameserver, DHCP server, Fitewall etc the autostart is needed.
+For some VMs such as nameserver, DHCP server, Firewall etc the autostart is needed.
 
 ```
-cat >> /etc/default/virtualbox << EOF
+cat > /etc/default/virtualbox << EOF
 VBOXWEB_USER=vbox
 VBOXAUTOSTART_DB=/etc/vbox
 VBOXAUTOSTART_CONFIG=/etc/vbox/auto.cfg
@@ -116,7 +116,7 @@ EOF
 ```
 
 ```
-cat >> /etc/vbox/auto.cfg << EOF
+cat > /etc/vbox/auto.cfg << EOF
 default_policy = deny
 vbox = {
         allow = true
@@ -210,7 +210,7 @@ VirtualBox and phpVirtualBox versions must match. For example, for VirtualBox-4.
 
 	unzip phpvirtualbox-4.3-1.zip
 
-	cp /root/phpvirtualbox-4.3-1 /usr/share/nginx/
+	cp -a /root/phpvirtualbox-4.3-1 /usr/share/nginx/
 
 	ln -s /usr/share/nginx/phpvirtualbox-4.3-1 /usr/share/nginx/phpvirtualbox
 
@@ -239,7 +239,7 @@ Create new virtualhost for phpVirtualBox
 		ssl_prefer_server_ciphers on;
 	
 		location / {
-		        try_files $uri $uri/ /index.html;
+		        try_files \$uri \$uri/ /index.html;
 		}
 		location ~ \.php$ {
 		       fastcgi_split_path_info ^(.+\.php)(/.+)$;
@@ -289,6 +289,7 @@ Configure virtualbox RDP authenticaton
 
 	su - vbox -c'VBoxManage setproperty vrdeauthlibrary "VBoxAuthSimple"'
 
+Log in into vbox interface https://YOUR-FQDN:4433 and change admin's password. Default is admin
 
 ##Links
 
