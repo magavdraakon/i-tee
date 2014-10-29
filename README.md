@@ -562,7 +562,7 @@ VirualBox permissions
 User vbox (group vboxusers)
 
 
-'''
+```
 cat >/etc/sudoers.d/itee<<END
 www-data ALL=(vbox) NOPASSWD: /var/www/railsapps/i-tee/utils/start_machine.sh 
 www-data ALL=(vbox) NOPASSWD: /var/www/railsapps/i-tee/utils/stop_machine.sh
@@ -571,82 +571,19 @@ www-data ALL=(vbox) NOPASSWD: /var/www/railsapps/i-tee/utils/pause_machine.sh
 www-data ALL=(vbox) NOPASSWD: /var/www/railsapps/i-tee/utils/delete_machine.sh
 www-data ALL=(vbox) NOPASSWD: /usr/bin/VBoxManage
 END
-'''
+```
 
 	chmod 0440 /etc/sudoers.d/itee	
 
 
 ## Setup some aliases for root
-'''
+```
 cat >>~/.bash_aliases<<END
 alias deploy='/var/www/railsapps/i-tee/utils/deploy.sh'
 alias restart='touch /var/www/railsapps/i-tee/tmp/restart.txt'
 END
 
-'''
-
-
-
-## install a DHCP server (ie. on a virtual machine)
-make yourself the root user
-
-	sudo -i
-
-update the package list
-
-	apt-get update
-
-install the DHCP server
-
-	apt-get install dhcp3-server
-
-make a folder for backups if you dont have one
-
-	mkdir /var/backups
-
-make a back-up of the DHCP configuration
-
-	cp -r /etc/default/dhcp3-server /var/backups
-	cp /etc/dhcp3/dhcpd.conf /var/backups
-
-change the DHCP configuration
-
-	nano /etc/default/dhcp3-server
-
-	INTERFACES="eth0”
-
-change the file /etc/dhcp3/dhcpd.conf 
-
-	nano /etc/dhcp3/dhcpd.conf
-
-add:
-
-	subnet 192.168.13.0 netmask 255.255.255.0 {
-		range 192.168.13.101 192.168.13.220;
-		default-lease-time 600;
-		max-lease-time 7200;
-		option routers 192.168.13.254;
-		host virtlab101 {
-			hardware ethernet 52:54:00:e8:8b:a3;
-			fixed-address 192.168.13.101;
-		}
-	}
-
-for each planned MAC address add a host block:
-
-	host <name> {
-		hardware ethernet <MAC>;
-		fixed-address <IP>;
-	}
-
-NB! configure the domain-name
-
-	option domain-name "<domain name>";
-	option domain-name-servers 172.16.0.175, 172.16.0.165;
-
-restart the DHCP server
-
-	/etc/init.d/dhcp3-server restart
+```
 
 
 ##Other things TODO
