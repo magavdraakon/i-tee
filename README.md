@@ -563,8 +563,7 @@ User vbox (group vboxusers)
 
 
 '''
-cat >/etc/sudoers.d/itee.sh<<END
-
+cat >/etc/sudoers.d/itee<<END
 www-data ALL=(vbox) NOPASSWD: /var/www/railsapps/i-tee/utils/start_machine.sh 
 www-data ALL=(vbox) NOPASSWD: /var/www/railsapps/i-tee/utils/stop_machine.sh
 www-data ALL=(vbox) NOPASSWD: /var/www/railsapps/i-tee/utils/resume_machine.sh
@@ -573,9 +572,18 @@ www-data ALL=(vbox) NOPASSWD: /var/www/railsapps/i-tee/utils/delete_machine.sh
 www-data ALL=(vbox) NOPASSWD: /usr/bin/VBoxManage
 END
 '''
-	
-Eemaldada kommentaar järgmiselt realt /etc/sudoers failist
-#includedir /etc/sudoers.d
+
+	chmod 0440 /etc/sudoers.d/itee	
+
+
+## Setup some aliases for root
+'''
+cat >>~/.bash_aliases<<END
+alias deploy='/var/www/railsapps/i-tee/utils/deploy.sh'
+alias restart='touch /var/www/railsapps/i-tee/tmp/restart.txt'
+END
+
+'''
 
 
 
@@ -655,6 +663,13 @@ load the settings:
 
 
 #TODO
+
+##Config
+  # hostname for rdp sessions
+  config.rdp_host = 'elab.itcollege.ee'
+  # port prefix for rdp sessions
+  config.rdp_port_prefix = '10'
+
 
 Integration with btrfs deduplication tool: https://github.com/g2p/bedup
 
