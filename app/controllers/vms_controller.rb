@@ -254,7 +254,7 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
       begin
         rdp_host=ITee::Application.config.rdp_host
       rescue
-        rdp_host=`hostname -f`
+        rdp_host=`hostname -f`.strip
       end
       begin
         rdp_port_prefix = ITee::Application.config.rdp_port_prefix
