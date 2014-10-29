@@ -17,6 +17,11 @@ ITee::Application.configure do
   config.admins = ['admin']
   config.managers = ['manager']
 
+  # hostname for rdp sessions
+  config.rdp_host = 'elab.itcollege.ee'
+  # port prefix for rdp sessions
+  config.rdp_port_prefix = '10'
+
    # determine how many instances are shown per page
   config.per_page=15
   
