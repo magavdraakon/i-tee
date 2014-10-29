@@ -238,7 +238,7 @@ Create new virtualhost for phpVirtualBox
 	
 		ssl_session_timeout 5m;
 	
-		ssl_protocols SSLv3 TLSv1;
+		ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
 		ssl_ciphers ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv3:+EXP;
 		ssl_prefer_server_ciphers on;
 	
