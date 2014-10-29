@@ -505,7 +505,7 @@ Create a file
 
 And insert the following lines
 
-
+```
    <VirtualHost *:80>
       ServerName www.yourhost.com
       # !!! Be sure to point DocumentRoot to 'public'!
@@ -534,10 +534,12 @@ And insert the following lines
     LogLevel warn
     CustomLog /var/log/apache2/access-itee.log combined
     SSLEngine on
+    SSLProtocol All -SSLv2 -SSLv3
     SSLCertificateFile /etc/apache2/project.pem
     SSLCertificateKeyFile /etc/apache2/project.key
     SSLOptions +StdEnvVars
   </VirtualHost>
+```
 
 Enable ssl, headers and rewrite modules
 
