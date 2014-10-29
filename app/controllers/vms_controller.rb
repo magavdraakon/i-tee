@@ -251,7 +251,17 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
       #logger.info @a
       
       port=@mac.ip.split('.').last
-      vm.description="To create a connection with this machine using linux/unix use<br/><strong>rdesktop -k et -u#{current_user.username} -p#{vm.password} -N -a16 elab.itcollege.ee:10#{port}</strong></br> or use xfreerdp as</br><strong>xfreerdp --plugin cliprdr -g 90% -u #{current_user.username} -p #{vm.password} elab.itcollege.ee:10#{port}</strong></br>"
+      begin
+        rdp_host=ITee::Application.config.rdp_host
+      rescue
+        rdp_host=`hostname -f`
+      end
+      begin
+        rdp_port_prefix = ITee::Application.config.rdp_port_prefix
+      rescue
+        rdp_port_prefix = '10'
+      end
+      vm.description="To create a connection with this machine using linux/unix use<br/><strong>rdesktop -k et -u#{current_user.username} -p#{vm.password} -N -a16 #{rdp_host}:#{rdp_port_prefix}#{port}</strong></br> or use xfreerdp as</br><strong>xfreerdp --plugin cliprdr -g 90% -u #{current_user.username} -p #{vm.password} #{rdp_host}:#{rdp_port_prefix}#{port}</strong></br>"
       
       vm.save
        
