@@ -114,7 +114,6 @@ $(".marked code").each(function(){
   // but only code with multiple lines should have line numbers
   if ($(this).parent()[0].tagName!="P"){
     $(this).addClass("linenums");
-    $(this).parent().css('background','black');
   }
 });
 
