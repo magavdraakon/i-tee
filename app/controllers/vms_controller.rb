@@ -248,7 +248,6 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
     if vm.state!="running" && vm.state!="paused"
       logger.info "käivitame masina skripti"
       @a=vm.ini_vm #the script is called in the model
-      #logger.info @a
       
       port=@mac.ip.split('.').last
       begin
@@ -261,14 +260,15 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
       rescue
         rdp_port_prefix = '10'
       end
-      vm.description="To create a connection with this machine using linux/unix use<br/><strong>rdesktop -k et -u#{current_user.username} -p#{vm.password} -N -a16 #{rdp_host}:#{rdp_port_prefix}#{port}</strong></br> or use xfreerdp as</br><strong>xfreerdp  -k et --plugin cliprdr -g 90% -u #{current_user.username} -p #{vm.password} #{rdp_host}:#{rdp_port_prefix}#{port}</strong></br>"
+      vm.description="To create a connection with this machine using linux/unix use<br/><strong>rdesktop -k et -u#{vm.user.username} -p#{vm.password} -N -a16 #{rdp_host}:#{rdp_port_prefix}#{port}</strong></br> or use xfreerdp as</br><strong>xfreerdp  -k et --plugin cliprdr -g 90% -u #{vm.user.username} -p #{vm.password} #{rdp_host}:#{rdp_port_prefix}#{port}</strong></br>"
       
       vm.save
        
       if @a.include?("masin #{vm.name} loodud")
         flash[:notice]=flash[:notice]+"<br/>"+vm.description
         flash[:notice]=flash[:notice].html_safe
-      else  
+      else
+        logger.info @a  
         @mac.vm_id=nil
         @mac.save
         flash[:notice]=nil

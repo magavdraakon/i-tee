@@ -79,6 +79,7 @@ ITee::Application.routes.draw do
   match 'vms_by_state', :to=>'vms#vms_by_state'
   match 'vms_by_state/:state', :to=>'vms#vms_by_state'
   
+  match 'my_labs/:id/:user_id', :to => 'labs#labs'
   match 'my_labs/:id', :to => 'labs#labs'
   match 'my_labs', :to =>'labs#labs'
 

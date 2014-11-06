@@ -143,7 +143,18 @@ class LabsController < ApplicationController
 
   # view and do labs - user view
   def labs
-    get_user_labs # @labs (all labs), @started, @complete, @not_started
+
+    @user=current_user # by default get the current user
+    if params[:user_id] then # if there is a user_id in the url
+      if  @admin then #  admins can use this to view users labs
+        @user=User.find(params[:user_id]) 
+      else # normal users are redirected to their own lab (if they dont have one, another redirect will happen)
+        logger.debug "\n'#{current_user.username}' redirected: not their lab & not admin \n"
+        redirect_to(my_labs_path+"/"+ (params[:id] ? params[:id] : "")) and return
+      end
+    end
+
+    get_user_labs(@user) # @labs (all labs), @started, @complete, @not_started
     
     # if no course is selected show the first one
     if params[:id]!=nil then
@@ -154,116 +165,14 @@ class LabsController < ApplicationController
     
     # to avoid users from seeing labs, that arent for them
     if !@labs.include?(@lab) && @labs!=[] then
-     redirect_to(error_401_path)
+      logger.debug "\n'#{current_user.username}' redirected: dont have lab '#{@lab.name}' (#{@lab.id}) \n"
+     redirect_to(error_401_path) and return
     end
-    
-    # decide what to show the user
-    if @started.include?(@lab) then
-      # get the latest lab_user and all the needed info to show the lab
-      @lab_user = LabUser.find(:last, :conditions=>["lab_id=? and user_id=?", @lab.id, current_user.id])
-      @vms=Vm.find_by_sql(["select * from vms where user_id=? and lab_vmt_id in (select id from lab_vmts where lab_id=?)", current_user.id, @lab_user.lab_id])
-    end
-    if @complete.include?(@lab) then
-      # get the latest lab_user and all the lab info with it
-      @lab_user = LabUser.find(:last, :conditions=>["lab_id=? and user_id=?", @lab.id, current_user.id])
-    end
+
+    @lab_user = LabUser.find(:last, :conditions=>["lab_id=? and user_id=?", @lab.id, @user.id])
     
     rescue ActiveRecord::RecordNotFound
-      redirect_to(my_labs_path)
-  end
-  
-  
-  #view of labs that can be started/continued/viewed
-  def courses    
-    
-    get_user_labs
-      
-    # if no course is selected show the first one
-    if params[:id]!=nil then
-      @lab = Lab.find(params[:id])
-    else
-      @lab=@labs.first 
-    end
-     
-   # to avoid users from seeing labs, that arent for them
-    if !@labs.include?(@lab) && @labs!=[] then
-     redirect_to(error_401_path)
-    end
-    rescue ActiveRecord::RecordNotFound
-      redirect_to(my_labs_path)
-  end
-  
-  def ended_lab
-    get_user_labs
-    @lab=Lab.find_by_id(params[:id])
-    if @lab==nil 
-      @lab=@complete.first
-    end
-    @other=@complete  
-    
-    @lab_user = LabUser.find(:last, :conditions=>["lab_id=? and user_id=?", @lab.id, current_user.id]) if @lab!=nil
-    @note=""
-    
-    if @lab_user==nil && @lab!=nil
-      #the lab is not meant for this user, redirect
-      redirect_to(error_401_path)
-    end
-    render :action=>"running_lab"
-    rescue ActiveRecord::RecordNotFound
-      redirect_to(my_labs_path)      
-  end
-  
-  
-  #view for running or completed labs
-  def running_lab
-    get_user_labs
-    @lab=Lab.find_by_id(params[:id])
-    
-    if @lab==nil 
-      @lab=@started.first
-    end
-    @other=@started
-    #find the last appearance of the current users lab (repeating a lab made possible)
-    @lab_user = LabUser.find(:last, :conditions=>["lab_id=? and user_id=?", @lab.id, current_user.id]) if @lab!=nil
-    @note=""
-    @vms=[]
-    
-    if @lab_user!=nil then #this user has this lab
-      # generating vm info if needed
-      @lab_user.lab.lab_vmts.each do |template|
-        #is there a machine like that already?
-        vm=Vm.find(:first, :conditions=>["lab_vmt_id=? and user_id=?", template.id, current_user.id ])
-        if vm==nil then
-          #no there is not
-          v=Vm.new
-          v.name="#{template.name}-#{current_user.username}"
-          v.lab_vmt_id=template.id
-          v.user_id=current_user.id
-                
-          #vm description TODO add login info
-          v.description="Initialize the virtual machine by clicking <strong>Start</strong>."
-  
-          v.save
-          @note="Machines successfully generated."
-          @vms<<v
-        else
-          @vms<<vm
-        end
-      end #end of making vms based of templates
-      if @lab_user.start==nil then
-        @lab_user.start=Time.now
-        @lab_user.save
-        #first time access to the lab
-        @status="running"
-        @other=@other+[@lab_user.lab]
-      end
-    else
-      #the lab is not meant for this user, redirect
-      redirect_to(error_401_path) if @lab!=nil
-  end
-  
-  rescue ActiveRecord::RecordNotFound
-    redirect_to(my_labs_path)
+      redirect_to(my_labs_path) and return
   end
   
   # method for starting a lab, creates virtual machine dbrows and sets the start time for the lab
@@ -278,9 +187,9 @@ class LabsController < ApplicationController
     if @lab_user!=nil then
       # yes, this user has this lab
       # generating vm info if needed
-      @lab_user.lab.lab_vmts.each do |template|
+      @lab_user.vmts.each do |template|
         #is there a machine like that already?
-        vm=Vm.find(:first, :conditions=>["lab_vmt_id=? and user_id=?", template.id, current_user.id ])
+        vm = Vm.where("lab_vmt_id=? and user_id=?", template.id, current_user.id).first
         if vm==nil then
           #no there is not
           v=Vm.new
@@ -363,13 +272,13 @@ class LabsController < ApplicationController
   
 
   private #----------------------------------------------------------------------------------
-   def get_user_labs
+   def get_user_labs(user)
     @labs=[] #only let the users pick from labs assigned to them
     @started=[]
     @complete=[]
     @not_started=[]
     #categorize the labs, order: running, not started, ended
-    labusers=LabUser.find(:all, :conditions=>["user_id=?", current_user.id], :order => 'end ASC, start DESC')
+    labusers=LabUser.find(:all, :conditions=>["user_id=?", user.id], :order => 'end ASC, start DESC')
     labusers.each do |u|
       @labs<<u.lab        
       @started<<u.lab  if u.start!=nil && u.end==nil 

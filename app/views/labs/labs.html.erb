@@ -20,7 +20,11 @@
 <%end%>  
 
 <% content_for :sidebar_head do %>
-  My labs
+  <% if @user!=current_user then %>
+    <b><u><%= @user.username %></u> labs</b>
+  <% else %>
+    <b>My labs</b>
+  <% end %>
 <%end%>
 
 
@@ -32,8 +36,8 @@
 
 <p>
   <% if @labs!=[] then%>
-    <%= link_to('Start lab',start_lab_path+"/"+@lab.id.to_s, :class=>'submit-button button') if @lab_user==nil %>
-    <%if @lab_user!=nil then%>
+    <%= link_to('Start lab',start_lab_path+"/"+@lab.id.to_s, :class=>'submit-button button') if @lab_user.start==nil %>
+    <%if @lab_user.start!=nil then%>
       <!-- started at: <%#=@lab_user.start%><br/>
           ended at: <%#=@lab_user.end%><br/>-->
     <script>
@@ -43,7 +47,7 @@
         //  $('#updated_progress').html(data);
         //});
         <% if @lab_user.end==nil then %>
-          <%@vms.each do |vm| %>
+          <% @lab_user.vms.each do |vm| %>
             <%if vm.state=="running" || vm.state=="paused" then%>
               $.get('/vms/get_progress/'+<%=vm.id%>, function(data) {
               $('#vm_progress<%=vm.id%>').html(data);});
@@ -60,8 +64,8 @@
       
     <%if @lab_user.end==nil then %>
       <h3>Virtual machines</h3>
-      <%= "There are no machines allocated for this lab" if @vms.empty?%>
-      <% @vms.each do |vm| %>
+      <%= "There are no machines allocated for this lab" if @lab_user.vms.empty? %>
+      <% @lab_user.vms.each do |vm| %>
         <p>
         <%state=vm.state 
           desc="Initialize the virtual machine #{vm.name} by clicking <strong>Start</strong>."
@@ -70,8 +74,8 @@
           <%=vm.name%>
           <%if vm.mac!=nil && state=="running"%>,
             RDP info: elab.itcollege.ee:10<%=vm.mac.ip.split('.').last if vm.mac!=nil%>,
-            user: <%=current_user.username%>,
-            pwd: <%=vm.password%>
+            user: <%= @lab_user.user.username %>,
+            pwd: <%= vm.password %>
           <%end%>
         </span> 
         <%if state=="running" && vm.mac!=nil && vm.lab_vmt.vmt.shellinabox then %>
@@ -100,7 +104,7 @@
     <%end%>
   <%end%>
   <p class="loader">
-    <%= link_to('Start all machines',start_all_path+"/"+@lab.id.to_s, :class=>"button start-button") if @lab_user.end==nil && !@vms.empty? %>
+    <%= link_to('Start all machines',start_all_path+"/"+@lab.id.to_s, :class=>"button start-button") if @lab_user.end==nil && !@lab_user.vms.empty? %>
   </p>    
     
 
