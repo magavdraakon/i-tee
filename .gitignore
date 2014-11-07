@@ -12,3 +12,4 @@ config/environments/production.rb
 config/environments/test.rb
 doc/*
 *~
+.idea/*

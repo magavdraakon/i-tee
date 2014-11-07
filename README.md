@@ -218,7 +218,7 @@ VirtualBox and phpVirtualBox versions must match. For example, for VirtualBox-4.
 
 	ln -s /usr/share/nginx/phpvirtualbox-4.3-1 /usr/share/nginx/phpvirtualbox
 
-	chown www-data:www-data /usr/share/nginx/phpvirtualbox -R
+	chown data:www-data /usr/share/nginx/phpvirtualbox -R
 
 
 Create new virtualhost for phpVirtualBox
@@ -368,6 +368,7 @@ Creating the user for the database:
 	create database itee_production character set utf8;
 	create user 'itee'@'localhost' identified by 's0mestrongpassw0rd<- CHANGETHISPASSWORD!';
 	grant all privileges on itee_production.* to 'itee'@'localhost';
+	quit;
 
 Create new file config/database.yml for database credentials with following content:
 
@@ -409,6 +410,8 @@ And change the info according to your own LDAP server settings
 	  ssl: true
 
 And change information about group_base:
+
+
 
 ## Gems, database migration
 
@@ -481,17 +484,21 @@ For example:
 
 
 insert the similar lines into the .conf file
-	<IfModule mod_passenger.c>
-	    PassengerRoot /usr/lib/ruby/gems/CHANGEVERSION/gems/passenger-<version>
-	    PassengerRuby /usr/bin/rubyCHANGEVERSION
-	</IfModule>
+
+```
+<IfModule mod_passenger.c>
+    PassengerRoot /usr/lib/ruby/gems/CHANGEVERSION/gems/passenger-<version>
+    PassengerRuby /usr/bin/rubyCHANGEVERSION
+</IfModule>
+```
 
 For example:
-	<IfModule mod_passenger.c>
-	     PassengerRoot /var/lib/gems/1.9.1/gems/passenger-4.0.53
-	     PassengerDefaultRuby /usr/bin/ruby1.9.1
-	 </IfModule>
-
+```
+<IfModule mod_passenger.c>
+PassengerRoot /var/lib/gems/1.9.1/gems/passenger-4.0.53
+PassengerDefaultRuby /usr/bin/ruby1.9.1
+</IfModule>
+```
 execute these commands to enable passenger and restart the apache server
 
 	a2enmod passenger
@@ -562,7 +569,12 @@ reload the web servers configuration files
 
 VirualBox permissions
 User vbox (group vboxusers)
+	
+	adduser www-data vboxusers
 
+Change owner for /var/www directory
+
+	chown www-data:www-data /var/www -R
 
 ```
 cat >/etc/sudoers.d/itee<<END
@@ -575,8 +587,15 @@ www-data ALL=(vbox) NOPASSWD: /usr/bin/VBoxManage
 END
 ```
 
+
 	chmod 0440 /etc/sudoers.d/itee	
 
+Make config directory for virtualbox
+
+```
+mkdir /var/www/.config/
+chown vbox:vbox /var/www/.config/
+```
 
 ## Setup some aliases for root
 ```
@@ -587,28 +606,21 @@ END
 
 ```
 
+## Test your installation
+Test your installation using web browser
 
-##Other things TODO
+https://YOUR-FQDN:4433 << change phpvitualbox default admin password!!!
 
-enable port forwarding using iptables
+https://YOUR-FQDN
 
-	pre-up /var/www/railsapps/i-tee/utils/port-forward.sh
+## TODO and configuration hints
 
-	net.ipv4.ip_forward=1
-
-load the settings:
-
-	sysctl -p /etc/sysctl.conf
-
-
-#TODO
-
-##Config
+```
   # hostname for rdp sessions
   config.rdp_host = 'elab.itcollege.ee'
   # port prefix for rdp sessions
   config.rdp_port_prefix = '10'
-
+```
 
 Integration with btrfs deduplication tool: https://github.com/g2p/bedup
 
@@ -632,13 +644,13 @@ For documentation:
 # Some common errors
 
 Error in creating database using rake
-
+```
 	rake aborted!
 	Psych::SyntaxError: (<unknown>): found character that cannot start any token while scanning for the next token at line 2 column 1
 	/usr/lib/ruby/1.9.1/psych.rb:203:in `parse'
 	/usr/lib/ruby/1.9.1/psych.rb:203:in `parse_stream'
 	/usr/lib/ruby/1.9.1/psych.rb:151:in `parse'
-
+```
 This indicates that you have tab in yaml file. Replace tabs with spaces.
 
 # Authors
