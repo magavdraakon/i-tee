@@ -141,133 +141,132 @@ class LabsController < ApplicationController
     end
   end
 
+
   # view and do labs - user view
   def labs
-
-    @user=current_user # by default get the current user
-    if params[:user_id] then # if there is a user_id in the url
-      if  @admin then #  admins can use this to view users labs
-        @user=User.find(params[:user_id]) 
-      else # normal users are redirected to their own lab (if they dont have one, another redirect will happen)
-        logger.debug "\n'#{current_user.username}' redirected: not their lab & not admin \n"
-        redirect_to(my_labs_path+"/"+ (params[:id] ? params[:id] : "")) and return
+    get_user # @user - either lab owner or current user
+    if !@user && params[:username] then
+          logger.debug "There is no user named '#{params[:username]}'"
+          flash[:notice] = "There is no user named '#{params[:username]}'"
+          redirect_to :back and return
+    elsif !@admin && params[:username] then # simple user should not have the username in url
+      logger.debug "\nmy_labs: Relocate user\n"
+      # simple user should not have the username in url
+      redirect_to(my_labs_path+(params[:id] ? "/#{params[:id]}" : ""))
+    else
+      get_user_labs(@user) # @labs (all labs), @started, @complete, @not_started
+      # if no course is selected show the first one
+      if params[:id]!=nil then
+        @lab = Lab.find(params[:id])
+      else
+        @lab=@labs.first 
+      end
+      # to avoid users from seeing labs, that arent for them
+      if !@labs.include?(@lab) && @labs!=[] then
+        logger.debug "\n'#{current_user.username}' redirected: dont have lab '#{@lab.name}' (#{@lab.id}) \n"
+        redirect_to(error_401_path) and return
+      else
+        @lab_user = LabUser.find(:last, :conditions=>["lab_id=? and user_id=?", @lab.id, @user.id])
       end
     end
 
-    get_user_labs(@user) # @labs (all labs), @started, @complete, @not_started
-    
-    # if no course is selected show the first one
-    if params[:id]!=nil then
-      @lab = Lab.find(params[:id])
-    else
-      @lab=@labs.first 
-    end
-    
-    # to avoid users from seeing labs, that arent for them
-    if !@labs.include?(@lab) && @labs!=[] then
-      logger.debug "\n'#{current_user.username}' redirected: dont have lab '#{@lab.name}' (#{@lab.id}) \n"
-     redirect_to(error_401_path) and return
-    end
-
-    @lab_user = LabUser.find(:last, :conditions=>["lab_id=? and user_id=?", @lab.id, @user.id])
-    
     rescue ActiveRecord::RecordNotFound
       redirect_to(my_labs_path) and return
+    rescue ActionController::RedirectBackError # cant redirect back? go to the lab instead
+      logger.info "\nNo :back error\n"
+      redirect_to(my_labs_path+(params[:id] ? "/#{params[:id]}" : ""))
   end
   
+
   # method for starting a lab, creates virtual machine dbrows and sets the start time for the lab
   def start_lab
     @lab=Lab.find(params[:id])  
-    if @lab==nil then
-      flash[:alert]  = "No such lab exists!"
-      redirect_to(error_401_path)
-    end
-    # ok, there is such lab, but does the user have it?
-    @lab_user = LabUser.find(:last, :conditions=>["lab_id=? and user_id=?", @lab.id, current_user.id]) 
-    if @lab_user!=nil then
-      # yes, this user has this lab
-      # generating vm info if needed
-      @lab_user.vmts.each do |template|
-        #is there a machine like that already?
-        vm = Vm.where("lab_vmt_id=? and user_id=?", template.id, current_user.id).first
-        if vm==nil then
-          #no there is not
-          v=Vm.new
-          v.name="#{template.name}-#{current_user.username}"
-          v.lab_vmt_id=template.id
-          v.user_id=current_user.id
-                
-          #vm description TODO add login info
-          v.description="Initialize the virtual machine by clicking <strong>Start</strong>."
-  
-          v.save
-          logger.debug "Machine #{v.name} successfully generated."
-        end
-      end #end of making vms based of templates
-      
-      if @lab_user.start==nil then #first time access to the lab 
-        @lab_user.start=Time.now
-        @lab_user.save
+    get_user # @user - either lab owner or current user
+    if !@user && params[:username] then
+      logger.debug "There is no user named '#{params[:username]}'"
+      flash[:notice] = "There is no user named '#{params[:username]}'"
+      redirect_to :back and return
+    elsif !@admin && params[:username] then
+      logger.debug "\n start_lab: Relocate user\n"
+      # simple user should not have the username in url
+      redirect_to(my_labs_path+(params[:id] ? "/#{params[:id]}" : ""))
+    else 
+      # ok, there is such lab, but does the user have it?
+      @lab_user = LabUser.find(:last, :conditions=>["lab_id=? and user_id=?", @lab.id, @user.id]) 
+      if @lab_user!=nil then       # yes, this user has this lab
+        logger.debug "\nStarting '#{@lab_user.user.username}' lab '#{@lab_user.lab.name}' as admin\n" if @admin
+        # generating vm info if needed
+        @lab_user.start_lab
+      else
+        # no this user does not have this lab
+        flash[:alert] = "That lab was not assigned to you!"
+        redirect_to(my_labs_path)
       end
-        
-    else
-      # no this user does not have this lab
-      flash[:alert]  = "That lab was not assigned to you!"
+      # what is done is done, redirect the user back to view the lab
+      redirect_to :back
+    end #is ok
+    rescue ActiveRecord::RecordNotFound # if find cant find
       redirect_to(my_labs_path)
-    end
-    
-    # what is done is done, redirect the user back to view the lab
-    redirect_to(my_labs_path+"/"+@lab.id.to_s)
-    
-    rescue ActiveRecord::RecordNotFound
-      redirect_to(my_labs_path)
+    rescue ActionController::RedirectBackError # cant redirect back? go to the lab instead
+      logger.info "\nNo :back error\n"
+      redirect_to(my_labs_path+(@lab ? "/#{@lab.id}" : "")+(@lab && params[:username] ? "/#{params[:username]}" : ""))
   end
   
   #method for ending a lab, deletes virtual machine db rows and sets the end date for the lab
   def end_lab
-    @lab_user=LabUser.find(params[:id])
-    @note=""
-    #check if this is this users lab (to not allow url hacking)
-    if current_user==@lab_user.user 
-      # get the vms for this lab_user
-      @vms=Vm.find_by_sql(["select * from vms where user_id=? and lab_vmt_id in (select id from lab_vmts where lab_id=?)", current_user.id, @lab_user.lab_id])
-      @vms.each do |vm|
-        vm.destroy
-        @note="Machine #{vm.name} successfully deleted."
-      end
-      #end of deleting vms for this lab
-  
-      @lab_user.end=Time.now
-      @lab_user.save 
-      
-      redirect_to(my_labs_path+"/"+@lab_user.lab.id.to_s)
+    @lab_user=LabUser.find(params[:id]) #NB! not based on lab, but based on attempt!
+    #check if this is this users lab (to not allow url hacking) or if the user is admin
+    if current_user==@lab_user.user || @admin then
+      logger.debug "\nEnding '#{@lab_user.user.username}' lab '#{@lab_user.lab.name}' as admin\n" if @admin
+      # remove the vms for this lab_user
+      @lab_user.end_lab
+      # back to the view the link was in
+      redirect_to :back
     else #this lab doesnt belong to this user, permission error
       flash[:alert]  = "Restricted access!"
       redirect_to(error_401_path)
     end # end- this users lab
-  
     rescue ActiveRecord::RecordNotFound
       redirect_to(my_labs_path)
+    rescue ActionController::RedirectBackError # cant redirect back? go to the lab instead
+      logger.info "\nNo :back error\n"
+      redirect_to(my_labs_path+(@lab_user.lab ? "/#{@lab_user.lab.id}" : ""))
   end
   
   #restarting a lab means deleting virtual machines, removing start/end times and progress/results
   def restart_lab
     @lab=Lab.find(params[:id])
-    @lab_user=LabUser.find(:last, :conditions=>["lab_id=? and user_id=?", @lab.id, current_user.id])
-    if @lab_user!=nil 
-      @lab_user.update_attributes(:progress =>nil, :result =>nil, :start=>nil, :pause=>nil, :end=>nil) 
-    
-      @vms=Vm.find_by_sql(["select * from vms where user_id=? and lab_vmt_id in (select id from lab_vmts where lab_id=?)", current_user.id, @lab_user.lab_id])
-      @vms.each do |vm|
-        vm.destroy
-        logger.debug"Machine #{vm.name} successfully deleted."
+    get_user
+    if !@user && params[:username] then
+          logger.debug "There is no user named '#{params[:username]}'"
+          flash[:notice] = "There is no user named '#{params[:username]}'"
+          redirect_to :back and return
+    elsif !@admin && params[:username] then
+      logger.debug "\nuser '#{current_user.username}' tried to load '#{params[:username]}' lab and was redirected to own lab\n"
+      # simple user should not have the username in url
+      redirect_to(my_labs_path+(params[:id] ? "/#{params[:id]}" : ""))
+    else
+      @lab_user=LabUser.where("lab_id=? and user_id=?", @lab.id, @user.id).first
+      if @lab_user!=nil then
+        logger.debug "\nRestarting '#{@lab_user.user.username}' lab '#{@lab_user.lab.name}' as admin\n" if @admin
+        # end lab by removing vms
+        @lab_user.end_lab
+        # clear time and other fields
+        @lab_user.update_attributes(:progress =>nil, :result =>nil, :start=>nil, :pause=>nil, :end=>nil) 
+        # create vms and set start time
+        @lab_user.start_lab
+      else # no this user does not have this lab
+        flash[:alert]  = "That lab was not assigned to you!"
+        redirect_to(my_labs_path)
       end
-      #end of deleting vms for this lab
-      
-    end#lab user exists
-    redirect_to(start_lab_path+"/"+@lab.id.to_s)
+      # redirect back to the view the link was in
+      redirect_to :back
+    end
     rescue ActiveRecord::RecordNotFound
       redirect_to(my_labs_path)
+    rescue ActionController::RedirectBackError # cant redirect back? go to the lab instead
+      logger.info "\nNo :back error\n"
+      redirect_to(my_labs_path+(@lab ? "/#{@lab.id}" : "")+(@lab && params[:username] ? "/#{params[:username]}" : ""))
   end
   
 
@@ -287,4 +286,12 @@ class LabsController < ApplicationController
     @not_started=@labs-@started-@complete
   end
   
+  def get_user
+    @user=current_user # by default get the current user
+    if params[:username] then # if there is a user_id in the url
+      if  @admin then #  admins can use this to view users labs
+        @user = User.where("username = ?",params[:username]).first 
+      end
+    end
+  end
 end

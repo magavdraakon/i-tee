@@ -178,16 +178,22 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
   #start all the machines this user has in a given lab
   def start_all
     @lab=Lab.find_by_id(params[:id])
-    @labuser=LabUser.find(:last, :conditions=>["lab_id=? and user_id=?", @lab.id, current_user.id]) if @lab!=nil
-    redirect=:back
-    if (@labuser==nil && @lab!=nil) || @lab==nil #either the lab doesnt exist or the user doesnt have it
+    @user=current_user
+    if params[:username] && @admin then
+      @user = User.where("username = ?",params[:username]).first 
+      @user = curent_user unless @user # in case of mistyped username 
+    end
+
+    @labuser = LabUser.find(:last, :conditions=>["lab_id=? and user_id=?", @lab.id, @user.id]) if @lab!=nil
+    redirect = :back
+    if (@labuser == nil && @lab!=nil) || @lab==nil #either the lab doesnt exist or the user doesnt have it
       redirect=error_401_path
     end
     if @labuser!=nil #user has this lab
       flash[:notice]=""
       
-      current_user.vms.each do |vm|
-        if vm.lab_vmt.lab.id==@lab.id && (vm.state!="running" || vm.state!="paused")
+      @labuser.vms.each do |vm|
+        if vm.state!="running" || vm.state!="paused" then
           init_vm(vm) 
           logger.info vm.name
         
@@ -201,11 +207,12 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
           end
           }
            flash[:notice]=flash[:notice]+"<br/>"
-        end #end if right lab
+        end #end if not running or paused
       end #end iterate trough vms
     end#end if labuser
     flash[:notice]=flash[:notice].html_safe
     redirect_to(redirect)
+
     rescue Timeout::Error
       flash[:alert]="Starting all virtual machines failed, try starting them one by one."
       flash[:notice]=nil
@@ -222,6 +229,7 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
     flash[:notice]=""
     init_vm(@vm)
   #  flash[:alert]=@a
+    flash[:notice]=flash[:notice].html_safe
     redirect_to(:back)
     rescue ActionController::RedirectBackError  # cant redirect back? go to the lab instead
       logger.info "\nNo :back error\n"
@@ -266,7 +274,7 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
        
       if @a.include?("masin #{vm.name} loodud")
         flash[:notice]=flash[:notice]+"<br/>"+vm.description
-        flash[:notice]=flash[:notice].html_safe
+        #flash[:notice]=flash[:notice].html_safe
       else
         logger.info @a  
         @mac.vm_id=nil
@@ -354,8 +362,8 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
   def get_progress
     
     @vm=Vm.find_by_id(params[:id])
-    unless @vm.user.id==current_user.id || @admin then 
-      @vm=Vm.new#dummy
+    unless @vm || @vm.user.id==current_user.id || @admin then 
+      @vm=Vm.new #dummy
     end
     render :partial => 'shared/vm_progress' 
   end
@@ -370,5 +378,5 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
       redirect_to(vms_path)
     end
   end
-  
+
 end

@@ -32,4 +32,7 @@ class User < ActiveRecord::Base
     return ub.count>0
   end
 
+  def has_lab(lab_id)
+    LabUser.where("user_id=? and lab_id=?", self.id, lab_id).size > 0 ? true : false
+  end
 end
