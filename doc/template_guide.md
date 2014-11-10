@@ -27,3 +27,7 @@ Shellinabox AJAX console for web based logins
 The virtual machine can give feedback to the web inferface using a simple protocol
 
     curl --insecure https://elab.itcollege.ee/set_progress?ip=<ip>&progress=<progress '_' for break>
+    
+##Kali linux
+
+    mount -o remount,exec,ro /dev/cdrom
