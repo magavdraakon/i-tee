@@ -127,3 +127,18 @@ function shownotice(html){
   $("#messages").html("<div escape=\"false\" id=\"flash_notice\"></div>");
   $("#flash_notice").html(html);
 }
+
+function toggle_checked_all(el){
+   $('.found input[type=checkbox]').prop('checked', el.checked);
+}
+function expandnext(el){
+  $(el).parents("tr").next("tr").toggle();
+  if ( $(el).text()=="Expand") 
+     $(el).text("Collapse")
+  else 
+     $(el).text("Expand")
+}
+function show_date(el){
+  if (el.checked) $("#expires").show();
+  else  $("#expires").hide();
+}

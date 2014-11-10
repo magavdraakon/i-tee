@@ -5,13 +5,13 @@
     <% classes="" #default
        classes= "bold" if lab.id==@lab.id %>
       <%if lab==@started.first then%>
-      <li>Started</li>
+      <li class="upper">Started</li>
       <% end 
          if lab==@not_started.first then%>
-      <li>Not started</li>
+      <li class="upper">Not started</li>
       <% end  
          if lab==@complete.first then%>
-      <li>Completed</li>
+      <li class="upper">Completed</li>
       <%end%>
       <li class="<%= classes %>">
       <%= link_to(lab.name, :controller=>'labs', :action=>'labs', :id=>lab.id)%>

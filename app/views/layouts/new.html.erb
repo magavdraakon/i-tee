@@ -39,6 +39,9 @@
               <div class="mb b_menu <%if @tab=="manager"%>current_tab<%end%>">
                 <%=link_to 'Manage users', users_path %>
               </div>
+              <div class="sb b_menu <%if @tab=="search"%>current_tab<%end%>">
+                <%=link_to 'Search', search_path %>
+              </div>
             <%end%>
             <div class="r_menu b_menu">
               <%# if user_signed_in? %>

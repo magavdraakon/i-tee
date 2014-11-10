@@ -1,0 +1,71 @@
+<% host=request.host host=host+":3000" if host=="localhost" %>
+<%= form_tag("/search", method: "get") do %>
+  <%= label_tag(:t, "Search for:") %>
+  <%= select_tag :t, options_for_select(["Lab","User", "Lab user"] , params[:t]), :prompt=>'Please choose' %>
+  <%= text_field_tag(:q, params[:q]) %>
+  
+  <%= submit_tag("Search") %>
+<% end %>
+<div id="index_t">
+<% if @users then %>
+<p>Found <%= @users.size %> users</p>
+	<%= form_for @users, :url => search_path do |f| %>
+	<input type="hidden" name="t" value="User" />
+	<input type="hidden" name="q" value="<%= params[:q] %>" />
+		<table >
+			<tr>
+				<th><label><input type="checkbox"  onclick="toggle_checked_all(this);" autocomplete="off"/><span> all</span></label></th>
+				<th>Username</th>
+				<th>labs</th>
+				<th><%=link_to("Last login", :controller=>"lab_users",:action=>"search", :sort_by=>"last_sign_in_at", :dir=>@dir, :t=>params[:t], :q=>params[:q])%></th>
+				<th>Token</th>
+				<th><%=link_to("Token expires", :controller=>"lab_users",:action=>"search", :sort_by=>"token_expires", :dir=>@dir, :t=>params[:t], :q=>params[:q])%></th>
+				<th></th>
+			</tr>
+		<% @users.each do |user| %>
+		<tr class="found">
+			<td><%= check_box_tag 'id[]', user.id  %></td>
+			<td><%= user.username %></td>
+			<td><%= user.lab_users.count %></td>
+			<td><span title="<%= user.last_sign_in_at %>"><%= distance_of_time_in_words(Time.now, user.last_sign_in_at.to_time )+" ago" if user.last_sign_in_at %></span></td>
+			<td><%=user.authentication_token.blank? ? "No token" : link_to("#{host}#{root_path(:auth_token => user.authentication_token)}", root_path(:auth_token => user.authentication_token)) %></td>
+			<td><span title="<%=user.token_expires %>"><%= (user.token_expires.to_time>Time.now ? "in ": "")+distance_of_time_in_words(Time.now, user.token_expires.to_time)+(user.token_expires.to_time>Time.now ? "": " ago") if user.token_expires %></span></td>
+			<td onclick="expandnext(this);">Expand</td>
+		</tr>
+		<tr class="hidden">
+			<td colspan="7">
+				<% user.lab_users.each do |lab_user| %>
+					<div style="padding:3px;">
+						<%= link_to lab_user.lab.name, my_labs_path+"/"+lab_user.lab.id.to_s+"/"+user.username  %>
+						<%= lab_user.start ? (lab_user.end ? "( Completed @ "+lab_user.end.to_s+" )" : "( Running )") : "( Uninitialized )" %>
+						<%= "#{lab_user.vms.size} Vms" if lab_user.vms.size>0 %> 
+						<%= link_to('Start lab',start_lab_path+"/"+lab_user.lab.id.to_s+"/"+lab_user.user.username , :class=>'submit-button button') if lab_user.start==nil %><%= link_to('Restart lab',restart_lab_path+"/"+lab_user.lab.id.to_s+"/"+lab_user.user.username, :class=>'add-button button', :confirm => "This will delete all saved data. Are you sure?") if lab_user.start %><%= link_to('End lab', end_lab_path+"/"+lab_user.id.to_s, :class=>'delete-button button', :confirm => "This will delete all saved data. Are you sure?" ) if lab_user.start && !lab_user.end %>
+					</div>
+				<% end %>
+			</td>
+		</tr>
+		<% end # per user%>
+		</table>
+		<label><input type="checkbox" name="lab" value="end" id="end_labs" onclick="document.getElementById('restart_labs').checked=false;" autocomplete="off"/>End all labs</label>
+		<label><input type="checkbox" name="lab" value="restart" id="restart_labs" onclick="document.getElementById('end_labs').checked=false;" autocomplete="off"/>Restart all labs</label>
+		<br/>
+		<label><input type="checkbox" name="vm" value="poweroff" id="power_vms" onclick="document.getElementById('start_vms').checked=false;" autocomplete="off" disabled/>Power off all VMs</label>
+		<label><input type="checkbox" name="vm" value="poweron" id="start_vms" onclick="document.getElementById('power_vms').checked=false;" autocomplete="off" disabled/>Power on all VMs</label>
+		<br/>
+		<label><input type="checkbox" id="reset_t" name="reset_token" onclick="document.getElementById('rem_t').checked=false;" autocomplete="off"/>reset token</label>
+		<label><input type="checkbox" id="reset_ex" name="reset_token_expire" onclick="show_date(this); document.getElementById('rem_t').checked=false;" autocomplete="off"/>set token expire date</label>
+		<span id="expires" class="hidden"><%= datetime_select("user", "token_expires", :default => 2.weeks.from_now) %></span>
+		<label><input type="checkbox" id="rem_t" name="remove_token" autocomplete="off" onclick="document.getElementById('reset_t').checked=false; a=document.getElementById('reset_ex'); a.checked=false; show_date(a);"/>remove token</label>
+		<br/>
+		<%= f.submit 'Update users', :confirm => 'Are you sure?'%>
+	<% end #form %>
+<% elsif @labs then %>
+	<%= form_for(@users) do |f| %>
+
+	<% end %>
+<% elsif @lab_users then %>
+	<%= form_for(@lab_users) do |f| %>
+
+	<% end %>
+<% end %>
+</div>
