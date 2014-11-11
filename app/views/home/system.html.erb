@@ -9,8 +9,8 @@
   group: <%= group%>
 </p>
 <p>
-  Number of virtual machines total: <%=%x(vboxmanage list vms|wc -l)%><br/>
-  Number of running virtual machines: <%=%x(vboxmanage list runningvms|wc -l)%><br/>
+  Number of virtual machines total: <%=%x(sudo -u vbox /usr/bin/VBoxManage list vms|wc -l)%><br/>
+  Number of running virtual machines: <%=%x(sudo -u vbox /usr/bin/VBoxManage list runningvms|wc -l)%><br/>
   Memory information [GB]<hr>
   <pre><%=%x(free -g)%></pre>
   Disk information<hr>
