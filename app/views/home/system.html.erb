@@ -8,3 +8,11 @@
     user: <%= user%><br/>
   group: <%= group%>
 </p>
+<p>
+  Number of virtual machines total: <%=%x(sudo -u vbox /usr/bin/VBoxManage list vms|wc -l)%><br/>
+  Number of running virtual machines: <%=%x(sudo -u vbox /usr/bin/VBoxManage list runningvms|wc -l)%><br/>
+  Memory information [GB]<hr>
+  <pre><%=%x(free -g)%></pre>
+  Disk information<hr>
+  <pre><%=%x(df -h)%></pre>
+</p>
