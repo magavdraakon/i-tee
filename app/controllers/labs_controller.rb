@@ -141,6 +141,10 @@ class LabsController < ApplicationController
     end
   end
 
+# search for labs to end all of their attempts (lab_users) etc.
+ def search
+
+ end
 
   # view and do labs - user view
   def labs
@@ -249,12 +253,8 @@ class LabsController < ApplicationController
       @lab_user=LabUser.where("lab_id=? and user_id=?", @lab.id, @user.id).first
       if @lab_user!=nil then
         logger.debug "\nRestarting '#{@lab_user.user.username}' lab '#{@lab_user.lab.name}' as admin\n" if @admin
-        # end lab by removing vms
-        @lab_user.end_lab
-        # clear time and other fields
-        @lab_user.update_attributes(:progress =>nil, :result =>nil, :start=>nil, :pause=>nil, :end=>nil) 
-        # create vms and set start time
-        @lab_user.start_lab
+        # restart lab (stop ->  clear -> start)
+        @lab_user.restart_lab
       else # no this user does not have this lab
         flash[:alert]  = "That lab was not assigned to you!"
         redirect_to(my_labs_path)

@@ -33,6 +33,9 @@ ITee::Application.routes.draw do
 
   # route, :to => 'controller#action'
   
+  match 'search', :to=>"lab_users#search"
+
+
   match 'lab_users/import', :to=>'lab_users#import'
   match 'manage_tokens', :to=>'lab_users#user_token'
   match 'edit_token', :to=>'token_authentications#edit'
@@ -40,7 +43,7 @@ ITee::Application.routes.draw do
   
   match 'users/edit', :to=>'users#edit'
   match 'users/edit/:id', :to=>'users#edit'
-  
+
   match 'error_401', :to => 'home#error_401'
   match 'template', :to => 'home#template'
   match 'system', :to => 'home#system'
@@ -76,7 +79,7 @@ ITee::Application.routes.draw do
   match 'restart_lab/:id', :to=> 'labs#restart_lab'
   match 'restart_lab', :to=> 'labs#restart_lab'
 
-  
+  match 'add_users/:id', :to=> 'lab_users#add_users'
   match 'add_users', :to=> 'lab_users#add_users'
   match 'lab_users/progress/:id', :to=> 'lab_users#progress'
   

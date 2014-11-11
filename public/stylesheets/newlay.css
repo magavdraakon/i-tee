@@ -16,6 +16,7 @@ margin-right:auto;
 }
 #c_wrap{
 background:#fff;
+overflow: auto; /*contains floating elements*/
 }
 #content {
 background:#fff;
@@ -26,7 +27,6 @@ min-height:500px;
 margin-left:300px;
 }
 #sidemenu{
-
 float:left;
 width: 300px;
 background:#fff;
@@ -428,6 +428,9 @@ input[type="password"]:focus, input[type="text"]:focus, textarea:focus {
 }
 .hidden{
   display:none;
+}
+.upper {
+  text-transform: uppercase;
 }
 
 /*buttons*/

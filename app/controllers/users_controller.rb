@@ -4,12 +4,12 @@ class UsersController < ApplicationController
   before_filter :user_tab, :only=>['show']
   
   def index
-    if params[:dir]=="asc" then
-      dir = "ASC"
-      @dir = "desc"
-    else 
+    if params[:dir]=="desc" then
       dir = "DESC"
       @dir = "asc"
+    else 
+      dir = "ASC"
+      @dir = "desc"
     end
     order = params[:sort_by]!=nil ? "#{params[:sort_by]} #{dir}" : "" 
     #@users= User.find_by_sql("select id, username, last_sign_in_at, ldap, email, last_sign_in_ip from users")
@@ -88,4 +88,5 @@ class UsersController < ApplicationController
       format.xml  { head :ok }
     end
   end
+
 end

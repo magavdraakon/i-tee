@@ -3,7 +3,8 @@ class LabUsersController < ApplicationController
   before_filter :authorise_as_manager, :except=>[:progress]
   #redirect to index view when trying to see unexisting things
   before_filter :save_from_nil, :only=>[:edit]
-  before_filter :manager_tab
+  before_filter :manager_tab, :except=>[:search]
+  before_filter :search_tab, :only=>[:search]
   def save_from_nil
     @lab_user = LabUser.find_by_id(params[:id])
     if @lab_user==nil 
@@ -57,7 +58,6 @@ class LabUsersController < ApplicationController
       checked_users=get_users_from(params[:users])
       removed_users=all_users-checked_users
       lab=params[:lab_user][:lab_id]
-      
       checked_users.each do |c|
         l=LabUser.new
         l.lab_id=lab
@@ -72,13 +72,13 @@ class LabUsersController < ApplicationController
         l=LabUser.find(:first, :conditions=>["lab_id=? and user_id=?", lab, d.id])
         l.delete if l!=nil
       end
-      redirect_to(lab_users_path, :notice => 'successful update.')
+      redirect_to(:back, :notice => 'successful update.')
     else
       #adding a single user to a lab
       @lab_user = LabUser.new(params[:lab_user])
       respond_to do |format|
         if @lab_user.save
-        format.html { redirect_to(lab_users_path, :notice => 'successful update.') }
+        format.html { redirect_to(:back, :notice => 'successful update.') }
         format.xml  { render :xml => @lab_user, :status => :created, :location => @lab_user }
       else
         format.html { render :action => "index" }
@@ -95,7 +95,7 @@ end
     
     respond_to do |format|
       if @lab_user.update_attributes(params[:lab_user])
-        format.html { redirect_to(lab_users_path, :notice => 'successful update.') }
+        format.html { redirect_to(:back, :notice => 'successful update.') }
         format.xml  { head :ok }
       else
         format.html { render :action => "edit" }
@@ -126,12 +126,16 @@ end
   def add_users
     @lab_users = LabUser.all
     @lab_user = LabUser.new 
-    #if no lab is set, take the first
-    @lab=Lab.find_by_id(params[:id])
+    # find lab by url id
+    @lab=Lab.find_by_id(params[:id]) if params[:id]
+    # if there is no url id, but a session lab_id exists, use that to find the lab
+    @lab=Lab.find_by_id(session[:lab_id]) if session[:lab_id] and !params[:id]
+    #if no lab is found, take the first
     if @lab==nil then
       @lab=Lab.first
       redirect_to(add_users_path) if params[:id]!=nil
     end
+    session[:lab_id]=@lab.id # remember for next time
     #users already in the particular lab
     @users_in=[]
     @lab.lab_users.each do |u|
@@ -182,6 +186,40 @@ end
     end
   end
   
+
+
+# search and react to actions
+  def search
+    if params[:dir]=="desc" then
+      dir = "DESC"
+      @dir = "asc"
+    else 
+      dir = "ASC"
+      @dir = "desc"
+    end
+    order = params[:sort_by]!=nil ? "#{params[:sort_by]} #{dir}" : "" 
+
+    if params[:t] && params[:t]=="User" then
+      if params[:id] then # updates based on selected users and actions
+        users=get_users_from(params[:id])
+        manage_users(users)
+        users.each do |u| 
+          if params[:lab] then # manage user labs 
+            manage_labusers(u.lab_users) 
+          end # end lab manage
+          if params[:vm] then
+            manage_vms(u.vms)
+          end # end vm manage
+        end
+      end # end updates
+       # search again with new values
+      @users=User.order(order).where('username like ?', "%#{params[:q]}%").all
+    end
+
+  end
+
+
+
   def progress
     
     @lab_user=LabUser.find_by_id(params[:id])
@@ -208,5 +246,53 @@ end
   def get_users_from(u_list)
     u_list=[] if u_list.blank?
     return u_list.collect{|u| User.find_by_id(u.to_i)}.compact
+  end
+
+  def manage_labusers(lab_users)
+    lab_users.each do |lu| 
+      if params[:lab]=="end" then # end all labs
+        lu.end_lab
+      elsif params[:lab]=="restart" then # restart all labs
+        # TODO! should restart only stopped labs?
+        lu.restart_lab
+      elsif params[:lab]=="remove_all" then
+        # TODO! 
+      end
+    end
+  end
+
+  def manage_vms(vms)
+    vms.each do |v|
+      if params[:vm]=="poweroff" then
+
+      elsif params[:vm]=="poweron" then
+
+      end
+    end
+  end
+
+  def manage_users(users)
+    users.each do |u| 
+      if params[:reset_token] then # reset token only if checked
+        logger.debug "\n reset token \n"
+        u.reset_authentication_token!
+      end
+
+      if params[:reset_token_expire] then # reset token expire time 
+        logger.debug "\n reset token expire date \n"
+        u.token_expires=DateTime.new( params[:user]["token_expires(1i)"].to_i,
+                                      params[:user]["token_expires(2i)"].to_i,
+                                      params[:user]["token_expires(3i)"].to_i,
+                                      params[:user]["token_expires(4i)"].to_i,
+                                      params[:user]["token_expires(5i)"].to_i)
+        u.save
+      end
+
+      if params[:remove_token] then # remove token and expire time
+        u.authentication_token = nil
+        u.token_expires=nil
+        u.save
+      end
+    end
   end
 end
