@@ -25,29 +25,29 @@ class Vm < ActiveRecord::Base
   end
 
   def del_vm
-    return %x(sudo -u vbox /var/www/railsapps/i-tee/utils/delete_machine.sh #{name}  2>&1)
+    return %x(sudo -u vbox #{Rails.root}/utils/delete_machine.sh #{name}  2>&1)
   end
   
   def poweroff_vm
     #TODO script .. pooleli
-    return %x(sudo -u vbox /var/www/railsapps/i-tee/utils/stop_machine.sh #{name}  2>&1)
+    return %x(sudo -u vbox #{Rails.root}/utils/stop_machine.sh #{name}  2>&1)
   end
   
   def poweron_vm
     #TODO script .. pooleli
-    return %x(sudo -u vbox /var/www/railsapps/i-tee/utils/poweron_machine.sh #{name}  2>&1)
+    return %x(sudo -u vbox #{Rails.root}/utils/poweron_machine.sh #{name}  2>&1)
   end
   
   def res_vm
-    return %x(sudo -u vbox /var/www/railsapps/i-tee/utils/resume_machine.sh #{name}  2>&1)
+    return %x(sudo -u vbox #{Rails.root}/utils/resume_machine.sh #{name}  2>&1)
   end
   
   def pau_vm
-    return %x(sudo -u vbox /var/www/railsapps/i-tee/utils/pause_machine.sh #{name}  2>&1)
+    return %x(sudo -u vbox #{Rails.root}/utils/pause_machine.sh #{name}  2>&1)
   end
   
   def ini_vm
-    return %x(sudo -u vbox /var/www/railsapps/i-tee/utils/start_machine.sh #{mac.mac} #{mac.ip} #{lab_vmt.vmt.image} #{name} #{password} 2>&1)
+    return %x(sudo -u vbox #{Rails.root}/utils/start_machine.sh #{mac.mac} #{mac.ip} #{lab_vmt.vmt.image} #{name} #{password} 2>&1)
   end
   
   def state
