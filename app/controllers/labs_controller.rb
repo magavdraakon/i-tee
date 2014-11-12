@@ -170,7 +170,7 @@ class LabsController < ApplicationController
         logger.debug "\n'#{current_user.username}' redirected: dont have lab '#{@lab.name}' (#{@lab.id}) \n"
         redirect_to(error_401_path) and return
       else
-        @lab_user = LabUser.find(:last, :conditions=>["lab_id=? and user_id=?", @lab.id, @user.id])
+        @lab_user = LabUser.find(:last, :conditions=>["lab_id=? and user_id=?", @lab.id, @user.id]) if @lab
       end
     end
 
