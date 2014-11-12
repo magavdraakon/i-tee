@@ -268,7 +268,9 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
       rescue
         rdp_port_prefix = '10'
       end
-      desc = "To create a connection with this machine using Windows use two commands:<br/>cmdkey /add:#{rdp_host} /user:#{vm.user.username} /pass:#{vm.password}<br/>mstsc.exe /v hostname:#{rdp_host}:#{rdp_port_prefix}#{port} /f<br/>"
+      desc =  "To create a connection with this machine using Windows use two commands:<br/>"
+      desc += "<strong>cmdkey /add:#{rdp_host} /user:#{vm.user.username} /pass:#{vm.password}</strong><br/>"
+      desc += "<strong>mstsc.exe /v #{rdp_host}:#{rdp_port_prefix}#{port} /f</strong><br/>"
       vm.description="To create a connection with this machine using linux/unix use<br/><strong>rdesktop -k et -u#{vm.user.username} -p#{vm.password} -N -a16 #{rdp_host}:#{rdp_port_prefix}#{port}</strong></br> or use xfreerdp as</br><strong>xfreerdp  -k et --plugin cliprdr -g 90% -u #{vm.user.username} -p #{vm.password} #{rdp_host}:#{rdp_port_prefix}#{port}</strong></br>"
       vm.description += desc
 
