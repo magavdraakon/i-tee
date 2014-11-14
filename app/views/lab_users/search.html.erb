@@ -75,6 +75,7 @@
 				<th><%=link_to("Lab name", :controller=>"lab_users",:action=>"search", :sort_by=>"name", :dir=>@dir, :t=>params[:t], :l=>params[:l])%></th>
 				<th>vms</th>
 				<th colspan="4">lab users</th>
+				<th>Host</th>
 				<th></th>
 			</tr>
 		<% @labs.each do |lab| %>
@@ -90,6 +91,7 @@
 			<td><%= ended %> ended</td>
 			<td><%= uninitialized %> uninitialized</td>
 			<td>Total <%= lab.lab_users.size %></td>
+			<td><%= lab.host.name if lab.host %></td>
 			<td onclick="expandnext(this);">Expand</td>
 		</tr>
 		<tr class="hidden">
