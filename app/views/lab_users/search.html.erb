@@ -5,7 +5,7 @@
   	<%= select_tag :t, options_for_select(["User", "Lab", "Lab user"] , params[:t]), :onchange=>"load_form(this.value);" %>
   	<%= text_field_tag(:u, params[:u], :placeholder=>'Username') %>
   	<%= text_field_tag(:l, params[:l], :placeholder=>'lab name') %>
-  
+  	<%= select_tag(:h, options_from_collection_for_select(Host.all,:name, :name ,params[:h]), :prompt=>'Choose host') %>
   	<%= submit_tag("Search") %>
   </div>
 <% end %>
@@ -68,11 +68,11 @@
 	<%= form_for @labs, :url => search_path do |f| %>
 		<input type="hidden" name="t" value="Lab" />
 		<input type="hidden" name="l" value="<%= params[:l] %>" />
-
+		<input type="hidden" name="l" value="<%= params[:h] %>" />
 		<table >
 			<tr>
 				<th><label><input type="checkbox"  onclick="toggle_checked_all(this);" autocomplete="off"/><span> all</span></label></th>
-				<th><%=link_to("Lab name", :controller=>"lab_users",:action=>"search", :sort_by=>"name", :dir=>@dir, :t=>params[:t], :l=>params[:l])%></th>
+				<th><%=link_to("Lab name", :controller=>"lab_users",:action=>"search", :sort_by=>"name", :dir=>@dir, :t=>params[:t], :l=>params[:l], :h=>params[:h])%></th>
 				<th>vms</th>
 				<th colspan="4">lab users</th>
 				<th>Host</th>
@@ -130,7 +130,7 @@
 			<tr>
 				<th><label><input type="checkbox"  onclick="toggle_checked_all(this);" autocomplete="off"/><span> all</span></label></th>
 				<th><%=link_to("Lab name", :controller=>"lab_users",:action=>"search", :sort_by=>"labs.name", :dir=>@dir, :t=>params[:t], :l=>params[:l], :u=>params[:u])%></th>
-				<th><%=link_to("Username", :controller=>"lab_users",:action=>"search", :sort_by=>"users.username", :dir=>@dir, :t=>params[:t], :l=>params[:l], :u=>params[:u])%></th>
+				<th><%=link_to("Username", :controller=>"lab_users",:action=>"search", :sort_by=>"users.username", :dir=>@dir, :t=>params[:t], :l=>params[:l], :u=>params[:u], :h=>params[:h])%></th>
 				<th>Start</th>
 				<th>End</th>
 				<th></th>
@@ -162,7 +162,7 @@
 		<br/>
 		<%= f.submit 'Update lab users', :confirm => 'Are you sure?'%>
 	<% end #form  %>
-<% elsif params[:l] || params[:u] then %>
+<% elsif params[:l] || params[:u] || params[:h] then %>
 	<h3>No matching results found</h3>
 <% end %>
 </div>

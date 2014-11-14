@@ -157,12 +157,15 @@ function load_form(For){
   if (For=="User") {
     $('#u').show();
     $('#l').hide();
+    $('#h').hide();
   } else if (For=="Lab") {
     $('#u').hide();
     $('#l').show();
+    $('#h').show();
   } else {
     // lab user
     $('#u').show();
     $('#l').show();
+    $('#h').hide();
   }
 }

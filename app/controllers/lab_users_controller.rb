@@ -225,7 +225,7 @@ end
           end
         end
       end # end updates
-      @labs = Lab.order(order).where('name like ?', "%#{params[:l]}%").all
+      @labs = Lab.joins(:host).order(order).where('labs.name like ? and hosts.name like ?', "%#{params[:l]}%", "%#{params[:h]}%").all
     elsif params[:t] && params[:t]=="Lab user" then
       if params[:id] then
         lab_users=get_lab_users_from(params[:id])
@@ -237,7 +237,7 @@ end
         end
       end #end updates
 
-      @lab_users = LabUser.joins(:user, :lab).order(order).where('labs.name like ? and users.username like ?', "%#{params[:l]}%", "%#{params[:u]}%").all
+      @lab_users = LabUser.joins(:user, :lab).order(order).where('labs.name like ? and users.username like ? ', "%#{params[:l]}%", "%#{params[:u]}%").all
     end
 
   end
