@@ -55,29 +55,9 @@ class LabsController < ApplicationController
   def edit
     #@lab = Lab.find(params[:id])
     @all_users=false
-    all_users=all_lab_users
-    @user_count=0;
-    @user_count=all_users.count if all_users!=nil 
-    @all_users=true if User.all.count==@user_count
-  end
-
-  def all_lab_users
-    return LabUser.find(:all, :conditions=>["lab_id=?", @lab.id])
-  end
-  
-  def add_all_users
-    User.all.each do |u|
-      l=LabUser.new
-      l.lab_id=@lab.id
-      l.user_id=u.id
-      l.save if LabUser.find(:first, :conditions=>["lab_id=? and user_id=?", l.lab_id, l.user_id])==nil
-    end
-  end
-  
-  def remove_all_users
-    all_lab_users.each do |u|
-      u.destroy
-    end
+    @user_count =0;
+    @user_count = @lab.lab_users.size  
+    @all_users=true if User.all.size==@user_count
   end
   
   # POST /labs
@@ -89,9 +69,8 @@ class LabsController < ApplicationController
     respond_to do |format|
       if @lab.save
                 
-        add_all_users  if params[:add].to_s==1.to_s
-                
-        remove_all_users if params[:remove].to_s==1.to_s 
+        @lab.add_all_users  if params[:add].to_s==1.to_s
+        @lab.remove_all_users if params[:remove].to_s==1.to_s 
                 
         format.html { redirect_to(@lab, :notice => "Lab was successfully created. #{params[:add]}") }
         format.xml  { render :xml => @lab, :status => :created, :location => @lab }
@@ -108,17 +87,15 @@ class LabsController < ApplicationController
     @lab = Lab.find(params[:id])
     
     @all_users=false
-    all_users=all_lab_users
-    @user_count=0;
-    @user_count=all_users.count if all_users!=nil 
-    @all_users=true if User.all.count==@user_count
+    @user_count =0;
+    @user_count = @lab.lab_users.size  
+    @all_users=true if User.all.size==@user_count
     
     respond_to do |format|
       if @lab.update_attributes(params[:lab])
           
-        add_all_users  if params[:add].to_s==1.to_s
-                
-        remove_all_users if params[:remove].to_s==1.to_s 
+        @lab.add_all_users  if params[:add].to_s==1.to_s    
+        @lab.remove_all_users if params[:remove].to_s==1.to_s 
         
         format.html { redirect_to(@lab, :notice => 'Lab was successfully updated.') }
         format.xml  { head :ok }

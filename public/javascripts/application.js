@@ -4,6 +4,10 @@
 //jQuery.noConflict()
 
 jQuery(document).ready(function() {
+  if (document.getElementById('search-form')){
+    // when there is a search form, load autocomplete with the default / refilled value
+    load_form($("#search-form select").val());
+  }
 
 jQuery(function ($) {
 		$('#basic-modal .modal').click(function (e) {
@@ -109,7 +113,6 @@ $(".marked").each(function(){
 $(".marked code").each(function(){
   // all code should use the prettyprint lib
   $(this).addClass("prettyprint");
-
   //console.log($(this).parent()[0].tagName);
   // but only code with multiple lines should have line numbers
   if ($(this).parent()[0].tagName!="P"){
@@ -141,4 +144,25 @@ function expandnext(el){
 function show_date(el){
   if (el.checked) $("#expires").show();
   else  $("#expires").hide();
+}
+
+function manage_checkboxes(inactive){
+  $.each(inactive, function( index, id ) {
+    document.getElementById(id).checked=false;
+  });
+ 
+}
+
+function load_form(For){
+  if (For=="User") {
+    $('#u').show();
+    $('#l').hide();
+  } else if (For=="Lab") {
+    $('#u').hide();
+    $('#l').show();
+  } else {
+    // lab user
+    $('#u').show();
+    $('#l').show();
+  }
 }

@@ -108,11 +108,8 @@ end
   # DELETE /lab_users/1.xml
   def destroy
     @lab_user = LabUser.find(params[:id])
-    #when removing someone from a lab, you need to thow their machines away too
-    @lab_user.lab.lab_vmts.each do |template|
-      vm=Vm.find(:first, :conditions=>["lab_vmt_id=? and user_id=?", template.id, @lab_user.user.id ])
-      vm.destroy if vm!=nil
-    end
+    #when removing someone from a lab, you need to end their lab
+    @lab_user.end_lab
     
     @lab_user.destroy
 
@@ -213,7 +210,34 @@ end
         end
       end # end updates
        # search again with new values
-      @users=User.order(order).where('username like ?', "%#{params[:q]}%").all
+      @users=User.order(order).where('username like ?', "%#{params[:u]}%").all
+    elsif params[:t] && params[:t]=="Lab" then
+      if params[:id] then
+        labs=get_labs_from(params[:id])
+        labs.each do |lab|
+          manage_users(lab.users)
+          if params[:lab] && params[:lab]=="remove_all" then
+            lab.remove_all_users
+          elsif params[:lab] && params[:lab]=="add_all" then
+            lab.add_all_users
+          elsif params[:lab] then
+            manage_labusers(lab.lab_users)
+          end
+        end
+      end # end updates
+      @labs = Lab.order(order).where('name like ?', "%#{params[:l]}%").all
+    elsif params[:t] && params[:t]=="Lab user" then
+      if params[:id] then
+        lab_users=get_lab_users_from(params[:id])
+        manage_labusers(lab_users)
+        lab_users.each do |lu|
+          if params[:lab] && params[:lab]=="remove_all" then
+            lu.destroy
+          end
+        end
+      end #end updates
+
+      @lab_users = LabUser.joins(:user, :lab).order(order).where('labs.name like ? and users.username like ?', "%#{params[:l]}%", "%#{params[:u]}%").all
     end
 
   end
@@ -243,9 +267,17 @@ end
   
   private #-----------------------------------------------
   # return a array of users based on the input (list of checked checkboxes)
-  def get_users_from(u_list)
-    u_list=[] if u_list.blank?
-    return u_list.collect{|u| User.find_by_id(u.to_i)}.compact
+  def get_users_from(id_list)
+    id_list=[] if id_list.blank?
+    return id_list.collect{|u| User.find_by_id(u.to_i)}.compact
+  end
+   def get_lab_users_from(id_list)
+    id_list=[] if id_list.blank?
+    return id_list.collect{|u| LabUser.find_by_id(u.to_i)}.compact
+  end
+   def get_labs_from(id_list)
+    id_list=[] if id_list.blank?
+    return id_list.collect{|u| Lab.find_by_id(u.to_i)}.compact
   end
 
   def manage_labusers(lab_users)
@@ -255,8 +287,6 @@ end
       elsif params[:lab]=="restart" then # restart all labs
         # TODO! should restart only stopped labs?
         lu.restart_lab
-      elsif params[:lab]=="remove_all" then
-        # TODO! 
       end
     end
   end

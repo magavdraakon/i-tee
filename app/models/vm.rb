@@ -15,8 +15,6 @@ class Vm < ActiveRecord::Base
       mac.save
     end
   end
-  
-  
 
   def add_pw
     chars = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789"
@@ -70,6 +68,103 @@ class Vm < ActiveRecord::Base
     else
       return 'stopped'
     end
+  end
+
+  def stop_vm
+    logger.info "Running VM power off script"
+    a=self.poweroff_vm #the script is called in the model
+    logger.info a
+    self.description="Power on the virtual machine by clicking <strong>Start</strong>."
+    self.save
+    # remove link to  mac 
+    @mac = Mac.find(:first, :conditions=>["vm_id=?", self.id])
+    @mac.vm_id=nil
+    @mac.save
+    return "Successful shutdown" 
+  end
+
+  def start_vm
+    #find out if there is a mac address bound with this vm already
+    result = {notice: "", alert: ""}
+    @mac= Mac.find(:first, :conditions=>["vm_id=?", self.id])
+    # binding a unused mac address with the vm if there is no mac
+    if @mac==nil then
+      @mac= Mac.find(:first, :conditions=>["vm_id is null"])
+      @mac.vm_id=self.id
+      if @mac.save  #save successful
+        result[:notice] = result[:notice]+"successful mac assignement."
+      end #end -if save
+    else
+      #the vm had a mac already, dont do anything
+      result[:notice] = result[:notice]+"Vm already had a mac."
+    end # end if nil
+      
+    if self.state!="running" && self.state!="paused"
+      logger.info "running Machine start script"
+      @a=self.ini_vm #the script is called in the model
+      
+      port=@mac.ip.split('.').last
+      begin
+        rdp_host=ITee::Application.config.rdp_host
+      rescue
+        rdp_host=`hostname -f`.strip
+      end
+      begin
+        rdp_port_prefix = ITee::Application.config.rdp_port_prefix
+      rescue
+        rdp_port_prefix = '10'
+      end
+      desc =  "To create a connection with this machine using Windows use two commands:<br/>"
+      desc += "<strong>cmdkey /generic:#{rdp_host} /user:#{self.user.username} /pass:#{self.password}</strong><br/>"
+      desc += "<strong>mstsc.exe /v:#{rdp_host}:#{rdp_port_prefix}#{port} /f</strong><br/>"
+      self.description="To create a connection with this machine using linux/unix use<br/><strong>rdesktop -k et -u#{self.user.username} -p#{self.password} -N -a16 #{rdp_host}:#{rdp_port_prefix}#{port}</strong></br> or use xfreerdp as</br><strong>xfreerdp  -k et --plugin cliprdr -g 90% -u #{self.user.username} -p #{self.password} #{rdp_host}:#{rdp_port_prefix}#{port}</strong></br>"
+      self.description += desc
+
+      self.save
+       
+      require 'timeout'
+      status = Timeout::timeout(60) {
+        # Something that should be interrupted if it takes too much time...
+        if @a!=nil
+          until @a.include?("masin #{self.name} loodud")
+             #do nothing, just wait
+             logger.debug "\nwaiting ...\n"
+          end
+        end
+      }
+
+      if @a.include?("masin #{self.name} loodud")
+        result[:notice] = result[:notice]+"<br/>"+self.description
+        #flash[:notice]=flash[:notice].html_safe
+      else
+        logger.info @a  
+        @mac.vm_id=nil
+        @mac.save
+        result[:notice] = nil
+        result[:alert]="Machine initialization <strong>failed</strong>."
+      end
+     # logger.debug "\n#{result}\n"
+      
+    end
+    return result   
+    # removed mac address conflict rescue. Conflict management is TODO!
+  end
+
+
+  #pause a machine
+  def pause_vm
+    logger.info "running VM pause script"
+    a = self.pau_vm #the script is called in the model
+    logger.info a
+    return "Successful vm pause.<br/> To resume the machine click on the resume link next to the machine name."
+  end
+
+  #resume machine from pause
+  def resume_vm
+    logger.info "running VM resume script"
+    a=self.res_vm # the script is called in the model
+    logger.info a
+    return "Successful vm resume." 
   end
 
 end

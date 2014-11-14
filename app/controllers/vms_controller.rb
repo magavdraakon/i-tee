@@ -191,142 +191,58 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
     end
     if @labuser!=nil #user has this lab
       flash[:notice]=""
-      
+
       @labuser.vms.each do |vm|
-        if vm.state!="running" || vm.state!="paused" then
-          init_vm(vm) 
+        if vm.state!="running" && vm.state!="paused" then # cant be running nor paused
+          @a = vm.start_vm 
           logger.info vm.name
-        
-          require 'timeout'
-          status = Timeout::timeout(60) {
-            # Something that should be interrupted if it takes too much time...
-            if @a!=nil
-            until @a.include?("masin #{vm.name} loodud")
-            #do nothing, just wait
-            end
-          end
-          }
-           flash[:notice]=flash[:notice]+"<br/>"
+          flash[:notice]=flash[:notice]+@a[:notice]+"<br/>"
         end #end if not running or paused
       end #end iterate trough vms
     end#end if labuser
     flash[:notice]=flash[:notice].html_safe
     redirect_to(redirect)
 
-    rescue Timeout::Error
-      flash[:alert]="Starting all virtual machines failed, try starting them one by one."
-      flash[:notice]=nil
-      redirect_to(:back)
+  rescue Timeout::Error
+    flash[:alert]="<br/>Starting all virtual machines failed, try starting them one by one."
+    flash[:notice]=nil
+    redirect_to(:back)
 
     rescue ActionController::RedirectBackError # cant redirect back? go to the lab instead
       logger.info "\nNo :back error\n"
       redirect_to(my_labs_path+"/"+@lab.id.to_s)
-    
-  end
+
+    end
   
   #start one machine
   def start_vm
-    flash[:notice]=""
-    init_vm(@vm)
-  #  flash[:alert]=@a
-    flash[:notice]=flash[:notice].html_safe
+    result = @vm.start_vm
+    flash[:notice] = result[:notice].html_safe if result[:notice]!=""
+    flash[:alert] = result[:alert].html_safe if result[:alert]!=""
     redirect_to(:back)
     rescue ActionController::RedirectBackError  # cant redirect back? go to the lab instead
       logger.info "\nNo :back error\n"
       redirect_to(my_labs_path+"/"+@vm.lab_vmt.lab.id.to_s)
   end
   
-  #assign mac and start machine
-  def init_vm(vm)
-    #find out if there is a mac address bound with this vm already
-    @mac= Mac.find(:first, :conditions=>["vm_id=?", vm.id])
-    # binding a unused mac address with the vm if there is no mac
-    if @mac==nil then
-      @mac= Mac.find(:first, :conditions=>["vm_id is null"])
-      @mac.vm_id=vm.id
-      if @mac.save  #save õnnestus, masinal on mac olemas..
-        flash[:notice] = flash[:notice]+"successful mac assignement."#"Successful vm initialisation." 
-      end #end -if save
-    else
-      #the vm had a mac already, dont do anything
-      flash[:notice] = flash[:notice]+"Vm already had a mac."
-      #redirect_to(:back)
-    end # end if nil
-      
-    if vm.state!="running" && vm.state!="paused"
-      logger.info "käivitame masina skripti"
-      @a=vm.ini_vm #the script is called in the model
-      
-      port=@mac.ip.split('.').last
-      begin
-        rdp_host=ITee::Application.config.rdp_host
-      rescue
-        rdp_host=`hostname -f`.strip
-      end
-      begin
-        rdp_port_prefix = ITee::Application.config.rdp_port_prefix
-      rescue
-        rdp_port_prefix = '10'
-      end
-      desc =  "To create a connection with this machine using Windows use two commands:<br/>"
-      desc += "<strong>cmdkey /generic:#{rdp_host} /user:#{vm.user.username} /pass:#{vm.password}</strong><br/>"
-      desc += "<strong>mstsc.exe /v:#{rdp_host}:#{rdp_port_prefix}#{port} /f</strong><br/>"
-      vm.description="To create a connection with this machine using linux/unix use<br/><strong>rdesktop -k et -u#{vm.user.username} -p#{vm.password} -N -a16 #{rdp_host}:#{rdp_port_prefix}#{port}</strong></br> or use xfreerdp as</br><strong>xfreerdp  -k et --plugin cliprdr -g 90% -u #{vm.user.username} -p #{vm.password} #{rdp_host}:#{rdp_port_prefix}#{port}</strong></br>"
-      vm.description += desc
-
-      vm.save
-       
-      if @a.include?("masin #{vm.name} loodud")
-        flash[:notice]=flash[:notice]+"<br/>"+vm.description
-        #flash[:notice]=flash[:notice].html_safe
-      else
-        logger.info @a  
-        @mac.vm_id=nil
-        @mac.save
-        flash[:notice]=nil
-        flash[:alert]="Machine initialization <strong>failed</strong>.".html_safe
-      end
-    end
-      
-    #VAADATA ÜLE!!!
-    rescue ActiveRecord::StaleObjectError # to resque from conflict, go on a new round of init?
-      logger.info "Mac address conflict"
-      redirect_to(:action=>'start_vm', :id=>vm.id)
-  end
-  
   #resume machine from pause
   def resume_vm
     #@vm=Vm.find(params[:id])
-    logger.info "käivitame masina taastamise skripti"
-    a=@vm.res_vm # the script is called in the model
-    flash[:notice] = "Successful vm resume." 
-    logger.info a
+    flash[:notice] = @vm.resume_vm 
     redirect_to(:back)
   end
   
   #pause a machine
   def pause_vm
     #@vm=Vm.find(params[:id])
-    logger.info "käivitame masina pausimise skripti"
-    a=@vm.pau_vm #the script is called in the model
-      
-    flash[:notice] = "Successful vm pause.<br/> To resume the machine click on the resume link next to the machine name.".html_safe 
-    logger.info a
+    flash[:notice] = @vm.pause_vm.html_safe
     redirect_to(:back) 
   end
   
   #stop the machine, do not delete the vm row from the db (release mac, but allow reinitialization)
   def stop_vm
     #@vm=Vm.find(params[:id])
-    logger.info "käivitame masina sulgemise skripti"
-    a=@vm.poweroff_vm #the script is called in the model
-    logger.info a
-    @vm.description="Power on the virtual machine by clicking <strong>Start</strong>."
-    @vm.save
-    flash[:notice] = "Successful shutdown" 
-    @mac = Mac.find(:first, :conditions=>["vm_id=?", @vm.id])
-    @mac.vm_id=nil
-    @mac.save
+    flash[:notice] = @vm.stop_vm
     redirect_to(:back)
   end
   
