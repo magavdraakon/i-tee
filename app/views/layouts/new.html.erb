@@ -86,12 +86,16 @@
                   </td>
                   <td>
                     <%= link_to_unless_current 'All virtual machines', vms_path+"?admin=1" %><br/>
-                    <%= link_to_unless_current('Virtual machines by state', vms_by_state_path+"?admin=1") %><br/>
-                    <%= link_to_unless_current('Virtual machines by lab', vms_by_lab_path+"?admin=1") %>  
+                    <%= link_to_unless_current('VMs by state', vms_by_state_path+"?admin=1") %><br/>
+                    <%= link_to_unless_current('VMs by lab', vms_by_lab_path+"?admin=1") %>  
                   </td>
                   <td>
-                    <%= link_to_unless_current 'Virtual machine templates', vmts_path %><br/>
-                    <%= link_to_unless_current 'Virtual machine templates in labs', lab_vmts_path %>
+                    <%= link_to_unless_current 'VM templates', vmts_path %><br/>
+                    <%= link_to_unless_current 'VM templates in labs', lab_vmts_path %>
+                  </td>
+                  <td>
+                    <%= link_to_unless_current 'Network templates', networks_path %><br/>
+                    <%= link_to_unless_current 'VMTs networks in labs', lab_vmt_networks_path %>
                   </td>
                   <td>
                     <%= link_to_unless_current('Hosts', hosts_path) %><br/>

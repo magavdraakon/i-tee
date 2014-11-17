@@ -1,0 +1,28 @@
+<h1>Listing network settings in lab vms</h1>
+<div id="index_t">
+  <table>
+  <thead>
+  <tr>
+    <th>Network</th>
+    <th>Slot</th>
+    <th>Lab vmt</th>
+    <th>Promiscuous</th>
+    <th>Reinit mac</th>
+    <th></th>
+  </tr>
+</thead>
+<% @lab_vmt_networks.each do |lab_vmt_network| %>
+  <tr>
+    <td><%= lab_vmt_network.network.name if lab_vmt_network.network %></td>
+    <td><%= lab_vmt_network.slot %></td>
+    <td><%= lab_vmt_network.lab_vmt.menustr if lab_vmt_network.lab_vmt %></td>
+    <td><%= lab_vmt_network.promiscuous %></td>
+    <td><%= lab_vmt_network.reinit_mac %></td>
+    <td><%= link_to 'Show', lab_vmt_network, :class=>"show-button button"  %><%= link_to 'Edit', edit_lab_vmt_network_path(lab_vmt_network), :class=>"edit-button button"  %><%= link_to 'Destroy', lab_vmt_network, confirm: 'Are you sure?', method: :delete, :class=>"delete-button button"  %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New Lab vmt network', new_lab_vmt_network_path, :class=>"add-button button" %>

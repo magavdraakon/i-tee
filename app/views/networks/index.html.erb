@@ -1,0 +1,48 @@
+<h1>Listing networks</h1>
+<div id="index_t">
+  <table>
+   <thead>
+  <tr>
+    <th>Name</th>
+    <th></th>
+  </tr>
+  </thead>
+
+<% @networks.each do |network| %>
+  <tr>
+    <td><%= network.name %></td>
+    <td><%#= link_to 'Show', network, :class=>"show-button button" %><%= link_to 'Edit', edit_network_path(network), :class=>"edit-button button" %><%= link_to 'Destroy', network, confirm: 'Are you sure?', method: :delete, :class=>"delete-button button" %></td>
+  </tr>
+<% end %>
+</table>
+<br />
+
+
+<p>Use the following patterns:</p>
+<ul>
+  <li><b>{user}</b> for VM owner username </li>
+  <li><b>{year}</b> for current year</li>
+  <li><b>{slot}</b> for the network interface nr set during network configuration</li>
+  <li><b>{labVmt}</b> for vmt name in lab</li>
+</ul>
+<%= form_for(@network) do |f| %>
+  <% if @network.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@network.errors.count, "error") %> prohibited this network from being saved:</h2>
+
+      <ul>
+      <% @network.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :name %><br />
+    <%= f.text_field :name %>
+  </div>
+  <div class="actions">
+   <%= link_to 'New Network', networks_path, :class=>"add-button button" if params[:id] %> <%= f.submit %> 
+  </div>
+<% end %>

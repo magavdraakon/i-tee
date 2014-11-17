@@ -1,0 +1,30 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Network:</b>
+  <%= @lab_vmt_network.network_id %>
+</p>
+
+<p>
+  <b>Slot:</b>
+  <%= @lab_vmt_network.slot %>
+</p>
+
+<p>
+  <b>Lab vmt:</b>
+  <%= @lab_vmt_network.lab_vmt_id %>
+</p>
+
+<p>
+  <b>Promiscuous:</b>
+  <%= @lab_vmt_network.promiscuous %>
+</p>
+
+<p>
+  <b>Reinit mac:</b>
+  <%= @lab_vmt_network.reinit_mac %>
+</p>
+
+
+<%= link_to 'Edit', edit_lab_vmt_network_path(@lab_vmt_network) %> |
+<%= link_to 'Back', lab_vmt_networks_path %>

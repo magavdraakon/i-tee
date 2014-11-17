@@ -1,4 +1,9 @@
 ITee::Application.routes.draw do
+  match 'networks/:id/edit', :to => "networks#index"
+  resources :lab_vmt_networks
+
+  resources :networks
+
   resources :user_badges
 
   resources :lab_badges

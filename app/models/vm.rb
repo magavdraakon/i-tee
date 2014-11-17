@@ -101,6 +101,17 @@ class Vm < ActiveRecord::Base
       
     if self.state!="running" && self.state!="paused"
       logger.info "running Machine start script"
+      # logging network interface info
+      self.lab_vmt.lab_vmt_networks.each do |nw|
+        # substituting placeholders with data
+        gen_name=nw.network.name.gsub('{year}', Time.now.year.to_s)
+        gen_name= gen_name.gsub('{user}', self.user.username)
+        gen_name= gen_name.gsub('{slot}', nw.slot.to_s)
+        gen_name= gen_name.gsub('{labVmt}', self.lab_vmt.name)
+
+        logger.debug "\nNIC#{nw.slot} #{gen_name} \n"
+      end
+
       @a=self.ini_vm #the script is called in the model
       
       port=@mac.ip.split('.').last

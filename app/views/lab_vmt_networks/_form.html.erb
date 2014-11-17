@@ -1,0 +1,38 @@
+
+<%= form_for(@lab_vmt_network) do |f| %>
+  <% if @lab_vmt_network.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@lab_vmt_network.errors.count, "error") %> prohibited this lab_vmt_network from being saved:</h2>
+
+      <ul>
+      <% @lab_vmt_network.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :network_id %><br />
+    <%= f.select :network_id, options_from_collection_for_select(Network.all,:id, :name, @lab_vmt_network.network_id)  %>
+  </div>
+  <div class="field">
+    <%= f.label :slot %><br />
+    <%= f.number_field :slot %>
+  </div>
+  <div class="field">
+    <%= f.label :lab_vmt_id %><br />
+    <%= f.select :lab_vmt_id, options_from_collection_for_select(LabVmt.all, :id, :menustr , @lab_vmt_network.lab_vmt_id)   %>
+  </div>
+  <div class="field">
+    <%= f.label :promiscuous %><br />
+    <%= f.check_box :promiscuous %>
+  </div>
+  <div class="field">
+    <%= f.label :reinit_mac %><br />
+    <%= f.check_box :reinit_mac %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

@@ -16,6 +16,7 @@
 		<input type="hidden" name="t" value="User" />
 		<input type="hidden" name="u" value="<%= params[:u] %>" />
 		<table >
+			<thead>
 			<tr>
 				<th><label><input type="checkbox"  onclick="toggle_checked_all(this);" autocomplete="off"/><span> all</span></label></th>
 				<th>Username</th>
@@ -25,6 +26,7 @@
 				<th><%=link_to("Token expires", :controller=>"lab_users",:action=>"search", :sort_by=>"token_expires", :dir=>@dir, :t=>params[:t], :u=>params[:u])%></th>
 				<th></th>
 			</tr>
+			</thead>
 		<% @users.each do |user| %>
 		<tr class="found">
 			<td><%= check_box_tag 'id[]', user.id  %></td>
@@ -70,6 +72,7 @@
 		<input type="hidden" name="l" value="<%= params[:l] %>" />
 		<input type="hidden" name="l" value="<%= params[:h] %>" />
 		<table >
+			<thead>
 			<tr>
 				<th><label><input type="checkbox"  onclick="toggle_checked_all(this);" autocomplete="off"/><span> all</span></label></th>
 				<th><%=link_to("Lab name", :controller=>"lab_users",:action=>"search", :sort_by=>"name", :dir=>@dir, :t=>params[:t], :l=>params[:l], :h=>params[:h])%></th>
@@ -78,6 +81,7 @@
 				<th>Host</th>
 				<th></th>
 			</tr>
+		</thead>
 		<% @labs.each do |lab| %>
 		<%  started =  lab.lab_users.where("start is not ? and end is ?", nil, nil).size
 			ended = lab.lab_users.where("start is not ? and end is not ?", nil, nil).size
@@ -127,6 +131,7 @@
 		<input type="hidden" name="l" value="<%= params[:l] %>" />
 
 		<table >
+			<thead>
 			<tr>
 				<th><label><input type="checkbox"  onclick="toggle_checked_all(this);" autocomplete="off"/><span> all</span></label></th>
 				<th><%=link_to("Lab name", :controller=>"lab_users",:action=>"search", :sort_by=>"labs.name", :dir=>@dir, :t=>params[:t], :l=>params[:l], :u=>params[:u])%></th>
@@ -135,6 +140,7 @@
 				<th>End</th>
 				<th></th>
 			</tr>
+			</thead>
 		<% @lab_users.each do |lu| %>
 		<tr class="found">
 			<td><%= check_box_tag 'id[]', lu.id  %></td>
