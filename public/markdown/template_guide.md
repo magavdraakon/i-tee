@@ -44,6 +44,11 @@ TODO: zerofill and shrink disks
 
 Install guest additions
 
+In case KALI Linux the exec rights are disabled in case mounting cdrom (iso). Then installation of 
+guest addidons can be done with remounting cdrom with exec options.
+
+    mount -o remount,exec,ro /dev/cdrom
+
 
 ###Optional packages and settings
 
