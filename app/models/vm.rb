@@ -71,6 +71,7 @@ class Vm < ActiveRecord::Base
   end
 
   def stop_vm
+   if self.state=="running" || self.state=="paused" then
     logger.info "Running VM power off script"
     a=self.poweroff_vm #the script is called in the model
     logger.info a
@@ -82,6 +83,7 @@ class Vm < ActiveRecord::Base
     @mac.save
     return "Successful shutdown" 
   end
+end
 
   def start_vm
     #find out if there is a mac address bound with this vm already

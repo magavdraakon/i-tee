@@ -201,16 +201,12 @@ end
         users=get_users_from(params[:id])
         manage_users(users)
         users.each do |u| 
-          if params[:lab] then # manage user labs 
-            manage_labusers(u.lab_users) 
-          end # end lab manage
-          if params[:vm] then
-            manage_vms(u.vms)
-          end # end vm manage
+          manage_labusers(u.lab_users) if params[:lab]  # manage user labs 
+          manage_vms(u.vms) if params[:vm]
         end
       end # end updates
        # search again with new values
-      @users=User.order(order).where('username like ?', "%#{params[:u]}%").all
+      @users=User.order(order).where('LOWER(username) like ?', "%#{params[:u].downcase}%").all
     elsif params[:t] && params[:t]=="Lab" then
       if params[:id] then
         labs=get_labs_from(params[:id])
@@ -221,23 +217,24 @@ end
           elsif params[:lab] && params[:lab]=="add_all" then
             lab.add_all_users
           elsif params[:lab] then
-            manage_labusers(lab.lab_users)
+            manage_labusers(lab.lab_users) 
           end
+          manage_vms(lab.vms) if params[:vm]
         end
       end # end updates
-      @labs = Lab.joins(:host).order(order).where('labs.name like ? and hosts.name like ?', "%#{params[:l]}%", "%#{params[:h]}%").all
+      @labs = Lab.joins(:host).order(order).where('LOWER(labs.name) like ? and LOWER(hosts.name) like ?', "%#{params[:l].downcase}%", "%#{(params[:h] ? params[:h] : '').downcase}%").all
     elsif params[:t] && params[:t]=="Lab user" then
       if params[:id] then
         lab_users=get_lab_users_from(params[:id])
-        manage_labusers(lab_users)
+        manage_labusers(lab_users) if params[:lab]
         lab_users.each do |lu|
-          if params[:lab] && params[:lab]=="remove_all" then
-            lu.destroy
-          end
+          manage_users([lu.user]) # action requires array
+          lu.destroy if params[:lab] && params[:lab]=="remove_all" 
+          manage_vms(lu.vms) if params[:vm]
         end
       end #end updates
 
-      @lab_users = LabUser.joins(:user, :lab).order(order).where('labs.name like ? and users.username like ? ', "%#{params[:l]}%", "%#{params[:u]}%").all
+      @lab_users = LabUser.joins(:user, :lab).order(order).where('LOWER(labs.name) like ? and LOWER(users.username) like ? ', "%#{params[:l].downcase}%", "%#{params[:u].downcase}%").all
     end
 
   end
@@ -245,7 +242,6 @@ end
 
 
   def progress
-    
     @lab_user=LabUser.find_by_id(params[:id])
     unless @lab_user.user.id==current_user.id || @admin then 
       @lab_user=LabUser.new#dummy
@@ -294,9 +290,9 @@ end
   def manage_vms(vms)
     vms.each do |v|
       if params[:vm]=="poweroff" then
-
+        v.stop_vm
       elsif params[:vm]=="poweron" then
-
+        v.start_vm
       end
     end
   end
