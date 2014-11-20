@@ -138,8 +138,9 @@ class Vm < ActiveRecord::Base
         # Something that should be interrupted if it takes too much time...
         if @a!=nil
           until @a.include?("masin #{self.name} loodud")
-             #do nothing, just wait
-             logger.debug "\nwaiting ...\n"
+          #do nothing, just wait
+            sleep(5)
+            logger.debug "\nwaiting ...\n"
           end
         end
       }
