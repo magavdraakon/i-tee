@@ -8,6 +8,16 @@ class Lab < ActiveRecord::Base
   
   validates_presence_of :name, :short_description
 
+#return all vms in this lab
+  def vms
+    lvs=[]
+    self.lab_vmts.each do |l|
+      lvs<<l.id
+    end
+    Vm.where("lab_vmt_id in (?)", lvs)
+  end
+
+# return list of users in this lab
   def users
   	ids=[]
   	self.lab_users.each do |lu|

@@ -2,7 +2,7 @@
 
 <p>
   <b>Network:</b>
-  <%= @lab_vmt_network.network_id %>
+  <%= @lab_vmt_network.network.name if @lab_vmt_network.network %>
 </p>
 
 <p>
@@ -12,7 +12,7 @@
 
 <p>
   <b>Lab vmt:</b>
-  <%= @lab_vmt_network.lab_vmt_id %>
+  <%= @lab_vmt_network.lab_vmt.menustr if @lab_vmt_network.lab_vmt %>
 </p>
 
 <p>

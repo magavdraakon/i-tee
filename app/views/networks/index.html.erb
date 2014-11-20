@@ -16,7 +16,7 @@
 <% end %>
 </table>
 <br />
-
+<%= link_to 'New Network', networks_path, :class=>"add-button button" if params[:id] %>
 
 <p>Use the following patterns:</p>
 <ul>
@@ -43,6 +43,6 @@
     <%= f.text_field :name %>
   </div>
   <div class="actions">
-   <%= link_to 'New Network', networks_path, :class=>"add-button button" if params[:id] %> <%= f.submit %> 
+    <%= f.submit %> 
   </div>
 <% end %>
