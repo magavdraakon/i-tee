@@ -22,30 +22,37 @@ class Vm < ActiveRecord::Base
     8.times { |i| self.password << chars[rand(chars.length)] }
   end
 
+
+  if ITee::Application::config.respond_to? :cmd_perfix then
+    @exec_line = ITee::Application::config.cmd_perfix
+  else
+    @exec_line = "sudo -u vbox "
+  end
+
   def del_vm
-    return %x(sudo -u vbox #{Rails.root}/utils/delete_machine.sh #{name}  2>&1)
+    return %x(#{@exec_line} #{Rails.root}/utils/delete_machine.sh #{name}  2>&1)
   end
   
   def poweroff_vm
     #TODO script .. pooleli
-    return %x(sudo -u vbox #{Rails.root}/utils/stop_machine.sh #{name}  2>&1)
+    return %x(#{@exec_line} #{Rails.root}/utils/stop_machine.sh #{name}  2>&1)
   end
   
   def poweron_vm
     #TODO script .. pooleli
-    return %x(sudo -u vbox #{Rails.root}/utils/poweron_machine.sh #{name}  2>&1)
+    %x(#{@exec_line}  #{Rails.root}/utils/poweron_machine.sh #{name}  2>&1)
   end
   
   def res_vm
-    return %x(sudo -u vbox #{Rails.root}/utils/resume_machine.sh #{name}  2>&1)
+    return %x(#{@exec_line} #{Rails.root}/utils/resume_machine.sh #{name}  2>&1)
   end
   
   def pau_vm
-    return %x(sudo -u vbox #{Rails.root}/utils/pause_machine.sh #{name}  2>&1)
+    return %x(#{@exec_line} #{Rails.root}/utils/pause_machine.sh #{name}  2>&1)
   end
   
   def ini_vm
-    return %x(sudo -u vbox #{Rails.root}/utils/start_machine.sh #{mac.mac} #{mac.ip} #{lab_vmt.vmt.image} #{name} #{password} 2>&1)
+    %x(#{@exec_line}  #{Rails.root}/utils/start_machine.sh #{mac.mac} #{mac.ip} #{lab_vmt.vmt.image} #{name} #{password} 2>&1)
   end
   
   def state
@@ -128,7 +135,7 @@ end
         rdp_port_prefix = '10'
       end
       desc =  "To create a connection with this machine using Windows use two commands:<br/>"
-      desc += "<strong>cmdkey /generic:#{rdp_host} /user:#{self.user.username} /pass:#{self.password}</strong><br/>"
+      desc += "<strong>cmdkey /generic:#{rdp_host} /user:localhost\\#{self.user.username} /pass:#{self.password}</strong><br/>"
       desc += "<strong>mstsc.exe /v:#{rdp_host}:#{rdp_port_prefix}#{port} /f</strong><br/>"
       self.description="To create a connection with this machine using linux/unix use<br/><strong>rdesktop -k et -u#{self.user.username} -p#{self.password} -N -a16 #{rdp_host}:#{rdp_port_prefix}#{port}</strong></br> or use xfreerdp as</br><strong>xfreerdp  -k et --plugin cliprdr -g 90% -u #{self.user.username} -p #{self.password} #{rdp_host}:#{rdp_port_prefix}#{port}</strong></br>"
       self.description += desc

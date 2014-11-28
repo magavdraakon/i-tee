@@ -1,5 +1,4 @@
 ITee::Application.configure do
-  config.use_libvirt = true
   # Settings specified here will take precedence over those in config/environment.rb
 
   # The production environment is meant for finished, "live" apps.
@@ -24,7 +23,16 @@ ITee::Application.configure do
 
    # determine how many instances are shown per page
   config.per_page=15
-  
+
+  #place for temporar files like VM customization files
+  config.run_dir = '/var/labs/run'
+
+  #envidonment for bash scripts executed by rails
+  ENV['ENVIRONMENT']="#{ITee::Application.config.run_dir}/environment.sh"
+
+  #Virtualbox User and command line for launching scripts
+  config.cmd_perfix = 'sudo -u vbox'
+
   # For nginx:
   # config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect'
 

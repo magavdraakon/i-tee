@@ -29,6 +29,12 @@ TEMPLATE=$3
 NAME=$4
 PWD=$5
 
+[ -r "$ENVIRONMENT" ] && . "$ENVIRONMENT" || echo "no environment variables from RAILS"
+
+[ -r "$NAME" ] && . "$NAME" || echo "no machine specific variables for customizing VM"
+
+env > /var/tmp/info.log
+
 echo "tekitan virtuaalmasina $NAME template-ist $TEMPLATE Mac aadressiga $MAC"
 if [ $(VBoxManage list vms | cut -f1 -d' '| tr -d '"'| grep $NAME ) ]
 then

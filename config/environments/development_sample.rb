@@ -4,7 +4,6 @@ ITee::Application.configure do
   #emulate_virtualization = true means that eucalyptus virtualization evnironment is't installed
   config.emulate_virtualization = false
   config.emulate_ldap = false
-  config.use_libvirt = true
 
   # determine how many instances are shown per page
   config.per_page=15
@@ -17,6 +16,16 @@ ITee::Application.configure do
   config.rdp_host = '192.168.13.12'
   # port prefix for rdp sessions
   config.rdp_port_prefix = '10'
+
+  #place for temporar files like VM customization files
+  config.run_dir = '/var/labs/run'
+
+  #envidonment for bash scripts executed by rails
+  ENV['ENVIRONMENT']="#{ITee::Application.config.run_dir}/environment.sh"
+
+  #Virtualbox User and command line for launching scripts
+  config.cmd_perfix = 'sudo -u vbox'
+
 
   # In the development environment your application's code is reloaded on
   # every request.  This slows down response time but is perfect for development
