@@ -9,14 +9,15 @@ class MaterialsController < ApplicationController
   def save_from_nil
     @material = Material.find_by_id(params[:id])
     if @material==nil 
-      redirect_to(materials_path,:notice=>"invalid id.")
+      redirect_to(materials_path,:notice=>'invalid id.')
     end
   end
 
   # GET /materials
   # GET /materials.xml
   def index
-    @materials = Material.paginate(:page=>params[:page], :per_page=>10)
+    set_order_by
+    @materials = Material.order(@order).paginate(:page=>params[:page], :per_page=>@per_page)
 
     respond_to do |format|
       format.html # index.html.erb
@@ -60,7 +61,7 @@ class MaterialsController < ApplicationController
         format.html { redirect_to(@material, :notice => 'Material was successfully created.') }
         format.xml  { render :xml => @material, :status => :created, :location => @material }
       else
-        format.html { render :action => "new" }
+        format.html { render :action => 'new' }
         format.xml  { render :xml => @material.errors, :status => :unprocessable_entity }
       end
     end
@@ -77,7 +78,7 @@ class MaterialsController < ApplicationController
         format.html { redirect_to(@material, :notice => 'Material was successfully updated.') }
         format.xml  { head :ok }
       else
-        format.html { render :action => "edit" }
+        format.html { render :action => 'edit' }
         format.xml  { render :xml => @material.errors, :status => :unprocessable_entity }
       end
     end

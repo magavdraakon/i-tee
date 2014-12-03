@@ -7,7 +7,7 @@ class LabVmtsController < ApplicationController
   def save_from_nil
     @lab_vmt = LabVmt.find_by_id(params[:id])
     if @lab_vmt==nil 
-      redirect_to(lab_vmts_path,:notice=>"invalid id.")
+      redirect_to(lab_vmts_path,:notice=>'invalid id.')
     end
   end
   
@@ -15,8 +15,9 @@ class LabVmtsController < ApplicationController
   # GET /lab_vmts.xml
   #index and new view are merged, but there is also a separate view for new 
   def index
-    @lab_vmts = LabVmt.find(:all, :order=>params[:sort_by])
-    @lab_vmts = @lab_vmts.paginate(:page=>params[:page], :per_page=>10)
+    set_order_by
+    @lab_vmts = LabVmt.order(@order)
+    @lab_vmts = @lab_vmts.paginate(:page=>params[:page], :per_page=>@per_page)
     @lab_vmt = LabVmt.new
     respond_to do |format|
       format.html # index.html.erb
@@ -37,15 +38,15 @@ class LabVmtsController < ApplicationController
   # POST /lab_vmts.xml
   def create
     @lab_vmt = LabVmt.new(params[:lab_vmt])
-    
-    if params[:from]=="labs/show"
+    set_order_by
+    if params[:from]=='labs/show'
       # if we go to the lab, we need lab info
       @lab = Lab.find(params[:lab_vmt][:lab_id])
       redirect_path=lab_path(@lab.id)
     else
       # if we go to the list, we need the list items.
-      @lab_vmts = LabVmt.find(:all, :order=>params[:sort_by])
-      @lab_vmts = @lab_vmts.paginate(:page=>params[:page], :per_page=>10)
+      @lab_vmts = LabVmt.order(@order)
+      @lab_vmts = @lab_vmts.paginate(:page=>params[:page], :per_page=>@per_page)
       redirect_path=lab_vmts_path
     end
     
@@ -70,7 +71,7 @@ class LabVmtsController < ApplicationController
         format.html { redirect_to(lab_vmts_url, :notice => 'Lab vmt was successfully updated.') }
         format.xml  { head :ok }
       else
-        format.html { render :action => "edit" }
+        format.html { render :action => 'edit' }
         format.xml  { render :xml => @lab_vmt.errors, :status => :unprocessable_entity }
       end
     end

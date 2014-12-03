@@ -8,7 +8,7 @@ class HostsController < ApplicationController
   def save_from_nil
     @host = Host.find_by_id(params[:id])
     if @host==nil 
-      redirect_to(hosts_path,:notice=>"invalid id.")
+      redirect_to(hosts_path,:notice=>'invalid id.')
     end
   end
 
@@ -60,7 +60,7 @@ class HostsController < ApplicationController
         format.html { redirect_to(@host, :notice => 'Host was successfully created.') }
         format.xml  { render :xml => @host, :status => :created, :location => @host }
       else
-        format.html { render :action => "new" }
+        format.html { render :action => 'new' }
         format.xml  { render :xml => @host.errors, :status => :unprocessable_entity }
       end
     end
@@ -76,7 +76,7 @@ class HostsController < ApplicationController
         format.html { redirect_to(@host, :notice => 'Host was successfully updated.') }
         format.xml  { head :ok }
       else
-        format.html { render :action => "edit" }
+        format.html { render :action => 'edit' }
         format.xml  { render :xml => @host.errors, :status => :unprocessable_entity }
       end
     end

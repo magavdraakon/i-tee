@@ -11,30 +11,16 @@ class ApplicationController < ActionController::Base
   before_filter :check_for_cancel, :only => [:create, :update]
   before_filter :check_token
 
-  @per_page=ITee::Application.config.per_page
+  @per_page = ITee::Application.config.per_page
 
-  if ITee::Application.config.emulate_ldap then
-    @admin = true
-    @logged_in = true
-    @username = "ttanav"
-    #current_user = User.find(:first, :conditions=>["username=?", @username])
-    current_user = User.first
-
-    before_filter :emulate_user    
-  else
-    before_filter :authenticate_user!, :except=>[:about, :getprogress, :set_progress]
-    before_filter :admin?
-    before_filter :manager?
-  end  
-  
-  def emulate_user
-   
-  end
+  before_filter :authenticate_user!, :except=>[:about, :getprogress, :set_progress]
+  before_filter :admin?
+  before_filter :manager?
 
   #return true if the current user is a admin
   def admin?
     # if there is no logged in user, there is no admin
-    unless current_user then
+    unless current_user
       @admin = false
       return
     end
@@ -45,7 +31,7 @@ class ApplicationController < ActionController::Base
 
   def manager?
     # if there is no logged in user, there is no manager
-    unless current_user then
+    unless current_user
       @manager = false
       return
     end
@@ -58,7 +44,7 @@ class ApplicationController < ActionController::Base
   def authorise_as_admin
     unless @admin
       #You don't belong here. Go away.
-      flash[:alert]  = "Restricted access!"
+      flash[:alert]  = 'Restricted access!'
       redirect_to(:controller=>'home', :action=>'error_401')
       end
    end
@@ -67,65 +53,74 @@ class ApplicationController < ActionController::Base
   def authorise_as_manager
     unless @manager || @admin
       #You don't belong here. Go away.
-      flash[:alert]  = "Restricted access!"
+      flash[:alert]  = 'Restricted access!'
       redirect_to(:controller=>'home', :action=>'error_401')       
     end
    end
   
   private#-------------------------------------------------------------------
-      
-      
+
+  def set_order_by
+    if params[:dir]=='desc'
+      dir = 'DESC'
+      @dir = 'asc'
+    else
+      dir = 'ASC'
+      @dir = 'desc'
+    end
+    @order = params[:sort_by]!=nil ? "#{params[:sort_by]} #{dir}" : ''
+  end
       
   def home_tab
-    @tab="home"
+    @tab='home'
   end
       
   def course_tab
-    @tab="courses"
+    @tab='courses'
   end
       
   def vm_tab
-    @tab="vms"
+    @tab='vms'
   end
       
   def admin_tab
-    @tab="admin"
+    @tab='admin'
   end
   
   def manager_tab
-    @tab="manager"
+    @tab='manager'
   end
 
   def user_tab
-    @tab="user"
+    @tab='user'
   end
 
   def search_tab
-    @tab="search"
+    @tab='search'
   end
 
   def check_for_cancel
-    if params[:commit] == "Cancel"
-      if params[:controller]=="vms" then
+    if params[:commit] == 'Cancel'
+      if params[:controller]=='vms'
         # special behaiviour because users cant edit their vms but they can see them
-        redirect_to :action=>"index", :admin=>"1"
+        redirect_to :action=>'index', :admin=>'1'
       else 
-        redirect_to :action=>"index"
+        redirect_to :action=>'index'
       end
     end
   end
   
   def check_token
-    if params[:auth_token] then
+    if params[:auth_token]
       # get the user with the given token
       user=User.find_by_token(params[:auth_token])
       # if there is such a user
-      if user then 
+      if user
         expiretime = user.token_expires
         logger.debug "the user: #{expiretime.inspect}"
-        logger.debug "the time: #{DateTime.now().inspect}"
+        logger.debug "the time: #{DateTime.now.inspect}"
         # check if the token is still valid 
-        if expiretime.to_datetime < DateTime.now() then
+        if expiretime.to_datetime < DateTime.now
           #the token has expired already, deny the user access
           redirect_to destroy_user_session_path
         end  

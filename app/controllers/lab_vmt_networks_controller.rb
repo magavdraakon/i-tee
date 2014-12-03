@@ -49,7 +49,7 @@ class LabVmtNetworksController < ApplicationController
         format.html { redirect_to @lab_vmt_network, notice: 'Lab vmt network was successfully created.' }
         format.json { render json: @lab_vmt_network, status: :created, location: @lab_vmt_network }
       else
-        format.html { render action: "new" }
+        format.html { render action: 'new' }
         format.json { render json: @lab_vmt_network.errors, status: :unprocessable_entity }
       end
     end
@@ -65,7 +65,7 @@ class LabVmtNetworksController < ApplicationController
         format.html { redirect_to @lab_vmt_network, notice: 'Lab vmt network was successfully updated.' }
         format.json { head :ok }
       else
-        format.html { render action: "edit" }
+        format.html { render action: 'edit' }
         format.json { render json: @lab_vmt_network.errors, status: :unprocessable_entity }
       end
     end

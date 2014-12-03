@@ -8,7 +8,7 @@ class LabUsersController < ApplicationController
   def save_from_nil
     @lab_user = LabUser.find_by_id(params[:id])
     if @lab_user==nil 
-      redirect_to(lab_users_path,:notice=>"invalid id.")
+      redirect_to(lab_users_path,:notice=>'invalid id.')
     end
   end
 
@@ -18,15 +18,8 @@ class LabUsersController < ApplicationController
   #index and new view are merged
   def index
     #@lab_users = LabUser.find(:all, :order=>params[:sort_by])
-    if params[:dir]=="asc" then
-      dir = "ASC"
-      @dir = "desc"
-    else 
-      dir = "DESC"
-      @dir = "asc"
-    end
-    order = params[:sort_by]!=nil ? "#{params[:sort_by]} #{dir}" : "" 
-    @lab_users = LabUser.order(order).paginate(:page => params[:page], :per_page => 10)
+    set_order_by
+    @lab_users = LabUser.order(@order).paginate(:page => params[:page], :per_page => @per_page)
     @lab_user = LabUser.new
     
     respond_to do |format|
@@ -44,16 +37,10 @@ class LabUsersController < ApplicationController
   # POST /lab_users
   # POST /lab_users.xml
   def create
-    if params[:dir]=="asc" then
-      dir = "ASC"
-      @dir = "&dir=desc"
-    else 
-      dir = "DESC"
-      @dir = "&dir=asc"
-    end
-    @lab_users = LabUser.order("#{params[:sort_by]} #{dir}")
+    set_order_by
+    @lab_users = LabUser.order(@order)
     # logic for when adding/removing multiple users at once to a specific lab
-    if params[:lab_user][:page]=='bulk_add' then
+    if params[:lab_user][:page]=='bulk_add'
       all_users=User.all
       checked_users=get_users_from(params[:users])
       removed_users=all_users-checked_users
@@ -63,13 +50,14 @@ class LabUsersController < ApplicationController
         l.lab_id=lab
         l.user_id=c.id
         #if there is no db row with the se parameters then create one
-        if LabUser.find(:first, :conditions=>["lab_id=? and user_id=?", lab, c.id])==nil then
+        # TODO: move to model
+        if LabUser.where('lab_id=? and user_id=?', lab, c.id).first==nil
           l.save
         end
       end
       removed_users.each do |d|
         #look for the unchecked users and remove them from db if they were there
-        l=LabUser.find(:first, :conditions=>["lab_id=? and user_id=?", lab, d.id])
+        l=LabUser.where('lab_id=? and user_id=?', lab, d.id).first
         l.delete if l!=nil
       end
       redirect_to(:back, :notice => 'successful update.')
@@ -81,7 +69,7 @@ class LabUsersController < ApplicationController
         format.html { redirect_to(:back, :notice => 'successful update.') }
         format.xml  { render :xml => @lab_user, :status => :created, :location => @lab_user }
       else
-        format.html { render :action => "index" }
+        format.html { render :action => 'index' }
         format.xml  { render :xml => @lab_user.errors, :status => :unprocessable_entity}
       end #end if
     end #end respond_to
@@ -98,7 +86,7 @@ end
         format.html { redirect_to(:back, :notice => 'successful update.') }
         format.xml  { head :ok }
       else
-        format.html { render :action => "edit" }
+        format.html { render :action => 'edit' }
         format.xml  { render :xml => @lab_user.errors, :status => :unprocessable_entity }
       end
     end
@@ -128,7 +116,7 @@ end
     # if there is no url id, but a session lab_id exists, use that to find the lab
     @lab=Lab.find_by_id(session[:lab_id]) if session[:lab_id] and !params[:id]
     #if no lab is found, take the first
-    if @lab==nil then
+    if @lab==nil
       @lab=Lab.first
       redirect_to(add_users_path) if params[:id]!=nil
     end
@@ -142,44 +130,44 @@ end
   
   def import
     @lab=Lab.find_by_id(params[:lab_id])
-    if (params[:txtsbs].present? && @lab!=nil)
+    if params[:txtsbs].present? && @lab!=nil
       @upload_text = params[:txtsbs].read
       users=@upload_text.split('\n')
       
-      notice=""
+      notice=''
       @upload_text.each_line do |u| 
         
       #users.each do |u|
       #while u = params[:txtsbs].readline        
         u.chomp!
         user=u.split(',')#username,realname, email, token
-        @user=User.find(:first, :conditions=>["username=?", user[0]])
-        if (@user==nil) then #user doesnt exist
+        @user=User.find_by_username(user[0]).first
+        if @user==nil #user doesnt exist
           email=user[2]
-          email=user[0]+"@itcollege.ee" if email!=nil
-
+          email=user[0]+'@itcollege.ee' if email!=nil
+          #TODO: email is username@itcollege when email is set??? take address (@something.end) from config?
           @user=User.create!(:email=>email ,:username=>user[0], :name=>user[1] ,:password=>user[3], :authentication_token=>user[3])
         end
         #TODO do we update the existing user? to add a token for example?
-        labuser=LabUser.find(:first, :conditions=>["user_id=? and lab_id=?", @user.id, @lab.id])
+        labuser=LabUser.where('user_id=? and lab_id=?', @user.id, @lab.id).first
         # by now we surely have a user, add it to the lab
-        if labuser==nil then
+        if labuser==nil
           labuser=LabUser.new
           labuser.lab=@lab
           labuser.user=@user
           if labuser.save 
-            notice=notice+user[0]+" added successfully<br/>"
+            notice=notice+user[0]+' added successfully<br/>'
           else
-            notice=notice+user[0]+" adding failed<br/>"
+            notice=notice+user[0]+' adding failed<br/>'
           end
         else
-          notice=notice+user[0]+" was already in the lab<br/>"
+          notice=notice+user[0]+' was already in the lab<br/>'
         end
       end
         
       redirect_to(:back, :notice=>notice)
     else
-      redirect_to(:back, :alert=>"No import file specified.")
+      redirect_to(:back, :alert=>'No import file specified.')
     end
   end
   
@@ -187,17 +175,10 @@ end
 
 # search and react to actions
   def search
-    if params[:dir]=="desc" then
-      dir = "DESC"
-      @dir = "asc"
-    else 
-      dir = "ASC"
-      @dir = "desc"
-    end
-    order = params[:sort_by]!=nil ? "#{params[:sort_by]} #{dir}" : "" 
 
-    if params[:t] && params[:t]=="User" then
-      if params[:id] then # updates based on selected users and actions
+    set_order_by
+    if params[:t] && params[:t]=='User'
+      if params[:id]  # updates based on selected users and actions
         users=get_users_from(params[:id])
         manage_users(users)
         users.each do |u| 
@@ -206,35 +187,34 @@ end
         end
       end # end updates
        # search again with new values
-      @users=User.order(order).where('LOWER(username) like ?', "%#{params[:u].downcase}%").all
-    elsif params[:t] && params[:t]=="Lab" then
-      if params[:id] then
+      @users=User.order(@order).where('LOWER(username) like ?', "%#{params[:u].downcase}%").all
+    elsif params[:t] && params[:t]=='Lab'
+      if params[:id]
         labs=get_labs_from(params[:id])
         labs.each do |lab|
           manage_users(lab.users)
-          if params[:lab] && params[:lab]=="remove_all" then
+          if params[:lab] && params[:lab]=='remove_all_users'
             lab.remove_all_users
-          elsif params[:lab] && params[:lab]=="add_all" then
+          elsif params[:lab] && params[:lab]=='add_all-users'
             lab.add_all_users
-          elsif params[:lab] then
+          elsif params[:lab]
             manage_labusers(lab.lab_users) 
           end
           manage_vms(lab.vms) if params[:vm]
         end
       end # end updates
-      @labs = Lab.joins(:host).order(order).where('LOWER(labs.name) like ? and LOWER(hosts.name) like ?', "%#{params[:l].downcase}%", "%#{(params[:h] ? params[:h] : '').downcase}%").all
-    elsif params[:t] && params[:t]=="Lab user" then
-      if params[:id] then
+      @labs = Lab.joins(:host).order(@order).where('LOWER(labs.name) like ? and LOWER(hosts.name) like ?', "%#{params[:l].downcase}%", "%#{(params[:h] ? params[:h] : '').downcase}%").all
+    elsif params[:t] && params[:t]=='Lab user'
+      if params[:id]
         lab_users=get_lab_users_from(params[:id])
         manage_labusers(lab_users) if params[:lab]
         lab_users.each do |lu|
           manage_users([lu.user]) # action requires array
-          lu.destroy if params[:lab] && params[:lab]=="remove_all" 
           manage_vms(lu.vms) if params[:vm]
         end
       end #end updates
 
-      @lab_users = LabUser.joins(:user, :lab).order(order).where('LOWER(labs.name) like ? and LOWER(users.username) like ? ', "%#{params[:l].downcase}%", "%#{params[:u].downcase}%").all
+      @lab_users = LabUser.joins(:user, :lab).order(@order).where('LOWER(labs.name) like ? and LOWER(users.username) like ? ', "%#{params[:l].downcase}%", "%#{params[:u].downcase}%").all
     end
 
   end
@@ -243,55 +223,54 @@ end
 
   def progress
     @lab_user=LabUser.find_by_id(params[:id])
-    unless @lab_user.user.id==current_user.id || @admin then 
+    unless @lab_user.user.id==current_user.id || @admin
       @lab_user=LabUser.new#dummy
     end
     render :partial => 'shared/lab_progress' 
   end
   
   def user_token
-     if params[:dir]=="asc" then
-      dir = "ASC"
-      @dir = "desc"
-    else 
-      dir = "DESC"
-      @dir = "asc"
-    end
-    order = params[:sort_by]!=nil ? "#{params[:sort_by]} #{dir}" : "" 
-    @users= User.order(order).paginate(:page=>params[:page], :per_page=>10)
+    set_order_by
+    @users= User.order(@order).paginate(:page=>params[:page], :per_page=>@per_page)
   end
   
   private #-----------------------------------------------
+
+
+
+
   # return a array of users based on the input (list of checked checkboxes)
   def get_users_from(id_list)
     id_list=[] if id_list.blank?
-    return id_list.collect{|u| User.find_by_id(u.to_i)}.compact
+    id_list.collect{|u| User.find_by_id(u.to_i)}.compact
   end
    def get_lab_users_from(id_list)
     id_list=[] if id_list.blank?
-    return id_list.collect{|u| LabUser.find_by_id(u.to_i)}.compact
+    id_list.collect{|u| LabUser.find_by_id(u.to_i)}.compact
   end
    def get_labs_from(id_list)
     id_list=[] if id_list.blank?
-    return id_list.collect{|u| Lab.find_by_id(u.to_i)}.compact
+    id_list.collect{|u| Lab.find_by_id(u.to_i)}.compact
   end
 
   def manage_labusers(lab_users)
     lab_users.each do |lu| 
-      if params[:lab]=="end" then # end all labs
+      if params[:lab]=='end'  # end all labs
         lu.end_lab
-      elsif params[:lab]=="restart" then # restart all labs
+      elsif params[:lab]=='restart' # restart all labs
         # TODO! should restart only stopped labs?
         lu.restart_lab
+      elsif params[:lab]=="remove" # remove all labs
+        lu.destroy
       end
     end
   end
 
   def manage_vms(vms)
     vms.each do |v|
-      if params[:vm]=="poweroff" then
+      if params[:vm]=='poweroff'
         v.stop_vm
-      elsif params[:vm]=="poweron" then
+      elsif params[:vm]=='poweron'
         v.start_vm
       end
     end
@@ -299,22 +278,22 @@ end
 
   def manage_users(users)
     users.each do |u| 
-      if params[:reset_token] then # reset token only if checked
-        logger.debug "\n reset token \n"
+      if params[:reset_token]  # reset token only if checked
+        logger.debug '\n reset token \n'
         u.reset_authentication_token!
       end
 
-      if params[:reset_token_expire] then # reset token expire time 
-        logger.debug "\n reset token expire date \n"
-        u.token_expires=DateTime.new( params[:user]["token_expires(1i)"].to_i,
-                                      params[:user]["token_expires(2i)"].to_i,
-                                      params[:user]["token_expires(3i)"].to_i,
-                                      params[:user]["token_expires(4i)"].to_i,
-                                      params[:user]["token_expires(5i)"].to_i)
+      if params[:reset_token_expire] # reset token expire time
+        logger.debug '\n reset token expire date \n'
+        u.token_expires=DateTime.new( params[:user]['token_expires(1i)'].to_i,
+                                      params[:user]['token_expires(2i)'].to_i,
+                                      params[:user]['token_expires(3i)'].to_i,
+                                      params[:user]['token_expires(4i)'].to_i,
+                                      params[:user]['token_expires(5i)'].to_i)
         u.save
       end
 
-      if params[:remove_token] then # remove token and expire time
+      if params[:remove_token] # remove token and expire time
         u.authentication_token = nil
         u.token_expires=nil
         u.save

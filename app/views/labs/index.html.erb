@@ -3,9 +3,9 @@
   <table>
     <thead>
       <tr>
-        <th>Name</th>
+        <th><%=link_to("Name", :controller=>"labs",:action=>"index", :sort_by=>"name", :dir=>@dir)%></th>
         <th>Short description</th>
-        <th>Host</th>
+        <th><%=link_to("Host", :controller=>"labs",:action=>"index", :sort_by=>"host_id", :dir=>@dir)%></th>
         <th></th>
       </tr>
     </thead>

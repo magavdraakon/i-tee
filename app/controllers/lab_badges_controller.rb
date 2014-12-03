@@ -48,7 +48,7 @@ class LabBadgesController < ApplicationController
         format.html { redirect_to @lab_badge, :notice => 'Lab badge was successfully created.' }
         format.json { render :json => @lab_badge, :status => :created, :location => @lab_badge }
       else
-        format.html { render :action => "new" }
+        format.html { render :action => 'new' }
         format.json { render :json => @lab_badge.errors, :status => :unprocessable_entity }
       end
     end
@@ -64,7 +64,7 @@ class LabBadgesController < ApplicationController
         format.html { redirect_to @lab_badge, :notice => 'Lab badge was successfully updated.' }
         format.json { head :ok }
       else
-        format.html { render :action => "edit" }
+        format.html { render :action => 'edit' }
         format.json { render :json => @lab_badge.errors, :status => :unprocessable_entity }
       end
     end

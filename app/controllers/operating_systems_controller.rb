@@ -6,7 +6,7 @@ class OperatingSystemsController < ApplicationController
   # GET /operating_systems
   # GET /operating_systems.xml
   def index
-    @operating_systems = OperatingSystem.paginate(:page=>params[:page], :per_page=>10)
+    @operating_systems = OperatingSystem.paginate(:page=>params[:page], :per_page=>@per_page)
 
     respond_to do |format|
       format.html # index.html.erb
@@ -51,7 +51,7 @@ class OperatingSystemsController < ApplicationController
         format.html { redirect_to(@operating_system, :notice => 'Operating system was successfully created.') }
         format.xml  { render :xml => @operating_system, :status => :created, :location => @operating_system }
       else
-        format.html { render :action => "new" }
+        format.html { render :action => 'new' }
         format.xml  { render :xml => @operating_system.errors, :status => :unprocessable_entity }
       end
     end
@@ -67,7 +67,7 @@ class OperatingSystemsController < ApplicationController
         format.html { redirect_to(@operating_system, :notice => 'Operating system was successfully updated.') }
         format.xml  { head :ok }
       else
-        format.html { render :action => "edit" }
+        format.html { render :action => 'edit' }
         format.xml  { render :xml => @operating_system.errors, :status => :unprocessable_entity }
       end
     end

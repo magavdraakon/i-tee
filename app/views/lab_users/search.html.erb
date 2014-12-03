@@ -53,7 +53,7 @@
 		</table>
 		<label><input type="checkbox" name="lab" value="end" id="end_labs" onclick="manage_checkboxes(['restart_labs', 'rem_labs'])" autocomplete="off"/>End all labs</label>
 		<label><input type="checkbox" name="lab" value="restart" id="restart_labs" onclick="manage_checkboxes(['end_labs', 'rem_labs'])" autocomplete="off"/>Restart all labs</label>
-		<label><input type="checkbox" name="lab" value="remove_all" id="rem_labs" onclick="manage_checkboxes(['restart_labs', 'end_labs'])" autocomplete="off"/>Remove all labs</label>
+		<label><input type="checkbox" name="lab" value="remove" id="rem_labs" onclick="manage_checkboxes(['restart_labs', 'end_labs'])" autocomplete="off"/>Remove all labs</label>
 		<br/>
 		<label><input type="checkbox" name="vm" value="poweroff" id="power_vms" onclick="manage_checkboxes(['start_vms']);" autocomplete="off"/>Power off all VMs</label>
 		<label><input type="checkbox" name="vm" value="poweron" id="start_vms" onclick="manage_checkboxes(['power_vms']);" autocomplete="off"/>Power on all VMs</label>
@@ -110,8 +110,10 @@
 		<label><input type="checkbox" name="lab" value="end" id="end_labs" onclick="manage_checkboxes(['restart_labs', 'rem_users', 'add_users'])" autocomplete="off"/>End all labs</label>
 		<label><input type="checkbox" name="lab" value="restart" id="restart_labs" onclick="manage_checkboxes(['end_labs', 'rem_users', 'add_users'])" autocomplete="off"/>Restart all labs</label>
 		<br/>
-		<label><input type="checkbox" name="lab" value="remove_all" id="rem_users" onclick="manage_checkboxes(['restart_labs', 'end_labs', 'add_users'])" autocomplete="off"/>Remove all users</label>
-		<label><input type="checkbox" name="lab" value="add_all" id="add_users" onclick="manage_checkboxes(['restart_labs', 'end_labs', 'rem_users'])" autocomplete="off"/>add all users</label>
+		<label><input type="checkbox" name="lab" value="remove_all_users" id="rem_users" onclick="manage_checkboxes
+                (['restart_labs', 'end_labs', 'add_users'])" autocomplete="off"/>Remove all users</label>
+		<label><input type="checkbox" name="lab" value="add_all_users" id="add_users" onclick="manage_checkboxes
+                (['restart_labs', 'end_labs', 'rem_users'])" autocomplete="off"/>add all users</label>
 		<br/>
 		<label><input type="checkbox" name="vm" value="poweroff" id="power_vms" onclick="manage_checkboxes(['start_vms']);" autocomplete="off"/>Power off all VMs</label>
 		<label><input type="checkbox" name="vm" value="poweron" id="start_vms" onclick="manage_checkboxes(['power_vms']);" autocomplete="off"/>Power on all VMs</label>
@@ -161,7 +163,7 @@
 		<label><input type="checkbox" name="lab" value="end" id="end_labs" onclick="manage_checkboxes(['restart_labs', 'rem_users', 'add_users'])" autocomplete="off"/>End lab</label>
 		<label><input type="checkbox" name="lab" value="restart" id="restart_labs" onclick="manage_checkboxes(['end_labs', 'rem_users', 'add_users'])" autocomplete="off"/>Restart lab</label>
 		<br/>
-		<label><input type="checkbox" name="lab" value="remove_all" id="rem_users" onclick="manage_checkboxes(['restart_labs', 'end_labs', 'add_users'])" autocomplete="off"/>Remove lab user</label>
+		<label><input type="checkbox" name="lab" value="remove" id="rem_users" onclick="manage_checkboxes(['restart_labs', 'end_labs', 'add_users'])" autocomplete="off"/>Remove lab user</label>
 		<br/>
 		<label><input type="checkbox" name="vm" value="poweroff" id="power_vms" onclick="manage_checkboxes(['start_vms']);" autocomplete="off"/>Power off all VMs</label>
 		<label><input type="checkbox" name="vm" value="poweron" id="start_vms" onclick="manage_checkboxes(['power_vms']);" autocomplete="off"/>Power on all VMs</label>

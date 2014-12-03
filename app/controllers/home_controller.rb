@@ -14,7 +14,7 @@ class HomeController < ApplicationController
   end
   
   def about
-    @tab="home" if user_signed_in?
+    @tab='home' if user_signed_in?
   end
   
   #this is a method that updates a lab_users progress
@@ -24,28 +24,28 @@ class HomeController < ApplicationController
     #render :layout => false
     #who sent the info? 
     @client_ip = request.remote_ip
-    @remote_ip = request.env["HTTP_X_FORWARDED_FOR"]
+    @remote_ip = request.env['HTTP_X_FORWARDED_FOR']
     
     #get the lab_user based on the ip aadress- get the vm with the given ip, get the vm-s lab_user
     # update the labuser.progress based on the input
     @target_ip=params[:target]
-    if @target_ip==nil then 
-      @target_ip="error" 
+    if @target_ip==nil
+      @target_ip='error'
     else
-      if @target_ip==@client_ip then#TODO- once the allowed ip range is known, update
+      if @target_ip==@client_ip #TODO- once the allowed ip range is known, update
         @progress=params[:progress]
-        if @progress!=nil then
+        if @progress!=nil
           @progress.gsub!(/_/) do
-            "<br/>"
+            '<br/>'
           end
         end
-        @mac=Mac.find(:first, :conditions=>['ip=?', @target_ip])
-        if @mac.vm!=nil then
+        @mac=Mac.find_by_ip(@target_ip).first #find(:first, :conditions=>['ip=?', @target_ip])
+        if @mac.vm!=nil
           #the mac exists and has a vm
           user=@mac.vm.user.id
           lab=@mac.vm.lab_vmt.lab.id
-          @lab_user=LabUser.find(:first, :conditions=>['user_id=? and lab_id=?', user, lab]) 
-          if @lab_user!=nil then
+          @lab_user=LabUser.where('user_id=? and lab_id=?', user, lab).first
+          if @lab_user!=nil
             #the vm helped find its lab_user
             @lab_user.progress=@progress
             @lab_user.save() 

@@ -10,14 +10,15 @@ class VmtsController < ApplicationController
   def save_from_nil
     @vmt = Vmt.find_by_id(params[:id])
     if @vmt==nil 
-      redirect_to(vmts_path,:notice=>"invalid id.")
+      redirect_to(vmts_path,:notice=>'invalid id.')
     end
   end
   
   # GET /vmts
   # GET /vmts.xml
   def index
-    @vmts = Vmt.paginate(:page=>params[:page], :per_page=>10)
+    set_order_by
+    @vmts = Vmt.order(@order).paginate(:page=>params[:page], :per_page=>@per_page)
 
     respond_to do |format|
       format.html # index.html.erb
@@ -62,7 +63,7 @@ class VmtsController < ApplicationController
         format.html { redirect_to(@vmt, :notice => 'Vmt was successfully created.') }
         format.xml  { render :xml => @vmt, :status => :created, :location => @vmt }
       else
-        format.html { render :action => "new" }
+        format.html { render :action => 'new' }
         format.xml  { render :xml => @vmt.errors, :status => :unprocessable_entity }
       end
     end
@@ -78,7 +79,7 @@ class VmtsController < ApplicationController
         format.html { redirect_to(@vmt, :notice => 'Vmt was successfully updated.') }
         format.xml  { head :ok }
       else
-        format.html { render :action => "edit" }
+        format.html { render :action => 'edit' }
         format.xml  { render :xml => @vmt.errors, :status => :unprocessable_entity }
       end
     end

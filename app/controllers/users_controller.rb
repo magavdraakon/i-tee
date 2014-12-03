@@ -4,17 +4,10 @@ class UsersController < ApplicationController
   before_filter :user_tab, :only=>['show']
   
   def index
-    if params[:dir]=="desc" then
-      dir = "DESC"
-      @dir = "asc"
-    else 
-      dir = "ASC"
-      @dir = "desc"
-    end
-    order = params[:sort_by]!=nil ? "#{params[:sort_by]} #{dir}" : "" 
+    set_order_by
     #@users= User.find_by_sql("select id, username, last_sign_in_at, ldap, email, last_sign_in_ip from users")
     #@users= @users.paginate(:page=>params[:page], :per_page=>10).order(order)
-    @users = User.select("id, username, last_sign_in_ip, last_sign_in_at, ldap, email").order(order).paginate(:page=>params[:page], :per_page=>10)
+    @users = User.select('id, username, last_sign_in_ip, last_sign_in_at, ldap, email').order(@order).paginate(:page=>params[:page], :per_page=>@per_page)
   end
   
   def show
@@ -32,25 +25,25 @@ class UsersController < ApplicationController
   
   def create
     @user = User.new(params[:user])
-    @user.password="randomness"
+    @user.password='randomness'
     @user.ldap=false
-    @user.ldap=true if params[:ldap_user]=="yes"
+    @user.ldap=true if params[:ldap_user]=='yes'
     respond_to do |format|
       if @user.save
-        if params[:token] then
+        if params[:token]
           #TODO:  Tokeni loomine
           @user.reset_authentication_token!
-          @user.token_expires=DateTime.new( params[:token]["expires(1i)"].to_i,
-                                      params[:token]["expires(2i)"].to_i,
-                                      params[:token]["expires(3i)"].to_i,
-                                      params[:token]["expires(4i)"].to_i,
-                                      params[:token]["expires(5i)"].to_i)
+          @user.token_expires=DateTime.new( params[:token]['expires(1i)'].to_i,
+                                      params[:token]['expires(2i)'].to_i,
+                                      params[:token]['expires(3i)'].to_i,
+                                      params[:token]['expires(4i)'].to_i,
+                                      params[:token]['expires(5i)'].to_i)
           @user.save
         end
         format.html { redirect_to(users_path, :notice => 'User was successfully created.') }
         format.xml  { render :xml => @user, :status => :created, :location => @user }
       else
-        format.html { render :action => "edit" }
+        format.html { render :action => 'edit' }
         format.xml  { render :xml => @user.errors, :status => :unprocessable_entity }
       end
     end
@@ -59,21 +52,21 @@ class UsersController < ApplicationController
   def update
     @user = User.find(params[:id])
     @user.ldap=false
-    @user.ldap=true if params[:ldap_user]=="yes"
-    if params[:generate_token]=="yes" then
+    @user.ldap=true if params[:ldap_user]=='yes'
+    if params[:generate_token]=='yes'
       @user.reset_authentication_token!
-      @user.token_expires=DateTime.new( params[:token]["expires(1i)"].to_i,
-                                      params[:token]["expires(2i)"].to_i,
-                                      params[:token]["expires(3i)"].to_i,
-                                      params[:token]["expires(4i)"].to_i,
-                                      params[:token]["expires(5i)"].to_i)
+      @user.token_expires=DateTime.new( params[:token]['expires(1i)'].to_i,
+                                      params[:token]['expires(2i)'].to_i,
+                                      params[:token]['expires(3i)'].to_i,
+                                      params[:token]['expires(4i)'].to_i,
+                                      params[:token]['expires(5i)'].to_i)
     end
     respond_to do |format|
       if @user.update_attributes(params[:user])
         format.html { redirect_to(users_path, :notice => 'User was successfully updated.') }
         format.xml  { head :ok }
       else
-        format.html { render :action => "edit" }
+        format.html { render :action => 'edit' }
         format.xml  { render :xml => @user.errors, :status => :unprocessable_entity }
       end
     end

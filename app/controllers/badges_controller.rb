@@ -49,7 +49,7 @@ class BadgesController < ApplicationController
         format.html { redirect_to @badge, :notice => 'Badge was successfully created.' }
         format.json { render :json => @badge, :status => :created, :location => @badge }
       else
-        format.html { render :action => "new" }
+        format.html { render :action => 'new' }
         format.json { render :json => @badge.errors, :status => :unprocessable_entity }
       end
     end
@@ -65,7 +65,7 @@ class BadgesController < ApplicationController
         format.html { redirect_to @badge, :notice => 'Badge was successfully updated.' }
         format.json { head :ok }
       else
-        format.html { render :action => "edit" }
+        format.html { render :action => 'edit' }
         format.json { render :json => @badge.errors, :status => :unprocessable_entity }
       end
     end

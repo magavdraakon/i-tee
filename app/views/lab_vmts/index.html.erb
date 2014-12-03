@@ -4,8 +4,8 @@
     <thead>
       <tr>
         <th>Name</th>
-        <th><%=link_to("Lab", :controller=>"lab_vmts",:action=>"index", :sort_by=>"lab_id")%></th>
-        <th><%=link_to("Vmt", :controller=>"lab_vmts",:action=>"index", :sort_by=>"vmt_id")%></th>
+        <th><%=link_to("Lab", :controller=>"lab_vmts",:action=>"index", :sort_by=>"lab_id", :dir=>@dir)%></th>
+        <th><%=link_to("Vmt", :controller=>"lab_vmts",:action=>"index", :sort_by=>"vmt_id", :dir=>@dir)%></th>
         <th></th>   
       </tr>
     </thead>
