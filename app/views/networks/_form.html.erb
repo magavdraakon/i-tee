@@ -22,6 +22,10 @@
     <%= f.label :name %><br />
     <%= f.text_field :name %>
   </div>
+    <div class="field">
+      <%= f.label :net_type %><br />
+      <%= f.select :net_type, options_for_select(['intnet','bridgeadapter', 'hostonlyadapter', 'nat']) %>
+    </div>
   <div class="actions">
     <%= f.submit %>
   </div>

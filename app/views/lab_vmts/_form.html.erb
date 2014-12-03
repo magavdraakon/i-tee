@@ -22,6 +22,10 @@
     <%= f.label :vmt_id %><br />
     <%=collection_select(:lab_vmt, :vmt_id, Vmt.all, :id, :image,{:prompt => true})%> <span class="red" title="Required field">*</span>
   </div>
+    <div class="field">
+      <%= f.label :allow_remote %><br />
+      <%= f.check_box :allow_remote %>
+    </div>
   <div class="actions">
     <%= submit_tag "Cancel" , :class=>"cancel"%>  <%= f.submit %>
   </div>

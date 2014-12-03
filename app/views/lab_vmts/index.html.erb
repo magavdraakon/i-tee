@@ -6,6 +6,7 @@
         <th>Name</th>
         <th><%=link_to("Lab", :controller=>"lab_vmts",:action=>"index", :sort_by=>"lab_id", :dir=>@dir)%></th>
         <th><%=link_to("Vmt", :controller=>"lab_vmts",:action=>"index", :sort_by=>"vmt_id", :dir=>@dir)%></th>
+        <th>Remote access</th>
         <th></th>   
       </tr>
     </thead>
@@ -15,6 +16,7 @@
         <td><%= lab_vmt.name %></td>
         <td><%= lab_vmt.lab.name %></td>
         <td><%= lab_vmt.vmt.image %></td>
+        <td><%= lab_vmt.allow_remote ? 'yes' : 'no' %></td>
         <td><%= link_to 'Edit', edit_lab_vmt_path(lab_vmt),:class=> 'edit-button button' %><%= link_to 'Destroy', lab_vmt, :confirm => 'Are you sure?', :method => :delete ,:class=> 'delete-button button'%></td>
       </tr>
     <% end %>
@@ -40,6 +42,7 @@
       <td>
         <%=collection_select(:lab_vmt, :vmt_id, Vmt.all, :id, :image,{:prompt => "Select VM template"})%>
       </td>
+      <td><%= f.label :allow_remote %> <%= f.check_box :allow_remote %></td>
       <td><%= f.submit "Add"%> </td>
     </tr>
   </table>

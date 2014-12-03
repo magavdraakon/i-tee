@@ -4,6 +4,7 @@
    <thead>
   <tr>
     <th>Name</th>
+    <th>Type</th>
     <th></th>
   </tr>
   </thead>
@@ -11,6 +12,7 @@
 <% @networks.each do |network| %>
   <tr>
     <td><%= network.name %></td>
+    <td><%=network.net_type %></td>
     <td><%#= link_to 'Show', network, :class=>"show-button button" %><%= link_to 'Edit', edit_network_path(network), :class=>"edit-button button" %><%= link_to 'Destroy', network, confirm: 'Are you sure?', method: :delete, :class=>"delete-button button" %></td>
   </tr>
 <% end %>
@@ -42,6 +44,10 @@
     <%= f.label :name %><br />
     <%= f.text_field :name %>
   </div>
+      <div class="field">
+        <%= f.label :net_type, 'Network type' %><br />
+        <%= f.select :net_type, options_for_select([['internal','intnet'],['bridged','bridgeadapter'], ['host-only','hostonlyadapter'], ['NAT','nat']], selected: @network.net_type) %>
+      </div>
   <div class="actions">
     <%= f.submit %> 
   </div>
