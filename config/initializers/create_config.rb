@@ -20,6 +20,14 @@ File.open(path, "w+") { |f|
 
   f.write("export CMD_LINE='#{exec_line}'\n")
 
+
+  if ITee::Application::config.respond_to? :run_dir then
+    run_dir = ITee::Application::config.run_dir
+  else
+    run_dir = '/var/labs'
+  end
+
+  f.write("export RUNDIR='#{run_dir}'\n")
 }
 rescue
   Rails.logger.error("Can't open file #{path} for writing!")

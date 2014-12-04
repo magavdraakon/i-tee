@@ -27,13 +27,13 @@ MAC=$1
 IP_ADDR=$2
 TEMPLATE=$3
 NAME=$4
-PWD=$5
+USER_PWD=$5
 
 [ -r "$ENVIRONMENT" ] && . "$ENVIRONMENT" || echo "no environment variables from RAILS"
 
-[ -r "$NAME" ] && . "$NAME" || echo "no machine specific variables for customizing VM"
+[ -r "$RUNDIR"/"$NAME".sh ] && . "$RUNDIR"/"$NAME".sh || echo "no machine specific variables for customizing VM" > /var/tmp/info.log
 
-env > /var/tmp/info.log
+env >> /var/tmp/info.log
 
 echo "tekitan virtuaalmasina $NAME template-ist $TEMPLATE Mac aadressiga $MAC"
 if [ $(VBoxManage list vms | cut -f1 -d' '| tr -d '"'| grep $NAME ) ]
@@ -66,7 +66,7 @@ GROUPNAME=${NAME:0:((${#NAME}-${#USERNAME})-1)}
 VBoxManage modifyvm $NAME --groups "/${GROUPNAME}","/${USERNAME}"
 
 
-PWDHASH=$(VBoxManage internalcommands passwordhash $PWD|cut -f3 -d' ')
+PWDHASH=$(VBoxManage internalcommands passwordhash $USER_PWD|cut -f3 -d' ')
 VBoxManage setextradata $NAME  "VBoxAuthSimple/users/${USERNAME}" $PWDHASH
 
 VBoxManage setextradata $NAME      "VBoxInternal/Devices/pcbios/0/Config/DmiSystemProduct"     "System Product"
@@ -75,9 +75,23 @@ VBoxManage setextradata $NAME      "VBoxInternal/Devices/pcbios/0/Config/DmiSyst
 VBoxManage setextradata $NAME      "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSKU"         "System SKU"
 VBoxManage setextradata $NAME      "VBoxInternal/Devices/pcbios/0/Config/DmiSystemFamily"      "System Family"
 
-INTERNALNETNAME=$(date +%Y)${USERNAME}
 
+if [ ${NICS#} -eq 0 ]
+then
+
+#NO specian network setup. Setting NIC2 to internal
+
+INTERNALNETNAME=$(date +%Y)${USERNAME}
 VBoxManage modifyvm $NAME  --intnet2 $INTERNALNETNAME
+
+echo "NO SPECIAL NIC SETUP" >> /var/tmp/info.log
+
+else
+    for NIC in $NICS
+    do
+        echo "$NIC" >> /var/tmp/info.log
+    done
+fi
 
 RDP_PORT=${IP_ADDR##*.}
 VBoxManage modifyvm $NAME --vrdeport 10$RDP_PORT

@@ -121,6 +121,51 @@ end
         logger.debug "\nNIC#{nw.slot} #{gen_name} \n"
       end
 
+      ###########################################################
+      #Create custom environment file for start_machine.sh script
+      ###########################################################
+
+      #customization script is stored into run_dir (application config)
+
+      # fallback name if run_dir is missing from application config
+      customization_file='/var/labs/'
+      if ITee::Application::config.respond_to? :run_dir then
+        customization_file="#{ITee::Application.config.run_dir}/"
+      end
+
+      customization_file += "#{name}.sh"
+
+      begin
+      File.open(customization_file, 'w+') { |f|
+        #Writing VM data
+        f.write("#Configuration file for VM: #{name}\n")
+        f.write("export NIC1='#{Rails.root}'\n")
+
+        #Writing NIC information
+        internal_list = ''
+        self.lab_vmt.lab_vmt_networks.each do |nw|
+          # substituting placeholders with data
+          gen_name=nw.network.name.gsub('{year}', Time.now.year.to_s)
+          gen_name= gen_name.gsub('{user}', self.user.username)
+          gen_name= gen_name.gsub('{slot}', nw.slot.to_s)
+          gen_name= gen_name.gsub('{labVmt}', self.lab_vmt.name)
+
+          logger.debug "\nNIC#{nw.slot} #{gen_name} \n"
+          internal_list += " NIC#{nw.slot}"
+
+        end
+        f.write("export NICS='#{internal_list}'\n")
+
+      }
+      rescue
+        Rails.logger.error("Can't open file #{customization_file} for writing!")
+      else
+        Rails.logger.info("Writing configuration to #{customization_file}")
+      end
+
+
+
+
       @a=self.ini_vm #the script is called in the model
       
       port=@mac.ip.split('.').last
