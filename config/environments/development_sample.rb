@@ -26,6 +26,8 @@ ITee::Application.configure do
   #Virtualbox User and command line for launching scripts
   config.cmd_perfix = 'sudo -u vbox'
 
+  # set log level to debug for development env
+  config.log_level = :debug
 
   # In the development environment your application's code is reloaded on
   # every request.  This slows down response time but is perfect for development
