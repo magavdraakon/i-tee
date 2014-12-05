@@ -663,7 +663,7 @@ div.field, div.actions {
   margin-bottom: 10px;
 }
 
-.vms {
+.vm_s {
     position:relative;
     border-radius:10px;
     border: 1px solid rgba(125, 159, 186, .5);
@@ -675,6 +675,6 @@ div.field, div.actions {
     margin-bottom: 5px;
     overflow:auto;
 }
-.vms .remote {
+.vm_s .remote {
    padding:3px;
 }
