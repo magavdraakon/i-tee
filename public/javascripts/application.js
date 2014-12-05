@@ -3,6 +3,8 @@
 
 //jQuery.noConflict()
 
+var remote_timeout='';
+
 jQuery(document).ready(function() {
   if (document.getElementById('search-form')){
     // when there is a search form, load autocomplete with the default / refilled value
@@ -130,6 +132,19 @@ function shownotice(html){
   $("#messages").html("<div escape=\"false\" id=\"flash_notice\"></div>");
   $("#flash_notice").html(html);
 }
+
+function show_remote(el, html){
+// override the messages div content. all other notices will be removed
+    $(el).siblings('.remote').html(html);
+   /* if (remote_timeout!='') {
+        clearTimeout(remote_timeout);
+        console.log('cleared');
+    }
+    remote_timeout= setTimeout(function() {
+        $(el).siblings('.remote').html('Choose a remote connection type from above');
+    }, 10000);*/
+}
+
 
 function toggle_checked_all(el){
    $('.found input[type=checkbox]').prop('checked', el.checked);
