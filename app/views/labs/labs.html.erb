@@ -1,16 +1,16 @@
-<%if @labs!=[] then%>
+<%if @labs!=[] %>
 
 <% content_for :sidebar do %> 
   <% @labs.each do |lab| %>
     <% classes="" #default
        classes= "bold" if lab.id==@lab.id %>
-      <%if lab==@started.first then%>
+      <%if lab==@started.first %>
       <li class="upper">Started</li>
       <% end 
-         if lab==@not_started.first then%>
+         if lab==@not_started.first %>
       <li class="upper">Not started</li>
       <% end  
-         if lab==@complete.first then%>
+         if lab==@complete.first %>
       <li class="upper">Completed</li>
       <%end%>
       <li class="<%= classes %>">
@@ -20,7 +20,7 @@
 <%end%>  
 
 <% content_for :sidebar_head do %>
-  <% if @user!=current_user then %>
+  <% if @user!=current_user %>
     <b><u><%= @user.username %></u> labs</b>
   <% else %>
     <b>My labs</b>
@@ -35,9 +35,9 @@
 </div>
 
 <p>
-  <% if @labs!=[] then%>
+  <% if @labs!=[] %>
     <%= link_to('Start lab',start_lab_path+"/"+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : "" ), :class=>'submit-button button') if @lab_user.start==nil %>
-    <%if @lab_user.start!=nil then%>
+    <%if @lab_user.start!=nil %>
       <!-- started at: <%#=@lab_user.start%><br/>
           ended at: <%#=@lab_user.end%><br/>-->
     <script>
@@ -46,9 +46,9 @@
         //$.get('/lab_users/progress/'+<%=@lab_user.id%>, function(data) {
         //  $('#updated_progress').html(data);
         //});
-        <% if @lab_user.end==nil then %>
+        <% if @lab_user.end==nil %>
           <% @lab_user.vms.each do |vm| %>
-            <%if vm.state=="running" || vm.state=="paused" then%>
+            <%if vm.state=="running" || vm.state=="paused" %>
               $.get('/vms/get_progress/'+<%=vm.id%>, function(data) {
               $('#vm_progress<%=vm.id%>').html(data);});
             <%end%>
@@ -60,44 +60,47 @@
       });
     </script>
     <div id="updated_progress"><%= render :partial => 'shared/lab_progress' %></div>
-    <%if @lab_user.result!=nil then %> result: <%= @lab_user.result%>    <br/><%end%>
+    <%if @lab_user.result %> result: <%= @lab_user.result%>    <br/><%end%>
       
-    <%if @lab_user.end==nil then %>
+    <%if @lab_user.end==nil  %>
       <h3>Virtual machines</h3>
       <%= "There are no machines allocated for this lab" if @lab_user.vms.empty? %>
       <% @lab_user.vms.each do |vm| %>
-        <p>
         <%state=vm.state 
           desc="Initialize the virtual machine #{vm.name} by clicking <strong>Start</strong>"
            desc="There is no remote desktop access for #{vm.name}" if (state=="running" || state=="paused") && !vm.lab_vmt.allow_remote
            desc=vm.description if (state=="running" || state=="paused") && vm.mac!=nil && vm.lab_vmt.allow_remote %>
-        <span class="button info-button" onclick="shownotice('<%=desc%>');">
-          <%=vm.name%>
-          <%if vm.mac!=nil && state=="running" && vm.lab_vmt.allow_remote %>,
-            RDP info: elab.itcollege.ee:10<%=vm.mac.ip.split('.').last if vm.mac!=nil%>,
-            user: <%= @lab_user.user.username %>,
-            pwd: <%= vm.password %>
-          <%end%>
-        </span> 
-        <%if state=="running" && vm.mac!=nil && vm.lab_vmt.vmt.shellinabox then %>
-          <a href="https://<%= request.host if vm.mac!=nil%>:8<%= vm.mac.ip.split('.').last %>" title="Login" target='_blank' class="button login-button">Login</a>
-        <%end%>
+        <div class="vms">
+          <div class="right">
+            <%= link_to('Start',start_vm_path+"/"+vm.id.to_s, :class=>"button start-button") if (state!="running" && state!="paused") || vm.mac==nil%>
+            <%= link_to('Pause', pause_vm_path+"/"+vm.id.to_s, :class=>'button pause-button') if state=="running" && vm.mac!=nil %>
+            <%= link_to('Resume',resume_vm_path+"/"+vm.id.to_s, :class=>'button start-button') if state=="paused" && vm.mac!=nil%>
+            <%= link_to('Stop',stop_vm_path+"/"+vm.id.to_s, :class=>"button stop-button") if state=="running" && vm.mac!=nil%>
 
-        
-        <span class="loader">
-          <%= link_to('Start',start_vm_path+"/"+vm.id.to_s, :class=>"button start-button") if (state!="running" && state!="paused") || vm.mac==nil%>
-          <%= link_to('Pause', pause_vm_path+"/"+vm.id.to_s, :class=>'button pause-button') if state=="running" && vm.mac!=nil %>
-          <%= link_to('Resume',resume_vm_path+"/"+vm.id.to_s, :class=>'button start-button') if state=="paused" && vm.mac!=nil%>
-          <%= link_to('Stop',stop_vm_path+"/"+vm.id.to_s, :class=>"button stop-button") if state=="running" && vm.mac!=nil%>
-        </span>
-    
-        <span class="vm_links">
-          <%="("+state+")" if vm.mac!=nil && (state=="running" || state=="paused") %>
-        </span><br/>
-      </p>
+            <%if state=="running" && vm.mac!=nil && vm.lab_vmt.vmt.shellinabox  %>
+                <a href="https://<%= request.host if vm.mac!=nil%>:8<%= vm.mac.ip.split('.').last %>" title="Login" target='_blank' class="button login-button">Login</a>
+            <%end%>
+          </div>
+          <% if vm.lab_vmt.allow_remote %>
+            <div class="remote_connections right clearr" style="text-align:right;">
+                <span class="button win-button" onclick="show_remote(this, '<%=vm.remote('win')%>')">Windows</span>
+                <span class="button rdesktop-button" onclick="show_remote(this, '<%=vm.remote('rdesktop')%>')">Linux (rdesktop)</span>
+                <span class="button xfreerdp-button" onclick="show_remote(this, '<%=vm.remote('xfreerdp')%>')">Linux (xfreerdp)</span>
+              <div escape="false" class="remote">Choose a remote connection type from above</div>
+            </div>
+          <% end %>
+          <b><%=vm.name%></b>
+          <span class="vm_links"><%="("+state+")" if vm.mac!=nil && (state=="running" || state=="paused") %></span>
+          <%if vm.mac!=nil && state=="running" && vm.lab_vmt.allow_remote %><br/>
+            <b>RDP info:</b> elab.itcollege.ee:10<%=vm.mac.ip.split('.').last if vm.mac!=nil%><br/>
+            <b>user:</b> <%= @lab_user.user.username %><br/>
+            <b>pwd:</b> <%= vm.password %>
+          <%end%>
+
+
+      </div>
       <div id="vm_progress<%=vm.id%>">
-        <%if state=="running" || state=="paused" then%>
-          <h3>Progress:</h3>
+        <%if state=="running" || state=="paused" %>
           <%=vm.progress%>
         <%end%>
       </div>

@@ -316,7 +316,6 @@ table caption {
     font-weight: normal;
     color: #1c140d;
     text-align: left;
-    border: 1px solid #e5eff8;
     padding: .3em .3em;
     border: 1px solid #C0C0C0;
 }
@@ -337,7 +336,6 @@ table caption {
     color: #8E8E8E;
     padding: .3em .3em;
     text-align: left;
-    background: white;
     border: 1px solid #C0C0C0;
     /*background: white url("../images/td-bg.png") repeat-x;*/
     background: #FDFDFD;
@@ -431,6 +429,21 @@ input[type="password"]:focus, input[type="text"]:focus, textarea:focus {
 }
 .upper {
   text-transform: uppercase;
+}
+.left {
+    float:left;
+}
+.right{
+    float:right;
+}
+.clearl{
+    clear:left;
+}
+.clearr{
+    clear:right;
+}
+.clearb {
+    clear:both;
 }
 
 /*buttons*/
@@ -648,4 +661,20 @@ display: inline;
 }
 div.field, div.actions {
   margin-bottom: 10px;
+}
+
+.vms {
+    position:relative;
+    border-radius:10px;
+    border: 1px solid rgba(125, 159, 186, .5);
+    padding:3px;
+    background-color: rgba(255, 255, 255, .7);
+    text-decoration:none;
+    color: #666666;
+    line-height:1.5em;
+    margin-bottom: 5px;
+    overflow:auto;
+}
+.vms .remote {
+   padding:3px;
 }

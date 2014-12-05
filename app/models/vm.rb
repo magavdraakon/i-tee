@@ -9,7 +9,7 @@ class Vm < ActiveRecord::Base
   validates_presence_of :name, :lab_vmt_id, :user_id
   validates_uniqueness_of :name
   def rel_mac
-    mac=Mac.find(:first, :conditions=>["vm_id=?", id])
+    mac=Mac.where('vm_id=?', id).first
     if mac!=nil
       mac.vm_id=nil
       mac.save
@@ -17,25 +17,25 @@ class Vm < ActiveRecord::Base
   end
 
   def add_pw
-    chars = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789"
-    self.password = ""
+    chars = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+    self.password = ''
     8.times { |i| self.password << chars[rand(chars.length)] }
   end
 
 
-  if ITee::Application::config.respond_to? :cmd_perfix then
+  if ITee::Application::config.respond_to? :cmd_perfix
     @exec_line = ITee::Application::config.cmd_perfix
   else
-    @exec_line = "sudo -u vbox "
+    @exec_line = 'sudo -u vbox '
   end
 
   def del_vm
-    return %x(#{@exec_line} #{Rails.root}/utils/delete_machine.sh #{name}  2>&1)
+     %x(#{@exec_line} #{Rails.root}/utils/delete_machine.sh #{name}  2>&1)
   end
   
   def poweroff_vm
     #TODO script .. pooleli
-    return %x(#{@exec_line} #{Rails.root}/utils/stop_machine.sh #{name}  2>&1)
+     %x(#{@exec_line} #{Rails.root}/utils/stop_machine.sh #{name}  2>&1)
   end
   
   def poweron_vm
@@ -44,11 +44,11 @@ class Vm < ActiveRecord::Base
   end
   
   def res_vm
-    return %x(#{@exec_line} #{Rails.root}/utils/resume_machine.sh #{name}  2>&1)
+    %x(#{@exec_line} #{Rails.root}/utils/resume_machine.sh #{name}  2>&1)
   end
   
   def pau_vm
-    return %x(#{@exec_line} #{Rails.root}/utils/pause_machine.sh #{name}  2>&1)
+    %x(#{@exec_line} #{Rails.root}/utils/pause_machine.sh #{name}  2>&1)
   end
   
   def ini_vm
@@ -78,34 +78,34 @@ class Vm < ActiveRecord::Base
   end
 
   def stop_vm
-   if self.state=="running" || self.state=="paused" then
-    logger.info "Running VM power off script"
+   if self.state=='running' || self.state=='paused'
+    logger.info 'Running VM power off script'
     a=self.poweroff_vm #the script is called in the model
     logger.info a
-    self.description="Power on the virtual machine by clicking <strong>Start</strong>."
+    self.description='Power on the virtual machine by clicking <strong>Start</strong>.'
     self.save
     # remove link to  mac 
-    @mac = Mac.find(:first, :conditions=>["vm_id=?", self.id])
+    @mac = Mac.where('vm_id=?', self.id).first
     @mac.vm_id=nil
     @mac.save
-    return "Successful shutdown" 
+    return 'Successful shutdown'
   end
 end
 
   def start_vm
     #find out if there is a mac address bound with this vm already
-    result = {notice: "", alert: ""}
-    @mac= Mac.find(:first, :conditions=>["vm_id=?", self.id])
+    result = {notice: '', alert: ''}
+    @mac= Mac.where('vm_id=?', self.id).first
     # binding a unused mac address with the vm if there is no mac
-    if @mac==nil then
-      @mac= Mac.find(:first, :conditions=>["vm_id is null"])
+    if @mac==nil
+      @mac= Mac.where('vm_id is null').first
       @mac.vm_id=self.id
       if @mac.save  #save successful
-        result[:notice] = result[:notice]+"successful mac assignement."
+        result[:notice] = result[:notice]+'successful mac assignement.'
       end #end -if save
     else
       #the vm had a mac already, dont do anything
-      result[:notice] = result[:notice]+"Vm already had a mac."
+      result[:notice] = result[:notice]+'Vm already had a mac.'
     end # end if nil
       
     if self.state!="running" && self.state!="paused"
@@ -119,7 +119,7 @@ end
 
       # fallback name if run_dir is missing from application config
       customization_file='/var/labs/'
-      if ITee::Application::config.respond_to? :run_dir then
+      if ITee::Application::config.respond_to? :run_dir
         customization_file="#{ITee::Application.config.run_dir}/"
       end
 
@@ -167,7 +167,7 @@ end
 
 
       @a=self.ini_vm #the script is called in the model
-      
+=begin
       port=@mac.ip.split('.').last
       begin
         rdp_host=ITee::Application.config.rdp_host
@@ -179,10 +179,15 @@ end
       rescue
         rdp_port_prefix = '10'
       end
-      desc =  "To create a connection with this machine using Windows use two commands:<br/>"
-      desc += "<strong>cmdkey /generic:#{rdp_host} /user:localhost\\#{self.user.username} /pass:#{self.password}</strong><br/>"
-      desc += "<strong>mstsc.exe /v:#{rdp_host}:#{rdp_port_prefix}#{port} /f</strong><br/>"
-      self.description="To create a connection with this machine using linux/unix use<br/><strong>rdesktop -k et -u#{self.user.username} -p#{self.password} -N -a16 #{rdp_host}:#{rdp_port_prefix}#{port}</strong></br> or use xfreerdp as</br><strong>xfreerdp  -k et --plugin cliprdr -g 90% -u #{self.user.username} -p #{self.password} #{rdp_host}:#{rdp_port_prefix}#{port}</strong></br>"
+=end
+      desc =  '<br/>To create a connection with this machine using Windows use two commands:<br/>'
+      desc += self.remote('win')#"<strong>cmdkey /generic:#{rdp_host} /user:localhost\\#{self.user.username} /pass:#{self.password}</strong><br/>"
+      #desc += "<strong>mstsc.exe /v:#{rdp_host}:#{rdp_port_prefix}#{port} /f</strong><br/>"
+      self.description = 'To create a connection with this machine using linux/unix use<br/>'
+      self.description += self.remote('rdesktop')
+      self.description += '<br/> or use xfreerdp as<br/>'
+      self.description += self.remote('xfreerdp')
+      #"<strong>rdesktop -k et -u#{self.user.username} -p#{self.password} -N -a16 #{rdp_host}:#{rdp_port_prefix}#{port}</strong></br> or use xfreerdp as</br><strong>xfreerdp  -k et --plugin cliprdr -g 90% -u #{self.user.username} -p #{self.password} #{rdp_host}:#{rdp_port_prefix}#{port}</strong></br>"
       self.description += desc
 
       self.save
@@ -232,6 +237,35 @@ end
     a=self.res_vm # the script is called in the model
     logger.info a
     return "Successful vm resume." 
+  end
+
+  # connection informations
+  def remote(typ)
+    port=self.mac ? self.mac.ip.split('.').last : ''
+    begin
+      rdp_host=ITee::Application.config.rdp_host
+    rescue
+      rdp_host=`hostname -f`.strip
+    end
+    begin
+      rdp_port_prefix = ITee::Application.config.rdp_port_prefix
+    rescue
+      rdp_port_prefix = '10'
+    end
+
+    case typ
+      when 'win'
+        desc = "<strong>cmdkey /generic:#{rdp_host} /user:localhost&#92;#{self.user.username} /pass:#{self.password}</strong><br/>"
+        desc += "<strong>mstsc.exe /v:#{rdp_host}:#{rdp_port_prefix}#{port} /f</strong>"
+      when 'rdesktop'
+        desc ="<strong>rdesktop -k et -u#{self.user.username} -p#{self.password} -N -a16 #{rdp_host}:#{rdp_port_prefix}#{port}</strong>"
+      when 'xfreerdp'
+        desc ="<strong>xfreerdp  -k et --plugin cliprdr -g 90% -u #{self.user.username} -p #{self.password} #{rdp_host}:#{rdp_port_prefix}#{port}</strong>"
+      else
+        desc ="<strong>rdesktop -k et -u#{self.user.username} -p#{self.password} -N -a16 #{rdp_host}:#{rdp_port_prefix}#{port}</strong>"
+
+    end
+
   end
 
 end
