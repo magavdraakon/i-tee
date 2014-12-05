@@ -105,7 +105,7 @@ end
       end #end -if save
     else
       #the vm had a mac already, dont do anything
-      result[:notice] = result[:notice]+'Vm already had a mac.'
+      logger.debug '\nVm already had a mac.\n'
     end # end if nil
       
     if self.state!="running" && self.state!="paused"
