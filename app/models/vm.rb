@@ -110,16 +110,6 @@ end
       
     if self.state!="running" && self.state!="paused"
       logger.info "running Machine start script"
-      # logging network interface info
-      self.lab_vmt.lab_vmt_networks.each do |nw|
-        # substituting placeholders with data
-        gen_name=nw.network.name.gsub('{year}', Time.now.year.to_s)
-        gen_name= gen_name.gsub('{user}', self.user.username)
-        gen_name= gen_name.gsub('{slot}', nw.slot.to_s)
-        gen_name= gen_name.gsub('{labVmt}', self.lab_vmt.name)
-
-        logger.debug "\nNIC#{nw.slot} #{gen_name} \n"
-      end
 
       ###########################################################
       #Create custom environment file for start_machine.sh script
@@ -140,21 +130,31 @@ end
         #Writing VM data
         f.write("#Configuration file for VM: #{name}\n")
         f.write("export NIC1='#{Rails.root}'\n")
+        f.write("NIC count #{self.lab_vmt.lab_vmt_networks.count}\n\n")
 
-        #Writing NIC information
-        internal_list = ''
-        self.lab_vmt.lab_vmt_networks.each do |nw|
-          # substituting placeholders with data
-          gen_name=nw.network.name.gsub('{year}', Time.now.year.to_s)
-          gen_name= gen_name.gsub('{user}', self.user.username)
-          gen_name= gen_name.gsub('{slot}', nw.slot.to_s)
-          gen_name= gen_name.gsub('{labVmt}', self.lab_vmt.name)
+        if self.lab_vmt.lab_vmt_networks.count > 0 then
+          f.write("function set_networks {\n\n#function for seting NICs for VM")
+          #Writing NIC information
+          internal_list = ''
+          self.lab_vmt.lab_vmt_networks.each do |nw|
+            # substituting placeholders with data
+            gen_name=nw.network.name.gsub('{year}', Time.now.year.to_s)
+            gen_name= gen_name.gsub('{user}', self.user.username)
+            gen_name= gen_name.gsub('{slot}', nw.slot.to_s)
+            gen_name= gen_name.gsub('{labVmt}', self.lab_vmt.name)
 
-          logger.debug "\nNIC#{nw.slot} #{gen_name} \n"
-          internal_list += " NIC#{nw.slot}"
+            logger.debug "\nNIC#{nw.slot} #{gen_name} net type #{nw.network.net_type}\n"
+            internal_list += " NIC#{nw.slot}"
 
+
+          end
+          f.write("\n"'echo "networks are now configured"')
+          f.write("\n}\n\n")
+          f.write("export NICS='#{internal_list}'\n")
+          #end for fuction set networks
         end
-        f.write("export NICS='#{internal_list}'\n")
+
+
 
       }
       rescue
@@ -202,6 +202,7 @@ end
       if @a.include?("masin #{self.name} loodud")
         result[:notice] = result[:notice]+"<br/>"+self.description
         #flash[:notice]=flash[:notice].html_safe
+        logger.debug @a
       else
         logger.info @a  
         @mac.vm_id=nil

@@ -75,23 +75,12 @@ VBoxManage setextradata $NAME      "VBoxInternal/Devices/pcbios/0/Config/DmiSyst
 VBoxManage setextradata $NAME      "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSKU"         "System SKU"
 VBoxManage setextradata $NAME      "VBoxInternal/Devices/pcbios/0/Config/DmiSystemFamily"      "System Family"
 
-
-if [ ${NICS#} -eq 0 ]
-then
-
-#NO specian network setup. Setting NIC2 to internal
-
+#if special networks are set then rewrite NIC setup
+declare -f set_networks >/dev/null && set_networks || {
+echo "No network setup"
 INTERNALNETNAME=$(date +%Y)${USERNAME}
 VBoxManage modifyvm $NAME  --intnet2 $INTERNALNETNAME
-
-echo "NO SPECIAL NIC SETUP" >> /var/tmp/info.log
-
-else
-    for NIC in $NICS
-    do
-        echo "$NIC" >> /var/tmp/info.log
-    done
-fi
+}
 
 RDP_PORT=${IP_ADDR##*.}
 VBoxManage modifyvm $NAME --vrdeport 10$RDP_PORT
