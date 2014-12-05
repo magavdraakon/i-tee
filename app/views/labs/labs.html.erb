@@ -81,7 +81,7 @@
                 <a href="https://<%= request.host if vm.mac!=nil%>:8<%= vm.mac.ip.split('.').last %>" title="Login" target='_blank' class="button login-button">Login</a>
             <%end%>
           </div>
-          <% if vm.lab_vmt.allow_remote %>
+          <% if vm.lab_vmt.allow_remote && state=="running" %>
             <div class="remote_connections right clearr" style="text-align:right;">
                 <span class="button win-button" onclick="show_remote(this, '<%=vm.remote('win')%>')">Windows</span>
                 <span class="button rdesktop-button" onclick="show_remote(this, '<%=vm.remote('rdesktop')%>')">Linux (rdesktop)</span>

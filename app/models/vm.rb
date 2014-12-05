@@ -101,7 +101,7 @@ end
       @mac= Mac.where('vm_id is null').first
       @mac.vm_id=self.id
       if @mac.save  #save successful
-        result[:notice] = result[:notice]+'successful mac assignement.'
+        logger.debug '\n successful mac assignement.\n'
       end #end -if save
     else
       #the vm had a mac already, dont do anything
@@ -205,7 +205,7 @@ end
       }
 
       if @a.include?("masin #{self.name} loodud")
-        result[:notice] = result[:notice]+"<br/>"+self.description
+        result[:notice] = result[:notice]+"Machine <b>#{self.name}</b> successfully started<br/>"
         #flash[:notice]=flash[:notice].html_safe
         logger.debug @a
       else
