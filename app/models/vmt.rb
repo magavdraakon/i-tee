@@ -12,7 +12,7 @@ class Vmt < ActiveRecord::Base
 
   def available
     available=[]
-    %x(#{@exec_line} vboxmanage list vms | grep template|cut -d' ' -f1|tr '"' ' ').split("\n").each do |vmt|
+    %x(sudo -u vbox vboxmanage list vms | grep template|cut -d' ' -f1|tr '"' ' ').split("\n").each do |vmt|
       available<< vmt.strip
     end
     available
