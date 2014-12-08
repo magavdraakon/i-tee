@@ -41,23 +41,24 @@
       <!-- started at: <%#=@lab_user.start%><br/>
           ended at: <%#=@lab_user.end%><br/>-->
     <script>
+      /*
       function update(){ 
         //temporarily disable the lab_user automatic updating, because it's not really used
-        //$.get('/lab_users/progress/'+<%=@lab_user.id%>, function(data) {
+        //$.get('/lab_users/progress/'+<%#=@lab_user.id%>, function(data) {
         //  $('#updated_progress').html(data);
         //});
-        <% if @lab_user.end==nil %>
-          <% @lab_user.vms.each do |vm| %>
-            <%if vm.state=="running" || vm.state=="paused" %>
-              $.get('/vms/get_progress/'+<%=vm.id%>, function(data) {
-              $('#vm_progress<%=vm.id%>').html(data);});
-            <%end%>
-         <%end%>
-        <%end%>
+        <%# if @lab_user.end==nil %>
+          <%# @lab_user.vms.each do |vm| %>
+            <%#if vm.state=="running" || vm.state=="paused" %>
+              $.get('/vms/get_progress/'+<%#=vm.id%>, function(data) {
+              $('#vm_progress<%#=vm.id%>').html(data);});
+            <%#end%>
+         <%#end%>
+        <#%end%>
       }
       $(document).ready(function($){
         window.setInterval('update()', 15*1000);
-      });
+      });*/
     </script>
     <div id="updated_progress"><%= render :partial => 'shared/lab_progress' %></div>
     <%if @lab_user.result %> result: <%= @lab_user.result%>    <br/><%end%>
