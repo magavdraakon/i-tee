@@ -12,9 +12,10 @@ class Vmt < ActiveRecord::Base
 
   def available
     available=[]
-    %x(sudo -u vbox vboxmanage list vms | grep template|cut -d' ' -f1|tr '"' ' ').split("\n").each do |vmt|
+    %x(sudo -u vbox VBoxManage list vms | grep template|cut -d' ' -f1|tr '"' ' ').split("\n").each do |vmt|
       available<< vmt.strip
     end
+    Rails.logger.debug "Templated - #{available}"
     available
   end
 end
