@@ -59,11 +59,7 @@ class Vm < ActiveRecord::Base
   end
   
   def state
-    #TODO - state is libvirt specific
-    #retunr values are running, paused, 
-    #return %x(virsh -c qemu:///system domstate #{name} 2>&1).split(' ').first.rstrip
-    #state  powered off, running, paused
-    ret = %x[#{@exec_line} /usr/bin/VBoxManage showvminfo #{name}|grep -E '^State:']
+    ret = %x["#{@exec_line} /usr/bin/VBoxManage showvminfo #{name}|grep -E '^State:'".strip!]
     r = "#{ret}".split(' ')[1]
 
     #Rails.logger.warn ret.split(' ')[1]
