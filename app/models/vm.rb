@@ -22,44 +22,44 @@ class Vm < ActiveRecord::Base
     8.times { |i| self.password << chars[rand(chars.length)] }
   end
 
-
+  #TODO does not work as desired
   if ITee::Application::config.respond_to? :cmd_perfix
-    @exec_line = ITee::Application::config.cmd_perfix
+    @exec_line = ITee::Application::config.cmd_perfix.chomp
   else
     @exec_line = 'sudo -u vbox '
   end
 
   def del_vm
-     %x(#{@exec_line} #{Rails.root}/utils/delete_machine.sh #{name}  2>&1)
+     %x(sudo -u vbox #{Rails.root}/utils/delete_machine.sh #{name}  2>&1)
   end
   
   def poweroff_vm
     #TODO script .. pooleli
-     %x(#{@exec_line} #{Rails.root}/utils/stop_machine.sh #{name}  2>&1)
+     %x(sudo -u vbox #{Rails.root}/utils/stop_machine.sh #{name}  2>&1)
   end
   
   def poweron_vm
     #TODO script .. pooleli
-    %x("#{@exec_line}  #{Rails.root}/utils/poweron_machine.sh #{name}  2>&1".strip!)
+    %x("sudo -u vbox  #{Rails.root}/utils/poweron_machine.sh #{name}  2>&1".strip!)
   end
   
   def res_vm
-    %x(#{@exec_line} #{Rails.root}/utils/resume_machine.sh #{name}  2>&1)
+    %x(sudo -u vbox #{Rails.root}/utils/resume_machine.sh #{name}  2>&1)
   end
   
   def pau_vm
-    %x(#{@exec_line} #{Rails.root}/utils/pause_machine.sh #{name}  2>&1)
+    %x(sudo -u vbox #{Rails.root}/utils/pause_machine.sh #{name}  2>&1)
   end
   
   def ini_vm
-    runstr = "#{@exec_line}  #{Rails.root}/utils/start_machine.sh #{mac.mac} #{mac.ip} #{lab_vmt.vmt.image} #{name} #{password} 2>&1".strip!
-    Rails.logger.debug "#{runstr}"
+    runstr = "sudo -u vbox  #{Rails.root}/utils/start_machine.sh #{mac.mac} #{mac.ip} #{lab_vmt.vmt.image} #{name} #{password} 2>&1"
+    Rails.logger.debug "ini_vm: #{runstr}"
     %x(#{runstr})
     #%x("#{@exec_line}  #{Rails.root}/utils/start_machine.sh #{mac.mac} #{mac.ip} #{lab_vmt.vmt.image} #{name} #{password} 2>&1")
   end
   
   def state
-    ret = %x["#{@exec_line} /usr/bin/VBoxManage showvminfo #{name}|grep -E '^State:'".strip!]
+    ret = %x[sudo -u vbox /usr/bin/VBoxManage showvminfo #{name}|grep -E '^State:']
     r = "#{ret}".split(' ')[1]
 
     #Rails.logger.warn ret.split(' ')[1]
