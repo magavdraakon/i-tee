@@ -40,7 +40,7 @@ class Vm < ActiveRecord::Base
   
   def poweron_vm
     #TODO script .. pooleli
-    %x(#{@exec_line}  #{Rails.root}/utils/poweron_machine.sh #{name}  2>&1)
+    %x("#{@exec_line}  #{Rails.root}/utils/poweron_machine.sh #{name}  2>&1".strip!)
   end
   
   def res_vm
@@ -52,7 +52,10 @@ class Vm < ActiveRecord::Base
   end
   
   def ini_vm
-    %x(#{@exec_line}  #{Rails.root}/utils/start_machine.sh #{mac.mac} #{mac.ip} #{lab_vmt.vmt.image} #{name} #{password} 2>&1)
+    runstr = "#{@exec_line}  #{Rails.root}/utils/start_machine.sh #{mac.mac} #{mac.ip} #{lab_vmt.vmt.image} #{name} #{password} 2>&1".strip!
+    Rails.logger.debug "#{runstr}"
+    %x(#{runstr})
+    #%x("#{@exec_line}  #{Rails.root}/utils/start_machine.sh #{mac.mac} #{mac.ip} #{lab_vmt.vmt.image} #{name} #{password} 2>&1")
   end
   
   def state

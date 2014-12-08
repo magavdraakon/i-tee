@@ -7,6 +7,12 @@ echo "Five arguments as mac IP template name password"
 exit 1
 fi
 
+function die {
+echo "Error with $1"
+echo "ERROR"
+exit 1
+}
+
 id | grep vboxusers > /dev/null
 
 
@@ -31,7 +37,9 @@ USER_PWD=$5
 
 [ -r "$ENVIRONMENT" ] && . "$ENVIRONMENT" || echo "no environment variables from RAILS"
 
-[ -r "$RUNDIR"/"$NAME".sh ] && . "$RUNDIR"/"$NAME".sh || echo "no machine specific variables for customizing VM" > /var/tmp/info.log
+[ -r "$RUNDIR"/"$NAME".sh ] && . "$RUNDIR"/"$NAME".sh || echo "no machine specific variables for customizing VM in "$RUNDIR"/"$NAME".sh" > /var/tmp/info.log
+
+
 
 env >> /var/tmp/info.log
 
