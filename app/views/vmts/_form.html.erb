@@ -10,7 +10,7 @@
 
   <div class="field">
     <%= f.label :image %><br />
-    <%= f.select :image, options_for_select(@vmt.available) %>
+    <%= f.select :image, options_for_select(@vmt.available, @vmt.image) %>
     <span class="red" title="Required field">*</span>
   </div>
    <div class="field">
