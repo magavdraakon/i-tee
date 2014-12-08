@@ -130,7 +130,7 @@ end
         #Writing VM data
         f.write("#Configuration file for VM: #{name}\n")
         f.write("export NIC1='#{Rails.root}'\n")
-        f.write("NIC count #{self.lab_vmt.lab_vmt_networks.count}\n\n")
+        f.write("#NIC count #{self.lab_vmt.lab_vmt_networks.count}\n\n")
 
         if self.lab_vmt.lab_vmt_networks.count > 0 then
           f.write("function set_networks {\n\n#function for seting NICs for VM")
