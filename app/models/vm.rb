@@ -134,7 +134,7 @@ end
         if self.lab_vmt.lab_vmt_networks.count > 0 then
           f.write("function set_networks {\n\n#function for seting NICs for VM")
           #Writing NIC information
-          internal_list = ''
+          vbox_cmd = ''
           self.lab_vmt.lab_vmt_networks.each do |nw|
             # substituting placeholders with data
             gen_name=nw.network.name.gsub('{year}', Time.now.year.to_s)
@@ -143,13 +143,25 @@ end
             gen_name= gen_name.gsub('{labVmt}', self.lab_vmt.name)
 
             logger.debug "\nNIC#{nw.slot} #{gen_name} net type #{nw.network.net_type}\n"
-            internal_list += " NIC#{nw.slot}"
-
+            if nw.network.net_type == 'nat'
+              vbox_cmd += "VBoxManage modifyvm \"$NAME\" --nic#{nw.slot} nat\n"
+            elsif nw.network.net_type == 'intnet'
+              vbox_cmd = "VBoxManage modifyvm \"$NAME\" --nic#{nw.slot} intnet\n"
+              vbox_cmd += "VBoxManage modifyvm \"$NAME\"  --intnet#{nw.slot} \"#{gen_name}\"\n"
+            elsif nw.network.net_type == 'bridgeadapter'
+              vbox_cmd = "VBoxManage modifyvm \"$NAME\" --nic#{nw.slot} bridged\n"
+              vbox_cmd += "VBoxManage modifyvm \"$NAME\"  --bridgeadapter#{nw.slot} \"#{gen_name}\"\n"
+            elsif nw.network.net_type == 'hostonlyadapter'
+              vbox_cmd = "VBoxManage modifyvm \"$NAME\" --nic#{nw.slot} hostonly\n"
+              vbox_cmd += "VBoxManage modifyvm \"$NAME\"  --hostonlyadapter#{nw.slot} \"#{gen_name}\"\n"
+            end
+            logger.debug vbox_cmd
+            f.write("\n#{vbox_cmd}\n")
+            vbox_cmd =''
 
           end
-          f.write("\n"'echo "networks are now configured"')
+          f.write("\n"'echo "networks are now configured for $NAME"')
           f.write("\n}\n\n")
-          f.write("export NICS='#{internal_list}'\n")
           #end for fuction set networks
         end
 
