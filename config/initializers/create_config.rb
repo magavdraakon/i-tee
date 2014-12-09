@@ -1,14 +1,17 @@
+require 'logger'
+
 if ITee::Application::config.respond_to? :run_dir then
   path="#{ITee::Application.config.run_dir}/environment.sh"
 else
   path='/var/labs/environment.sh'
 end
 
-
+Rails.logger.info("Starting i-tee")
 
 
 begin
 File.open(path, "w+") { |f|
+  f.write("export ENVIRONMENT='#{ENV['ENVIRONMENT']}'\n")
   f.write("export RAILSROOT='#{Rails.root}'\n")
 
 

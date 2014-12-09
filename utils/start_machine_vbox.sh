@@ -1,7 +1,7 @@
 #!/bin/bash
 # Author: Margus Ernits margus.ernits@gmail.com
 
-if [ $# -ne 5 ]
+if [ $# -ne 6 ]
 then 
 echo "Five arguments as mac IP template name password"
 exit 1
@@ -34,10 +34,11 @@ IP_ADDR=$2
 TEMPLATE=$3
 NAME=$4
 USER_PWD=$5
+ENVIRONMENT=$6
 
-[ -r "$ENVIRONMENT" ] && . "$ENVIRONMENT" || echo "no environment variables from RAILS"
+[ -r "$ENVIRONMENT" ] && . "$ENVIRONMENT" || echo "no environment $ENVIRONMENT variables from RAILS" > /var/tmp/info.log
 
-[ -r "$RUNDIR"/"$NAME".sh ] && . "$RUNDIR"/"$NAME".sh || echo "no machine specific variables for customizing VM in "$RUNDIR"/"$NAME".sh" > /var/tmp/info.log
+[ -r "$RUNDIR"/"$NAME".sh ] && . "$RUNDIR"/"$NAME".sh || echo "no machine specific variables for customizing VM in "$RUNDIR"/"$NAME".sh" >> /var/tmp/info.log
 
 
 

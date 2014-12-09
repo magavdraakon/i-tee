@@ -40,7 +40,7 @@ class Vm < ActiveRecord::Base
   
   def poweron_vm
     #TODO script .. pooleli
-    %x("sudo -u vbox  #{Rails.root}/utils/poweron_machine.sh #{name}  2>&1".strip!)
+    %x("sudo -u vbox  #{Rails.root}/utils/poweron_machine.sh #{name}  2>&1".strip)
   end
   
   def res_vm
@@ -52,7 +52,7 @@ class Vm < ActiveRecord::Base
   end
   
   def ini_vm
-    runstr = "sudo -u vbox  #{Rails.root}/utils/start_machine.sh #{mac.mac} #{mac.ip} #{lab_vmt.vmt.image} #{name} #{password} 2>&1"
+    runstr = "sudo -u vbox  #{Rails.root}/utils/start_machine.sh #{mac.mac} #{mac.ip} #{lab_vmt.vmt.image} #{name} #{password} #{ENV['ENVIRONMENT']} 2>&1"
     Rails.logger.debug "ini_vm: #{runstr}"
     %x(#{runstr})
     #%x("#{@exec_line}  #{Rails.root}/utils/start_machine.sh #{mac.mac} #{mac.ip} #{lab_vmt.vmt.image} #{name} #{password} 2>&1")
@@ -190,7 +190,7 @@ end
       self.description += desc
 
       self.save
-       
+=begin
       require 'timeout'
       status = Timeout::timeout(60) {
         # Something that should be interrupted if it takes too much time...
@@ -202,7 +202,7 @@ end
           end
         end
       }
-
+=end
       if @a.include?("masin #{self.name} loodud")
         result[:notice] = result[:notice]+"Machine <b>#{self.name}</b> successfully started<br/>"
         #flash[:notice]=flash[:notice].html_safe
