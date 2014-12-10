@@ -217,8 +217,8 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
   #start one machine
   def start_vm
     result = @vm.start_vm
-    flash[:notice] = result[:notice].html_safe if result[:notice]!=""
-    flash[:alert] = result[:alert].html_safe if result[:alert]!=""
+    flash[:notice] = result[:notice].html_safe if result[:notice] && result[:notice]!=''
+    flash[:alert] = result[:alert].html_safe if result[:alert] && result[:alert]!=''
     redirect_to(:back)
     rescue ActionController::RedirectBackError  # cant redirect back? go to the lab instead
       logger.info "\nNo :back error\n"
