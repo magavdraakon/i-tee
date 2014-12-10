@@ -138,8 +138,8 @@
 				<th><label><input type="checkbox"  onclick="toggle_checked_all(this);" autocomplete="off"/><span> all</span></label></th>
 				<th><%=link_to("Lab name", :controller=>"lab_users",:action=>"search", :sort_by=>"labs.name", :dir=>@dir, :t=>params[:t], :l=>params[:l], :u=>params[:u])%></th>
 				<th><%=link_to("Username", :controller=>"lab_users",:action=>"search", :sort_by=>"users.username", :dir=>@dir, :t=>params[:t], :l=>params[:l], :u=>params[:u], :h=>params[:h])%></th>
-				<th>Start</th>
-				<th>End</th>
+				<th><%=link_to("Start", :controller=>"lab_users",:action=>"search", :sort_by=>"lab_users.start", :dir=>@dir, :t=>params[:t], :l=>params[:l], :u=>params[:u], :h=>params[:h])%></th>
+				<th><%=link_to("End", :controller=>"lab_users",:action=>"search", :sort_by=>"lab_users.end", :dir=>@dir, :t=>params[:t], :l=>params[:l], :u=>params[:u], :h=>params[:h])%></th>
 				<th></th>
 			</tr>
 			</thead>
