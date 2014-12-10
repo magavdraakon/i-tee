@@ -11,11 +11,16 @@ class ApplicationController < ActionController::Base
   before_filter :check_for_cancel, :only => [:create, :update]
   before_filter :check_token
 
-  @per_page = ITee::Application.config.per_page
+
 
   before_filter :authenticate_user!, :except=>[:about, :getprogress, :set_progress]
   before_filter :admin?
   before_filter :manager?
+  before_filter :per_page
+
+  def per_page
+    @per_page = ITee::Application.config.per_page
+  end
 
   #return true if the current user is a admin
   def admin?

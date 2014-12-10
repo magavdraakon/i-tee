@@ -10,7 +10,7 @@ class TokenAuthenticationsController < ApplicationController
   
   def update
     if params[:commit]=='cancel'
-      redirect_to manage_tokens_path 
+      redirect_to users_path
     else
       
 	    @user = User.find(params[:id])
@@ -22,7 +22,7 @@ class TokenAuthenticationsController < ApplicationController
                                       params[:user]['token_expires(5i)'].to_i)
       respond_to do |format|
         if @user.save
-         format.html { redirect_to(manage_tokens_path, :notice => 'successful update.') }
+         format.html { redirect_to(users_path, :notice => 'successful update.') }
          format.xml  { head :ok }
         else
          format.html { render :action => 'edit' }

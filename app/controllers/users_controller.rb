@@ -7,7 +7,7 @@ class UsersController < ApplicationController
     set_order_by
     #@users= User.find_by_sql("select id, username, last_sign_in_at, ldap, email, last_sign_in_ip from users")
     #@users= @users.paginate(:page=>params[:page], :per_page=>10).order(order)
-    @users = User.select('id, username, last_sign_in_ip, last_sign_in_at, ldap, email').order(@order).paginate(:page=>params[:page], :per_page=>@per_page)
+    @users = User.select('id, username, last_sign_in_ip, last_sign_in_at, ldap, email, authentication_token, token_expires').order(@order).paginate(:page=>params[:page], :per_page=>@per_page)
   end
   
   def show
