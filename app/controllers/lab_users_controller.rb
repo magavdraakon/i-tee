@@ -141,7 +141,7 @@ end
       #while u = params[:txtsbs].readline        
         u.chomp!
         user=u.split(',')#username,realname, email, token
-        @user=User.find_by_username(user[0]).first
+        @user=User.where('username=?', user[0]).first
         if @user==nil #user doesnt exist
           email=user[2]
           email=user[0]+'@itcollege.ee' if email!=nil
