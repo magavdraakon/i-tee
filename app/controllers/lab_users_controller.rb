@@ -29,6 +29,19 @@ class LabUsersController < ApplicationController
   end
   
 
+  def show
+    @lab_user = LabUser.find_by_id(params[:id])
+    @info={'running'=>[], 'paused'=>[], 'stopped'=>[]}
+    @lab_user.vms.each do |v|
+      v['username']=@lab_user.user.username
+      v['port']='10'+v.mac.ip.split('.').last if v.mac!=nil
+      @info[v.state]<< v
+    end
+    respond_to do |format|
+      format.json  { render :json => @info }
+    end
+  end
+
   # GET /lab_users/1/edit
   def edit
     #@lab_user = LabUser.find(params[:id])
