@@ -291,7 +291,11 @@ end
   end
 
   def manage_users(users)
-    users.each do |u| 
+    users.each do |u|
+      if params[:user] && params[:user]=='destroy'
+        u.destroy
+        next
+      end
       if params[:reset_token]  # reset token only if checked
         logger.debug '\n reset token \n'
         u.reset_authentication_token!
