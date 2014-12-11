@@ -203,7 +203,8 @@ end
           manage_vms(lab.vms) if params[:vm]
         end
       end # end updates
-      @labs = Lab.joins(:host).order(@order).where('LOWER(labs.name) like ? and LOWER(hosts.name) like ?', "%#{params[:l].downcase}%", "%#{(params[:h] ? params[:h] : '').downcase}%").all
+      @labs = Lab.joins('left join hosts on hosts.id=labs.host_id').order(@order).where('LOWER(labs.name) like ?', "%#{params[:l].downcase}%").all if params[:h]==''
+      @labs = Lab.joins('left join hosts on hosts.id=labs.host_id').order(@order).where('LOWER(labs.name) like ? and LOWER(hosts.name) like ?', "%#{params[:l].downcase}%", "%#{(params[:h] ? params[:h] : '').downcase}%").all if params[:h]!=''
     elsif params[:t] && params[:t]=='Lab user'
       if params[:id]
         lab_users=get_lab_users_from(params[:id])
