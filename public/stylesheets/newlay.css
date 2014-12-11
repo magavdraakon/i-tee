@@ -485,19 +485,11 @@ input[type="password"]:focus, input[type="text"]:focus, textarea:focus {
     border: 2px solid rgba(125, 159, 186, .5);
     padding-left:22px;
     padding-right:4px;
-    padding-top:3px;
-    padding-bottom:3px;
     background-color: rgba(255, 255, 255, .7);
     text-decoration:none;
     color: #666666;
     cursor: pointer;
-    line-height:2em;
-    margin-bottom: 5px;
-    
-}
-
-
-div.buttons {
+    line-height:23px;
     display:inline-block;
 }
 
