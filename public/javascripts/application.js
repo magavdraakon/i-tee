@@ -184,3 +184,46 @@ function load_form(For){
     $('#h').hide();
   }
 }
+
+function get_vm_info(el, id){
+    to=$(el).parents("tr").next("tr");
+    if ( $(el).text()=="Expand"){
+        $(el).text("Collapse");
+        $.getJSON('/lab_users/'+id+".json", function(data) {
+            html="";
+            $.each(data, function(index, cat){
+
+                html+="<div>";
+                html+='<b class="upper">'+index+" machines</b><br/>";
+                if (cat.length<1){
+                    html+="None<br/>";
+                } else {
+                    $.each(cat, function(id, el){
+                        vm=el.vm;
+                        //console.log(vm);
+                        html+= vm.name;
+                        if (index=="running")
+                         html+=' <b>RDP info:</b> elab.itcollege.ee:'+vm.port+' <b>username:</b> '+vm.username+' <b>password:</b> '+vm.password+
+                                ' <a href="/pause_vm/'+vm.id+'" class="button pause-button">Pause</a>'+
+                                ' <a href="/stop_vm/'+vm.id+'" class="button stop-button">Stop</a>';
+                        else if (index=="paused"){
+                            html+=' <a href="/resume_vm/'+vm.id+'" class="button start-button">Resume</a>'
+                        } else { // stopped
+                            html+=' <a href="/start_vm/'+vm.id+'" class="button start-button">Start</a>';
+                        }
+                        html+="<br/>";
+
+                    });
+                }
+                html+="</div>";
+
+            });
+            to.children('td').html(html);
+        });
+    } else{
+        $(el).text("Expand");
+    }
+
+    to.toggle();
+
+}

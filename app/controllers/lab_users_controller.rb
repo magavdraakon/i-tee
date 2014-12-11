@@ -29,6 +29,19 @@ class LabUsersController < ApplicationController
   end
   
 
+  def show
+    @lab_user = LabUser.find_by_id(params[:id])
+    @info={'running'=>[], 'paused'=>[], 'stopped'=>[]}
+    @lab_user.vms.each do |v|
+      v['username']=@lab_user.user.username
+      v['port']='10'+v.mac.ip.split('.').last if v.mac!=nil
+      @info[v.state]<< v
+    end
+    respond_to do |format|
+      format.json  { render :json => @info }
+    end
+  end
+
   # GET /lab_users/1/edit
   def edit
     #@lab_user = LabUser.find(params[:id])
@@ -203,7 +216,8 @@ end
           manage_vms(lab.vms) if params[:vm]
         end
       end # end updates
-      @labs = Lab.joins(:host).order(@order).where('LOWER(labs.name) like ? and LOWER(hosts.name) like ?', "%#{params[:l].downcase}%", "%#{(params[:h] ? params[:h] : '').downcase}%").all
+      @labs = Lab.joins('left join hosts on hosts.id=labs.host_id').order(@order).where('LOWER(labs.name) like ?', "%#{params[:l].downcase}%").all if params[:h]==''
+      @labs = Lab.joins('left join hosts on hosts.id=labs.host_id').order(@order).where('LOWER(labs.name) like ? and LOWER(hosts.name) like ?', "%#{params[:l].downcase}%", "%#{(params[:h] ? params[:h] : '').downcase}%").all if params[:h]!=''
     elsif params[:t] && params[:t]=='Lab user'
       if params[:id]
         lab_users=get_lab_users_from(params[:id])

@@ -5,7 +5,7 @@
   	<%= select_tag :t, options_for_select(["User", "Lab", "Lab user"] , params[:t]), :onchange=>"load_form(this.value);" %>
   	<%= text_field_tag(:u, params[:u], :placeholder=>'Username') %>
   	<%= text_field_tag(:l, params[:l], :placeholder=>'lab name') %>
-  	<%= select_tag(:h, options_from_collection_for_select(Host.all,:name, :name ,params[:h]), :prompt=>'Choose host') %>
+  	<%= select_tag(:h, options_from_collection_for_select(Host.all,:name, :name ,params[:h]), :prompt=>'All hosts') %>
   	<%= submit_tag("Search") %>
   </div>
 <% end %>
@@ -76,9 +76,9 @@
 			<tr>
 				<th><label><input type="checkbox"  onclick="toggle_checked_all(this);" autocomplete="off"/><span> all</span></label></th>
 				<th><%=link_to("Lab name", :controller=>"lab_users",:action=>"search", :sort_by=>"name", :dir=>@dir, :t=>params[:t], :l=>params[:l], :h=>params[:h])%></th>
-				<th>vms</th>
+				<th>VM templates</th>
 				<th colspan="4">lab users</th>
-				<th>Host</th>
+				<th><%=link_to("Host", :controller=>"lab_users",:action=>"search", :sort_by=>"host_id", :dir=>@dir, :t=>params[:t], :l=>params[:l], :h=>params[:h])%></th>
 				<th></th>
 			</tr>
 		</thead>
@@ -99,9 +99,8 @@
 			<td onclick="expandnext(this);">Expand</td>
 		</tr>
 		<tr class="hidden">
-			<td colspan="8" >
+			<td colspan="9" >
 				<div class="marked"><%= lab.short_description %></div>
-				
 			</td>
 		</tr>
 		
@@ -150,7 +149,7 @@
 			<td><%= lu.user.username %></td>
 			<td><span title="<%= lu.start %>"><%= distance_of_time_in_words(Time.now, lu.start.to_time )+" ago" if lu.start %></span></td>
 			<td><span title="<%= lu.end %>"><%= distance_of_time_in_words(Time.now, lu.end.to_time )+" ago" if lu.end %></span></td>
-			<td onclick="expandnext(this);">Expand</td>
+			<td onclick="get_vm_info(this, <%=lu.id%>);">Expand</td>
 		</tr>
 		<tr class="hidden">
 			<td colspan="6" >
