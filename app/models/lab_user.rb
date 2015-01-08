@@ -4,6 +4,7 @@ class LabUser < ActiveRecord::Base
   
   validates_presence_of :user_id, :lab_id
 
+	before_destroy :end_lab
 # get all vms that belong to this labuser (Lab attempt)
   def vms
   	vmts=LabVmt.where("lab_id = ? ", self.lab_id)
@@ -15,11 +16,11 @@ class LabUser < ActiveRecord::Base
   	stopped=0
   	paused=0
   	self.vms.each do |v|
-  		if v.state=='running' then
+  		if v.state=='running'
       		running+=1
-    	elsif v.state=='paused' then
+    	elsif v.state=='paused'
       		paused+=1
-    	elsif v.state=='powered' then
+    	elsif v.state=='powered'
       		stopped+=1
     	else
       		stopped+=1
@@ -35,11 +36,11 @@ class LabUser < ActiveRecord::Base
 
 # create needed Vm-s based on the lab templates and set start to now
   def start_lab
-  	if !self.start && !self.end then # can only start labs that are not started or finished
+  	if !self.start && !self.end  # can only start labs that are not started or finished
   		self.vmts.each do |template|
         	#is there a machine like that already?
         	vm = Vm.where("lab_vmt_id=? and user_id=?", template.id, self.user.id).first
-        	if vm==nil then #no there is not
+        	if vm==nil  #no there is not
           		Vm.create(:name=>"#{template.name}-#{self.user.username}", :lab_vmt=>template, :user=>self.user, :description=>"Initialize the virtual machine by clicking <strong>Start</strong>.")
           		logger.debug "Machine #{template.name}-#{self.user.username} successfully generated."
         	end

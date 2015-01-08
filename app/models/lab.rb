@@ -32,7 +32,7 @@ class Lab < ActiveRecord::Base
       l=LabUser.new
       l.lab_id=self.id
       l.user_id=u.id
-      l.save if LabUser.find(:first, :conditions=>["lab_id=? and user_id=?", l.lab_id, l.user_id])==nil
+      l.save if LabUser.where("lab_id=? and user_id=?", l.lab_id, l.user_id).first==nil
     end
   end
   
