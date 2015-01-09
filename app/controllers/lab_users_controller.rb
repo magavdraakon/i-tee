@@ -208,7 +208,7 @@ end
           manage_users(lab.users)
           if params[:lab] && params[:lab]=='remove_all_users'
             lab.remove_all_users
-          elsif params[:lab] && params[:lab]=='add_all-users'
+          elsif params[:lab] && params[:lab]=='add_all_users'
             lab.add_all_users
           elsif params[:lab]
             manage_labusers(lab.lab_users) 
