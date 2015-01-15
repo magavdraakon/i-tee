@@ -9,8 +9,17 @@ NAME=$1
 
 
 #TODO ensure that VM with that name exists
-time VBoxManage controlvm $NAME poweroff || logger -p warn -t i-tee filed to power off $NAME
+time VBoxManage controlvm $NAME poweroff || logger -p warn -t ITEE failed to power off $NAME
 
-time VBoxManage unregistervm $NAME --delete || logger -p err -t i-tee filed to unregister $NAME
+sleep 5
+
+time VBoxManage unregistervm $NAME --delete || {
+logger -p err -t ITEE failed to unregister $NAME
+logger -p err -t ITEE $(pwd) $(ls -l $NAME)
+sleep 5
+time VBoxManage unregistervm $NAME --delete || logger -p err -t ITEE failed to unregister $NAME again
+}
+
+logger -p info -t i-tee VM $NAME deleted
 echo "VM $NAME deleted."
 
