@@ -63,6 +63,7 @@
 		<span id="expires" class="hidden"><%= datetime_select("user", "token_expires", :default => 2.weeks.from_now) %></span>
 		<label><input type="checkbox" id="rem_t" name="remove_token" autocomplete="off" onclick="manage_checkboxes(['reset_ex', 'reset_t']); show_date(document.getElementById('reset_ex'));"/>remove token</label>
 		<br/>
+          <label><input type="checkbox" name="user" value="destroy" /> Destroy user(s)</label><br/>
 		<%= f.submit 'Update users', :confirm => 'Are you sure?'%>
 	<% end #form %>
 <% elsif @labs && @labs.size>0 then %>
@@ -70,7 +71,7 @@
 	<%= form_for @labs, :url => search_path do |f| %>
 		<input type="hidden" name="t" value="Lab" />
 		<input type="hidden" name="l" value="<%= params[:l] %>" />
-		<input type="hidden" name="l" value="<%= params[:h] %>" />
+		<input type="hidden" name="h" value="<%= params[:h] %>" />
 		<table >
 			<thead>
 			<tr>

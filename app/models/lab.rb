@@ -28,16 +28,18 @@ class Lab < ActiveRecord::Base
 
 # add any user that doesnt have this lab yet
   def add_all_users
+    logger.debug "\n adding all users to lab: '#{self.name}'\n"
   	User.all.each do |u|
       l=LabUser.new
       l.lab_id=self.id
       l.user_id=u.id
-      l.save if LabUser.find(:first, :conditions=>["lab_id=? and user_id=?", l.lab_id, l.user_id])==nil
+      l.save if LabUser.where("lab_id=? and user_id=?", l.lab_id, l.user_id).first==nil
     end
   end
   
 # remove all users from this lab
   def remove_all_users
+    logger.debug "\n removing all users from lab: '#{self.name}'\n"
   	self.lab_users.each do |u|
       u.destroy
     end

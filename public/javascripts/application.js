@@ -145,10 +145,11 @@ function show_remote(el, html){
     }, 10000);*/
 }
 
-
+// search select all/none
 function toggle_checked_all(el){
    $('.found input[type=checkbox]').prop('checked', el.checked);
 }
+// search
 function expandnext(el){
   $(el).parents("tr").next("tr").toggle();
   if ( $(el).text()=="Expand") 
@@ -156,11 +157,12 @@ function expandnext(el){
   else 
      $(el).text("Expand")
 }
+// search token
 function show_date(el){
   if (el.checked) $("#expires").show();
   else  $("#expires").hide();
 }
-
+// search lower half
 function manage_checkboxes(inactive){
   $.each(inactive, function( index, id ) {
     document.getElementById(id).checked=false;
@@ -225,5 +227,28 @@ function get_vm_info(el, id){
     }
 
     to.toggle();
+
+}
+
+
+// add users by lab
+function manage_checked(status, message){
+    if(confirm(message)){
+        $('.user_li input[type=checkbox]').prop('checked', status);
+    }
+}
+
+// show users
+function show_names(letter){
+    if (letter=='*') { // show all
+        $('.user_li').show();
+    } else {
+        $('.user_li').hide();
+        if (letter=="checked"){ // show only selected
+            $('.user_li input:checked').parents('.user_li').show();
+        } else { // show based on letter
+            $('.letter_'+letter).show();
+        }
+    }
 
 }

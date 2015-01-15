@@ -159,26 +159,36 @@ end
           email=user[2]
           email=user[0]+'@itcollege.ee' if email!=nil
           #TODO: email is username@itcollege when email is set??? take address (@something.end) from config?
-          @user=User.create!(:email=>email ,:username=>user[0], :name=>user[1] ,:password=>user[3], :authentication_token=>user[3])
-        end
-        #TODO do we update the existing user? to add a token for example?
-        labuser=LabUser.where('user_id=? and lab_id=?', @user.id, @lab.id).first
-        # by now we surely have a user, add it to the lab
-        if labuser==nil
-          labuser=LabUser.new
-          labuser.lab=@lab
-          labuser.user=@user
-          if labuser.save 
-            notice=notice+user[0]+' added successfully<br/>'
+          if user[3]
+            @user=User.create!(:email=>email ,:username=>user[0], :name=>user[1] ,:password=>user[3])
           else
-            notice=notice+user[0]+' adding failed<br/>'
+            notice=notice+user[0]+' adding failed - token needed for new users<br/>'
           end
-        else
-          notice=notice+user[0]+' was already in the lab<br/>'
+        end
+        if user[3] # if token is given
+          @user.authentication_token=user[3]
+          @user.token_expires = 2.weeks.from_now # TODO! default expiry time from settings?
+          @user.save
+        end
+        if @user # only if user exists / ws created
+          labuser=LabUser.where('user_id=? and lab_id=?', @user.id, @lab.id).first
+          # by now we surely have a user, add it to the lab
+          if labuser==nil
+            labuser=LabUser.new
+            labuser.lab=@lab
+            labuser.user=@user
+            if labuser.save
+              notice=notice+user[0]+' added successfully<br/>'
+            else
+              notice=notice+user[0]+' adding failed<br/>'
+            end
+          else
+            notice=notice+user[0]+' was already in the lab<br/>'
+          end
         end
       end
-        
-      redirect_to(:back, :notice=>notice)
+
+      redirect_to(:back, :notice=>notice.html_safe)
     else
       redirect_to(:back, :alert=>'No import file specified.')
     end
@@ -208,7 +218,7 @@ end
           manage_users(lab.users)
           if params[:lab] && params[:lab]=='remove_all_users'
             lab.remove_all_users
-          elsif params[:lab] && params[:lab]=='add_all-users'
+          elsif params[:lab] && params[:lab]=='add_all_users'
             lab.add_all_users
           elsif params[:lab]
             manage_labusers(lab.lab_users) 
@@ -291,7 +301,11 @@ end
   end
 
   def manage_users(users)
-    users.each do |u| 
+    users.each do |u|
+      if params[:user] && params[:user]=='destroy'
+        u.destroy
+        next
+      end
       if params[:reset_token]  # reset token only if checked
         logger.debug '\n reset token \n'
         u.reset_authentication_token!
