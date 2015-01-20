@@ -74,13 +74,28 @@ The result should look like:
 vboxdrv               409815  3 vboxnetadp,vboxnetflt,vboxpci
 
 
-Download and install VirtualBox Extension Pack that corresponds to your version of VirtualBox:
+Download and install VirtualBox Extension Pack that corresponds to your version of VirtualBox.
+First find out virtualbox version:
 
-	wget http://download.virtualbox.org/virtualbox/4.3.16/Oracle_VM_VirtualBox_Extension_Pack-4.3.16-95972.vbox-extpack
+	VER=$(apt-cache policy virtualbox-4.3 |grep Installed:| cut -f2 -d: |cut -f1 -d-|cut -f2 -d' ')
+
+Seconly find out subversion of virtualbox:
+
+	SUBVER=$(apt-cache policy virtualbox-4.3 |grep Installed:| cut -f2 -d: |cut -f1 -d~|cut -f2 -d' ')
+
+Test results:
+
+	echo $VER
+	echo $SUBVER
+
+
+Install particular extension pack
+
+	wget http://download.virtualbox.org/virtualbox/${VER}/Oracle_VM_VirtualBox_Extension_Pack-${SUBVER}.vbox-extpack
 
 Install the extension pack using vboxmanage:
 
-	VBoxManage extpack install Oracle_VM_VirtualBox_Extension_Pack-4.3.16-95972.vbox-extpack
+	VBoxManage extpack install Oracle_VM_VirtualBox_Extension_Pack-${SUBVER}.vbox-extpack
 
 List extension packs using vboxmanage:
 
@@ -209,16 +224,16 @@ Download latest version of phpVirtualBox http://sourceforge.net/projects/phpvirt
 VirtualBox and phpVirtualBox versions must match. For example, for VirtualBox-4.3 series you need phpvirtualbox-4.3-x.zip:
 
 	
-	wget http://sourceforge.net/projects/phpvirtualbox/files/phpvirtualbox-4.3-1.zip/download \
-	 -O phpvirtualbox-4.3-1.zip
+	wget http://sourceforge.net/projects/phpvirtualbox/files/phpvirtualbox-4.3-2.zip/download \
+	 -O phpvirtualbox-4.3-2.zip
 
-	unzip phpvirtualbox-4.3-1.zip
+	unzip phpvirtualbox-4.3-2.zip
 
-	cp -a /root/phpvirtualbox-4.3-1 /usr/share/nginx/
+	cp -a /root/phpvirtualbox-4.3-2 /usr/share/nginx/
 
-	ln -s /usr/share/nginx/phpvirtualbox-4.3-1 /usr/share/nginx/phpvirtualbox
+	ln -s /usr/share/nginx/phpvirtualbox-4.3-2 /usr/share/nginx/phpvirtualbox
 
-	chown data:www-data /usr/share/nginx/phpvirtualbox -R
+	chown www-data:www-data /usr/share/nginx/phpvirtualbox -R
 
 
 Create new virtualhost for phpVirtualBox
@@ -261,7 +276,7 @@ Create new virtualhost for phpVirtualBox
 	}
 	EOF
 
-Insdtall php support for nginx
+Install php support for nginx
 
 	apt-get install php5-fpm
 
