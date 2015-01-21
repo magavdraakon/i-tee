@@ -165,12 +165,13 @@ end
             notice=notice+user[0]+' adding failed - token needed for new users<br/>'
           end
         end
-        if user[3] # if token is given
-          @user.authentication_token=user[3]
-          @user.token_expires = 2.weeks.from_now # TODO! default expiry time from settings?
-          @user.save
-        end
         if @user # only if user exists / ws created
+          if user[3] # if token is given
+            @user.authentication_token=user[3]
+            @user.token_expires = 2.weeks.from_now # TODO! default expiry time from settings?
+            @user.save
+          end
+
           labuser=LabUser.where('user_id=? and lab_id=?', @user.id, @lab.id).first
           # by now we surely have a user, add it to the lab
           if labuser==nil
