@@ -93,7 +93,7 @@
           <b><%=vm.name%></b>
           <span class="vm_links"><%="("+state+")" if vm.mac!=nil && (state=="running" || state=="paused") %></span>
           <%if vm.mac!=nil && state=="running" && vm.lab_vmt.allow_remote %><br/>
-            <b>RDP info:</b> elab.itcollege.ee:10<%=vm.mac.ip.split('.').last if vm.mac!=nil%><br/>
+            <b>RDP info:</b> <%= ITee::Application.config.rdp_host %>:10<%=vm.mac.ip.split('.').last if vm.mac!=nil%><br/>
             <b>user:</b> <%= @lab_user.user.username %><br/>
             <b>pwd:</b> <%= vm.password %>
           <%end%>
