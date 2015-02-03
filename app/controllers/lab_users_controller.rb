@@ -153,7 +153,13 @@ end
       #users.each do |u|
       #while u = params[:txtsbs].readline        
         u.chomp!
-        user=u.split(',')#username,realname, email, token
+        user=u.split(',')#username,realname, email, token (username compulsory for everyone, real name and email not?)
+        if user.empty? || user[0]==nil || user[0]==''
+          notice=notice+'adding user "<b>'+u+'</b>" failed '
+          notice=notice+' - needs username' if user[0]==nil || user[0]==''
+          notice=notice+'<br/>'
+          next
+        end
         @user=User.where('username=?', user[0]).first
         if @user==nil #user doesnt exist
           email=user[2]
@@ -162,7 +168,7 @@ end
           if user[3]
             @user=User.create!(:email=>email ,:username=>user[0], :name=>user[1] ,:password=>user[3])
           else
-            notice=notice+user[0]+' adding failed - token needed for new users<br/>'
+            notice=notice+'<b>'+user[0]+'</b> adding failed - token needed for new users<br/>'
           end
         end
         if @user # only if user exists / ws created
@@ -179,12 +185,12 @@ end
             labuser.lab=@lab
             labuser.user=@user
             if labuser.save
-              notice=notice+user[0]+' added successfully<br/>'
+              notice=notice+'<b>'+user[0]+'</b> added successfully<br/>'
             else
-              notice=notice+user[0]+' adding failed<br/>'
+              notice=notice+'<b>'+user[0]+'</b> adding failed<br/>'
             end
           else
-            notice=notice+user[0]+' was already in the lab<br/>'
+            notice=notice+'<b>'+user[0]+'</b> was already in the lab<br/>'
           end
         end
       end
