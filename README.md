@@ -360,6 +360,11 @@ Create the railsapps directory
 
 	mkdir -p /var/www/railsapps/
 
+Create directory for runtime files
+
+	mkdir -p /var/labs/run/
+	chown www-data.www-data /var/labs/run/
+
 Download the code from GitHub to the newly created folder
 
 	cd /var/www/railsapps
@@ -620,6 +625,12 @@ alias restart='touch /var/www/railsapps/i-tee/tmp/restart.txt'
 END
 
 ```
+
+## Create directory for temp files
+
+	mkdir /var/www/railsapps/i-tee/tmp
+	chown www-data:www-data /var/www/railsapps/i-tee/tmp/
+
 
 ## Test your installation
 Test your installation using web browser
