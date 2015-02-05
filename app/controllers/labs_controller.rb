@@ -44,6 +44,7 @@ class LabsController < ApplicationController
   # GET /labs/new.xml
   def new
     @lab = Lab.new
+    @lab.lab_vmts.build.lab_vmt_networks.build
     @all_users=false
     @user_count=0
     respond_to do |format|
@@ -54,6 +55,10 @@ class LabsController < ApplicationController
 
   # GET /labs/1/edit
   def edit
+    @lab.lab_vmts.each do |v|
+      v.lab_vmt_networks.build
+    end
+    @lab.lab_vmts.build.lab_vmt_networks.build
     #@lab = Lab.find(params[:id])
     @all_users=false
     @user_count =0

@@ -5,6 +5,9 @@ class Lab < ActiveRecord::Base
   has_many :lab_users, :dependent => :destroy
   has_many :lab_badges, :dependent => :destroy
   belongs_to :host
+
+  accepts_nested_attributes_for :lab_vmts, :reject_if =>  proc { |attributes| attributes['name'].blank? && attributes['vmt_id'].blank? }, :allow_destroy => true
+  accepts_nested_attributes_for :lab_badges, :reject_if => :all_blank, :allow_destroy => true
   
   validates_presence_of :name, :short_description
 
