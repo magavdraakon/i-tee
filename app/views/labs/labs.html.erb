@@ -90,7 +90,7 @@
               <div escape="false" class="remote">Choose a remote connection type from above</div>
             </div>
           <% end %>
-          <b><%=vm.lab_vmt.nickname%></b>
+          <b><%=vm.lab_vmt.nickname ? vm.lab_vmt.nickname : vm.name %></b>
           <span class="vm_links"><%="("+state+")" if vm.mac!=nil && (state=="running" || state=="paused") %></span>
           <%if vm.mac!=nil && state=="running" && vm.lab_vmt.allow_remote %><br/>
             <b>RDP info:</b> <%= ITee::Application.config.rdp_host %>:10<%=vm.mac.ip.split('.').last if vm.mac!=nil%><br/>
