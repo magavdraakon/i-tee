@@ -4,6 +4,7 @@
     <thead>
       <tr>
         <th>Name</th>
+        <th>Nickname</th>
         <th><%=link_to("Lab", :controller=>"lab_vmts",:action=>"index", :sort_by=>"lab_id", :dir=>@dir)%></th>
         <th><%=link_to("Vmt", :controller=>"lab_vmts",:action=>"index", :sort_by=>"vmt_id", :dir=>@dir)%></th>
         <th>Remote access</th>
@@ -14,6 +15,7 @@
     <% @lab_vmts.each do |lab_vmt| %>
       <tr class="vmt">
         <td><%= lab_vmt.name %></td>
+        <td><%= lab_vmt.nickname %></td>
         <td><%= lab_vmt.lab.name %></td>
         <td><%= lab_vmt.vmt.image %></td>
         <td><%= lab_vmt.allow_remote ? 'yes' : 'no' %></td>
@@ -33,17 +35,15 @@
       <% end %>      
     </div>
   <% end %>
-  <table>
-    <tr>
-      <td>  <%= f.text_field :name , :title=>"Name for the template in this lab. Alphanumeric with no spaces."%> <%= hidden_field_tag "from", "lab_vmts/index"%></td>
-      <td>
+  <%= f.text_field :name , :placeholder=>"Name, Alphanumeric with no spaces."%> <%= hidden_field_tag "from", "lab_vmts/index"%><br/>
+      <%= f.text_field :name , :placeholder=>"Nickname, shown to user"%><br/>
+
+
         <%=collection_select(:lab_vmt, :lab_id, Lab.all, :id, :name,{:prompt => "Select lab"})%>
-      </td>
-      <td>
+      <br/>
+
         <%=collection_select(:lab_vmt, :vmt_id, Vmt.all, :id, :image,{:prompt => "Select VM template"})%>
-      </td>
-      <td><%= f.label :allow_remote %> <%= f.check_box :allow_remote %></td>
-      <td><%= f.submit "Add"%> </td>
-    </tr>
-  </table>
+      <br/>
+      <%= f.label :allow_remote %> <%= f.check_box :allow_remote %><br/>
+      <%= f.submit "Add"%>
 <%end%>

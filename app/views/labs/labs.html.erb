@@ -34,7 +34,7 @@
   <%=link_M @lab.description %>
 </div>
 
-<p>
+
   <% if @labs!=[] %>
     <%= link_to('Start lab',start_lab_path+"/"+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : "" ), :class=>'submit-button button') if @lab_user.start==nil %>
     <%if @lab_user.start!=nil %>
@@ -68,8 +68,8 @@
       <%= "There are no machines allocated for this lab" if @lab_user.vms.empty? %>
       <% @lab_user.vms.each do |vm| %>
         <%state=vm.state 
-          desc="Initialize the virtual machine #{vm.name} by clicking <strong>Start</strong>"
-           desc="There is no remote desktop access for #{vm.name}" if (state=="running" || state=="paused") && !vm.lab_vmt.allow_remote
+          desc="Initialize the virtual machine #{vm.lab_vmt.nickname} by clicking <strong>Start</strong>"
+           desc="There is no remote desktop access for #{vm.lab_vmt.nickname}" if (state=="running" || state=="paused") && !vm.lab_vmt.allow_remote
            desc=vm.description if (state=="running" || state=="paused") && vm.mac!=nil && vm.lab_vmt.allow_remote %>
         <div class="vm_s">
           <div class="right loader">
@@ -90,7 +90,7 @@
               <div escape="false" class="remote">Choose a remote connection type from above</div>
             </div>
           <% end %>
-          <b><%=vm.name%></b>
+          <b><%=vm.lab_vmt.nickname%></b>
           <span class="vm_links"><%="("+state+")" if vm.mac!=nil && (state=="running" || state=="paused") %></span>
           <%if vm.mac!=nil && state=="running" && vm.lab_vmt.allow_remote %><br/>
             <b>RDP info:</b> <%= ITee::Application.config.rdp_host %>:10<%=vm.mac.ip.split('.').last if vm.mac!=nil%><br/>
@@ -121,5 +121,5 @@
   <%else%>
     <h3>You currently don't have any labs assigned.</h3>
   <%end%>
-</p>
+
 

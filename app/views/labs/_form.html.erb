@@ -43,9 +43,10 @@
     <%= f.fields_for :lab_vmts do |labVmt_form| %>
        <div class="vmt">
           <div class="right"> <%= labVmt_form.check_box :_destroy%>  <%= labVmt_form.label :_destroy, 'Remove' %></div>
-          <%= labVmt_form.label :name %> <%= labVmt_form.text_field :name, :title=>"Name for the template in this lab. Alphanumeric with no spaces." %><br/>
+          <%= labVmt_form.label :name %> <%= labVmt_form.text_field :name, :placeholder=>"unique. Alphanumeric with no spaces." %><br/>
+         <%= labVmt_form.label :nickname %> <%= labVmt_form.text_field :nickname, :placeholder=>"Name shown to user." %><br/>
           <%= labVmt_form.label :vmt_id %> <%= labVmt_form.select :vmt_id, options_from_collection_for_select(Vmt.all, :id, :image, labVmt_form.object.vmt_id ), {:prompt => "Select VM template"}%><br/>
-
+         <%= labVmt_form.label :allow_remote %>  <%= labVmt_form.check_box :allow_remote %>
           <div class="networks">
           <%= labVmt_form.fields_for :lab_vmt_networks do |labVmtNet_form| %>
               <div class="network">

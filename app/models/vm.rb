@@ -216,7 +216,7 @@ end
       }
 =end
       if @a.include?("masin #{self.name} loodud")
-        result[:notice] = result[:notice]+"Machine <b>#{self.name}</b> successfully started<br/>"
+        result[:notice] = result[:notice]+"Machine <b>#{self.lab_vmt.nickname}</b> successfully started<br/>"
         #flash[:notice]=flash[:notice].html_safe
         logger.debug @a
       else

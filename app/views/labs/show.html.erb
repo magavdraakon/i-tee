@@ -13,7 +13,7 @@
 <h3>Virtual machine templates in this lab</h3>
 <p>
   <% @lab.lab_vmts.each do |vmt| %>
-    <%= link_to(vmt.name, vmt_path(vmt.id),  :target => '_blank', :class=>"button info-button", :title=>"View the template") %>
+    <%= link_to(vmt.name+" (#{vmt.nickname})", vmt_path(vmt.id),  :target => '_blank', :class=>"button info-button", :title=>"View the template") %>
     <%=link_to("edit", edit_lab_vmt_path(vmt.id),  :target => '_blank', :class=>"button edit-button", :title=>"Edit the template in this lab")%>  
     <%= link_to("remove", vmt,:confirm => 'Are you sure?', :method=>:delete, :class=>"button delete-button", :title=>"Remove the template from this lab")%> <br/>
   <%end%>
@@ -30,7 +30,7 @@
   <% end %>
   <table>
     <tr>
-      <td>Add: <%= f.text_field :name, :title=>"Name for the template in this lab. Alphanumeric with no spaces." %></td>
+      <td>Add: <%= f.text_field :name, :placeholder=>"Unique, alphanumeric with no spaces." %> <%= f.text_field :nickname, :placeholder=>"Nickname shown to user" %></td>
       <td>
         <%=f.hidden_field :lab_id, :value=>@lab.id%>
         <%= hidden_field_tag "from", "labs/show"%>

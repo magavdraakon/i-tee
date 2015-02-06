@@ -10,9 +10,13 @@
   <% end %>
 
   <div class="field">
-    <%= f.label :name %><br />
+    <%= f.label :name %> (unique name, used for file name generation)<br />
     <%= f.text_field :name %> <span class="red" title="Required field">*</span>
   </div>
+    <div class="field">
+      <%= f.label :nickname %> (short, descriptive name shown to the user)<br />
+      <%= f.text_field :nickname %> <span class="red" title="Required field">*</span>
+    </div>
   <div class="field">
     <% @lab_vmt.lab_id=@lab.id if @lab!=nil%>
     <%= f.label :lab_id %><br />
