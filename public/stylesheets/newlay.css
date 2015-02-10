@@ -537,8 +537,20 @@ input[type="password"]:focus, input[type="text"]:focus, textarea:focus {
   font-weight:bold;
 }
 
-
-
+/* lab edit form */
+#lab_vmts .vmt{
+    padding:3px;
+    border:solid 1px #c0c0c0;
+    border-radius:10px;
+    margin:3px;
+}
+#lab_vmts .network{
+    padding:3px;
+    border:solid 1px #c0c0c0;
+    border-radius:10px;
+    display:inline-block;
+    margin:3px;
+}
 /*add_users view */
 .user_li {
   float:left;

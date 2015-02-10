@@ -25,19 +25,56 @@
   </div>
   
   <div class="field">
-    <%if @all_users then%><%#all users have this lab%>
+    <%if @all_users %><%#all users have this lab%>
       <%= check_box_tag("remove", '1')%>
       <%=label_tag("remove", "Remove all users")%>
     <%else%><%#some users might have this lab%>
       <%= check_box_tag("add", '1')%>
       <%=label_tag("add", "Add all users")%><br/>
-      <%if @user_count>0 then%> <%#no need to show remove if there are no users%>
+      <%if @user_count>0%> <%#no need to show remove if there are no users%>
         <%= check_box_tag("remove", '1')%>
         <%=label_tag("remove", "Remove all users")%>
       <%end%>
     <%end%>
   </div>
-  
+
+    <h3>Virtual machines in this lab</h3>
+    <div id="lab_vmts">
+    <%= f.fields_for :lab_vmts do |labVmt_form| %>
+       <div class="vmt">
+          <div class="right"> <%= labVmt_form.check_box :_destroy%>  <%= labVmt_form.label :_destroy, 'Remove' %></div>
+          <%= labVmt_form.label :name %> <%= labVmt_form.text_field :name, :placeholder=>"unique. Alphanumeric with no spaces." %><br/>
+         <%= labVmt_form.label :nickname %> <%= labVmt_form.text_field :nickname, :placeholder=>"Name shown to user." %><br/>
+          <%= labVmt_form.label :vmt_id %> <%= labVmt_form.select :vmt_id, options_from_collection_for_select(Vmt.all, :id, :image, labVmt_form.object.vmt_id ), {:prompt => "Select VM template"}%><br/>
+         <%= labVmt_form.label :allow_remote %>  <%= labVmt_form.check_box :allow_remote %>
+          <div class="networks">
+          <%= labVmt_form.fields_for :lab_vmt_networks do |labVmtNet_form| %>
+              <div class="network">
+                <%= labVmtNet_form.label :network_id %>
+                <%= labVmtNet_form.select :network_id, options_from_collection_for_select(Network.all,:id, :name, labVmtNet_form.object.network_id), {:prompt => "Select network template"}  %>
+                <br />
+                <%= labVmtNet_form.label :slot %> <%= labVmtNet_form.number_field :slot %><br/>
+
+                <%= labVmtNet_form.check_box :promiscuous %> <%= labVmtNet_form.label :promiscuous %><br />
+
+                <%= labVmtNet_form.check_box :reinit_mac %> <%= labVmtNet_form.label :reinit_mac %><br />
+                <br/>
+                <%= labVmtNet_form.check_box :_destroy%>  <%= labVmtNet_form.label :_destroy, 'Remove' %>
+              </div>
+          <%end%>
+          </div>
+          <span class="button add-button" onclick="add_network_to_vmt(this);">Add more networks</span>
+       </div>
+    <% end %>
+      <%= select_tag :networks, options_from_collection_for_select(Network.all,:id, :name), {:prompt => "Select network template", :style=>"display:none"}  %>
+      <%= select_tag :vm_templates, options_from_collection_for_select(Vmt.all,:id, :image), {:prompt => "Select VM template", :style=>"display:none"}  %>
+
+    </div>
+    <span class="button add-button" onclick="add_vmt_to_lab();">Add more VMTs</span>
+    <h3>Badges in this lab</h3>
+    <div id="badges">
+
+    </div>
   <div class="actions">
     <%= submit_tag "Cancel" , :class=>"cancel"%> <%= f.submit %>
   </div>
@@ -50,7 +87,7 @@
 <% content_for :sidebar do %>
   <p>To add a link to a material use the expression #M_<i>&lt;id&gt;</i></p>
   <p><b>Materials:</b><br/>
-  <%Material.find(:all, :order=>'name').each do |m|%>
+  <%Material.order('name').each do |m|%>
     <%=m.id%>. <%=m.name%><br/>
   <%end%>
   </p>

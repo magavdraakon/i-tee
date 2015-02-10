@@ -12,67 +12,67 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
   def save_from_nil
     @vm = Vm.find_by_id(params[:id])
     if @vm==nil 
-      redirect_to(vms_path,:notice=>"invalid id.")
+      redirect_to(vms_path,:notice=>'invalid id.')
     end
   end
   
   def vms_by_lab
-    @b_by="lab"
+    @b_by='lab'
     sql=[]
-    if params[:dir]=="asc" then
-      dir = "ASC"
-      @dir = "&dir=desc"
+    if params[:dir]=='asc'
+      dir = 'ASC'
+      @dir = '&dir=desc'
     else 
-      dir = "DESC"
-      @dir = "&dir=asc"
+      dir = 'DESC'
+      @dir = '&dir=asc'
     end
-    order = params[:sort_by]!=nil ? " order by #{params[:sort_by]} #{dir}" : ""
+    order = params[:sort_by]!=nil ? " order by #{params[:sort_by]} #{dir}" : ''
     logger.debug "ORDER #{order}"
-    if params[:admin]!=nil && @admin then
+    if params[:admin]!=nil && @admin
       @lab=Lab.find(params[:id]) if params[:id]# try to get the selected lab
-      @lab=Lab.first if !params[:id] # but if the parameter is not set, take the first lab
+      @lab=Lab.first unless params[:id] # but if the parameter is not set, take the first lab
       #@vms=Vm.find(:all, :joins=>["vms inner join lab_vmts as l on vms.lab_vmt_id=l.id"], :order=>params[:sort_by])
       sql= Vm.find_by_sql("select vms.*, lab_vmts.lab_id from vms, lab_vmts where vms.lab_vmt_id=lab_vmts.id and lab_id=#{@lab.id} #{order}")
-      @tab="admin"
-      @labs=Lab.find(:all).uniq
+      @tab='admin'
+      @labs=Lab.all.uniq
     else
-      if params[:id]!=nil then # try to get the selected lab 
-         @lab=Lab.find(:first, :joins=>["labs inner join lab_users on lab_users.lab_id=labs.id"], :conditions=>["lab_id=? and user_id=?",params[:id], current_user.id])
+      if params[:id]!=nil  # try to get the selected lab
+         @lab=Lab.joins('labs inner join lab_users on lab_users.lab_id=labs.id').where('lab_id=? and user_id=?',params[:id], current_user.id).first
       else # but if the parameter is not set, take the first lab this user has   
-         @lab=Lab.find(:first, :joins=>["labs inner join lab_users on lab_users.lab_id=labs.id"], :conditions=>["user_id=?", current_user.id])  
+         @lab=Lab.joins('labs inner join lab_users on lab_users.lab_id=labs.id').where('user_id=?', current_user.id).first
       end
        sql= Vm.find_by_sql("select * from vms, lab_vmts where vms.lab_vmt_id=lab_vmts.id and lab_id=#{@lab.id} and user_id=#{current_user.id} #{order}") if @lab # only try to get the vms if there is a lab
-      @labs=Lab.find(:all, :joins=>["labs inner join lab_users on lab_users.lab_id=labs.id"], :conditions=>["user_id=?", current_user.id]).uniq
+      @labs=Lab.joins('labs inner join lab_users on lab_users.lab_id=labs.id').where('user_id=?', current_user.id).uniq
     end
     @vms= sql.paginate( :page => params[:page], :per_page => 10)
     render :action=>'index'
   end
   
    def vms_by_state
-    @b_by="state"
-    @state="running"
-    @state=params[:state] if params[:state]
-    state=@state
-    state="error:" if state=="uninitialized"
+    @b_by='state'
+
+    @state=params[:state] ? params[:state] : 'running'
+    @state='stopped' if @state=='uninitialized'
+
     # TODO! turn it into DRY
-    if params[:dir]=="asc" then
-      dir = "ASC"
-      @dir = "&dir=desc"
+    if params[:dir]=='asc'
+      dir = 'ASC'
+      @dir = '&dir=desc'
     else 
-      dir = "DESC"
-      @dir = "&dir=asc"
+      dir = 'DESC'
+      @dir = '&dir=asc'
     end
-    order = params[:sort_by] ? " order by #{params[:sort_by]} #{dir}" : ""
+    order = params[:sort_by] ? " order by #{params[:sort_by]} #{dir}" : ''
   
-    if params[:admin]!=nil && @admin then
-      @tab="admin"
+    if params[:admin]!=nil && @admin
+      @tab='admin'
       vms=Vm.find_by_sql("select vms.*, lab_vmts.lab_id from vms, lab_vmts where vms.lab_vmt_id=lab_vmts.id #{order}")
     else
        vms=Vm.find_by_sql("select vms.*, lab_vmts.lab_id from vms, lab_vmts where vms.lab_vmt_id=lab_vmts.id and user_id=#{current_user.id} #{order}")    
     end
     @vm=[]
     vms.each do |vm|
-      @vm.push(vm) if vm.state==state
+      @vm.push(vm) if vm.state==@state
     end
     @vms=@vm.paginate(:page=>params[:page], :per_page=>10)
     render :action=>'index'

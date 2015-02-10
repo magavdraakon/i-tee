@@ -30,12 +30,12 @@
             <div class="vb b_menu <% if @tab == "vms" %>current_tab<%end%>">
               <%=link_to 'My machines', vms_path %>
             </div>
-            <%if  @admin then  %>
+            <%if  @admin   %>
               <div class="ab b_menu <% if @tab=="admin"%>current_tab<%end%>">
                 <%=link_to 'Manage labs', labs_path %>
               </div>
             <%end%>
-            <%if @manager || @admin then %>
+            <%if @manager || @admin  %>
               <div class="mb b_menu <%if @tab=="manager"%>current_tab<%end%>">
                 <%=link_to 'Manage users', users_path %>
               </div>
@@ -63,7 +63,7 @@
         <div id="s_menu"></div>
         <div id="wrap">
           <div class="home s_menu <% if @tab == "home"%>current_tab<%end%>">
-            <%if @admin then%> 
+            <%if @admin %>
               <%=link_to_unless_current('Index', root_path)%>
               <%=link_to_unless_current('Template guide', template_path) %>
               <%=link_to_unless_current('System guide', system_path) %>  
@@ -76,7 +76,7 @@
             <%= link_to_unless_current('Virtual machines by lab', vms_by_lab_path) %>
           </div>
           <div class="course s_menu <% if @tab == "user" %>current_tab<%end%>"> </div>
-          <%if  @admin then  %>
+          <%if  @admin   %>
             <div class="admin s_menu <% if @tab=="admin"%>current_tab<%end%>">
               <table>
                 <tr>
@@ -110,7 +110,7 @@
               </table>
             </div>
           <%end%>
-          <% if @manager || @admin then%>
+          <% if @manager || @admin %>
             <div class="manager s_menu <% if @tab=="manager"%>current_tab<%end%>">
               <table>
                 <tr>
@@ -138,7 +138,7 @@
               </ul>
             </div>
         
-            <div id="content"class="side_visible">
+            <div id="content" class="side_visible">
               <div id="menu-show"></div>
               <div id="messages">
               <%= content_tag(:div, flash[:error], :id => "flash_error", :escape=>false) if flash[:error] %>

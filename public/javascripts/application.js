@@ -252,3 +252,30 @@ function show_names(letter){
     }
 
 }
+
+
+// add networks to vmt in edit / new lab
+function add_network_to_vmt(el){
+    var n= $(el).parents('.vmt').find('.network').size();
+    var p= $(".vmt").index($(el).parents('.vmt'));
+    var options=$("#networks").html();
+    console.log("sellel on võrke hetkel", n, 'vanem:', p);
+    $(el).parents('.vmt').find('.networks').append("<div class=\"network\"><label for=\"lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"_network_id\">Network</label> <select id=\"lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"_network_id\" name=\"lab[lab_vmts_attributes]["+p+"][lab_vmt_networks_attributes]["+n+"][network_id]\">"+options+"</select> <br/><label for=\"lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"_slot\">Slot</label> <input id=\"lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"_slot\" name=\"lab[lab_vmts_attributes]["+p+"][lab_vmt_networks_attributes]["+n+"][slot]\" size=\"30\" type=\"number\" /><br/> <input name=\"lab[lab_vmts_attributes]["+p+"][lab_vmt_networks_attributes]["+n+"][promiscuous]\" type=\"hidden\" value=\"0\" /><input id=\"lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"_promiscuous\" name=\"lab[lab_vmts_attributes]["+p+"][lab_vmt_networks_attributes]["+n+"][promiscuous]\" type=\"checkbox\" value=\"1\" /> <label for=\"lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"_promiscuous\">Promiscuous</label><br /> <input name=\"lab[lab_vmts_attributes]["+p+"][lab_vmt_networks_attributes]["+n+"][reinit_mac]\" type=\"hidden\" value=\"0\" /><input id=\"lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"_reinit_mac\" name=\"lab[lab_vmts_attributes]["+p+"][lab_vmt_networks_attributes]["+n+"][reinit_mac]\" type=\"checkbox\" value=\"1\" /> <label for=\"lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"_reinit_mac\">Reinit mac</label><br /> <br/>  <input name=\"lab[lab_vmts_attributes]["+p+"][lab_vmt_networks_attributes]["+n+"][_destroy]\" type=\"hidden\" value=\"0\" /><input id=\"lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"__destroy\" name=\"lab[lab_vmts_attributes]["+p+"][lab_vmt_networks_attributes]["+n+"][_destroy]\" type=\"checkbox\" value=\"1\" />  <label for=\"lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"__destroy\">Remove</label> </div>");
+   // $("#images").append("<div class=\"image\"> <label for=\"item_images_attributes_"+n+"_layer_id\">Layer</label> <select id=\"item_images_attributes_"+n+"_layer_id\" name=\"item[images_attributes]["+n+"][layer_id]\">"+$("#item_layer_id").html()+"</select> <br> <label for=\"item_images_attributes_"+n+"_part\">Part</label> <input id=\"item_images_attributes_"+n+"_part\" name=\"item[images_attributes]["+n+"][part]\" type=\"number\" /> <br> <label for=\"item_images_attributes_"+n+"_partname\">Part name</label> <input id=\"item_images_attributes_"+n+"_partname\" name=\"item[images_attributes]["+n+"][partname]\" type=\"text\" /> <br> <input class=\"female\" id=\"item_images_attributes_"+n+"_f_img\" name=\"item[images_attributes]["+n+"][f_img]\" type=\"file\" /> <br> <input class=\"male\" id=\"item_images_attributes_"+n+"_m_img\" name=\"item[images_attributes]["+n+"][m_img]\" type=\"file\" /></div> ");
+}
+
+// add vmts to lab in edit/new lab
+function add_vmt_to_lab(){
+    var n= $("#lab_vmts").find('.vmt').size();
+    console.log('on ', n);
+    var options=$("#vm_templates").html();
+    $("#lab_vmts").append("<div class=\"vmt\">  <div class=\"right\"> <input name=\"lab[lab_vmts_attributes]["+n+"][_destroy]\" type=\"hidden\" value=\"0\" /><input id=\"lab_lab_vmts_attributes_"+n+"__destroy\" name=\"lab[lab_vmts_attributes]["+n+"][_destroy]\" type=\"checkbox\" value=\"1\" />  <label for=\"lab_lab_vmts_attributes_"+n+"__destroy\">Remove</label></div><label for=\"lab_lab_vmts_attributes_"+n+"_name\">Name</label> <input id=\"lab_lab_vmts_attributes_"+n+"_name\" name=\"lab[lab_vmts_attributes]["+n+"][name]\" size=\"30\" placeholder=\"Unique, alphanumeric with no spaces.\" type=\"text\" /><br/> <label for=\"lab_lab_vmts_attributes_"+n+"_nickname\">Nickname</label> <input id=\"lab_lab_vmts_attributes_"+n+"_nickname\" name=\"lab[lab_vmts_attributes]["+n+"][nickname]\" placeholder=\"Name shown to user.\" size=\"30\" type=\"text\" /><br/><label for=\"lab_lab_vmts_attributes_"+n+"_vmt_id\">Vmt</label> <select id=\"lab_lab_vmts_attributes_"+n+"_vmt_id\" name=\"lab[lab_vmts_attributes]["+n+"][vmt_id]\">"+options+"</select><br/><br/><div class=\"networks\"></div></div>");
+    s=document.createElement('span');
+    s.innerHTML='Add more networks';
+    s.setAttribute('class', 'button add-button');
+    s.onclick=function(){
+        add_network_to_vmt(this);
+    };
+    $(".vmt").last().append(s);
+    s.click();
+}
