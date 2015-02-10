@@ -45,7 +45,7 @@ ENVIRONMENT=$6
 env >> /var/tmp/info.log
 
 echo "tekitan virtuaalmasina $NAME template-ist $TEMPLATE Mac aadressiga $MAC"
-if [ $(VBoxManage list vms | cut -f1 -d' '| tr -d '"'| grep $NAME ) ]
+if [ $(VBoxManage list vms | cut -f1 -d' '| tr -d '"'| grep "^$NAME$" ) ]
 then
 	echo "machine already exists. Starting old instance of $NAME"
 else
