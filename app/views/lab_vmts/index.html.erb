@@ -36,7 +36,7 @@
     </div>
   <% end %>
   <%= f.text_field :name , :placeholder=>"Name, Alphanumeric with no spaces."%> <%= hidden_field_tag "from", "lab_vmts/index"%><br/>
-      <%= f.text_field :name , :placeholder=>"Nickname, shown to user"%><br/>
+      <%= f.text_field :nickname , :placeholder=>"Nickname, shown to user"%><br/>
 
 
         <%=collection_select(:lab_vmt, :lab_id, Lab.all, :id, :name,{:prompt => "Select lab"})%>
