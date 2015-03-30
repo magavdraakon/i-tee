@@ -8,6 +8,8 @@ Rdesktop can be executed via copy/paste from web interface.
 
 * In Windows or MacOS X RDP client mstsc can be used. Sadly we can not execute it with one sipmle command line
 
+For MacOS the CoRD - http://cord.sourceforge.net can be used TODO TOTEST
+
 Possible solutions:
 
 1. Guacamole RDP client
