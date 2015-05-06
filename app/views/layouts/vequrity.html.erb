@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ITee</title>
+  <%= stylesheet_link_tag 'reset', :cache=>true %>
+  <%# stylesheet_link_tag "../javascripts/prettify/sons-of-obsidian", :cache=>true %>
+  <%= stylesheet_link_tag ITee::Application.config.skin ? ITee::Application.config.skin : 'EIK' %>
+  <%= stylesheet_link_tag 'prettify' %>
+  <%= javascript_include_tag :all, :cache=>true %>
+  <%# javascript_include_tag "Marked/lib/marked", :cache=>true %>
+  <%#= javascript_include_tag "prettify/prettify", :cache=>true %>
+  <%#= javascript_include_tag "prettify/run_prettify", :cache=>true %>
+
+  <%= csrf_meta_tag %>
+  <link  href="//fonts.googleapis.com/css?family=Ubuntu:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css" >
+  <%= yield :javascript %>
+</head>
+<body>
+<div id="contain">
+    <div id="top">
+      <div id="top-bar">
+        <%=link_to image_tag('VQR logo text on black background.jpg' ), root_path, :class=>'left', :id=>'logo'%>
+        <%= link_to image_tag('vequritylogomtrg.jpeg'), 'http://vequrity.com/' , :class=>'right', :id=>'logo2' %>
+        <%if user_signed_in?%>
+            <%= link_to 'Sign out', destroy_user_session_path, :class=>'right'  %>
+            <%= link_to current_user.username, current_user , :class=>'right '+ (@tab == 'user' ? 'current_tab' : '') %>
+        <% end %>
+
+      </div>
+    </div>
+  <div id="middle">
+    <%if user_signed_in?%>
+    <div id="m_menu">
+          <%=link_to 'Home', root_path, :class=>'hb b_menu'+(@tab== 'home'?' current_tab':'')%>
+          <%=link_to 'Labs', my_labs_path, :class=>'cb b_menu'+(@tab== 'courses'?' current_tab':'')%>
+          <%=link_to 'My machines', vms_path, :class=>'vb b_menu'+(@tab== 'vms'?' current_tab':'') %>
+          <%if  @admin   %>
+                <%=link_to 'Manage labs', labs_path, :class=>'ab b_menu'+(@tab== 'admin'?' current_tab':'') %>
+          <% end %>
+          <%if @manager || @admin  %>
+                <%=link_to 'Manage users', users_path, :class=>'mb b_menu'+(@tab== 'manager'?' current_tab':'') %>
+                <%=link_to 'Search', search_path, :class=>'sb b_menu'+(@tab== 'search'?' current_tab':'') %>
+          <% end %>
+    </div>
+
+    <div id="s_menu">
+
+      <% if @admin %>
+          <div class="home s_menu <% if @tab == 'home' %>current_tab<% end %>">
+            <table>
+              <tr><td> <%=link_to_unless_current('Index', root_path)%></td><td>
+            <%=link_to_unless_current('Template guide', template_path) %></td><td>
+            <%=link_to_unless_current('System guide', system_path) %></td></tr>
+            </table>
+          </div>
+      <% end %>
+      <div class="course s_menu <% if @tab == 'courses' %>current_tab<% end %>"></div>
+      <div class="vms s_menu <% if @tab == 'vms' %>current_tab<% end %>">
+        <table>
+          <tr><td>
+        <%= link_to_unless_current 'All virtual machines', vms_path %></td><td>
+        <%= link_to_unless_current('Virtual machines by state', vms_by_state_path) %></td><td>
+        <%= link_to_unless_current('Virtual machines by lab', vms_by_lab_path) %></td></tr>
+            </table>
+      </div>
+      <div class="user s_menu <% if @tab == 'user' %>current_tab<% end %>"> </div>
+      <% if  @admin   %>
+          <div class="admin s_menu <% if @tab == 'admin' %>current_tab<% end %>">
+            <table>
+              <tr>
+                <td>
+                  <%= link_to_unless_current 'Labs', labs_path %><br/>
+                  <%= link_to_unless_current 'Materials', materials_path %>
+                </td>
+                <td>
+                  <%= link_to_unless_current 'All virtual machines', vms_path+'?admin=1' %><br/>
+                  <%= link_to_unless_current('VMs by state', vms_by_state_path+'?admin=1') %><br/>
+                  <%= link_to_unless_current('VMs by lab', vms_by_lab_path+'?admin=1') %>
+                </td>
+                <td>
+                  <%= link_to_unless_current 'VM templates', vmts_path %><br/>
+                  <%= link_to_unless_current 'VM templates in labs', lab_vmts_path %>
+                </td>
+                <td>
+                  <%= link_to_unless_current 'Network templates', networks_path %><br/>
+                  <%= link_to_unless_current 'VMTs networks in labs', lab_vmt_networks_path %>
+                </td>
+                <td>
+                  <%= link_to_unless_current('Hosts', hosts_path) %><br/>
+                  <%= link_to_unless_current('Operating systems', operating_systems_path) %>
+                </td>
+                <td>
+                  <%= link_to_unless_current('Badges', badges_path) %><br/>
+                  <%= link_to_unless_current 'Lab badges', lab_badges_path %><br/>
+                  <%= link_to_unless_current('User badges', user_badges_path) %><br/>
+                </td>
+              </tr>
+            </table>
+          </div>
+      <%end%>
+      <% if @manager || @admin %>
+          <div class="manager s_menu <% if @tab == 'manager' %>current_tab<%end%>">
+            <table>
+              <tr>
+                <td>
+                  <%=link_to 'Users', users_path %><br/>
+                  <%=link_to 'New user', new_user_path %>
+                </td>
+                <td>
+                  <%= link_to_unless_current 'Manage user tokens',  manage_tokens_path %>
+                </td>
+                <td>
+                  <%=link_to_unless_current 'Users in labs', lab_users_path %><br/>
+                  <%=link_to_unless_current 'Add users by lab', add_users_path %>
+                </td>
+              </tr>
+            </table>
+          </div>
+      <% end %>
+    </div>
+    <% end %>
+    <div id="wrap">
+      <div id="c_wrap">
+        <div id="sidemenu">
+          <div id="menu-hide"></div>
+          <div id="menu-head"><%= yield :sidebar_head %></div>
+          <ul>
+            <%= yield :sidebar %>
+          </ul>
+        </div>
+
+        <div id="content" class="side_visible">
+          <div id="menu-show"></div>
+          <div id="messages">
+            <%= content_tag(:div, flash[:error], :id => 'flash_error', :escape=>false) if flash[:error] %>
+            <%= content_tag(:div, flash[:notice], :id => 'flash_notice', :escape=>false) if flash[:notice] %>
+            <%= content_tag(:div, flash[:alert], :id => 'flash_alert', :escape=>false) if flash[:alert] %>
+          </div>
+
+          <%= yield  %>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="footer"><%= link_to('i-Tee 2015', about_path)%></div>
+</div>
+<div id="loading"></div>
+</body>
+</html>

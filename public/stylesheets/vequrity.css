@@ -1,0 +1,412 @@
+/* stylesheet to go along with vequrity layout */
+/*{
+
+}
+
+*/
+body, html {
+    height:100%;
+    margin:0;
+    padding:0;
+
+}
+a{ text-decoration:none; color:red;}
+
+#contain {position:relative;
+    background: url('../images/sisutaust.jpeg');
+    background-size: cover;
+    min-height:100%;
+    line-height:1.25em;
+}
+#c-wrap {
+    height:100%;
+}
+#content {padding:10px;
+    height:100%;
+}
+/* Topmenu */
+#top {
+    background: black;
+    width:100%;
+    overflow-y:auto;
+    text-align: center;
+}
+#top-bar {
+    width:90%;
+    margin:auto;
+}
+#top a {
+    line-height:100px;
+    font-size:20px;
+    background: black;
+    color:white;
+    font-weight: bold;
+    padding: 0 20px;
+}
+#top img{
+     vertical-align: middle;
+}
+#logo img{
+    height:35px;
+}
+#logo2 img{
+       height:80px;
+}
+#top .current_tab {
+    color:red;
+}
+
+/* middle */
+#middle {
+    position:relative;
+    overflow-y:auto;
+    width:90%;
+    margin:auto;
+    padding-bottom: 30px;
+}
+#m_menu  {
+    border-bottom:solid 2px black;
+    padding:40px 40px 0 40px;
+}
+.b_menu {
+    display:inline-block;
+    padding: 10px 15px;
+    color:dimgrey;
+    font-size:17px;
+    margin-bottom:-2px;
+}
+
+.b_menu.current_tab {
+    border-bottom:solid 3px red;
+
+}
+.s_menu a{
+    color:dimgrey;
+    font-size:17px;
+    display:inline-block;
+}
+.s_menu  {
+    display: none;
+}
+.s_menu td  {
+   padding: 0 10px;
+}
+.s_menu.current_tab  {
+   display: initial;
+}
+#s_menu {
+    color:red;
+    line-height:25px;
+   margin-bottom:20px;
+}
+/* footer */
+#footer {position: absolute;
+    bottom:0;
+    background: black;
+    width:100%;
+    text-align: center;
+}
+#footer a {
+    line-height:30px;
+    font-size:15px;
+    background: black;
+    color:white;
+    text-decoration:none;
+    font-weight: bold;
+    padding: 0 20px;
+}
+
+
+/*sidebar*/
+.side_visible {
+    margin-left:300px;
+}
+#sidemenu{
+    float:left;
+    width: 300px;
+}
+
+ul {margin-left:30px; list-style-type:circle; }
+ul.no-bullet {
+    list-style-type:none;
+    margin-left:0;
+}
+#sidemenu ul {margin-left:0;}
+#menu-head {
+    margin-top: -30px;
+    height: 30px;
+    color: black;
+    padding-left:10px;
+    font-size: 1.2em;
+    line-height:1.5em;
+    font-weight: 500;
+    /* font-family: Verdana, Helvetica, Arial, sans-serif;*/
+}
+#sidemenu li {
+    list-style-type:none;
+    height: 2em;
+    line-height: 2em;
+    color: black;
+    font-size: 0.8em;
+    /* font-family: "Helvetica Neue", "Lucida Grande", Helvetica, Arial, Verdana, sans-serif;*/
+}
+#sidemenu li.between {
+    padding-left: 10px;
+    background: #F8F8FF;
+}
+
+#sidemenu li.started {
+    list-style-type:none;
+    height: 2em;
+    font-size: 0.8em;
+    background:#e0f2dc;
+    /*font-family: "Helvetica Neue", "Lucida Grande", Helvetica, Arial, Verdana, sans-serif;*/
+}
+#sidemenu li.ended {
+    list-style-type:none;
+    height: 2em;
+    font-size: 0.8em;
+    background:#F8F8FF;
+    /* font-family: "Helvetica Neue", "Lucida Grande", Helvetica, Arial, Verdana, sans-serif;*/
+}
+
+#sidemenu li a {
+    height: 2em;
+    line-height:2em;
+    padding-left: 10px;
+    color: black;
+    display: block;
+    text-decoration: none;
+}
+
+#sidemenu a:hover {
+   color:#ff0000;
+}
+
+#sidemenu #menu-hide {
+    position: relative;
+    top: 0;
+    left: 285px;
+    height: 30px;
+    width: 15px;
+    display: block;
+    background: transparent url("../images/menu-hide.png") no-repeat;
+    cursor: pointer;
+}
+#sidemenu ul p {
+    font-size: 0.8em;
+    padding:5px;
+
+}
+#sidemenu ul {
+
+}
+#menu-show {
+    display: none;
+    height: 30px;
+    width: 15px;
+    position: relative;
+    left: -10px;
+    top:0;
+    background: transparent url("../images/menu-show.png") no-repeat 0 0;
+    cursor: pointer;
+}
+.current_lab a {
+    font-weight: bold;
+    color:#ff0000 !important;
+}
+
+/*  LOGIN   */
+#sign_in {
+    height:100%;
+    width:100%;
+    display:table;
+    background:red;
+}
+
+
+/* tabelid */
+
+#index_t table  {
+    width:100%;
+    font-size:0.9em;
+    border:solid black 1px;
+}
+#index_t td  {
+    border:solid black 1px;
+    padding:3px;
+
+}
+#index_t th  {
+    background: black;
+    color:white;
+    padding:3px;
+}
+#index_t tr:hover  {
+    background: rgba(255,0,0,0.5);
+
+}
+/*buttons*/
+.win-button {background: url("../images/Windows Logo-32.png") 4px 3px no-repeat; background-size: 16px;}/* https://icons8.com/web-app/154/Windows-Logo */
+.mac-button {background: url("../images/Mac OS-32.png") 4px 3px no-repeat;  background-size: 16px;}/* https://icons8.com/web-app/890/Mac-OS */
+.rdesktop-button, .xfreerdp-button {background: url("../images/Ubuntu-32.png") 4px 3px no-repeat;  background-size: 16px;} /* https://icons8.com/web-app/11339/Ubuntu */
+
+.edit-button {background: url("../images/edit.png") 4px 3px no-repeat;}
+.show-button {background: url("../images/show.gif") 6px 3px no-repeat;}
+.delete-button {background: url("../images/delete.png") 4px 3px no-repeat;}
+
+.add-button {background: url("../images/add.png") 4px 3px no-repeat;}
+.info-button {background: url("../images/info.png") 4px 3px no-repeat; }
+.stop-button {background: url("../images/stop.png") 4px 3px no-repeat; }
+.start-button {background: url("../images/play.png") 4px 3px no-repeat; }
+.pause-button {background: url("../images/pause.png") 4px 3px no-repeat; }
+
+.submit-button {background: url("../images/submit.png") 4px 3px no-repeat;}
+.login-button {background: url("../images/login.gif") 4px 3px no-repeat;}
+
+.cancel-button {background: url("../images/cancel.png") 6px 3px no-repeat;}
+
+.button:hover {
+    background-color: rgba(255, 255, 255, 1.0);
+    color:black;
+}
+
+.button {
+    border-top-left-radius:10px;
+    border-top-right-radius:10px;
+    border-bottom-left-radius:10px;
+    border-bottom-right-radius:10px;
+    /*increase roundness (for firefox)*/
+    -moz-border-radius-topleft: 10px;
+    -moz-border-radius-topright: 10px;
+    -moz-border-radius-bottomleft: 10px;
+    -moz-border-radius-bottomright: 10px;
+    /*increase roundness (for webkit)*/
+    -webkit-border-top-left-radius: 10px;
+    -webkit-border-top-right-radius: 10px;
+    -webkit-border-bottom-left-radius: 10px;
+    -webkit-border-bottom-right-radius: 10px;
+    border: 2px solid rgba(125, 159, 186, .5);
+    padding-left:22px;
+    padding-right:4px;
+    background-color: rgba(255, 255, 255, .7);
+    text-decoration:none;
+    color: #666666;
+    cursor: pointer;
+    line-height:23px;
+    display:inline-block;
+}
+
+
+/* pagination classes */
+.pagination, .page_info {
+    font-size:0.8em;
+    text-align:right;
+    color: #666666;
+}
+
+.pagination a, .previous_page, .next_page, .current {
+    border-top-left-radius:10px;
+    border-top-right-radius:10px;
+    border-bottom-left-radius:10px;
+    border-bottom-right-radius:10px;
+    /*increase roundness (for firefox)*/
+    -moz-border-radius-topleft: 10px;
+    -moz-border-radius-topright: 10px;
+    -moz-border-radius-bottomleft: 10px;
+    -moz-border-radius-bottomright: 10px;
+    /*increase roundness (for webkit)*/
+    -webkit-border-top-left-radius: 10px;
+    -webkit-border-top-right-radius: 10px;
+    -webkit-border-bottom-left-radius: 10px;
+    -webkit-border-bottom-right-radius: 10px;
+    border: 2px solid rgba(125, 159, 186, .5);
+    padding:2px;
+    padding-left:4px;
+    padding-right:4px;
+    text-decoration:none;
+    color: #666666;
+    cursor: pointer;
+    line-height:2em;
+    background-color: rgba(255, 255, 255, .7);
+}
+
+.disabled, .current {
+    cursor:default;
+    color:#c0c0c0;
+
+}
+.current {
+    color:#000;
+    font-weight:bold;
+}
+
+
+
+@media screen and (max-width: 700px) {
+    #top a {
+        float:none;
+        display: block;
+        line-height: normal;
+        padding: 5px;
+        clear:both;
+    }
+    #logo, #logo2 {
+        display:inline !important;
+        line-height:70px !important;
+
+    }
+    #middle {
+        width:100%;
+        padding:10px 10px 80px 10px;
+    }
+    #m_menu  {
+        border-bottom:solid 2px black;
+        padding: 5px ;
+        padding-top:10px;
+    }
+}
+
+
+
+
+
+
+
+
+/* classes */
+.red{
+    color:red;
+}
+.grey{
+    color:gray;
+}
+.bold {
+    font-weight:bold;
+}
+.hidden{
+    display:none;
+}
+.upper {
+    text-transform: uppercase;
+}
+.left {
+    float:left;
+}
+.right{
+    float:right;
+}
+.clearl{
+    clear:left;
+}
+.clearr{
+    clear:right;
+}
+.clearb {
+    clear:both;
+}
+
+/* dont show here */
+#login_info, #login_logos {
+    display:none;
+}

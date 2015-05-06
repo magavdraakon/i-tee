@@ -3,7 +3,7 @@
 <% content_for :sidebar do %> 
   <% @labs.each do |lab| %>
     <% classes="" #default
-       classes= "bold" if lab.id==@lab.id %>
+       classes= "current_lab" if lab.id==@lab.id %>
       <%if lab==@started.first %>
       <li class="upper">Started</li>
       <% end 

@@ -6,7 +6,7 @@ class ApplicationController < ActionController::Base
   Time.zone='Tallinn'
   protect_from_forgery
   
-  layout 'new'
+  layout ITee::Application.config.skin ? ITee::Application.config.skin : 'EIK'
   require 'will_paginate/array'
   before_filter :check_for_cancel, :only => [:create, :update]
   before_filter :check_token
