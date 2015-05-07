@@ -425,14 +425,7 @@ body.sessions #messages {
     border-radius:50%;
     padding: 10px;
 }
-#sulge {
-    position: fixed;
-    top: 0;
-    right: 0;
-    z-index: 15;
-    padding:4px;
-    font-weight: bold;
-}
+
 #loading {
     display:none;
     height: 0px;
