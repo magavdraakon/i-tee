@@ -10,8 +10,8 @@
     <a href="http://www.itcollege.ee/en/it-college/staff/" target="_blank">IT College homepage</a>.</p>
 </div>
 <div id="sign_in">
-  
-  <h2>Sign in</h2>
+
+  <h2 id="sign_in_title">Sign in</h2>
 
 <%= form_for(resource, :as => resource_name, :url => session_path(resource_name)) do |f| %>
   <p><%= f.label :username %><br />
@@ -26,6 +26,11 @@
   
   <p><%= f.submit "Sign in" %></p>
 <% end %>
+  <div id="login_messages">
+    <%= content_tag(:div, flash[:error], :id => 'flash_error', :escape=>false) if flash[:error] %>
+    <%= content_tag(:div, flash[:notice], :id => 'flash_notice', :escape=>false) if flash[:notice] %>
+    <%= content_tag(:div, flash[:alert], :id => 'flash_alert', :escape=>false) if flash[:alert] %>
+  </div>
 </div>
 <%# render :partial => "devise/shared/links" %>
 <div id="login_logos">

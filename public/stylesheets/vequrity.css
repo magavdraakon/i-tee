@@ -58,7 +58,6 @@ a{ text-decoration:none; color:red;}
 
 /* middle */
 #middle {
-    position:relative;
     overflow-y:auto;
     width:90%;
     margin:auto;
@@ -102,6 +101,7 @@ a{ text-decoration:none; color:red;}
 /* footer */
 #footer {position: absolute;
     bottom:0;
+    padding:10px 0;
     background: black;
     width:100%;
     text-align: center;
@@ -218,13 +218,50 @@ ul.no-bullet {
 
 /*  LOGIN   */
 #sign_in {
-    height:100%;
-    width:100%;
-    display:table;
-    background:red;
+    color:white;
+    text-align:center;
+    padding:40px 20px;
+    max-width:500px;
+    max-height: 200px;
+    margin:auto;
+    position:absolute;
+    top:0;
+    bottom:0;
+    left:0;
+    right:0;
+    line-height:35px;
+    font-size:20px;
+    background:rgba(0,0,0,0.5);
+}
+#sign_in p{
+    margin-top:10px;
+}
+#sign_in input{
+   width:300px;
+    font-size:20px;
+    border: solid black 2px;
+    background: white;
+    color:black;
+    padding:3px 5px;
+    text-align: center;
+}
+#sign_in input[type="submit"]{
+    border-color:white;
+    background: black;
+    color:white;
+    font-weight:bold;
+}
+body.sessions{
+    background: url('../images/front_student_w_net.jpg');
+    background-size: cover;
+}
+body.sessions #contain {
+    background: none;
 }
 
-
+body.sessions #messages {
+      display: none;
+  }
 /* tabelid */
 
 #index_t table  {
@@ -272,20 +309,7 @@ ul.no-bullet {
 }
 
 .button {
-    border-top-left-radius:10px;
-    border-top-right-radius:10px;
-    border-bottom-left-radius:10px;
-    border-bottom-right-radius:10px;
-    /*increase roundness (for firefox)*/
-    -moz-border-radius-topleft: 10px;
-    -moz-border-radius-topright: 10px;
-    -moz-border-radius-bottomleft: 10px;
-    -moz-border-radius-bottomright: 10px;
-    /*increase roundness (for webkit)*/
-    -webkit-border-top-left-radius: 10px;
-    -webkit-border-top-right-radius: 10px;
-    -webkit-border-bottom-left-radius: 10px;
-    -webkit-border-bottom-right-radius: 10px;
+    border-radius:10px
     border: 2px solid rgba(125, 159, 186, .5);
     padding-left:22px;
     padding-right:4px;
@@ -306,20 +330,7 @@ ul.no-bullet {
 }
 
 .pagination a, .previous_page, .next_page, .current {
-    border-top-left-radius:10px;
-    border-top-right-radius:10px;
-    border-bottom-left-radius:10px;
-    border-bottom-right-radius:10px;
-    /*increase roundness (for firefox)*/
-    -moz-border-radius-topleft: 10px;
-    -moz-border-radius-topright: 10px;
-    -moz-border-radius-bottomleft: 10px;
-    -moz-border-radius-bottomright: 10px;
-    /*increase roundness (for webkit)*/
-    -webkit-border-top-left-radius: 10px;
-    -webkit-border-top-right-radius: 10px;
-    -webkit-border-bottom-left-radius: 10px;
-    -webkit-border-bottom-right-radius: 10px;
+    border-radius:10px;
     border: 2px solid rgba(125, 159, 186, .5);
     padding:2px;
     padding-left:4px;
@@ -366,10 +377,66 @@ ul.no-bullet {
         padding-top:10px;
     }
 }
+@media screen and (max-height: 500px) {
+    #sign_in {
+        position:static;
+        margin:auto;
+    }
+
+}
 
 
 
-
+/* LOADER */
+#blurred_bg{
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: url('../images/sisutaust.jpeg');
+    background-size: cover;
+    opacity:0.5;
+    z-index:5;
+}
+#tabel{
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    margin:0 auto;
+    z-index: 10;
+    display:table;
+    width:100%;
+    height:100%;
+    color:white;
+}
+#cell{
+    display:table-cell;
+    vertical-align:middle;
+}
+#sisu {
+    display: table;
+    margin: auto;
+    height:100px;
+    width:100px;
+    opacity:0.9;
+    border-radius:50%;
+    padding: 10px;
+}
+#sulge {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 15;
+    padding:4px;
+    font-weight: bold;
+}
+#loading {
+    display:none;
+    height: 0px;
+}
 
 
 
@@ -407,6 +474,6 @@ ul.no-bullet {
 }
 
 /* dont show here */
-#login_info, #login_logos {
+#login_info, #login_logos, #sign_in_title {
     display:none;
 }

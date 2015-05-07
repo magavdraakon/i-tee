@@ -9,8 +9,8 @@ class ApplicationController < ActionController::Base
   layout ITee::Application.config.skin ? ITee::Application.config.skin : 'EIK'
   require 'will_paginate/array'
   before_filter :check_for_cancel, :only => [:create, :update]
-  before_filter :check_token
 
+  before_filter :check_token
 
 
   before_filter :authenticate_user!, :except=>[:about, :getprogress, :set_progress]
@@ -97,7 +97,9 @@ class ApplicationController < ActionController::Base
   end
 
   def user_tab
-    @tab='user'
+
+      @tab='user'
+
   end
 
   def search_tab

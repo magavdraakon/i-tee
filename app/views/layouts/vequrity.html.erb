@@ -15,7 +15,7 @@
   <link  href="//fonts.googleapis.com/css?family=Ubuntu:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css" >
   <%= yield :javascript %>
 </head>
-<body>
+<body class="<%= (controller_name ? ( controller_name.gsub '/', '_') : ' ')+' '+(params[:action] ? params[:action] : '') %>">
 <div id="contain">
     <div id="top">
       <div id="top-bar">
@@ -145,6 +145,17 @@
   </div>
   <div id="footer"><%= link_to('i-Tee 2015', about_path)%></div>
 </div>
-<div id="loading"></div>
+<div id="loading">
+				<div id="blurred_bg"></div>
+				<div id="tabel">
+					<div id="cell">
+						<div id="sulge" onclick="hideDetails();">Sulge</div>
+						<div id="sisu">
+							<%= image_tag('ajax-loader.gif') %>
+						</div>
+					</div>
+				</div>
+			</div>
+</div>
 </body>
 </html>
