@@ -149,9 +149,9 @@ ul.no-bullet {
 }
 #sidemenu ul {margin-left:0;}
 #menu-head {
-    /*margin-top: -30px;
-    height: 30px;*/
-    margin-top:30px;
+    margin-top: -30px;
+    height: 30px;
+
     color: black;
     font-weight: 500;
     /* font-family: Verdana, Helvetica, Arial, sans-serif;*/
@@ -193,17 +193,18 @@ ul.no-bullet {
 #sidemenu a:hover {
    color:#ff0000;
 }
-/*
+
 #sidemenu #menu-hide {
     position: relative;
-    top: 0;
+    top: -10px;
     left: 285px;
     height: 30px;
-    width: 15px;
+    width: 30px;
     display: block;
-    background: transparent url("../images/menu-hide.png") no-repeat;
+    background: transparent url("../images/Back-50.png") no-repeat; /*https://icons8.com/web-app/1806/Back*/
+    background-size:contain;
     cursor: pointer;
-}*/
+}
 #sidemenu ul p {
     padding:5px;
 
@@ -211,17 +212,18 @@ ul.no-bullet {
 #sidemenu ul {
 
 }
-/*
+
 #menu-show {
     display: none;
     height: 30px;
-    width: 15px;
+    width: 30px;
     position: relative;
     left: -10px;
-    top:0;
-    background: transparent url("../images/menu-show.png") no-repeat 0 0;
+    top:-20px;
+    background: transparent url("../images/Right4-50.png") no-repeat; /*https://icons8.com/web-app/7233/Right4*/
+    background-size:contain;
     cursor: pointer;
-}*/
+}
 .current_lab a {
     font-weight: normal!important;
     color:#ff0000 !important;
