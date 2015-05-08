@@ -2,11 +2,13 @@
 <html>
 <head>
   <title>ITee</title>
+  <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,300italic,400italic,600,700,600italic,700italic&amp;subset=latin-ext" rel="stylesheet" type="text/css">
   <%= stylesheet_link_tag 'reset', :cache=>true %>
   <%# stylesheet_link_tag "../javascripts/prettify/sons-of-obsidian", :cache=>true %>
   <%= stylesheet_link_tag ITee::Application.config.skin ? ITee::Application.config.skin : 'EIK' %>
   <%= stylesheet_link_tag 'prettify' %>
   <%= javascript_include_tag :all, :cache=>true %>
+
   <%# javascript_include_tag "Marked/lib/marked", :cache=>true %>
   <%#= javascript_include_tag "prettify/prettify", :cache=>true %>
   <%#= javascript_include_tag "prettify/run_prettify", :cache=>true %>

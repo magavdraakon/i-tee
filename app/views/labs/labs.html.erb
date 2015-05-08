@@ -21,9 +21,9 @@
 
 <% content_for :sidebar_head do %>
   <% if @user!=current_user %>
-    <b><u><%= @user.username %></u> labs</b>
+    <h2><ins><%= @user.username %></ins> labs</h2>
   <% else %>
-    <b>My labs</b>
+    <h2>My labs</h2>
   <% end %>
 <%end%>
 
@@ -36,7 +36,9 @@
 
 
   <% if @labs!=[] %>
-    <%= link_to('Start lab',start_lab_path+"/"+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : "" ), :class=>'submit-button button') if @lab_user.start==nil %>
+        <div class="manage_lab">
+            <%= link_to('Start lab',start_lab_path+"/"+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : "" ), :class=>'button submit-button sl-button') if @lab_user.start==nil %>
+        </div>
     <%if @lab_user.start!=nil %>
       <!-- started at: <%#=@lab_user.start%><br/>
           ended at: <%#=@lab_user.end%><br/>-->
@@ -64,6 +66,7 @@
     <%if @lab_user.result %> result: <%= @lab_user.result%>    <br/><%end%>
       
     <%if @lab_user.end==nil  %>
+                <div>
       <h3>Virtual machines</h3>
       <%= "There are no machines allocated for this lab" if @lab_user.vms.empty? %>
       <% @lab_user.vms.each do |vm| %>
@@ -98,24 +101,21 @@
             <b>pwd:</b> <%= vm.password %>
           <%end%>
 
-
+          <div id="vm_progress<%=vm.id%>">
+            <%if state=="running" || state=="paused" %>
+                <%=vm.progress%>
+            <%end%>
+          </div>
       </div>
-      <div id="vm_progress<%=vm.id%>">
-        <%if state=="running" || state=="paused" %>
-          <%=vm.progress%>
-        <%end%>
-      </div>
-     
-    <%end%>
-  <%end%>
-  <p class="loader">
-    <%= link_to('Start all machines',start_all_path+"/"+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : "" ), :class=>"button start-button") if @lab_user.end==nil && !@lab_user.vms.empty? %>
-  </p>    
-    
 
-    
-      <%= link_to('Restart lab',restart_lab_path+"/"+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : "" ), :class=>'add-button button', :confirm => "This will delete all saved data. Are you sure?") if @lab_user.start %> 
-      <%= link_to('End lab', end_lab_path+"/"+@lab_user.id.to_s, :class=>'delete-button button', :confirm => "This will delete all saved data. Are you sure?" ) unless @lab_user.end  %>
+    <%end # foreach %>
+    </div>
+  <%end #has vms%>
+<div class="manage_lab">
+    <span class="loader"><%= link_to('Start all',start_all_path+"/"+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : "" ), :class=>"button start-button sl-button") if @lab_user.end==nil && !@lab_user.vms.empty? %></span>
+    <span><%= link_to('Restart lab',restart_lab_path+"/"+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : "" ), :class=>'add-button button rl-button', :confirm => "This will delete all saved data. Are you sure?") if @lab_user.start %></span>
+    <span><%= link_to('End lab', end_lab_path+"/"+@lab_user.id.to_s, :class=>'delete-button button el-button', :confirm => "This will delete all saved data. Are you sure?" ) unless @lab_user.end  %></span>
+</div>
     <%end%>
   <%end%>
   <%else%>
