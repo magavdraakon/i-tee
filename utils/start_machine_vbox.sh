@@ -108,6 +108,7 @@ VBoxManage setextradata $NAME "VBoxInternal/Devices/pcbios/0/Config/DmiBIOSRelea
 
 
 if [ $FIRST_START = "true" ]
+then
     # connect DVD iso if exists
     if [ -f "/var/labs/ovas/${GROUPNAME}.iso" ]
     then
