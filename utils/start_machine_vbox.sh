@@ -91,6 +91,13 @@ INTERNALNETNAME=$(date +%Y)${USERNAME}
 VBoxManage modifyvm $NAME  --intnet2 $INTERNALNETNAME
 }
 
+# connect DVD iso if exists
+if [ -f "/var/labs/ovas/${NAME}.iso" ]
+
+VBoxManage storageattach "${NAME}" --storagectl IDE --port 1 --device 0 --type dvddrive --medium "/var/labs/ovas/${NAME}.iso"
+
+fi
+
 RDP_PORT=${IP_ADDR##*.}
 VBoxManage modifyvm $NAME --vrdeport 10$RDP_PORT
 
