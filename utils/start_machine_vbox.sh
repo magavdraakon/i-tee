@@ -110,6 +110,7 @@ then
 VBoxManage storageattach "${NAME}" --storagectl IDE --port 1 --device 0 --type dvddrive --medium "/var/labs/ovas/${GROUPNAME}.iso"
 
 for i in {1..20}
+do
 VBoxManage guestcontrol "${NAME}" execute --image /usr/bin/test --username student --password student --verbose --timeout 10000 --wait-exit  -- /home/student/done.txt
     if [ $? -ne 0 ]
     then
@@ -121,7 +122,7 @@ VBoxManage guestcontrol "${NAME}" execute --image /usr/bin/test --username stude
     fi
 done
 
-VBoxManage.exe storageattach "${NAME}" --storagectl IDE --port 0 --device 0 --medium "none"
+VBoxManage storageattach "${NAME}" --storagectl IDE --port 0 --device 0 --medium "none"
 
 fi
 
