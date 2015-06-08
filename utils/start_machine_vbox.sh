@@ -91,16 +91,6 @@ INTERNALNETNAME=$(date +%Y)${USERNAME}
 VBoxManage modifyvm $NAME  --intnet2 $INTERNALNETNAME
 }
 
-# connect DVD iso if exists
-if [ -f "/var/labs/ovas/${NAME}.iso" ]
-then
-
-VBoxManage storageattach "${NAME}" --storagectl IDE --port 1 --device 0 --type dvddrive --medium "/var/labs/ovas/${NAME}.iso"
-
-fi
-
-RDP_PORT=${IP_ADDR##*.}
-VBoxManage modifyvm $NAME --vrdeport 10$RDP_PORT
 
 VBoxManage setextradata $NAME "VBoxInternal/Devices/pcbios/0/Config/DmiSystemVendor" "I-tee Distance Laboratory System"
 
@@ -111,6 +101,32 @@ VBoxManage setextradata $NAME "VBoxInternal/Devices/pcbios/0/Config/DmiBIOSVersi
 VBoxManage setextradata $NAME "VBoxInternal/Devices/pcbios/0/Config/DmiBIOSReleaseDate"   "${USERNAME}"
 
 VBoxManage startvm $NAME --type headless
+
+
+# connect DVD iso if exists
+if [ -f "/var/labs/ovas/${GROUPNAME}.iso" ]
+then
+
+VBoxManage storageattach "${NAME}" --storagectl IDE --port 1 --device 0 --type dvddrive --medium "/var/labs/ovas/${GROUPNAME}.iso"
+
+for i in {1..20}
+VBoxManage guestcontrol "${NAME}" execute --image /usr/bin/test --username student --password student --verbose --timeout 10000 --wait-exit  -- /home/student/done.txt
+    if [ $? -ne 0 ]
+    then
+        sleep 1
+
+        echo 'waiting for puppet'
+    else
+        break
+    fi
+done
+
+VBoxManage.exe storageattach "${NAME}" --storagectl IDE --port 0 --device 0 --medium "none"
+
+fi
+
+RDP_PORT=${IP_ADDR##*.}
+VBoxManage modifyvm $NAME --vrdeport 10$RDP_PORT
 
 if [ $? -ne 0 ]
 then
