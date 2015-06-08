@@ -122,7 +122,7 @@ then
     for i in {1..60}
     do
 
-        if [ $(VboxManage list runningvms | cut -f1 -d' '| tr -d '"'| grep "^$NAME$" ) ]
+        if [ $(VBoxManage list runningvms | cut -f1 -d' '| tr -d '"'| grep "^$NAME$" ) ]
         then
             sleep 1
         else
@@ -135,16 +135,17 @@ then
     VBoxManage controlvm $NAME acpipowerbutton && sleep 5
     VBoxManage controlvm $NAME poweroff
 
-    VBoxManage storageattach "${NAME}" --storagectl IDE --port 0 --device 0 --medium "none"
+    VBoxManage storageattach "${NAME}" --storagectl IDE --port 1 --device 0 --medium "none"
 
     fi
 fi
 
+RDP_PORT=${IP_ADDR##*.}
+VBoxManage modifyvm $NAME --vrdeport 10$RDP_PORT
 
 VBoxManage startvm $NAME --type headless
 
-RDP_PORT=${IP_ADDR##*.}
-VBoxManage modifyvm $NAME --vrdeport 10$RDP_PORT
+
 
 if [ $? -ne 0 ]
 then
