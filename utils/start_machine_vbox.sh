@@ -93,6 +93,7 @@ VBoxManage modifyvm $NAME  --intnet2 $INTERNALNETNAME
 
 # connect DVD iso if exists
 if [ -f "/var/labs/ovas/${NAME}.iso" ]
+then
 
 VBoxManage storageattach "${NAME}" --storagectl IDE --port 1 --device 0 --type dvddrive --medium "/var/labs/ovas/${NAME}.iso"
 
