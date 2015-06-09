@@ -45,6 +45,10 @@ ENVIRONMENT=$6
 env >> /var/tmp/info.log
 
 echo "tekitan virtuaalmasina $NAME template-ist $TEMPLATE Mac aadressiga $MAC"
+
+
+FIRST_START=false
+
 if [ $(VBoxManage list vms | cut -f1 -d' '| tr -d '"'| grep "^$NAME$" ) ]
 then
 	echo "machine already exists. Starting old instance of $NAME"
@@ -52,14 +56,15 @@ else
     SNAPSHOT=$(vboxmanage snapshot $TEMPLATE list|grep '*'|grep template|awk '{print $2}')
     echo $(vboxmanage snapshot $TEMPLATE list|grep '*'|grep template)
     if [ $SNAPSHOT ]
-        then
-            echo "Cloning $NAME using $TEMPLATE and snapshot $SNAPSHOT"
-            #echo "time VBoxManage clonevm  $TEMPLATE --snapshot $SNAPSHOT --options link --name $NAME --register"
-            time VBoxManage clonevm  $TEMPLATE --snapshot $SNAPSHOT --options link --name $NAME --register
-        else
-            echo "cloning $NAME using $TEMPLATE"
-            time VBoxManage clonevm $TEMPLATE --name $NAME --register
-        fi
+    then
+        echo "Cloning $NAME using $TEMPLATE and snapshot $SNAPSHOT"
+        #echo "time VBoxManage clonevm  $TEMPLATE --snapshot $SNAPSHOT --options link --name $NAME --register"
+        time VBoxManage clonevm  $TEMPLATE --snapshot $SNAPSHOT --options link --name $NAME --register
+    else
+        echo "cloning $NAME using $TEMPLATE"
+        time VBoxManage clonevm $TEMPLATE --name $NAME --register
+    fi
+    FIRST_START=true
 fi
 
 if [ $? -ne 0 ]
@@ -91,8 +96,6 @@ INTERNALNETNAME=$(date +%Y)${USERNAME}
 VBoxManage modifyvm $NAME  --intnet2 $INTERNALNETNAME
 }
 
-RDP_PORT=${IP_ADDR##*.}
-VBoxManage modifyvm $NAME --vrdeport 10$RDP_PORT
 
 VBoxManage setextradata $NAME "VBoxInternal/Devices/pcbios/0/Config/DmiSystemVendor" "I-tee Distance Laboratory System"
 
@@ -102,7 +105,47 @@ VBoxManage setextradata $NAME "VBoxInternal/Devices/pcbios/0/Config/DmiBIOSVersi
 # dmidecode -s bios-release-date
 VBoxManage setextradata $NAME "VBoxInternal/Devices/pcbios/0/Config/DmiBIOSReleaseDate"   "${USERNAME}"
 
+
+
+if [ $FIRST_START = "true" ]
+then
+    # connect DVD iso if exists
+    if [ -f "/var/labs/ovas/${GROUPNAME}.iso" ]
+    then
+
+    VBoxManage storageattach "${NAME}" --storagectl IDE --port 1 --device 0 --type dvddrive --medium "/var/labs/ovas/${GROUPNAME}.iso"
+
+    VBoxManage startvm $NAME --type headless
+
+    sleep 2
+
+    for i in {1..60}
+    do
+
+        if [ $(VBoxManage list runningvms | cut -f1 -d' '| tr -d '"'| grep "^$NAME$" ) ]
+        then
+            sleep 1
+        else
+            echo "First configuration for ${NAME} done!"
+            break
+        fi
+
+
+    done
+    VBoxManage controlvm $NAME acpipowerbutton && sleep 5
+    VBoxManage controlvm $NAME poweroff
+
+    VBoxManage storageattach "${NAME}" --storagectl IDE --port 1 --device 0 --medium "none"
+
+    fi
+fi
+
+RDP_PORT=${IP_ADDR##*.}
+VBoxManage modifyvm $NAME --vrdeport 10$RDP_PORT
+
 VBoxManage startvm $NAME --type headless
+
+
 
 if [ $? -ne 0 ]
 then
