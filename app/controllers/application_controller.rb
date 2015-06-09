@@ -6,17 +6,35 @@ class ApplicationController < ActionController::Base
   Time.zone='Tallinn'
   protect_from_forgery
   
-  layout ITee::Application.config.skin ? ITee::Application.config.skin : 'EIK'
+
   require 'will_paginate/array'
   before_filter :check_for_cancel, :only => [:create, :update]
 
   before_filter :check_token
-
+  layout :set_layout
 
   before_filter :authenticate_user!, :except=>[:about, :getprogress, :set_progress]
   before_filter :admin?
   before_filter :manager?
   before_filter :per_page
+
+  def set_layout
+    logger.info('REQUEST: ' + request.host)
+    begin
+       ITee::Application.config.skins[request.host]
+    rescue
+      logger.info('No skin set for this host, trying to get default skin')
+      begin
+        ITee::Application.config.default_skin
+      rescue
+        logger.info('no default skin set in config, use EIK skin')
+        'EIK'
+      end
+    end
+
+   # layout ITee::Application.config.skins[request.host] ? ITee::Application.config.skins[request.host]  : ITee::Application.config.default_skin ? ITee::Application.config.default_skin : 'EIK'
+  end
+
 
   def per_page
     @per_page = ITee::Application.config.per_page

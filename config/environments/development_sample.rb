@@ -9,7 +9,8 @@ ITee::Application.configure do
   config.per_page=15
 
   # determine what layout to use
-  config.skin = 'EIK'
+  config.default_skin = 'EIK'
+  config.skins = { 'host1'=> 'EIK'}
 
   #Administrator and manager usernames
   config.admins = ['admin1','admin2']
