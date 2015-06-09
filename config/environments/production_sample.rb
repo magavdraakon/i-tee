@@ -24,6 +24,10 @@ ITee::Application.configure do
    # determine how many instances are shown per page
   config.per_page=15
 
+   # determine what layout to use
+  config.default_skin = 'EIK'
+  config.skins = { 'host1'=> 'EIK'}
+
   #place for temporar files like VM customization files
   config.run_dir = '/var/labs/run'
 

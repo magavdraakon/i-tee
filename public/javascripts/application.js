@@ -18,16 +18,19 @@ jQuery(function ($) {
 		});
     });
 	$("#menu-hide").click(function() {
-		$('#sidemenu').hide("slow", function(){
-			$('#content').css("margin-left", 0);
+		$('#sidemenu').hide(0,function(){
+            $('#content').animate({"margin-left": 0}, 500);
 			$('#menu-show').css("display", "block");
 		});		
 	});
 
 	$("#menu-show").click(function() {
-		$('#content').css("margin-left", 300);
-		$('#sidemenu').show("slow");
-		$('#menu-show').css("display", "none");
+        $('#menu-show').css("display", "none");
+		$('#content').animate({"margin-left": 300}, 500, function(){
+            $('#sidemenu').show(0);
+
+        });
+
     
 });
 
