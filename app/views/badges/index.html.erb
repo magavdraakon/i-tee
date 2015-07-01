@@ -13,7 +13,11 @@
   <tr>
     <td><%= image_tag badge.icon , :size => "25x30", :alt=>"icon" %></td>
     <td><%= image_tag badge.placeholder , :size => "25x30", :alt=>"placeholder"%></td>
-    <td><%= link_to 'Show', badge, :class=> 'show-button button' %><%= link_to 'Edit', edit_badge_path(badge) ,:class=> 'edit-button button'%><%= link_to 'Destroy', badge, :confirm => 'Are you sure?', :method => :delete , :class=> 'delete-button button'%></td>
+    <td class="narrow">
+      <%= link_to 'Show', badge, :class=> 'show-button button' %>
+      <%= link_to 'Edit', edit_badge_path(badge) ,:class=> 'edit-button button'%>
+      <%= link_to 'Destroy', badge, :confirm => 'Are you sure?', :method => :delete , :class=> 'delete-button button'%>
+    </td>
   </tr>
 <% end %>
 </table>

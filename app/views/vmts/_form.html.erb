@@ -19,7 +19,7 @@
     <span class="red" title="Required field">*</span>
   </div>
   <div class="field">
-    <%= f.label :operating_system %> 
+    <%= f.label :operating_system_id %>
     <%=collection_select(:vmt, :operating_system_id, OperatingSystem.all, :id, :name, {:prompt => true})%>
    <span class="red" title="Required field">*</span>
   </div>

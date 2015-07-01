@@ -47,8 +47,8 @@
         <%if @admin && @tab=='admin' %><td><%= vm.lab_vmt.name%> </td><%end%>
         <td><%= vm.lab_vmt.lab.name%> </td>
         <%if @admin && @tab=='admin' %><td><%= vm.user.username %></td><%end%>
-        <td><% if vm.lab_vmt.allow_remote %><%=vm.password%><%end%></td>
-        <td>
+        <td class="narrow"><% if vm.lab_vmt.allow_remote %><%=vm.password%><%end%></td>
+        <td class="narrow">
           <%="("+state+")" unless vm.mac==nil || state=="error"%>
           <span class="loader">
             <%= link_to('Start',start_vm_path+"/"+vm.id.to_s, :class=>"button start-button") if (state!="running" && state!="paused") || vm.mac==nil%>
@@ -61,10 +61,15 @@
   compleating the lab or when the user is removed from the lab%>
 
 
-        <td> <% if vm.lab_vmt.allow_remote or (@admin && @tab=='admin') %>
+        <td class="narrow"> <% if vm.lab_vmt.allow_remote or (@admin && @tab=='admin') %>
           <% desc="Initialize the virtual machine by clicking <strong>Start</strong>."
              desc=vm.description if (state=="running" || state=="paused") && vm.mac!=nil%>
-          <span class="button info-button" onclick="shownotice('<%=desc%>');">Info</span><% if vm.lab_vmt.vmt.shellinabox && state=="running" && vm.mac!=nil %><a href="https://<%= request.host if vm.mac!=nil%>:8<%= vm.mac.ip.split('.').last %>" title="Login" target='_blank' class="button login-button">Login</a><%end%><%= link_to 'Edit', edit_vm_path(vm),:class=> 'edit-button button' if @admin && @tab=="admin"%><%= link_to 'Destroy', vm, :confirm => 'Are you sure?', :method => :delete,:class=> 'delete-button button' if @admin && @tab=="admin"%>
+          <span class="button info-button" onclick="shownotice('<%=desc%>');">Info</span>
+              <% if vm.lab_vmt.vmt.shellinabox && state=="running" && vm.mac!=nil %>
+                  <a href="https://<%= request.host if vm.mac!=nil%>:8<%= vm.mac.ip.split('.').last %>" title="Login" target='_blank' class="button login-button">Login</a>
+              <%end%>
+              <%= link_to 'Edit', edit_vm_path(vm),:class=> 'edit-button button' if @admin && @tab=="admin"%>
+              <%= link_to 'Destroy', vm, :confirm => 'Are you sure?', :method => :delete,:class=> 'delete-button button' if @admin && @tab=="admin"%>
             <% end %>
           </td>
       </tr>
@@ -82,7 +87,7 @@
 <%end%>
 
 <%= content_for :sidebar do %>
- 
+ <ul>
   <% if @b_by=='state' %>
     <%if @admin && @tab=='admin' %>
     <li><%=link_to("Running", vms_by_state_path+"/running?admin=1") %></li>
@@ -104,5 +109,6 @@
         <% end %>
       </li>
     <%end%>
-  <%end%> 
+  <%end%>
+ </ul>
 <%end%>

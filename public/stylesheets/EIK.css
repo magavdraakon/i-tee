@@ -7,6 +7,33 @@ background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#cbe86b), to(#f2e9e1))
  font-family: 'Ubuntu', serif;
 
 }
+/* overall text */
+
+
+ol   { margin-left: 40px; list-style-type: decimal; }
+th              { font-weight: bolder; text-align: center }
+h1              { font-size: 2em; margin: .67em 0 }
+h2              { font-size: 1.5em; margin: .75em 0 }
+h3              { font-size: 1.17em; margin: .83em 0 }
+h4, p, form     { margin: 1.1em 0 }
+p,ul,ol  {line-height:1.5em;}
+h5              { font-size: .83em; margin: 1.5em 0 }
+h6              { font-size: .75em; margin: 1.67em 0 }
+h1, h2, h3, h4, h5, h6, b, strong { font-weight: bolder }
+i, cite, em, var, address { font-style: italic }
+pre, tt, code, kbd, samp  { font-family: monospace }
+pre             { white-space: pre }
+big             { font-size: 1.17em }
+small, sub, sup { font-size: .83em }
+sub             { vertical-align: sub }
+sup             { vertical-align: super }
+s, strike, del  { text-decoration: line-through }
+hr              { border: 1px inset }
+
+h1 a, h2 a, h3 a{
+    color:inherit;
+    font-weight :normal;
+}
 #contain  {
 max-width:1200px;
 min-width:900px;
@@ -31,6 +58,7 @@ float:left;
 width: 300px;
 background:#fff;
 border-right:1px solid #c0c0c0;
+    border-bottom: 1px solid #C2C2C2;
 }
 #wrap, .b_menu{
 -moz-box-shadow: -2px -1px 0px 0px #888;
@@ -245,13 +273,13 @@ margin-top: -30px;
     background: transparent url("../images/menu-hide.png") no-repeat;
     cursor: pointer;
 }
-#sidemenu ul p {
+#sidemenu  p {
 font-size: 0.8em;
 padding:5px;
 
 }
 #sidemenu ul {
-border-bottom: 1px solid #C2C2C2;
+
 }
 #menu-show {
     display: none;
@@ -345,7 +373,11 @@ table caption {
     background: #f2e9e1;
 }
 
+#index_t .narrow  {
+    width:1%;
+    white-space: nowrap;
 
+}
     
 /*forms*/
 input[type="submit"] {  
@@ -415,6 +447,11 @@ input[type="password"]:focus, input[type="text"]:focus, textarea:focus {
     -webkit-border-bottom-right-radius: 5px;
 }  
 
+textarea {
+    width:100%;
+}
+
+
 .red{
   color:red;
 }
@@ -446,9 +483,15 @@ input[type="password"]:focus, input[type="text"]:focus, textarea:focus {
     clear:both;
 }
 
+
+/* prettify */
+.linenums {
+    list-style-position: inside;
+    margin: 0;
+}
 /*buttons*/
-.win-button {background: url("../images/Windows Logo-32.png") 4px 3px no-repeat; background-size: 16px;}/* https://icons8.com/web-app/154/Windows-Logo */
-.mac-button {background: url("../images/Mac OS-32.png") 4px 3px no-repeat;  background-size: 16px;}/* https://icons8.com/web-app/890/Mac-OS */
+.win-button {background: url("../images/Windows_Logo-32.png") 4px 3px no-repeat; background-size: 16px;}/* https://icons8.com/web-app/154/Windows-Logo */
+.mac-button {background: url("../images/Mac_OS-32.png") 4px 3px no-repeat;  background-size: 16px;}/* https://icons8.com/web-app/890/Mac-OS */
 .rdesktop-button, .xfreerdp-button {background: url("../images/Ubuntu-32.png") 4px 3px no-repeat;  background-size: 16px;} /* https://icons8.com/web-app/11339/Ubuntu */
 
 .edit-button {background: url("../images/edit.png") 4px 3px no-repeat;}
@@ -573,28 +616,6 @@ input[type="password"]:focus, input[type="text"]:focus, textarea:focus {
     vertical-align: middle;
 }
 
-/* overall text */
-
-
-ol   { margin-left: 40px; list-style-type: decimal; }
-th              { font-weight: bolder; text-align: center }
-h1              { font-size: 2em; margin: .67em 0 }
-h2              { font-size: 1.5em; margin: .75em 0 }
-h3              { font-size: 1.17em; margin: .83em 0 }
-h4, p, form     { margin: 1.1em 0 }
-p,ul,ol  {line-height:1.5em;}
-h5              { font-size: .83em; margin: 1.5em 0 }
-h6              { font-size: .75em; margin: 1.67em 0 }
-h1, h2, h3, h4, h5, h6, b, strong { font-weight: bolder }
-i, cite, em, var, address { font-style: italic }
-pre, tt, code, kbd, samp  { font-family: monospace }
-pre             { white-space: pre }
-big             { font-size: 1.17em }
-small, sub, sup { font-size: .83em }
-sub             { vertical-align: sub }
-sup             { vertical-align: super }
-s, strike, del  { text-decoration: line-through }
-hr              { border: 1px inset }
 
 /*scaffold stuff*/
 .notice, #flash_notice {

@@ -15,7 +15,7 @@
         <td><%=u.username%></td>
         <td><%=u.authentication_token.blank? ? "No token" : link_to("#{host}#{root_path(:auth_token => u.authentication_token)}", root_path(:auth_token => u.authentication_token)) %></td>
         <td><span title="<%=u.token_expires %>"><%= (u.token_expires.to_time>Time.now ? "in ": "")+distance_of_time_in_words(Time.now, u.token_expires.to_time)+(u.token_expires.to_time>Time.now ? "": " ago") if u.token_expires %></span></td>
-        <td>
+        <td class="narrow">
           <%= link_to "Create", edit_token_path+"/"+u.id.to_s, :class=>'button add-button' if u.authentication_token.blank? %>
           <%= link_to "Edit", edit_token_path+"/"+u.id.to_s, :class=>'button edit-button' if !u.authentication_token.blank? %>
           <%= link_to "Delete", token_authentication_path(:id => u.id),:class=>'button delete-button', :method => :delete, :confirm => "Are you sure?" if !u.authentication_token.blank? %>

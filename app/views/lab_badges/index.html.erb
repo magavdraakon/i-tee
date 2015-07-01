@@ -15,7 +15,11 @@
     <td><%= lab_badge.lab.name %></td>
     <td><%= image_tag lab_badge.badge.icon, :size => "25x30", :alt=> lab_badge.name %></td>
     <td><%= lab_badge.name %></td>
-    <td><%= link_to 'Show', lab_badge, :class=> 'show-button button' %><%= link_to 'Edit', edit_lab_badge_path(lab_badge),:class=> 'edit-button button' %><%= link_to 'Destroy', lab_badge, :confirm => 'Are you sure?', :method => :delete, :class=> 'delete-button button' %></td>
+    <td class="narrow">
+      <%= link_to 'Show', lab_badge, :class=> 'show-button button' %>
+      <%= link_to 'Edit', edit_lab_badge_path(lab_badge),:class=> 'edit-button button' %>
+      <%= link_to 'Destroy', lab_badge, :confirm => 'Are you sure?', :method => :delete, :class=> 'delete-button button' %>
+    </td>
   </tr>
 <% end %>
 </table>

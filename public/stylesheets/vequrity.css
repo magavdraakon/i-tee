@@ -11,7 +11,14 @@ body, html {
     padding:0;
 
 }
+
+textarea {
+    width:100%;
+}
 a{ text-decoration:none; color:red;}
+p {
+    margin: 10px 0;
+}
 h1 {
     margin:15px 0;
     font-size:30px;
@@ -96,11 +103,11 @@ h3 {
 }
 .s_menu a{
     color:dimgrey;
-    font-size:17px;
     display:inline-block;
 }
 .s_menu  {
     display: none;
+    font-size:17px;
 }
 .s_menu td  {
    padding: 0 10px;
@@ -205,7 +212,7 @@ ul.no-bullet {
     background-size:contain;
     cursor: pointer;
 }
-#sidemenu ul p {
+#sidemenu  p {
     padding:5px;
 
 }
@@ -287,7 +294,7 @@ body.sessions #messages {
     padding:3px;
 
 }
-#index_t td:last-child  {
+#index_t .narrow  {
    width:1%;
     white-space: nowrap;
 
@@ -295,6 +302,7 @@ body.sessions #messages {
 #index_t th  {
     background: black;
     color:white;
+    vertical-align: middle;
     padding:3px;
 }
 #index_t tr:hover  {
@@ -304,11 +312,11 @@ body.sessions #messages {
 /*buttons*/
 .win-button {
     padding-left: 22px!important;
-    background: url("../images/Windows Logo-32.png") 4px 3px no-repeat;
+    background: url("../images/Windows_Logo-32.png") 4px 3px no-repeat;
     background-size: 16px;}/* https://icons8.com/web-app/154/Windows-Logo */
 .mac-button {
     padding-left: 22px!important;
-    background: url("../images/Mac OS-32.png") 4px 3px no-repeat;
+    background: url("../images/Mac_OS-32.png") 4px 3px no-repeat;
     background-size: 16px;}/* https://icons8.com/web-app/890/Mac-OS */
 .rdesktop-button, .xfreerdp-button {
     padding-left: 22px!important;
@@ -407,6 +415,22 @@ body.sessions #messages {
 .vm_s a{
     font-size:1.2em
 }
+
+
+/* lab edit form */
+#lab_vmts .vmt{
+    padding:3px;
+    border:solid 1px #c0c0c0;
+    margin:3px;
+    border-width: 1px 0;
+}
+#lab_vmts .network{
+    padding:3px;
+    border:solid 1px #c0c0c0;
+    display:inline-block;
+    margin:3px;
+}
+
 /* pagination classes */
 .pagination, .page_info {
     font-size:0.8em;
@@ -566,4 +590,9 @@ body.sessions #messages {
 /* dont show here */
 #login_info, #login_logos, #sign_in_title {
     display:none;
+}
+
+/* prettify */
+.linenums {
+    list-style-position: inside;
 }

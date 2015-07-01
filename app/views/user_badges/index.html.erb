@@ -13,7 +13,11 @@
   <tr>
     <td><%= user_badge.user.username %></td>
     <td><%= user_badge.lab_badge.name %></td>
-    <td><%= link_to 'Show', user_badge , :class=> 'show-button button'%><%= link_to 'Edit', edit_user_badge_path(user_badge), :class=> 'edit-button button' %><%= link_to 'Destroy', user_badge, :confirm => 'Are you sure?', :method => :delete, :class=> 'delete-button button' %></td>
+    <td class="narrow">
+      <%= link_to 'Show', user_badge , :class=> 'show-button button'%>
+      <%= link_to 'Edit', edit_user_badge_path(user_badge), :class=> 'edit-button button' %>
+      <%= link_to 'Destroy', user_badge, :confirm => 'Are you sure?', :method => :delete, :class=> 'delete-button button' %>
+    </td>
   </tr>
 <% end %>
 </table>

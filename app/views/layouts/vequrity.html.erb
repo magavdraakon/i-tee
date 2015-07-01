@@ -21,8 +21,8 @@
 <div id="contain">
     <div id="top">
       <div id="top-bar">
-        <%=link_to image_tag('VQR logo text on black background.jpg' ), root_path, :class=>'left', :id=>'logo'%>
-        <%= link_to image_tag('vequritylogomtrg.jpeg'), 'http://vequrity.com/' , :class=>'right', :id=>'logo2' %>
+        <%=link_to image_tag('VQR_logo_text_on_black_background.jpg' ), root_path, :class=>'left', :id=>'logo'%>
+        <%= link_to image_tag('vequritylogomtrg.jpeg'), '#' , :class=>'right', :id=>'logo2' %>
         <%if user_signed_in?%>
             <%= link_to 'Sign out', destroy_user_session_path, :class=>'right'  %>
             <%= link_to current_user.username, current_user , :class=>'right '+ (@tab == 'user' ? 'current_tab' : '') %>
@@ -75,7 +75,7 @@
                   <%= link_to_unless_current 'Materials', materials_path %>
                 </td>
                 <td>
-                  <%= link_to_unless_current 'All virtual machines', vms_path+'?admin=1' %><br/>
+                  <%= link_to_unless_current 'Virtual machines', vms_path+'?admin=1' %><br/>
                   <%= link_to_unless_current('VMs by state', vms_by_state_path+'?admin=1') %><br/>
                   <%= link_to_unless_current('VMs by lab', vms_by_lab_path+'?admin=1') %>
                 </td>
@@ -126,10 +126,8 @@
         <div id="sidemenu">
           <div id="menu-hide"></div>
           <div id="menu-head"><%= yield :sidebar_head %></div>
-          <ul>
             <%= yield :sidebar %>
-          </ul>
-        </div>
+          </div>
 
         <div id="content" class="side_visible">
           <div id="menu-show"></div>
@@ -148,15 +146,14 @@
   <div id="footer"><%= link_to('i-Tee 2015', about_path)%></div>
 </div>
 <div id="loading">
-				<div id="blurred_bg"></div>
-				<div id="tabel">
-					<div id="cell">
-						<div id="sisu">
-							<%= image_tag('ajax-loader.gif') %>
-						</div>
-					</div>
-				</div>
+	<div id="blurred_bg"></div>
+	<div id="tabel">
+			<div id="cell">
+			<div id="sisu">
+				<%= image_tag('ajax-loader.gif') %>
 			</div>
+		</div>
+	</div>
 </div>
 </body>
 </html>

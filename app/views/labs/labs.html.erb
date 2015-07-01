@@ -1,6 +1,7 @@
 <%if @labs!=[] %>
 
-<% content_for :sidebar do %> 
+<% content_for :sidebar do %>
+        <ul>
   <% @labs.each do |lab| %>
     <% classes="" #default
        classes= "current_lab" if lab.id==@lab.id %>
@@ -17,6 +18,7 @@
       <%= link_to(lab.name, :controller=>'labs', :action=>'labs', :id=>lab.id)%>
     </li>
   <% end %>
+        </ul>
 <%end%>  
 
 <% content_for :sidebar_head do %>

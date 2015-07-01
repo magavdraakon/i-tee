@@ -68,7 +68,7 @@
       <td>Add: <%= f.text_field :name, :title=>"Name for the badge in this lab. Alphanumeric with no spaces." %></td>
       <td>
         <%=f.hidden_field :lab_id, :value=>@lab.id%>
-        <%= hidden_field_tag "from", "labs/show"%>
+        <%= hidden_field_tag "from", "labs/show", :id => "from2"%>
       </td>
       <td>
         <%=collection_select(:lab_badge, :badge_id, Badge.all, :id, :icon,{:prompt => "Select Badge"})%>
