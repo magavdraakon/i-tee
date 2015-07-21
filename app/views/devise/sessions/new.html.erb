@@ -1,4 +1,4 @@
-<div id="info"> 
+<div id="login_info">
   <p> The IT College distance laboratory system i-Tee offers labs for different courses.</p>
   <ol>
     <li> Log in the system with a IT College class username and password.</li>
@@ -6,11 +6,12 @@
     <li> Start the lab and read trough the given materials.</li>
     <li> End the lab once you're done (or save it to continue later)</li>
   </ol>
-  <p> Please refer to Margus Ernits if you have any questions. The e-mail address can be found in the <a href="http://www.itcollege.ee/en/it-college/staff/" target="_blank">IT College homepage</a>.</p>
+  <p> Please refer to Margus Ernits if you have any questions. The e-mail address can be found in the
+    <a href="http://www.itcollege.ee/en/it-college/staff/" target="_blank">IT College homepage</a>.</p>
 </div>
 <div id="sign_in">
-  
-  <h2>Sign in</h2>
+
+  <h2 id="sign_in_title">Sign in</h2>
 
 <%= form_for(resource, :as => resource_name, :url => session_path(resource_name)) do |f| %>
   <p><%= f.label :username %><br />
@@ -25,9 +26,14 @@
   
   <p><%= f.submit "Sign in" %></p>
 <% end %>
+  <div id="login_messages">
+    <%= content_tag(:div, flash[:error], :id => 'flash_error', :escape=>false) if flash[:error] %>
+    <%= content_tag(:div, flash[:notice], :id => 'flash_notice', :escape=>false) if flash[:notice] %>
+    <%= content_tag(:div, flash[:alert], :id => 'flash_alert', :escape=>false) if flash[:alert] %>
+  </div>
 </div>
 <%# render :partial => "devise/shared/links" %>
-<div id="logos">
+<div id="login_logos">
   <a href="http://www.struktuurifondid.ee/"><img src="../images/logo-euroopa-sotsiaalfond.jpg" alt="Euroopa Liidu struktuuritoetus"/></a>
   <a href="http://www.eitsa.ee/"><img src="../images/eitsa.png" alt="Eesti Infotehnoloogia SA"/></a>
 </div>

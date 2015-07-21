@@ -18,8 +18,10 @@
         <td><%= lab_vmt.nickname %></td>
         <td><%= lab_vmt.lab.name %></td>
         <td><%= lab_vmt.vmt.image %></td>
-        <td><%= lab_vmt.allow_remote ? 'yes' : 'no' %></td>
-        <td><%= link_to 'Edit', edit_lab_vmt_path(lab_vmt),:class=> 'edit-button button' %><%= link_to 'Destroy', lab_vmt, :confirm => 'Are you sure?', :method => :delete ,:class=> 'delete-button button'%></td>
+        <td class="narrow"><%= lab_vmt.allow_remote ? 'yes' : 'no' %></td>
+        <td class="narrow">
+          <%= link_to 'Edit', edit_lab_vmt_path(lab_vmt),:class=> 'edit-button button' %>
+          <%= link_to 'Destroy', lab_vmt, :confirm => 'Are you sure?', :method => :delete ,:class=> 'delete-button button'%></td>
       </tr>
     <% end %>
   </table>

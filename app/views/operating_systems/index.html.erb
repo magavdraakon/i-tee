@@ -12,9 +12,13 @@
     <% @operating_systems.each do |operating_system| %>
       <tr>
         <td><%= operating_system.name %></td>
-        <td><%= operating_system.icon %></td>
+        <td><%= image_tag operating_system.icon if operating_system.icon!='' %></td>
         <td><%= operating_system.connection_help %></td>
-        <td><%= link_to 'Show', operating_system , :class=>"button show-button"%><%= link_to 'Edit', edit_operating_system_path(operating_system), :class=>"button edit-button" %><%= link_to 'Destroy', operating_system, :confirm => 'Are you sure?', :method => :delete, :class=>"button delete-button" %></td>
+        <td class="narrow">
+          <%= link_to 'Show', operating_system , :class=>"button show-button"%>
+          <%= link_to 'Edit', edit_operating_system_path(operating_system), :class=>"button edit-button" %>
+          <%= link_to 'Destroy', operating_system, :confirm => 'Are you sure?', :method => :delete, :class=>"button delete-button" %>
+        </td>
       </tr>
     <% end %>
   </table>

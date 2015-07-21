@@ -1,4 +1,4 @@
-<h3>Listing labs</h3>
+<h3>List labs or <%= link_to 'create a new lab', new_lab_path  %></h3>
 <div id="index_t">
   <table>
     <thead>
@@ -14,7 +14,11 @@
         <td><%= lab.name %></td>
         <td class="marked"><%= lab.short_description %></td>
         <td><%= lab.host.name if lab.host %></td>
-        <td><%= link_to 'View', lab,:class=> 'show-button button' %><%= link_to 'Edit info', edit_lab_path(lab) ,:class=> 'edit-button button'%><%= link_to 'Destroy', lab, :confirm => 'Are you sure?', :method => :delete,:class=> 'delete-button button' %></td>
+        <td class="narrow">
+          <%= link_to 'View', lab,:class=> 'show-button button' %>
+          <%= link_to 'Edit info', edit_lab_path(lab) ,:class=> 'edit-button button'%>
+          <%= link_to 'Destroy', lab, :confirm => 'Are you sure?', :method => :delete,:class=> 'delete-button button' %>
+        </td>
       </tr>
     <% end %>
   </table>

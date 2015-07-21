@@ -8,6 +8,10 @@ ITee::Application.configure do
   # determine how many instances are shown per page
   config.per_page=15
 
+  # determine what layout to use
+  config.default_skin = 'EIK'
+  config.skins = { 'host1'=> 'EIK'}
+
   #Administrator and manager usernames
   config.admins = ['admin1','admin2']
   config.managers = ['manager1']

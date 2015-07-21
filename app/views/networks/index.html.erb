@@ -13,7 +13,11 @@
   <tr>
     <td><%= network.name %></td>
     <td><%=network.net_type %></td>
-    <td><%#= link_to 'Show', network, :class=>"show-button button" %><%= link_to 'Edit', edit_network_path(network), :class=>"edit-button button" %><%= link_to 'Destroy', network, confirm: 'Are you sure?', method: :delete, :class=>"delete-button button" %></td>
+    <td class="narrow">
+      <%#= link_to 'Show', network, :class=>"show-button button" %>
+      <%= link_to 'Edit', edit_network_path(network), :class=>"edit-button button" %>
+      <%= link_to 'Destroy', network, confirm: 'Are you sure?', method: :delete, :class=>"delete-button button" %>
+    </td>
   </tr>
 <% end %>
 </table>

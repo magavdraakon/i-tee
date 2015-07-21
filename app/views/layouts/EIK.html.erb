@@ -85,7 +85,7 @@
                     <%= link_to_unless_current 'Materials', materials_path %>
                   </td>
                   <td>
-                    <%= link_to_unless_current 'All virtual machines', vms_path+"?admin=1" %><br/>
+                    <%= link_to_unless_current 'Virtual machines', vms_path+"?admin=1" %><br/>
                     <%= link_to_unless_current('VMs by state', vms_by_state_path+"?admin=1") %><br/>
                     <%= link_to_unless_current('VMs by lab', vms_by_lab_path+"?admin=1") %>  
                   </td>
@@ -133,9 +133,9 @@
             <div id="sidemenu">
               <div id="menu-hide"></div>
               <div id="menu-head"><%= yield :sidebar_head %></div>
-              <ul>
+
                 <%= yield :sidebar %>
-              </ul>
+
             </div>
         
             <div id="content" class="side_visible">

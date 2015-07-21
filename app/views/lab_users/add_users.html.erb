@@ -54,11 +54,13 @@
 <%end%>
 
 <% content_for :sidebar do %>
+    <ul>
   <% Lab.all.each do |l|%>
     <% classes="" #default
        classes= "bold" if l.id==@lab.id %>
     <li class="<%= classes %>"><%=link_to(l.name, :controller=>"lab_users", :action=>"add_users", :id=>l.id)%></li>
   <%end%>
+    </ul>
 <%end%>
 
 

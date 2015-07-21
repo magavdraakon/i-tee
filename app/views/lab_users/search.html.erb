@@ -18,7 +18,7 @@
 		<table >
 			<thead>
 			<tr>
-				<th><label><input type="checkbox"  onclick="toggle_checked_all(this);" autocomplete="off"/><span> all</span></label></th>
+				<th><label><%= check_box_tag 'toggle','', false,  :onclick=>"toggle_checked_all(this);", :id=>"toggle_u"  %><span> all</span></label></th>
 				<th>Username</th>
 				<th>labs</th>
 				<th><%=link_to("Last login", :controller=>"lab_users",:action=>"search", :sort_by=>"last_sign_in_at", :dir=>@dir, :t=>params[:t], :u=>params[:u])%></th>
@@ -29,7 +29,7 @@
 			</thead>
 		<% @users.each do |user| %>
 		<tr class="found">
-			<td><%= check_box_tag 'id[]', user.id  %></td>
+			<td><%= check_box_tag 'id[]', user.id , false, :id=>"id_#{user.id}" %></td>
 			<td><%= user.username %></td>
 			<td><%= user.lab_users.count %></td>
 			<td><span title="<%= user.last_sign_in_at %>"><%= distance_of_time_in_words(Time.now, user.last_sign_in_at.to_time )+" ago" if user.last_sign_in_at %></span></td>
@@ -44,24 +44,26 @@
 						<%= link_to lab_user.lab.name, my_labs_path+"/"+lab_user.lab.id.to_s+"/"+user.username  %>
 						<%= lab_user.start ? (lab_user.end ? "( Completed @ "+lab_user.end.to_s+" )" : "( Running )") : "( Uninitialized )" %>
 						<%= "#{lab_user.vms.size} Vms" if lab_user.vms.size>0 %> 
-						<%= link_to('Start lab',start_lab_path+"/"+lab_user.lab.id.to_s+"/"+lab_user.user.username , :class=>'submit-button button') if lab_user.start==nil %><%= link_to('Restart lab',restart_lab_path+"/"+lab_user.lab.id.to_s+"/"+lab_user.user.username, :class=>'add-button button', :confirm => "This will delete all saved data. Are you sure?") if lab_user.start %><%= link_to('End lab', end_lab_path+"/"+lab_user.id.to_s, :class=>'delete-button button', :confirm => "This will delete all saved data. Are you sure?" ) if lab_user.start && !lab_user.end %>
+						<%= link_to('Start lab',start_lab_path+"/"+lab_user.lab.id.to_s+"/"+lab_user.user.username , :class=>'submit-button button') if lab_user.start==nil %>
+                      <%= link_to('Restart lab',restart_lab_path+"/"+lab_user.lab.id.to_s+"/"+lab_user.user.username, :class=>'add-button button', :confirm => "This will delete all saved data. Are you sure?") if lab_user.start %>
+                      <%= link_to('End lab', end_lab_path+"/"+lab_user.id.to_s, :class=>'delete-button button', :confirm => "This will delete all saved data. Are you sure?" ) if lab_user.start && !lab_user.end %>
 					</div>
 				<% end %>
 			</td>
 		</tr>
 		<% end # per user%>
 		</table>
-		<label><input type="checkbox" name="lab" value="end" id="end_labs" onclick="manage_checkboxes(['restart_labs', 'rem_labs'])" autocomplete="off"/>End all labs</label>
-		<label><input type="checkbox" name="lab" value="restart" id="restart_labs" onclick="manage_checkboxes(['end_labs', 'rem_labs'])" autocomplete="off"/>Restart all labs</label>
-		<label><input type="checkbox" name="lab" value="remove" id="rem_labs" onclick="manage_checkboxes(['restart_labs', 'end_labs'])" autocomplete="off"/>Remove all labs</label>
+		<label><%= check_box_tag "lab", "end", false, :id=>"end_labs", :onclick=>"manage_checkboxes(['restart_labs', 'rem_labs'])"%>End all labs</label>
+		<label><%= check_box_tag "lab", "restart", false, :id=>"restart_labs", :onclick=>"manage_checkboxes(['end_labs', 'rem_labs'])"%>Restart all labs</label>
+		<label><%= check_box_tag "lab", "remove", false, :id=>"rem_labs", :onclick=>"manage_checkboxes(['restart_labs', 'end_labs'])"%>Remove all labs</label>
 		<br/>
-		<label><input type="checkbox" name="vm" value="poweroff" id="power_vms" onclick="manage_checkboxes(['start_vms']);" autocomplete="off"/>Power off all VMs</label>
-		<label><input type="checkbox" name="vm" value="poweron" id="start_vms" onclick="manage_checkboxes(['power_vms']);" autocomplete="off"/>Power on all VMs</label>
+		<label><input type="checkbox" name="vm" value="poweroff" id="power_vms" onclick="manage_checkboxes(['start_vms']);"/>Power off all VMs</label>
+		<label><input type="checkbox" name="vm" value="poweron" id="start_vms" onclick="manage_checkboxes(['power_vms']);" />Power on all VMs</label>
 		<br/>
-		<label><input type="checkbox" id="reset_t" name="reset_token" onclick="manage_checkboxes(['rem_t'])" autocomplete="off"/>reset token</label>
-		<label><input type="checkbox" id="reset_ex" name="reset_token_expire" onclick="show_date(this);manage_checkboxes([ 'rem_t'])" autocomplete="off"/>set token expire date</label>
+		<label><input type="checkbox" id="reset_t" name="reset_token" onclick="manage_checkboxes(['rem_t'])" />reset token</label>
+		<label><input type="checkbox" id="reset_ex" name="reset_token_expire" onclick="show_date(this);manage_checkboxes([ 'rem_t'])" />set token expire date</label>
 		<span id="expires" class="hidden"><%= datetime_select("user", "token_expires", :default => 2.weeks.from_now) %></span>
-		<label><input type="checkbox" id="rem_t" name="remove_token" autocomplete="off" onclick="manage_checkboxes(['reset_ex', 'reset_t']); show_date(document.getElementById('reset_ex'));"/>remove token</label>
+		<label><input type="checkbox" id="rem_t" name="remove_token" onclick="manage_checkboxes(['reset_ex', 'reset_t']); show_date(document.getElementById('reset_ex'));"/>remove token</label>
 		<br/>
           <label><input type="checkbox" name="user" value="destroy" /> Destroy user(s)</label><br/>
 		<%= f.submit 'Update users', :confirm => 'Are you sure?'%>
@@ -75,7 +77,7 @@
 		<table >
 			<thead>
 			<tr>
-				<th><label><input type="checkbox"  onclick="toggle_checked_all(this);" autocomplete="off"/><span> all</span></label></th>
+				<th><label><%= check_box_tag 'toggle','', false,  :onclick=>"toggle_checked_all(this);" , :id=>"toggle_l" %><span> all</span></label></th>
 				<th><%=link_to("Lab name", :controller=>"lab_users",:action=>"search", :sort_by=>"name", :dir=>@dir, :t=>params[:t], :l=>params[:l], :h=>params[:h])%></th>
 				<th>VM templates</th>
 				<th colspan="4">lab users</th>
@@ -89,7 +91,7 @@
 			uninitialized = lab.lab_users.where("start is ? and end is ?", nil, nil).size
 		%>
 		<tr class="found">
-			<td><%= check_box_tag 'id[]', lab.id  %></td>
+			<td><%= check_box_tag 'id[]', lab.id , false, :id=>"id_#{lab.id}" %></td>
 			<td><%= lab.name %></td>
 			<td><%= lab.lab_vmts.size %></td>
 			<td><%= started %> Started</td>
@@ -107,21 +109,21 @@
 		
 		<% end # per lab%>
 		</table>
-		<label><input type="checkbox" name="lab" value="end" id="end_labs" onclick="manage_checkboxes(['restart_labs', 'rem_users', 'add_users'])" autocomplete="off"/>End all labs</label>
-		<label><input type="checkbox" name="lab" value="restart" id="restart_labs" onclick="manage_checkboxes(['end_labs', 'rem_users', 'add_users'])" autocomplete="off"/>Restart all labs</label>
+		<label><input type="checkbox" name="lab" value="end" id="end_labs" onclick="manage_checkboxes(['restart_labs', 'rem_users', 'add_users'])" />End all labs</label>
+		<label><input type="checkbox" name="lab" value="restart" id="restart_labs" onclick="manage_checkboxes(['end_labs', 'rem_users', 'add_users'])"/>Restart all labs</label>
 		<br/>
 		<label><input type="checkbox" name="lab" value="remove_all_users" id="rem_users" onclick="manage_checkboxes
-                (['restart_labs', 'end_labs', 'add_users'])" autocomplete="off"/>Remove all users</label>
+                (['restart_labs', 'end_labs', 'add_users'])" />Remove all users</label>
 		<label><input type="checkbox" name="lab" value="add_all_users" id="add_users" onclick="manage_checkboxes
-                (['restart_labs', 'end_labs', 'rem_users'])" autocomplete="off"/>add all users</label>
+                (['restart_labs', 'end_labs', 'rem_users'])" />add all users</label>
 		<br/>
-		<label><input type="checkbox" name="vm" value="poweroff" id="power_vms" onclick="manage_checkboxes(['start_vms']);" autocomplete="off"/>Power off all VMs</label>
-		<label><input type="checkbox" name="vm" value="poweron" id="start_vms" onclick="manage_checkboxes(['power_vms']);" autocomplete="off"/>Power on all VMs</label>
+		<label><input type="checkbox" name="vm" value="poweroff" id="power_vms" onclick="manage_checkboxes(['start_vms']);" />Power off all VMs</label>
+		<label><input type="checkbox" name="vm" value="poweron" id="start_vms" onclick="manage_checkboxes(['power_vms']);" />Power on all VMs</label>
 		<br/>
-		<label><input type="checkbox" id="reset_t" name="reset_token" onclick="manage_checkboxes(['rem_t'])" autocomplete="off"/>reset token</label>
-		<label><input type="checkbox" id="reset_ex" name="reset_token_expire" onclick="show_date(this);manage_checkboxes(['rem_t'])" autocomplete="off"/>set token expire date</label>
+		<label><input type="checkbox" id="reset_t" name="reset_token" onclick="manage_checkboxes(['rem_t'])" />reset token</label>
+		<label><input type="checkbox" id="reset_ex" name="reset_token_expire" onclick="show_date(this);manage_checkboxes(['rem_t'])" />set token expire date</label>
 		<span id="expires" class="hidden"><%= datetime_select("user", "token_expires", :default => 2.weeks.from_now) %></span>
-		<label><input type="checkbox" id="rem_t" name="remove_token" autocomplete="off" onclick="manage_checkboxes([ 'reset_ex', 'reset_t']); show_date(document.getElementById('reset_ex'));"/>remove token</label>
+		<label><input type="checkbox" id="rem_t" name="remove_token"  onclick="manage_checkboxes([ 'reset_ex', 'reset_t']); show_date(document.getElementById('reset_ex'));"/>remove token</label>
 		<br/>
 		<%= f.submit 'Update labs', :confirm => 'Are you sure?'%>
 	<% end #form  %>
@@ -135,7 +137,7 @@
 		<table >
 			<thead>
 			<tr>
-				<th><label><input type="checkbox"  onclick="toggle_checked_all(this);" autocomplete="off"/><span> all</span></label></th>
+				<th><label><%= check_box_tag 'toggle','', false,  :onclick=>"toggle_checked_all(this);", :id=>"toggle_lu" %><span> all</span></label></th>
 				<th><%=link_to("Lab name", :controller=>"lab_users",:action=>"search", :sort_by=>"labs.name", :dir=>@dir, :t=>params[:t], :l=>params[:l], :u=>params[:u])%></th>
 				<th><%=link_to("Username", :controller=>"lab_users",:action=>"search", :sort_by=>"users.username", :dir=>@dir, :t=>params[:t], :l=>params[:l], :u=>params[:u], :h=>params[:h])%></th>
 				<th><%=link_to("Start", :controller=>"lab_users",:action=>"search", :sort_by=>"lab_users.start", :dir=>@dir, :t=>params[:t], :l=>params[:l], :u=>params[:u], :h=>params[:h])%></th>
@@ -145,7 +147,7 @@
 			</thead>
 		<% @lab_users.each do |lu| %>
 		<tr class="found">
-			<td><%= check_box_tag 'id[]', lu.id  %></td>
+			<td><%= check_box_tag 'id[]', lu.id , false, :id=>"id_#{lu.id}" %></td>
 			<td><%= lu.lab.name %></td>
 			<td><%= lu.user.username %></td>
 			<td><span title="<%= lu.start %>"><%= distance_of_time_in_words(Time.now, lu.start.to_time )+" ago" if lu.start %></span></td>
@@ -160,13 +162,13 @@
 		
 		<% end # per lab%>
 		</table>
-		<label><input type="checkbox" name="lab" value="end" id="end_labs" onclick="manage_checkboxes(['restart_labs', 'rem_users', 'add_users'])" autocomplete="off"/>End lab</label>
-		<label><input type="checkbox" name="lab" value="restart" id="restart_labs" onclick="manage_checkboxes(['end_labs', 'rem_users', 'add_users'])" autocomplete="off"/>Restart lab</label>
+		<label><input type="checkbox" name="lab" value="end" id="end_labs" onclick="manage_checkboxes(['restart_labs', 'rem_users', 'add_users'])" />End lab</label>
+		<label><input type="checkbox" name="lab" value="restart" id="restart_labs" onclick="manage_checkboxes(['end_labs', 'rem_users', 'add_users'])" />Restart lab</label>
 		<br/>
-		<label><input type="checkbox" name="lab" value="remove" id="rem_users" onclick="manage_checkboxes(['restart_labs', 'end_labs', 'add_users'])" autocomplete="off"/>Remove lab user</label>
+		<label><input type="checkbox" name="lab" value="remove" id="rem_users" onclick="manage_checkboxes(['restart_labs', 'end_labs', 'add_users'])" />Remove lab user</label>
 		<br/>
-		<label><input type="checkbox" name="vm" value="poweroff" id="power_vms" onclick="manage_checkboxes(['start_vms']);" autocomplete="off"/>Power off all VMs</label>
-		<label><input type="checkbox" name="vm" value="poweron" id="start_vms" onclick="manage_checkboxes(['power_vms']);" autocomplete="off"/>Power on all VMs</label>
+		<label><input type="checkbox" name="vm" value="poweroff" id="power_vms" onclick="manage_checkboxes(['start_vms']);" />Power off all VMs</label>
+		<label><input type="checkbox" name="vm" value="poweron" id="start_vms" onclick="manage_checkboxes(['power_vms']);" />Power on all VMs</label>
 		<br/>
 		<%= f.submit 'Update lab users', :confirm => 'Are you sure?'%>
 	<% end #form  %>
