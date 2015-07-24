@@ -363,7 +363,9 @@ Create the railsapps directory
 Create directory for runtime files
 
 	mkdir -p /var/labs/run/
-	chown www-data.www-data /var/labs/run/
+	chown vbox.www-data /var/labs/run/
+	chmod g+w /var/labs/run/
+    chmod g+s /var/labs/run/
 
 Download the code from GitHub to the newly created folder
 
