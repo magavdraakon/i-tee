@@ -90,6 +90,7 @@
           <% if vm.lab_vmt.allow_remote && state=="running" %>
             <div class="remote_connections right clearr" style="text-align:right;">
                 <span class="button win-button" onclick="show_remote(this, '<%=vm.remote('win')%>')">Windows</span>
+                <span class="button mac-button" onclick="show_remote(this, '<%=vm.remote('mac')%>')">Mac</span>
                 <span class="button rdesktop-button" onclick="show_remote(this, '<%=vm.remote('rdesktop')%>')">Linux (rdesktop)</span>
                 <span class="button xfreerdp-button" onclick="show_remote(this, '<%=vm.remote('xfreerdp')%>')">Linux (xfreerdp)</span>
               <div escape="false" class="remote">Choose a remote connection type from above</div>

@@ -272,6 +272,8 @@ end
         desc ="<strong>rdesktop -k et -u#{self.user.username} -p#{self.password} -N -a16 #{rdp_host}:#{rdp_port_prefix}#{port}</strong>"
       when 'xfreerdp'
         desc ="<strong>xfreerdp  -k et --plugin cliprdr -g 90% -u #{self.user.username} -p #{self.password} #{rdp_host}:#{rdp_port_prefix}#{port}</strong>"
+      when 'mac'
+        desc ="<strong>open rdp://#{self.user.username}:#{self.password}@#{rdp_host}:#{rdp_port_prefix}#{port}</strong>"
       else
         desc ="<strong>rdesktop -k et -u#{self.user.username} -p#{self.password} -N -a16 #{rdp_host}:#{rdp_port_prefix}#{port}</strong>"
 
