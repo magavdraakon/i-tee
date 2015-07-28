@@ -7,6 +7,14 @@
   <p>You are a moderator</p>
 <%end%>
 
+<% home="#{Rails.root}/public/markdown/home.md" -%>
+<%if File.file?(home) -%>
+<div class="marked">
+  <%= %x(cat #{home}) %>
+  <hr>
+</div>
+<%else-%>
+
 <p>Using this system:</p>
 <ul>
   <li>choose a lab from the <strong>Labs</strong> menu;</li>
@@ -18,5 +26,5 @@
   <li>end the lab by using the <strong>End Lab</strong> button</li>
   <li>You can suspend the lab by pausing the machines by using the <strong>Pause</strong> button and continue the lab later</li>
 </ul>
-  
+<%end-%>
     
