@@ -20,6 +20,7 @@ authorizations: &AUTHORIZATIONS
     objectClass: inetOrgPerson
     authorizationRole: postsAdmin
 
+# for active directory and zentyal server the attribute value is sAMAccountName
 ## Enviornments
 
 development:
