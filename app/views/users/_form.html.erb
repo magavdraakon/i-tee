@@ -16,7 +16,12 @@
     <%= f.label :email %><br />
     <%= f.text_field :email %>  <span class="red" title="Required field">*</span>
   </div>
-  <div class="field">
+    <div class="field">
+      <%= f.label :role %><br />
+      <%= f.select :role, options_for_select({ 'user'=> 0, 'manager'=>1, 'admin'=>2}, @user.role ) %>
+    </div>
+
+    <div class="field">
     <%= label_tag :ldap_user %>
     <%= check_box_tag :ldap_user, "yes", @user.ldap %> 
   </div>

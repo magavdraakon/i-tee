@@ -8,6 +8,7 @@
         <th><%=link_to("Last sign in", :controller=>"users",:action=>"index", :sort_by=>"last_sign_in_at", :dir=>@dir)%></th>
         <th>Last IP</th>
         <th><%=link_to("LDAP user", :controller=>"users",:action=>"index", :sort_by=>"ldap", :dir=>@dir)%></th>
+        <th><%=link_to("Role", :controller=>"users",:action=>"index", :sort_by=>"role", :dir=>@dir)%></th>
         <!-- <th><%#=link_to("Token", :controller=>"users",:action=>"index", :sort_by=>"authentication_token", :dir=>@dir)%></th>
         <th><%#=link_to("Token expires", :controller=>"users",:action=>"index", :sort_by=>"token_expires", :dir=>@dir)%></th>
         <th>Token</th>-->
@@ -21,6 +22,8 @@
         <td><span title="<%= user.last_sign_in_at %>"><%= distance_of_time_in_words(Time.now, user.last_sign_in_at.to_time )+" ago" if user.last_sign_in_at %></span></td>
         <td><%= user.last_sign_in_ip %></td>
         <td><%= user.ldap %></td>
+        <td><%= user.rolename %></td>
+
      <!--   <td><%#=user.authentication_token.blank? ? "No token" : link_to("#{host}#{root_path(:auth_token => user.authentication_token)}", root_path(:auth_token => user.authentication_token)) %></td>
         <td><span title="<%#=user.token_expires %>"><%#= (user.token_expires.to_time>Time.now ? "in ": "")+distance_of_time_in_words(Time.now, user.token_expires.to_time)+(user.token_expires.to_time>Time.now ? "": " ago") if user.token_expires %></span></td>
         <td class="narrow">

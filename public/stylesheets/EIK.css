@@ -80,8 +80,16 @@ margin:30px;
 padding:10px;
 
 }
+#login_logos {
+    clear:both;
+    text-align:center;
+}
+#login_info {
+    float:right;
+    width:50%;
+}
 #sign_in{
-
+float:left;
 border:solid #f2e9e1 1px;
 padding:20px;
 width:35%;
