@@ -48,7 +48,7 @@ class ApplicationController < ActionController::Base
       return
     end
     # check config to see if the user is an admin (true/false)
-    @admin = current_user.admin? 
+    @admin = current_user.is_admin?
   end
   
 
@@ -59,7 +59,7 @@ class ApplicationController < ActionController::Base
       return
     end
     # check config to see if the user is a manager (true/false)
-    @manager = current_user.manager?
+    @manager = current_user.is_manager?
   end
 
   

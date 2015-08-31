@@ -5,31 +5,43 @@ class User < ActiveRecord::Base
          :recoverable, :rememberable, :trackable, :validatable, :token_authenticatable
 
   # Setup accessible (or protected) attributes for your model
-  attr_accessible :username, :email, :password, 
-        :password_confirmation, :remember_me, :keypair, :token_expires
-  
+  attr_accessible :username, :email, :password, :password_confirmation, :remember_me, :keypair, :token_expires, :role
+
   has_many :vms, :dependent => :destroy
   has_many :lab_users, :dependent => :destroy
   has_many :user_badges, :dependent => :destroy
 
   validates_format_of :username, :with => /^[[:alnum:]]+[[:alnum:]_]+[[:alnum:]]$/ , :message => 'can only be alphanumeric with and dashes with no spaces'
-  
-  def admin?
-    return ITee::Application.config.admins.include?(username)
+
+
+  def rolename
+    if self.role==nil
+      'NaN'
+    elsif self.role==0
+      'user'
+    elsif self.role==1
+      'manager'
+    elsif self.role==2
+      'admin'
+    end
   end
 
-  def manager?
-    return ITee::Application.config.managers.include?(username)
+  def is_admin?
+     self.role==2 || ITee::Application.config.admins.include?(username)
+  end
+
+  def is_manager?
+    self.role==1 || ITee::Application.config.managers.include?(username)
   end
 
   # find first user that has the given token
   def self.find_by_token(token)
-    return User.find(:first, :conditions=>["authentication_token=?", token])
+    User.where("authentication_token=?", token).first
   end
 
   def has_badge(lab_badge_id)
-    ub=UserBadge.find(:all, :conditions=>["lab_badge_id=? and user_id=?", lab_badge_id, id])
-    return ub.count>0
+    ub=UserBadge.where("lab_badge_id=? and user_id=?", lab_badge_id, id).all
+    ub.count>0
   end
 
   def has_lab(lab_id)
