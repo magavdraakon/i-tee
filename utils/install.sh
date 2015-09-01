@@ -79,10 +79,9 @@ openssl x509 -req -days 3650 -in /root/YOUR-FQDN.req -signkey /etc/ssl/private/Y
 openssl x509 -in /etc/ssl/certs/YOUR-FQDN.pem -text -noout
 
 
-PHPWIRTUALBOX=phpvirtualbox-5.0-2.zip
-wget http://downloads.sourceforge.net/project/phpvirtualbox/$PHPWIRTUALBOX
-wget http://sourceforge.net/projects/phpvirtualbox/files/$PHPWIRTUALBOX/download \
- -O $PHPWIRTUALBOX
+PHPWIRTUALBOX=5.0-2.zip
+
+wget https://github.com/imoore76/phpvirtualbox/archive/$PHPWIRTUALBOX -O $PHPWIRTUALBOX
 
 unzip $PHPWIRTUALBOX
 
@@ -130,7 +129,7 @@ server {
 }
 EOF
 
-apt-get install php5-fpm
+apt-get install php5-fpm -y
 
 ln -s /etc/nginx/sites-available/i-tee /etc/nginx/sites-enabled/
 
