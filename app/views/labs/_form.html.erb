@@ -42,6 +42,7 @@
     <div id="lab_vmts">
     <%= f.fields_for :lab_vmts do |labVmt_form| %>
        <div class="vmt">
+         <%= labVmt_form.hidden_field :lab_id %>
           <div class="right"> <%= labVmt_form.check_box :_destroy%>  <%= labVmt_form.label :_destroy, 'Remove' %></div>
           <%= labVmt_form.label :name %> <%= labVmt_form.text_field :name, :placeholder=>"unique. Alphanumeric with no spaces." %><br/>
          <%= labVmt_form.label :nickname %> <%= labVmt_form.text_field :nickname, :placeholder=>"Name shown to user." %><br/>
