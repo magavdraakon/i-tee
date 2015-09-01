@@ -160,3 +160,50 @@ cd i-tee
 apt-get install libmysqlclient-dev mysql-server
 
 
+
+if [[ -r /var/www/railsapps/i-tee/config/database.yml ]]
+then
+    echo "Database already configured"
+    echo "If you want to reset database then delete file /var/www/railsapps/i-tee/config/database.yml"
+else
+
+echo "Give mysql root password"
+read MYSQLPWD
+
+apt-get install makepasswd -y
+RANDOMPASSWORD=$(makepasswd --chars=14)
+
+mysql -uroot -p$MYSQLPWD << EOF
+create database itee_production character set utf8;
+create user 'itee'@'localhost' identified by '$RANDOMPASSWORD';
+grant all privileges on itee_production.* to 'itee'@'localhost';
+quit;
+EOF
+
+cat > /var/www/railsapps/i-tee/config/database.yml << EOF
+production:
+  adapter: mysql
+  database: itee_production
+  username: itee
+  password: $RANDOMPASSWORD
+
+# SQLite version 3.x
+#   gem install sqlite3-ruby (not necessary on OS X Leopard)
+development:
+  adapter: sqlite3
+  database: db/development.sqlite3
+  pool: 5
+  timeout: 5000
+
+# Warning: The database defined as "test" will be erased and
+# re-generated from your development database when you run "rake".
+# Do not set this db to the same as development or production.
+test:
+  adapter: sqlite3
+  database: db/test.sqlite3
+  pool: 5
+  timeout: 5000
+
+EOF
+
+fi
