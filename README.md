@@ -657,6 +657,45 @@ http://www.vionblog.com/virtualbox-4-3-autostart-debian-wheezy/
 
 https://gist.github.com/mikedevita/7461832
 
+
+### Integrating with Active Directory or SAMBA4
+
+1. Create service account to SAMBA4|AD
+
+
+2. Change config/initializers/devise.rb file to accept ldap bind with administrator user (or service account for i-tee)
+
+```
+#config.ldap_use_admin_to_bind = false <-- Change this to true
+config.ldap_use_admin_to_bind = true
+
+```
+
+3.  change config/ldap.yml
+
+```
+authorizations: &AUTHORIZATIONS
+  
+#  group_base: cn=Groups,dc=itcollege,dc=ee as a sample
+
+  group_base: cn=Groups,dc=YOURDC,dc=YOUR
+
+  require_attribute:
+    objectClass: inetOrgPerson
+    authorizationRole: postsAdmin
+
+
+production:
+  host: YOUR_DOMAIN_CONTOLLER
+  port: 636
+  attribute: sAMAccountName 
+  base: dc=YOURDC,dc=YOUR
+  admin_user: livex@vequrity.com
+  admin_password: YOUR_SERVICE_ACCOUNT_PASSWORD
+  ssl: true
+  # <<: *AUTHORIZATIONS
+```
+
 ##For developers
 
 For documentation:
