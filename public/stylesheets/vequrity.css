@@ -294,7 +294,7 @@ body.sessions #messages {
     padding:3px;
 
 }
-#index_t .narrow  {
+ .narrow  {
    width:1%;
     white-space: nowrap;
 
@@ -409,6 +409,9 @@ body.sessions #messages {
     border-top:solid 1px dimgrey;
     padding: 10px 0;
 }
+.vm_s td {
+   padding:3px;
+}
 .vm_s:last-child {
     border-bottom:solid 1px dimgrey;
 }
@@ -416,6 +419,53 @@ body.sessions #messages {
     font-size:1.2em
 }
 
+.copyMe {
+    position:relative;
+    padding: 2px 4px;
+    border:solid 1px #c0c0c0;
+    margin:6px 0;
+    text-align: right;
+}
+.copyMe strong {
+    margin-right:8em;
+    text-align: left;
+    display: block;
+}
+.copyMe .parentheight {
+    position:absolute;
+    top:0;
+    right:0;
+    bottom:0;
+    width: 7em;
+    text-align:center;
+    border-left:solid 1px #c0c0c0;
+    background: #DDD;
+}
+.copyMe .important {
+    color:rgba(0, 0, 87, 1);
+    font-weight: bold;
+}
+
+.copyMe .helptext {
+    position:absolute;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+    right:0;
+    left:0;
+}
+.remote_connections {
+    margin:3px 0;
+}
+.showtoggle {
+    font-weight:bold;
+    text-decoration:none;
+    color:rgba(0, 0, 87, 1);
+    cursor: pointer;
+    padding:0 5px;
+    display:inline-block;
+}
 
 /* lab edit form */
 #lab_vmts .vmt{

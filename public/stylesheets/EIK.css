@@ -389,7 +389,7 @@ table caption {
     background: #f2e9e1;
 }
 
-#index_t .narrow  {
+.narrow  {
     width:1%;
     white-space: nowrap;
 
@@ -708,18 +708,93 @@ div.field, div.actions {
   margin-bottom: 10px;
 }
 
+/* lab view */
+
 .vm_s {
     position:relative;
     border-radius:10px;
     border: 1px solid rgba(125, 159, 186, .5);
-    padding:3px;
+
     background-color: rgba(255, 255, 255, .7);
     text-decoration:none;
     color: #666666;
     line-height:1.5em;
     margin-bottom: 5px;
     overflow:auto;
+    width: 100%;
 }
-.vm_s .remote {
-   padding:3px;
+.vm_s td  {
+    padding:3px;
+}
+
+.wrap  {
+    white-space: normal;
+}
+.copyMe {
+    position:relative;
+    padding: 2px 2px 2px 4px;
+    border:solid 1px #c0c0c0;
+    margin:3px 0;
+    text-align: right;
+}
+.copyMe strong {
+    margin-right:8em;
+    text-align: left;
+    display: block;
+}
+.copyMe .parentheight {
+    position:absolute;
+    background: #f2e9e1;
+    top:0;
+    right:0;
+    bottom:0;
+    width: 7em;
+    text-align:center;
+    border-left:solid 1px #c0c0c0;
+}
+.copyMe .important {
+    color:darkred;
+    font-weight: bold;
+}
+
+.copyMe .helptext {
+    position:absolute;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+    right:0;
+    left:0;
+}
+.remote_connections {
+    margin:3px 0;
+}
+.showtoggle {
+    border-top-left-radius:10px;
+    border-top-right-radius:10px;
+    border-bottom-left-radius:10px;
+    border-bottom-right-radius:10px;
+    /*increase roundness (for firefox)*/
+    -moz-border-radius-topleft: 10px;
+    -moz-border-radius-topright: 10px;
+    -moz-border-radius-bottomleft: 10px;
+    -moz-border-radius-bottomright: 10px;
+    /*increase roundness (for webkit)*/
+    -webkit-border-top-left-radius: 10px;
+    -webkit-border-top-right-radius: 10px;
+    -webkit-border-bottom-left-radius: 10px;
+    -webkit-border-bottom-right-radius: 10px;
+    border: 2px solid rgba(125, 159, 186, .5);
+    padding:0 4px;
+    background-color: rgba(255, 255, 255, .7);
+    text-decoration:none;
+    color: #666666;
+    cursor: pointer;
+    line-height:23px;
+    display:inline-block;
+}
+/* hide unneccesary */
+
+#login_messages {
+    display:none;
 }

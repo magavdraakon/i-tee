@@ -76,26 +76,10 @@
           desc="Initialize the virtual machine #{vm.lab_vmt.nickname} by clicking <strong>Start</strong>"
            desc="There is no remote desktop access for #{vm.lab_vmt.nickname}" if (state=="running" || state=="paused") && !vm.lab_vmt.allow_remote
            desc=vm.description if (state=="running" || state=="paused") && vm.mac!=nil && vm.lab_vmt.allow_remote %>
-        <div class="vm_s">
-          <div class="right loader">
-            <%= link_to('Start',start_vm_path+"/"+vm.id.to_s, :class=>"button start-button") if (state!="running" && state!="paused") || vm.mac==nil%>
-            <%= link_to('Pause', pause_vm_path+"/"+vm.id.to_s, :class=>'button pause-button') if state=="running" && vm.mac!=nil %>
-            <%= link_to('Resume',resume_vm_path+"/"+vm.id.to_s, :class=>'button start-button') if state=="paused" && vm.mac!=nil%>
-            <%= link_to('Stop',stop_vm_path+"/"+vm.id.to_s, :class=>"button stop-button") if state=="running" && vm.mac!=nil%>
+        <table class="vm_s">
+          <tr>
 
-            <%if state=="running" && vm.mac!=nil && vm.lab_vmt.vmt.shellinabox  %>
-                <a href="https://<%= request.host if vm.mac!=nil%>:8<%= vm.mac.ip.split('.').last %>" title="Login" target='_blank' class="button login-button">Login</a>
-            <%end%>
-          </div>
-          <% if vm.lab_vmt.allow_remote && state=="running" %>
-            <div class="remote_connections right clearr" style="text-align:right;">
-                <span class="button win-button" onclick="show_remote(this, '<%=vm.remote('win')%>')">Windows</span>
-                <span class="button mac-button" onclick="show_remote(this, '<%=vm.remote('mac')%>')">Mac</span>
-                <span class="button rdesktop-button" onclick="show_remote(this, '<%=vm.remote('rdesktop')%>')">Linux (rdesktop)</span>
-                <span class="button xfreerdp-button" onclick="show_remote(this, '<%=vm.remote('xfreerdp')%>')">Linux (xfreerdp)</span>
-              <div escape="false" class="remote">Choose a remote connection type from above</div>
-            </div>
-          <% end %>
+            <td class="narrow" >
           <b><%=vm.lab_vmt.nickname ? vm.lab_vmt.nickname : vm.name %></b>
           <span class="vm_links"><%="("+state+")" if vm.mac!=nil && (state=="running" || state=="paused") %></span>
           <%if vm.mac!=nil && state=="running" && vm.lab_vmt.allow_remote %><br/>
@@ -109,7 +93,35 @@
                 <%=vm.progress%>
             <%end%>
           </div>
-      </div>
+            </td>
+
+            <td style="text-align:right;">
+              <div class=" loader" ><%= link_to('Start',start_vm_path+"/"+vm.id.to_s, :class=>"button start-button") if (state!="running" && state!="paused") || vm.mac==nil%>
+              <%= link_to('Pause', pause_vm_path+"/"+vm.id.to_s, :class=>'button pause-button') if state=="running" && vm.mac!=nil %>
+              <%= link_to('Resume',resume_vm_path+"/"+vm.id.to_s, :class=>'button start-button') if state=="paused" && vm.mac!=nil%>
+              <%= link_to('Stop',stop_vm_path+"/"+vm.id.to_s, :class=>"button stop-button") if state=="running" && vm.mac!=nil%>
+
+              <%if state=="running" && vm.mac!=nil && vm.lab_vmt.vmt.shellinabox  %>
+                  <a href="https://<%= request.host if vm.mac!=nil%>:8<%= vm.mac.ip.split('.').last %>" title="Login" target='_blank' class="button login-button">Login</a>
+              <%end%>
+              </div>
+            <% if vm.lab_vmt.allow_remote && state=="running" %>
+                <div class="remote_connections">
+                    <span onclick="toggleOtherOsButtons(this)" class="showtoggle">&lt; more</span>
+                    <span class="button win-button Win" onclick="show_remote(this, '<%=vm.remote('win')%>')">Windows</span>
+                    <span class="button mac-button Mac" onclick="show_remote(this, '<%=vm.remote('mac')%>')">Mac</span>
+                    <span class="button rdesktop-button Linux Unix" onclick="show_remote(this, '<%=vm.remote('rdesktop')%>')">Linux (rdesktop)</span>
+                    <span class="button xfreerdp-button Linux Unix" onclick="show_remote(this, '<%=vm.remote('xfreerdp')%>')">Linux (xfreerdp)</span>
+
+                  <div escape="false" class="remote copyMe">
+                    <div class="parentheight hidden"><div class="helptext ">Click to copy</div></div>
+                    <div class="commands copy">Choose a remote connection type from above</div>
+                  </div>
+                </div>
+            <% end %>
+            </td>
+          </tr>
+      </table>
 
     <%end # foreach %>
     </div>

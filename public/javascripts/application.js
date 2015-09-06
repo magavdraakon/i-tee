@@ -127,6 +127,10 @@ $(".marked code").each(function(){
 
 prettyPrint();
 //document ready
+/* added 6. sept 2015*/
+   //makeCopy(); // make elements clickable
+    hideOtherOsButtons();
+
 });
 
 
@@ -136,17 +140,7 @@ function shownotice(html){
   $("#flash_notice").html(html);
 }
 
-function show_remote(el, html){
-// override the messages div content. all other notices will be removed
-    $(el).siblings('.remote').html(html);
-   /* if (remote_timeout!='') {
-        clearTimeout(remote_timeout);
-        console.log('cleared');
-    }
-    remote_timeout= setTimeout(function() {
-        $(el).siblings('.remote').html('Choose a remote connection type from above');
-    }, 10000);*/
-}
+
 
 // search select all/none
 function toggle_checked_all(el){
@@ -282,3 +276,92 @@ function add_vmt_to_lab(){
     $(".vmt").last().append(s);
     s.click();
 }
+
+
+function show_remote(el, html){
+// override the messages div content. all other notices will be removed
+    $(el).siblings('.remote').find(".commands").html(html);
+    $(el).siblings('.remote').find(".hidden").show();
+    makeCopy($(el).siblings('.remote').get(0)); // make it selectable
+}
+
+
+/* added 6. sept 2015 */
+
+// return operating system name
+function getOs(){
+    var OSName="Unknown OS";
+    if (navigator.platform.indexOf("Win")!=-1) OSName="Windows";
+    if (navigator.platform.indexOf("Mac")!=-1) OSName="MacOS";
+    if (navigator.platform.indexOf("X11")!=-1) OSName="UNIX";
+    if (navigator.platform.indexOf("Linux")!=-1) OSName="Linux";
+    return OSName;
+}
+
+// highlight text in an element
+function SelectText(element) {
+    var doc = document , range, selection;
+    if (doc.body.createTextRange) {
+        range = document.body.createTextRange();
+        range.moveToElementText(element);
+        range.select();
+    } else if (window.getSelection) {
+        selection = window.getSelection();
+        range = document.createRange();
+        range.selectNodeContents(element);
+        selection.removeAllRanges();
+        selection.addRange(range);
+    }
+}
+
+// change text in an element for a period of time
+function changeFor(el, newtext, time){
+    var old=el.innerHTML;
+    el.innerHTML=newtext;
+    var oldclass=el.getAttribute("class");
+    el.setAttribute("class", oldclass+" important");
+    setTimeout(function(){
+        el.innerHTML=old;
+        el.setAttribute("class", oldclass);
+    }, time);
+}
+
+// generate eventlisteners for text copying
+function makeCopy(el){
+        el.addEventListener('click', function(event) {
+            var help = this.getElementsByClassName("helptext")[0];
+            var copy= this.getElementsByClassName("copy")[0];
+            SelectText(copy); // use the other fn to select the first span
+            try {
+                var successful = document.execCommand('copy');
+                // works in:  chrome 42+, ff 41+, ie 9.0+, opera 29.0+, not supported in safari
+                if (successful) { // change text in the second span
+                    changeFor(help, "Copied", 5000);
+                } else {
+                    changeFor(help, (getOs()=="Mac" ? "⌘ + c" : "Ctrl + c"), 5000);
+                }
+                console.log('Copying text command was ' + (successful ? 'successful' : 'unsuccessful'));
+            } catch (err) {
+                console.log('Oops, unable to copy');
+                // if you cant copy, then show the notice to ctrl+c
+                changeFor(help, (getOs()=="Mac" ? "⌘ + c" : "Ctrl + c"), 5000);
+            }
+        });
+}
+
+function hideOtherOsButtons(){
+    // hide remote desktop buttons for other os-s
+    $(".remote_connections .button").hide();
+    $(".remote_connections ."+getOs()).show();
+}
+function toggleOtherOsButtons(el){
+    // hide remote desktop buttons for other os-s
+    $(el).parent(".remote_connections").find(".button").toggle();
+    $(".remote_connections ."+getOs()).show();
+    if (el.innerHTML=="&lt; more")
+        el.innerHTML="less &gt;";
+    else
+        el.innerHTML="&lt; more";
+}
+
+/* EOF added 6. sept 2015 */
