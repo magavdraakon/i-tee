@@ -338,13 +338,13 @@ function makeCopy(el){
                 if (successful) { // change text in the second span
                     changeFor(help, "Copied", 5000);
                 } else {
-                    changeFor(help, (getOs()=="MacOS" ? "⌘ + c" : "Ctrl + c"), 5000);
+                    changeFor(help, (getOs()=="MacOS" ? "Press ⌘ + c" : "Press Ctrl + c"), 5000);
                 }
                 console.log('Copying text command was ' + (successful ? 'successful' : 'unsuccessful'));
             } catch (err) {
                 console.log('Oops, unable to copy');
                 // if you cant copy, then show the notice to ctrl+c
-                changeFor(help, (getOs()=="MacOS" ? "⌘ + c" : "Ctrl + c"), 5000);
+                changeFor(help, (getOs()=="MacOS" ? "Press ⌘ + c" : "Press Ctrl + c"), 5000);
             }
         });
 }
