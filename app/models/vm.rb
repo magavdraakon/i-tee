@@ -266,8 +266,8 @@ end
 
     case typ
       when 'win'
-        desc = "<strong>cmdkey /generic:#{rdp_host} /user:localhost&#92;#{self.user.username} /pass:#{self.password}</strong>"
-        desc += "<strong>mstsc.exe /v:#{rdp_host}:#{rdp_port_prefix}#{port} /f</strong>"
+        desc = "<strong>cmdkey /generic:#{rdp_host} /user:localhost&#92;#{self.user.username} /pass:#{self.password}&amp;&amp;"
+        desc += "mstsc.exe /v:#{rdp_host}:#{rdp_port_prefix}#{port} /f</strong>"
       when 'rdesktop'
         desc ="<strong>rdesktop -k et -u#{self.user.username} -p#{self.password} -N -a16 #{rdp_host}:#{rdp_port_prefix}#{port}</strong>"
       when 'xfreerdp'
