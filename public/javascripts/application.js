@@ -338,30 +338,37 @@ function makeCopy(el){
                 if (successful) { // change text in the second span
                     changeFor(help, "Copied", 5000);
                 } else {
-                    changeFor(help, (getOs()=="Mac" ? "⌘ + c" : "Ctrl + c"), 5000);
+                    changeFor(help, (getOs()=="MacOS" ? "⌘ + c" : "Ctrl + c"), 5000);
                 }
                 console.log('Copying text command was ' + (successful ? 'successful' : 'unsuccessful'));
             } catch (err) {
                 console.log('Oops, unable to copy');
                 // if you cant copy, then show the notice to ctrl+c
-                changeFor(help, (getOs()=="Mac" ? "⌘ + c" : "Ctrl + c"), 5000);
+                changeFor(help, (getOs()=="MacOS" ? "⌘ + c" : "Ctrl + c"), 5000);
             }
         });
 }
 
 function hideOtherOsButtons(){
     // hide remote desktop buttons for other os-s
-    $(".remote_connections .button").hide();
-    $(".remote_connections ."+getOs()).show();
+    if (getOs()!="Unknown OS"){
+        $(".remote_connections .button").hide();
+        $(".remote_connections ."+getOs()).show();
+    } else {
+        $(".showtoggle").hide();
+    }
+
 }
 function toggleOtherOsButtons(el){
     // hide remote desktop buttons for other os-s
-    $(el).parent(".remote_connections").find(".button").toggle();
-    $(".remote_connections ."+getOs()).show();
-    if (el.innerHTML=="&lt; more")
-        el.innerHTML="less &gt;";
-    else
-        el.innerHTML="&lt; more";
+    if (getOs()!="Unknown OS"){
+        $(el).parent(".remote_connections").find(".button").toggle();
+        $(".remote_connections ."+getOs()).show();
+        if (el.innerHTML=="&lt; more")
+            el.innerHTML="less &gt;";
+        else
+            el.innerHTML="&lt; more";
+    }
 }
 
 /* EOF added 6. sept 2015 */
