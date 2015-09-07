@@ -74,11 +74,13 @@ curl --insecure https://YOUR_FQDN/GENERATED_PUBLIC_KEY.pub >> /root/.ssh/authori
 
 
 Gnome flashback session
+```
 apt-get install gnome-session-fallback
-
+```
 Enable automatic shutdown when acpi power button is pressed
+```
 gsettings set org.gnome.settings-daemon.plugins.power button-power shutdown
-
+```
 
 Writing LAB descriptions and materials
 ======================================
