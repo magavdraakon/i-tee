@@ -88,9 +88,9 @@ VBoxManage setextradata ${NAME}      "VBoxInternal/Devices/pcbios/0/Config/DmiSy
 if [[ -r /var/labs/run/${TEMPLATE}.sh ]]
 then
 source /var/labs/run/${TEMPLATE}.sh
-#echo 'Content-Type: application/json' -X POST -d '{"api_key":"'"$API_KEY_ADMIN"'", "lab":"'"$LAB_ID"'", "username":"'"$USERNAME"'", "password":"'"${USER_PWD}"'", "info":{"answer":"42"}}' "$LAB_URI/api/v1/labuser"
+echo "'Content-Type: application/json' -X POST -d '{"api_key":"'"$API_KEY_ADMIN"'", "lab":"'"$LAB_ID"'", "username":"'"$USERNAME"'", "password":"'"${USER_PWD}"'", "info":{"answer":"42"}}' "$LAB_URI""
 
-USER_KEY=$(curl -H 'Content-Type: application/json' -X POST -d '{"api_key":"'"$API_KEY_ADMIN"'", "lab":"'"$LAB_ID"'", "username":"'"$USERNAME"'", "password":"'"${USER_PWD}"'", "info":{"answer":"42"}}' "$LAB_URI/api/v1/labuser" 2>/dev/null | cut -d'"' -f4 -)
+USER_KEY=$(curl -H 'Content-Type: application/json' -X POST -d '{"api_key":"'"$API_KEY_ADMIN"'", "lab":"'"$LAB_ID"'", "username":"'"$USERNAME"'", "password":"'"${USER_PWD}"'", "info":{"answer":"42"}}' "$LAB_URI" 2>/dev/null | cut -d'"' -f4 -)
 
 test $? && echo USER_KEY created || echo creating user key failed
 
