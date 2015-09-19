@@ -44,7 +44,7 @@ ENVIRONMENT=$6
 
 env >> /var/tmp/info.log
 
-echo "tekitan virtuaalmasina $NAME template-ist $TEMPLATE Mac aadressiga $MAC"
+echo "tekitan virtuaalmasina $NAME template-ist ${TEMPLATE} Mac aadressiga $MAC"
 
 
 FIRST_START=false
@@ -53,16 +53,16 @@ if [ $(VBoxManage list vms | cut -f1 -d' '| tr -d '"'| grep "^$NAME$" ) ]
 then
 	echo "machine already exists. Starting old instance of $NAME"
 else
-    SNAPSHOT=$(vboxmanage snapshot $TEMPLATE list|grep '*'|grep template|awk '{print $2}')
-    echo $(vboxmanage snapshot $TEMPLATE list|grep '*'|grep template)
+    SNAPSHOT=$(vboxmanage snapshot ${TEMPLATE} list|grep '*'|grep template|awk '{print $2}')
+    echo $(vboxmanage snapshot ${TEMPLATE} list|grep '*'|grep template|awk '{print $2}')
     if [ $SNAPSHOT ]
     then
-        echo "Cloning $NAME using $TEMPLATE and snapshot $SNAPSHOT"
-        #echo "time VBoxManage clonevm  $TEMPLATE --snapshot $SNAPSHOT --options link --name $NAME --register"
-        time VBoxManage clonevm  $TEMPLATE --snapshot $SNAPSHOT --options link --name $NAME --register
+        echo "Cloning $NAME using ${TEMPLATE} and snapshot $SNAPSHOT"
+        #echo "time VBoxManage clonevm  ${TEMPLATE} --snapshot $SNAPSHOT --options link --name $NAME --register"
+        time VBoxManage clonevm  ${TEMPLATE} --snapshot $SNAPSHOT --options link --name $NAME --register
     else
-        echo "cloning $NAME using $TEMPLATE"
-        time VBoxManage clonevm $TEMPLATE --name $NAME --register
+        echo "cloning $NAME using ${TEMPLATE}"
+        time VBoxManage clonevm ${TEMPLATE} --name $NAME --register
     fi
     FIRST_START=true
 fi
@@ -70,7 +70,7 @@ fi
 if [ $? -ne 0 ]
 then
 #echo "Clone VM failed"
-echo "Virtual Machine clonig fails $TEMPLATE $NAME" 
+echo "Virtual Machine clonig fails ${TEMPLATE} $NAME"
 #| mail $ADMIN -s $(hostname -f)
 exit 1
 fi
@@ -81,35 +81,41 @@ VBoxManage modifyvm $NAME --groups "/${GROUPNAME}","/${USERNAME}"
 
 
 PWDHASH=$(VBoxManage internalcommands passwordhash $USER_PWD|cut -f3 -d' ')
-VBoxManage setextradata $NAME  "VBoxAuthSimple/users/${USERNAME}" $PWDHASH
+VBoxManage setextradata ${NAME}  "VBoxAuthSimple/users/${USERNAME}" ${PWDHASH}
 
-VBoxManage setextradata $NAME      "VBoxInternal/Devices/pcbios/0/Config/DmiSystemProduct"     "System Product"
-VBoxManage setextradata $NAME      "VBoxInternal/Devices/pcbios/0/Config/DmiSystemVersion"     "System Version"
-VBoxManage setextradata $NAME      "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSerial"      "System Serial"
-VBoxManage setextradata $NAME      "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSKU"         "System SKU"
-VBoxManage setextradata $NAME      "VBoxInternal/Devices/pcbios/0/Config/DmiSystemFamily"      "System Family"
+VBoxManage setextradata ${NAME}      "VBoxInternal/Devices/pcbios/0/Config/DmiSystemProduct"     "System Product"
+VBoxManage setextradata ${NAME}      "VBoxInternal/Devices/pcbios/0/Config/DmiSystemVersion"     "System Version"
+if [[ -r /var/labs/run/${TEMPLATE}.sh ]]
+then
+source /var/labs/run/${TEMPLATE}.sh
+VBoxManage setextradata ${NAME}      "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSerial"      ${API_KEY_DASHBOARD}
+else
+VBoxManage setextradata ${NAME}      "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSerial"      "System Serial"
+fi
+VBoxManage setextradata ${NAME}      "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSKU"         "System SKU"
+VBoxManage setextradata ${NAME}      "VBoxInternal/Devices/pcbios/0/Config/DmiSystemFamily"      "System Family"
 
-#if special networks are set then rewrite NIC setup
-declare -f set_networks >/dev/null && set_networks || {
+# if special networks are set then rewrite NIC setup
+declare -f set_networks > /dev/null && set_networks || {
 echo "No network setup"
 INTERNALNETNAME=$(date +%Y)${USERNAME}
-VBoxManage modifyvm $NAME  --intnet2 $INTERNALNETNAME
+VBoxManage modifyvm ${NAME}  --intnet2 $INTERNALNETNAME
 }
 
 
-VBoxManage setextradata $NAME "VBoxInternal/Devices/pcbios/0/Config/DmiSystemVendor" "I-tee Distance Laboratory System"
+VBoxManage setextradata ${NAME} "VBoxInternal/Devices/pcbios/0/Config/DmiSystemVendor" "I-tee Distance Laboratory System"
 
 # dmidecode -s bios-version
-VBoxManage setextradata $NAME "VBoxInternal/Devices/pcbios/0/Config/DmiBIOSVersion"       "${NAME}"
+VBoxManage setextradata ${NAME} "VBoxInternal/Devices/pcbios/0/Config/DmiBIOSVersion"       "${NAME}"
 
 # dmidecode -s bios-release-date
-VBoxManage setextradata $NAME "VBoxInternal/Devices/pcbios/0/Config/DmiBIOSReleaseDate"   "${USERNAME}"
+VBoxManage setextradata ${NAME} "VBoxInternal/Devices/pcbios/0/Config/DmiBIOSReleaseDate"   "${USERNAME}"
 
 
 
-if [ $FIRST_START = "true" ]
+if [ "${FIRST_START}" = "true" ]
 then
-    # connect DVD iso if exists
+#    # connect DVD iso if exists
     if [ -f "/var/labs/ovas/${GROUPNAME}.iso" ]
     then
 
@@ -132,8 +138,8 @@ then
 
 
     done
-    VBoxManage controlvm $NAME acpipowerbutton && sleep 5
-    VBoxManage controlvm $NAME poweroff
+    VBoxManage controlvm ${NAME} acpipowerbutton && sleep 5
+    VBoxManage controlvm ${NAME} poweroff
 
     VBoxManage storageattach "${NAME}" --storagectl IDE --port 1 --device 0 --medium "none"
 
@@ -141,16 +147,16 @@ then
 fi
 
 RDP_PORT=${IP_ADDR##*.}
-VBoxManage modifyvm $NAME --vrdeport 10$RDP_PORT
+VBoxManage modifyvm ${NAME} --vrdeport 10${RDP_PORT}
 
-VBoxManage startvm $NAME --type headless
+VBoxManage startvm ${NAME} --type headless
 
 
 
 if [ $? -ne 0 ]
 then
 #echo "Starting VM failed"
-echo "Virtual Machine start from $TEMPLATE with name: $NAME Failed" 
+echo "Virtual Machine start from ${TEMPLATE} with name: $NAME Failed"
 #| mail $ADMIN -s $(hostname -f)
 exit 1
 fi
