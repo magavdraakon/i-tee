@@ -88,10 +88,11 @@ VBoxManage setextradata ${NAME}      "VBoxInternal/Devices/pcbios/0/Config/DmiSy
 if [[ -r /var/labs/run/${TEMPLATE}.sh ]]
 then
 source /var/labs/run/${TEMPLATE}.sh
-echo 'Content-Type: application/json' -X POST -d '{"api_key":"'"$API_KEY_ADMIN"'", "lab":"'"$LAB_ID"'", "username":"'"$USERNAME"'", "password":"'"${USER_PWD}"'", "info":{"answer":"42"}}' $LAB_URI
+echo 'Content-Type: application/json' -X POST -d '{"api_key":"'"$API_KEY_ADMIN"'", "lab":"'"$LAB_ID"'", "username":"'"$USERNAME"'", "password":"'"${USER_PWD}"'", "info":{"answer":"42"}}' $LAB_URI/api/v1/labuser
 
-curl -H 'Content-Type: application/json' -X POST -d '{"api_key":"'"$API_KEY_ADMIN"'", "lab":"'"$LAB_ID"'", "username":"'"$USERNAME"'", "password":"'"${USER_PWD}"'", "info":{"answer":"42"}}' $LAB_URI
+USER_KEY=$(curl -H 'Content-Type: application/json' -X POST -d '{"api_key":"'"API_KEY_ADMIN"'", "lab":"'"$LAB_ID"'", "username":"'"$USERNAME"'", "password":"'"${USER_PWD}"'", "info":{"answer":"42"}}' $LAB_URI/api/v1/labuser| cut -d\" -f4 -)
 
+echo USER_KEY=$USER_KEY
     VBoxManage setextradata ${NAME}      "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSerial"      ${LAB_URI}/${LAB_ID}/${USER_KEY}
 else
     VBoxManage setextradata ${NAME}      "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSerial"      "System Serial"
