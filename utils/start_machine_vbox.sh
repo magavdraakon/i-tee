@@ -94,7 +94,7 @@ USER_KEY=$(curl -H 'Content-Type: application/json' -X POST -d '{"api_key":"'"$A
 
 test $? && echo USER_KEY created || echo creating user key failed
 
-    VBoxManage setextradata ${NAME}      "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSerial"      "${LAB_URI}/${LAB_ID}/${USER_KEY}"
+    VBoxManage setextradata ${NAME}      "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSerial"      "${LAB_ID}/${USER_KEY}"
 else
     VBoxManage setextradata ${NAME}      "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSerial"      "System Serial"
 fi
