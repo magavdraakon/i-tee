@@ -32,6 +32,11 @@ apt-get update
 
 
 apt-get install virtualbox-5.0 -y
+
+
+VBoxManage extpack uninstall "Oracle VM VirtualBox Extension Pack"
+su - vbox -c'vboxmanage extpack uninstall "Oracle VM VirtualBox Extension Pack"'
+
 VER=$(apt-cache policy virtualbox-5.0 |grep Installed:| cut -f2 -d: |cut -f1 -d-|cut -f2 -d' ')
 SUBVER=$(apt-cache policy virtualbox-5.0 |grep Installed:| cut -f2 -d: |cut -f1 -d~|cut -f2 -d' ')
 
@@ -90,7 +95,7 @@ unzip $PHPVIRTUALBOX
 
 cp -a /root/phpvirtualbox-$(basename $PHPVIRTUALBOX .zip) /usr/share/nginx/
 
-ln -s /usr/share/nginx/phpvirtualbox-$(basename $PHPVIRTUALBOX .zip) /usr/share/nginx/phpvirtualbox
+ln -sf /usr/share/nginx/phpvirtualbox-$(basename $PHPVIRTUALBOX .zip) /usr/share/nginx/phpvirtualbox
 
 chown www-data:www-data /usr/share/nginx/phpvirtualbox -R
 
@@ -318,3 +323,5 @@ END
 
 sudo mkdir /var/www/railsapps/i-tee/tmp
 sudo chown www-data:www-data /var/www/railsapps/i-tee/tmp/
+
+su - vbox -c'VBoxManage setproperty vrdeauthlibrary "VBoxAuthSimple"'
