@@ -88,10 +88,13 @@ VBoxManage setextradata ${NAME}      "VBoxInternal/Devices/pcbios/0/Config/DmiSy
 if [[ -r /var/labs/run/${TEMPLATE}.sh ]]
 then
 source /var/labs/run/${TEMPLATE}.sh
-VBoxManage setextradata ${NAME}      "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSerial"      ${API_KEY_DASHBOARD}
+curl -H 'Content-Type: application/json' -X POST -d '{"api_key":"'"$API_KEY_ADMIN"'", "lab":"'"$LAB_ID"'", "username":"'"$USERNAME"'", "password":"'"${USER_PWD}"'", "info":{"answer":"42"}}' $LAB_URI
+
+    VBoxManage setextradata ${NAME}      "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSerial"      ${LAB_URI}/${LAB_ID}/${USER_KEY}
 else
-VBoxManage setextradata ${NAME}      "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSerial"      "System Serial"
+    VBoxManage setextradata ${NAME}      "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSerial"      "System Serial"
 fi
+
 VBoxManage setextradata ${NAME}      "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSKU"         "System SKU"
 VBoxManage setextradata ${NAME}      "VBoxInternal/Devices/pcbios/0/Config/DmiSystemFamily"      "System Family"
 
