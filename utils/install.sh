@@ -325,3 +325,5 @@ sudo mkdir /var/www/railsapps/i-tee/tmp
 sudo chown www-data:www-data /var/www/railsapps/i-tee/tmp/
 
 su - vbox -c'VBoxManage setproperty vrdeauthlibrary "VBoxAuthSimple"'
+sudo service php5-fpm restart
+sudo service vboxweb-service restart
