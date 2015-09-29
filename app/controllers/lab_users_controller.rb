@@ -163,7 +163,7 @@ end
         @user=User.where('username=?', user[0]).first
         if @user==nil #user doesnt exist
           email=user[2]
-          email="#{user[0]}@itcollege.ee" if email == nil
+          email="#{user[0]}@itcollege.ee" if email == nil || email == ''
           #TODO: email is username@itcollege when email is set??? take address (@something.end) from config?
           if user[3]
             @user=User.create!(:email=>email ,:username=>user[0], :name=>user[1] ,:password=>user[3])
