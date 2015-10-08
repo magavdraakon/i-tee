@@ -151,6 +151,14 @@ vim /usr/share/nginx/phpvirtualbox/config.php
 
 su - vbox -c'VBoxManage setproperty vrdeauthlibrary "VBoxAuthSimple"'
 
+#You need ruby2.x
+
+apt-get install -y python-software-properties
+apt-add-repository ppa:brightbox/ruby-ng
+apt-get update
+apt-get install -y ruby2.2 ruby-switch
+ruby-switch --set ruby2.2 ruby2.2-dev
+
 apt-get install ruby ruby-dev git-core curl zlib1g-dev -y
 apt-get install libssl-dev libreadline-dev -y
 apt-get install libyaml-dev libsqlite3-dev sqlite3 libxml2-dev -y
