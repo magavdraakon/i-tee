@@ -21,7 +21,10 @@ Do system upgrade
 
 	sudo apt-get install linux-headers-$(uname -r) build-essential dkms
 
-	sudo apt-get install unzip
+	sudo apt-get install unzip git htop -y
+	
+	sudo apt-get install makepasswd -y
+
 
 
 Install GIT: 
@@ -61,9 +64,14 @@ Upgrade local repository cache:
 	
 	apt-get update
 
-Install VirtualBox 4.3 package:
+Install VirtualBox 5.0 package:
 
-	apt-get install virtualbox-4.3
+	apt-get install virtualbox-5.0 -y
+	
+In case of upgrade, remove vbox extension back
+
+	VBoxManage extpack uninstall "Oracle VM VirtualBox Extension Pack"
+	su - vbox -c'vboxmanage extpack uninstall "Oracle VM VirtualBox Extension Pack"'
 
 If everything is successful then module list should contain vboxdrv module. Test it using lsmod:
 	
@@ -77,11 +85,11 @@ vboxdrv               409815  3 vboxnetadp,vboxnetflt,vboxpci
 Download and install VirtualBox Extension Pack that corresponds to your version of VirtualBox.
 First find out virtualbox version:
 
-	VER=$(apt-cache policy virtualbox-4.3 |grep Installed:| cut -f2 -d: |cut -f1 -d-|cut -f2 -d' ')
+	VER=$(apt-cache policy virtualbox-5.0 |grep Installed:| cut -f2 -d: |cut -f1 -d-|cut -f2 -d' ')
 
 Seconly find out subversion of virtualbox:
 
-	SUBVER=$(apt-cache policy virtualbox-4.3 |grep Installed:| cut -f2 -d: |cut -f1 -d~|cut -f2 -d' ')
+	SUBVER=$(apt-cache policy virtualbox-5.0 |grep Installed:| cut -f2 -d: |cut -f1 -d~|cut -f2 -d' ')
 
 Test results:
 
@@ -223,17 +231,19 @@ To check signed certificate data:
 Download latest version of phpVirtualBox http://sourceforge.net/projects/phpvirtualbox/files/?source=navbar
 VirtualBox and phpVirtualBox versions must match. For example, for VirtualBox-4.3 series you need phpvirtualbox-4.3-x.zip:
 
+		
+	PHPVIRTUALBOX=5.0-3.zip
 	
-	wget http://sourceforge.net/projects/phpvirtualbox/files/phpvirtualbox-4.3-2.zip/download \
-	 -O phpvirtualbox-4.3-2.zip
-
-	unzip phpvirtualbox-4.3-2.zip
-
-	cp -a /root/phpvirtualbox-4.3-2 /usr/share/nginx/
-
-	ln -s /usr/share/nginx/phpvirtualbox-4.3-2 /usr/share/nginx/phpvirtualbox
-
+	wget https://github.com/imoore76/phpvirtualbox/archive/$PHPVIRTUALBOX -O $PHPVIRTUALBOX
+	
+	unzip $PHPVIRTUALBOX
+	
+	cp -a /root/phpvirtualbox-$(basename $PHPVIRTUALBOX .zip) /usr/share/nginx/
+	
+	ln -sf /usr/share/nginx/phpvirtualbox-$(basename $PHPVIRTUALBOX .zip) /usr/share/nginx/phpvirtualbox
+	
 	chown www-data:www-data /usr/share/nginx/phpvirtualbox -R
+
 
 
 Create new virtualhost for phpVirtualBox
@@ -243,10 +253,10 @@ Create new virtualhost for phpVirtualBox
 	#
 	server {
 		listen 4433;
-
+	
 		root /usr/share/nginx/phpvirtualbox;
 		index index.php index.html index.htm;
-
+	
 		ssl on;
 		ssl_certificate /etc/ssl/certs/YOUR-FQDN.pem;
 		ssl_certificate_key /etc/ssl/private/YOUR-FQDN.key;
@@ -258,23 +268,24 @@ Create new virtualhost for phpVirtualBox
 		ssl_prefer_server_ciphers on;
 	
 		location / {
-		        try_files \$uri \$uri/ /index.html;
+				try_files \$uri \$uri/ /index.html;
 		}
 		location ~ \.php$ {
-		       fastcgi_split_path_info ^(.+\.php)(/.+)$;
-		       # NOTE: You should have "cgi.fix_pathinfo = 0;" in php.ini
-		       fastcgi_pass unix:/var/run/php5-fpm.sock;
-		       fastcgi_index index.php;
-		       include fastcgi_params;
+			   fastcgi_split_path_info ^(.+\.php)(/.+)$;
+			   # NOTE: You should have "cgi.fix_pathinfo = 0;" in php.ini
+			   fastcgi_pass unix:/var/run/php5-fpm.sock;
+			   fastcgi_index index.php;
+			   include fastcgi_params;
 		}
-
-
+	
+	
 		location ~ /\.ht {
-		        deny all;
+				deny all;
 		}
-
+	
 	}
 	EOF
+
 
 Install php support for nginx
 
@@ -293,8 +304,6 @@ Restart nginx web server
 	service nginx restart
 
 
-uurida - http://www.iodigitalsec.com/nginx-ssl-php5-fpm-on-debian-wheezy/
-
 
 Change vbox user password to the same vbox system user
 	
@@ -309,10 +318,6 @@ Configure virtualbox RDP authenticaton
 	su - vbox -c'VBoxManage setproperty vrdeauthlibrary "VBoxAuthSimple"'
 
 Log in into vbox interface https://YOUR-FQDN:4433 and change admin's password. Default is admin
-
-##Links
-
-	http://www.vionblog.com/virtualbox-4-3-phpvirtualbox-debian-wheezy/
 
 
 # Application Config
