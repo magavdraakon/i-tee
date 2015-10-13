@@ -8,7 +8,8 @@ Devise.setup do |config|
   config.ldap_config = "#{Rails.root}/config/ldap.yml"
   # config.ldap_check_group_membership = false
   # config.ldap_check_attributes = false
-  config.ldap_use_admin_to_bind = false
+  # change next line = false if your LDAP needs anonymous bind
+  config.ldap_use_admin_to_bind = true
   
   # ==> Mailer Configuration
   # Configure the e-mail address which will be shown in DeviseMailer.
