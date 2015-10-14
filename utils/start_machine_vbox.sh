@@ -36,6 +36,8 @@ NAME=$4
 USER_PWD=$5
 ENVIRONMENT=$6
 
+logger -p info -t i-tee VM ${NAME} starting
+
 [ -r "$ENVIRONMENT" ] && . "$ENVIRONMENT" || echo "no environment $ENVIRONMENT variables from RAILS" > /var/tmp/info.log
 
 [ -r "$RUNDIR"/"$NAME".sh ] && . "$RUNDIR"/"$NAME".sh || echo "no machine specific variables for customizing VM in "$RUNDIR"/"$NAME".sh" >> /var/tmp/info.log
@@ -91,7 +93,9 @@ source /var/labs/run/${TEMPLATE}.sh
 
 curl -H 'Content-Type: application/json' -X DELETE -d '{"api_key":"'"${API_KEY_ADMIN}"'", "lab":"'"${LAB_ID}"'", "userName":"'"${USERNAME}"'", "reset":false}' "${LAB_URI}"
 
-echo "'Content-Type: application/json' -X POST -d '{"api_key":"'"$API_KEY_ADMIN"'", "lab":"'"$LAB_ID"'", "username":"'"$USERNAME"'", "password":"'"${USER_PWD}"'", "info":{"answer":"42"}}' "${LAB_URI}""
+
+
+echo "SENT user delete" 'Content-Type: application/json' -X POST -d '{"api_key":"'"${API_KEY_ADMIN}"'", "lab":"'"${LAB_ID}"'", "username":"'"${USERNAME}"'", "password":"'"${USER_PWD}"'", "info":{"answer":"42"}}' "${LAB_URI}"
 #curl -H "Content-Type: application/json" -X GET -d '{"api_key":"botkey", "username":"someone"}' http://localhost:3000/api/v1/userkey
 USER_KEY=$(curl -H 'Content-Type: application/json' -X POST -d '{"api_key":"'"${API_KEY_ADMIN}"'", "lab":"'"${LAB_ID}"'", "username":"'"${USERNAME}"'", "password":"'"${USER_PWD}"'", "info":{"answer":"42"}}' "${LAB_URI}" | cut -d'"' -f4 -)
 
