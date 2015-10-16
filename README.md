@@ -13,6 +13,7 @@ http://conferences.sigcomm.org/sigcomm/2015/pdf/papers/p113.pdf
     ACM, New York, NY, USA, 113-114. DOI=http://dx.doi.org/10.1145/2785956.2790033
 
 
+i-tee contains three layers such as: Virtualisation, Web frontend (access control, lab control), Learningspace layer.
 
 # Preparing for installation of i-tee
 
