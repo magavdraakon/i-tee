@@ -21,7 +21,7 @@ Before installing i-tee system the Ubuntu server with VirtualBox headless is nee
 
 
 * Install Ubuntu Server 14.04 LTS 64bit with separate /var directory (enough room for virtual machines)
-* Choose btrfs filesystem for /var for virtual machines
+* Choose btrfs filesystem for /var for virtual machines (optional)
 * Configure network
 
 Do system upgrade
@@ -682,7 +682,7 @@ https://gist.github.com/mikedevita/7461832
 2. Change config/initializers/devise.rb file to accept ldap bind with administrator user (or service account for i-tee)
 
 ```
-#config.ldap_use_admin_to_bind = false <-- Change this to true
+#config.ldap_use_admin_to_bind = false <-- Change this to true in case you don't use anonymous bind
 config.ldap_use_admin_to_bind = true
 
 ```
@@ -706,7 +706,7 @@ production:
   port: 636
   attribute: sAMAccountName 
   base: dc=YOURDC,dc=YOUR
-  admin_user: livex@vequrity.com
+  admin_user: rfsrv@rangeforce.com
   admin_password: YOUR_SERVICE_ACCOUNT_PASSWORD
   ssl: true
   # <<: *AUTHORIZATIONS
