@@ -27,3 +27,27 @@ Switch to open3 in sh model.
 ----------------------------
 require 'open3'
 stdin, stdout, status = Open3.capture3("ls")
+
+
+
+
+Users Guide
+===========
+
+
+Introduction
+------------
+
+
+Creating VM templates using phpvirtualbox
+-----------------------------------------
+
+
+Creating Lab templates
+----------------------
+
+Creating network templates
+--------------------------
+
+Creating users and adding users to the labs
+-------------------------------------------
