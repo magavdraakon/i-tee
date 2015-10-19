@@ -349,11 +349,16 @@ Make sure that virtualization layer works and VMs can be created using phpVboxMa
 Make yourself the root user
 
 	sudo -i
+	
+	
+You need ruby 2 to run i-tee
 
-
-if you dont have ruby installed:
-
-	apt-get install ruby ruby-dev git-core curl zlib1g-dev 
+	apt-get install -y python-software-properties
+	apt-add-repository ppa:brightbox/ruby-ng
+	apt-get update
+	apt-get install -y ruby2.2 ruby2.2-dev ruby-switch
+	ruby-switch --set ruby2.2 ruby2.2-dev
+	apt-get install git-core curl zlib1g-dev 
 	apt-get install libssl-dev libreadline-dev 
 	apt-get install libyaml-dev libsqlite3-dev sqlite3 libxml2-dev 
 	apt-get install libxslt1-dev libcurl4-openssl-dev 
@@ -364,10 +369,11 @@ Do we need python-software-properties?
 Check the version of ruby and rails installed:
 
 	ruby -v
-	ruby 1.9.3p484 (2013-11-22 revision 43786) [x86_64-linux]
+	ruby 2.2.2p95 (2015-04-13 revision 50295) [x86_64-linux]
+
 
 	gem -v
-	1.8.23
+	2.4.5
 
 
 ## installing the distance laboratory system
