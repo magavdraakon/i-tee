@@ -13,6 +13,6 @@ fi
 
 for n in $(seq 1 $1)
 do
-	echo "$2$n,user $2$n,$2$n@demo.ex,12345678912"
+	echo "$2$n,user $2$n,$2$n@rangeforce.lab,12345678912"
 
 done
