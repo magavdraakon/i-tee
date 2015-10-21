@@ -30,6 +30,14 @@ stdin, stdout, status = Open3.capture3("ls")
 
 
 
+Ideas
+=====
+
+Allow to set password hash for particular lab (for lecturer)
+Select lab and set RDP password for particulat user for all lab machines. (used in startup script)
+
+
+
 
 Users Guide
 ===========
