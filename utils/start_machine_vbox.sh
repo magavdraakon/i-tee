@@ -38,13 +38,10 @@ ENVIRONMENT=$6
 
 logger -p info -t i-tee VM ${NAME} starting
 
-[ -r "$ENVIRONMENT" ] && . "$ENVIRONMENT" || echo "no environment $ENVIRONMENT variables from RAILS" > /var/tmp/info.log
+[ -r "$ENVIRONMENT" ] && . "$ENVIRONMENT" || logger -p err -t i-tee  "no environment $ENVIRONMENT variables from RAILS"
 
 [ -r "$RUNDIR"/"$NAME".sh ] && . "$RUNDIR"/"$NAME".sh || echo "no machine specific variables for customizing VM in "$RUNDIR"/"$NAME".sh" >> /var/tmp/info.log
 
-
-
-env >> /var/tmp/info.log
 
 echo "tekitan virtuaalmasina $NAME template-ist ${TEMPLATE} Mac aadressiga $MAC"
 
@@ -175,6 +172,7 @@ echo "Virtual Machine start from ${TEMPLATE} with name: $NAME Failed"
 exit 1
 fi
 
+#TODO - return something else (get rid of masin $NAME loodud)
 echo "masin $NAME loodud"
 #echo "VM named: $NAME created"
 
