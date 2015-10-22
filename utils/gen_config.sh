@@ -104,3 +104,6 @@ end
 
 END
 fi
+
+
+#TODO generate ldap config
