@@ -269,13 +269,13 @@ end
         desc = "<strong>cmdkey /generic:#{rdp_host} /user:localhost&#92;#{self.user.username} /pass:#{self.password}&amp;&amp;"
         desc += "mstsc.exe /v:#{rdp_host}:#{rdp_port_prefix}#{port} /f</strong>"
       when 'rdesktop'
-        desc ="<strong>rdesktop -k et -u#{self.user.username} -p#{self.password} -N -a16 #{rdp_host}:#{rdp_port_prefix}#{port}</strong>"
+        desc ="<strong>rdesktop  -u#{self.user.username} -p#{self.password} -N -a16 #{rdp_host}:#{rdp_port_prefix}#{port}</strong>"
       when 'xfreerdp'
-        desc ="<strong>xfreerdp  -k et --plugin cliprdr -g 90% -u #{self.user.username} -p #{self.password} #{rdp_host}:#{rdp_port_prefix}#{port}</strong>"
+        desc ="<strong>xfreerdp  --plugin cliprdr -g 90% -u #{self.user.username} -p #{self.password} #{rdp_host}:#{rdp_port_prefix}#{port}</strong>"
       when 'mac'
         desc ="<strong>open rdp://#{self.user.username}:#{self.password}@#{rdp_host}:#{rdp_port_prefix}#{port}</strong>"
       else
-        desc ="<strong>rdesktop -k et -u#{self.user.username} -p#{self.password} -N -a16 #{rdp_host}:#{rdp_port_prefix}#{port}</strong>"
+        desc ="<strong>rdesktop  -u#{self.user.username} -p#{self.password} -N -a16 #{rdp_host}:#{rdp_port_prefix}#{port}</strong>"
 
     end
 
