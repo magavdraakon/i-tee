@@ -97,6 +97,7 @@ echo "SENT user delete" 'Content-Type: application/json' -X POST -d '{"api_key":
 USER_KEY=$(curl -H 'Content-Type: application/json' -X POST -d '{"api_key":"'"${API_KEY_ADMIN}"'", "lab":"'"${LAB_ID}"'", "username":"'"${USERNAME}"'", "password":"'"${USER_PWD}"'", "info":{"answer":"42"}}' "${LAB_URI}" | cut -d'"' -f4 -)
 
 echo USER_KEY is $USER_KEY
+logger -p info -t i-tee  "USER_KEY for user ${USERNAME} is $USER_KEY for VM  ${TEMPLATE}"
 
     VBoxManage setextradata ${NAME}      "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSerial"      "${LAB_ID}/${USER_KEY}"
 else
