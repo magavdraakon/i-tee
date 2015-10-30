@@ -97,6 +97,9 @@ ITee::Application.routes.draw do
   match 'my_labs/:id', :to => 'labs#labs'
   match 'my_labs', :to =>'labs#labs'
 
+  match 'user_labs/:username', :to=>'labs#labs'
+  match 'user_labs/:username/:id', :to => 'labs#labs'
+
   
   # The priority is based upon order of creation:
   # first created -> highest priority.
