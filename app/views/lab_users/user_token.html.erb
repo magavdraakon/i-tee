@@ -5,6 +5,7 @@
     <thead>
       <tr>
         <th><%=link_to("User",manage_tokens_path+"?sort_by=username&dir="+@dir)%></th>
+        <th><%=link_to("Last login",manage_tokens_path+"?sort_by=last_sign_in_at&dir="+@dir)%></th>
         <th><%= link_to("Token",manage_tokens_path+"?sort_by=authentication_token&dir="+@dir)%></th>
         <th><%= link_to("Expiry time",manage_tokens_path+"?sort_by=token_expires&dir="+@dir)%></th>
         <th></th> 
@@ -12,7 +13,8 @@
     </thead>
     <% @users.each do |u| %>
       <tr>
-        <td><%=u.username%></td>
+        <td><%= u.username %></td>
+        <td><span title="<%= u.last_sign_in_at %>"><%= distance_of_time_in_words(Time.now, u.last_sign_in_at.to_time )+" ago" if u.last_sign_in_at %></span></td>
         <td><%=u.authentication_token.blank? ? "No token" : link_to("#{host}#{root_path(:auth_token => u.authentication_token)}", root_path(:auth_token => u.authentication_token)) %></td>
         <td><span title="<%=u.token_expires %>"><%= (u.token_expires.to_time>Time.now ? "in ": "")+distance_of_time_in_words(Time.now, u.token_expires.to_time)+(u.token_expires.to_time>Time.now ? "": " ago") if u.token_expires %></span></td>
         <td class="narrow">
