@@ -53,13 +53,7 @@ min-height:500px;
 .side_visible {
 margin-left:300px;
 }
-#sidemenu{
-float:left;
-width: 300px;
-background:#fff;
-border-right:1px solid #c0c0c0;
-    border-bottom: 1px solid #C2C2C2;
-}
+
 #wrap, .b_menu{
 -moz-box-shadow: -2px -1px 0px 0px #888;
 -webkit-box-shadow: -2px -1px 0px 0px #888;
@@ -212,6 +206,14 @@ max-width:100%;
 /*sidebar*/
 ul {margin-left:30px; list-style-type:circle; }
 ul.no-bullet {list-style-type:none; margin-left:0px;}
+#sidemenu{
+    float:left;
+    width: 300px;
+    background:#fff;
+    border-right:1px solid #c0c0c0;
+    border-bottom: 1px solid #C2C2C2;
+    display:none;
+}
 #sidemenu ul {margin-left:0px;}
 #menu-head {
 margin-top: -30px;
@@ -291,11 +293,8 @@ font-size: 0.8em;
 padding:5px;
 
 }
-#sidemenu ul {
-
-}
 #menu-show {
-    display: none;
+    display: block;
     height: 30px;
     width: 15px;
     position: relative;
@@ -462,6 +461,16 @@ input[type="password"]:focus, input[type="text"]:focus, textarea:focus {
     -webkit-border-bottom-left-radius: 5px;
     -webkit-border-bottom-right-radius: 5px;
 }  
+
+fieldset {
+    border: solid 1px #C0C0C0;
+    padding: 10px;
+}
+legend {
+    font-size:1.2em;
+    font-weight:bold;
+}
+
 
 textarea {
     width:100%;

@@ -30,7 +30,7 @@
 <%end%>
 
 
-<!-- <h1><%=@lab.name %></h1> -->
+<h3><%=@lab.name %></h3>
 
 <div class="marked">
   <%=link_M @lab.description %>
@@ -127,9 +127,26 @@
     </div>
   <%end #has vms%>
 <div class="manage_lab">
-    <span class="loader"><%= link_to('Start all',start_all_path+"/"+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : "" ), :class=>"button start-button sl-button") if @lab_user.end==nil && !@lab_user.vms.empty? %></span>
-    <span><%= link_to('Restart lab',restart_lab_path+"/"+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : "" ), :class=>'add-button button rl-button', :confirm => "This will delete all saved data. Are you sure?") if @lab_user.start %></span>
-    <span><%= link_to('End lab', end_lab_path+"/"+@lab_user.id.to_s, :class=>'delete-button button el-button', :confirm => "This will delete all saved data. Are you sure?" ) unless @lab_user.end  %></span>
+    <% if @lab_user.end==nil && !@lab_user.vms.empty? %>
+        <span class="loader">
+          <%= link_to('Start all',start_all_path+"/"+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : "" ),
+                      :class=>"button start-button sl-button")  %>
+        </span>
+    <% end %>
+    <% if @lab_user.start && @lab.restartable %>
+        <span>
+          <%= link_to('Restart lab',restart_lab_path+"/"+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : "" ),
+                      :class=>'add-button button rl-button',
+                      :confirm => "This will delete all saved data. Are you sure?") %>
+        </span>
+    <%end%>
+    <% unless  @lab_user.end  || !@lab.endable %>
+        <span>
+          <%= link_to('End lab', end_lab_path+"/"+@lab_user.id.to_s,
+                      :class=>'delete-button button el-button',
+                      :confirm => "This will delete all saved data. Are you sure?" )   %>
+        </span>
+    <%end%>
 </div>
     <%end%>
   <%end%>

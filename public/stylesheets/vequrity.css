@@ -147,6 +147,7 @@ h3 {
     float:left;
     width: 300px;
     font-size:1.1em;
+    display: none;
 }
 
 ul {margin-left:30px; list-style-type:circle; }
@@ -221,7 +222,7 @@ ul.no-bullet {
 }
 
 #menu-show {
-    display: none;
+    display: block;
     height: 30px;
     width: 30px;
     position: relative;
@@ -645,4 +646,16 @@ body.sessions #messages {
 /* prettify */
 .linenums {
     list-style-position: inside;
+}
+
+/*forms */
+
+
+fieldset {
+    border: solid 1px #C0C0C0;
+    padding: 10px;
+}
+legend {
+    font-size:1.2em;
+    font-weight:bold;
 }

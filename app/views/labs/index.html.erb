@@ -6,6 +6,8 @@
         <th><%=link_to("Name", :controller=>"labs",:action=>"index", :sort_by=>"name", :dir=>@dir)%></th>
         <th>Short description</th>
         <th><%=link_to("Host", :controller=>"labs",:action=>"index", :sort_by=>"host_id", :dir=>@dir)%></th>
+        <th><%=link_to("Restartable", :controller=>"labs",:action=>"index", :sort_by=>"restartable", :dir=>@dir)%></th>
+        <th><%=link_to("Endable", :controller=>"labs",:action=>"index", :sort_by=>"endable", :dir=>@dir)%></th>
         <th></th>
       </tr>
     </thead>
@@ -14,6 +16,8 @@
         <td><%= lab.name %></td>
         <td class="marked"><%= lab.short_description %></td>
         <td><%= lab.host.name if lab.host %></td>
+        <td><%= lab.restartable ? 'yes' : 'no' %></td>
+        <td><%= lab.endable ? 'yes' : 'no' %></td>
         <td class="narrow">
           <%= link_to 'View', lab,:class=> 'show-button button' %>
           <%= link_to 'Edit info', edit_lab_path(lab) ,:class=> 'edit-button button'%>
