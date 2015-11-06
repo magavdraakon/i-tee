@@ -179,7 +179,7 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
   def start_all
     @lab=Lab.find_by_id(params[:id])
     @user=current_user
-    if params[:username] && @admin then
+    if params[:username] && @admin
       @user = User.where("username = ?",params[:username]).first 
       @user = curent_user unless @user # in case of mistyped username 
     end
@@ -193,7 +193,7 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
       flash[:notice]=""
 
       @labuser.vms.each do |vm|
-        if vm.state!="running" && vm.state!="paused" then # cant be running nor paused
+        if vm.state!="running" && vm.state!="paused"  # cant be running nor paused
           @a = vm.start_vm 
           logger.info vm.name
           flash[:notice]=flash[:notice]+@a[:notice]+"<br/>"
@@ -238,7 +238,47 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
     flash[:notice] = @vm.pause_vm.html_safe
     redirect_to(:back) 
   end
-  
+
+  #stop all the machines this user has in a given lab
+def stop_all
+  @lab=Lab.find_by_id(params[:id])
+  @user=current_user
+  if params[:username] && @admin
+    @user = User.where('username = ?',params[:username]).first
+    @user = curent_user unless @user # in case of mistyped username
+  end
+
+  @labuser = LabUser.find(:last, :conditions=>['lab_id=? and user_id=?', @lab.id, @user.id]) if @lab!=nil
+  redirect = :back
+  if (@labuser == nil && @lab!=nil) || @lab==nil #either the lab doesnt exist or the user doesnt have it
+    redirect=error_401_path
+  end
+  if @labuser!=nil #user has this lab
+    flash[:notice]=''
+
+    @labuser.vms.each do |vm|
+      if vm.state=='running' || vm.state=='paused'  # has to be running or paused
+        @a = vm.stop_vm
+        logger.info "#{vm.name} stopped"
+        flash[:notice]=flash[:notice]+"<b>#{vm.lab_vmt.nickname}</b> stopped<br/>"
+      end #end if not running or paused
+    end #end iterate trough vms
+  end#end if labuser
+  flash[:notice]=flash[:notice].html_safe
+  redirect_to(redirect)
+
+rescue Timeout::Error
+  flash[:alert]='<br/>Stopping all virtual machines failed, try stopping them one by one.'
+  flash[:notice]=nil
+  redirect_to(:back)
+
+rescue ActionController::RedirectBackError # cant redirect back? go to the lab instead
+  logger.info "\nNo :back error\n"
+  redirect_to(my_labs_path+"/"+@lab.id.to_s)
+
+end
+
+
   #stop the machine, do not delete the vm row from the db (release mac, but allow reinitialization)
   def stop_vm
     #@vm=Vm.find(params[:id])
