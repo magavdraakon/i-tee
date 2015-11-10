@@ -43,8 +43,14 @@ h3 {
 #c-wrap {
     height:100%;
 }
-#content {padding:10px;
+#content {
+    padding:10px;
     height:100%;
+
+}
+.user_labs #content, .vms_by_state #content, .vms_by_lab #content, .labs.edit #content, .labs.new #content {
+    padding-left:30px;
+    position:relative;
 }
 /* Topmenu */
 #top {
@@ -118,7 +124,7 @@ h3 {
 #s_menu {
     color:red;
     line-height:25px;
-   margin-bottom:20px;
+
 }
 /* footer */
 #footer {position: absolute;
@@ -148,6 +154,7 @@ h3 {
     width: 300px;
     font-size:1.1em;
     display: none;
+    margin-top:15px;
 }
 
 ul {margin-left:30px; list-style-type:circle; }
@@ -157,7 +164,7 @@ ul.no-bullet {
 }
 #sidemenu ul {margin-left:0;}
 #menu-head {
-    margin-top: -30px;
+
     height: 30px;
 
     color: black;
@@ -203,9 +210,7 @@ ul.no-bullet {
 }
 
 #sidemenu #menu-hide {
-    position: relative;
-    top: -10px;
-    left: 285px;
+    float:right;
     height: 30px;
     width: 30px;
     display: block;
@@ -217,20 +222,17 @@ ul.no-bullet {
     padding:5px;
 
 }
-#sidemenu ul {
-
-}
 
 #menu-show {
     display: block;
     height: 30px;
     width: 30px;
-    position: relative;
-    left: -10px;
-    top:-20px;
+    position: absolute;
+    left: 0px;
     background: transparent url("../images/Right4-50.png") no-repeat; /*https://icons8.com/web-app/7233/Right4*/
     background-size:contain;
     cursor: pointer;
+    float:left;
 }
 .current_lab a {
     font-weight: normal!important;
@@ -297,7 +299,7 @@ body.sessions #messages {
 }
  .narrow  {
    width:1%;
-    white-space: nowrap;
+   white-space: nowrap;
 
 }
 #index_t th  {

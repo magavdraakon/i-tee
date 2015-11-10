@@ -190,15 +190,7 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
       redirect=error_401_path
     end
     if @labuser!=nil #user has this lab
-      flash[:notice]=""
-
-      @labuser.vms.each do |vm|
-        if vm.state!="running" && vm.state!="paused"  # cant be running nor paused
-          @a = vm.start_vm 
-          logger.info vm.name
-          flash[:notice]=flash[:notice]+@a[:notice]+"<br/>"
-        end #end if not running or paused
-      end #end iterate trough vms
+      flash[:notice]= @labuser.start_all_vms
     end#end if labuser
     flash[:notice]=flash[:notice].html_safe
     redirect_to(redirect)
@@ -254,15 +246,7 @@ def stop_all
     redirect=error_401_path
   end
   if @labuser!=nil #user has this lab
-    flash[:notice]=''
-
-    @labuser.vms.each do |vm|
-      if vm.state=='running' || vm.state=='paused'  # has to be running or paused
-        @a = vm.stop_vm
-        logger.info "#{vm.name} stopped"
-        flash[:notice]=flash[:notice]+"<b>#{vm.lab_vmt.nickname}</b> stopped<br/>"
-      end #end if not running or paused
-    end #end iterate trough vms
+    flash[:notice] = @labuser.stop_all_vms
   end#end if labuser
   flash[:notice]=flash[:notice].html_safe
   redirect_to(redirect)

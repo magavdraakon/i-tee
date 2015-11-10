@@ -15,7 +15,7 @@
       <li class="upper">Completed</li>
       <%end%>
       <li class="<%= classes %>">
-      <%= link_to(lab.name, :controller=>'labs', :action=>'labs', :id=>lab.id)%>
+      <%= link_to(lab.name, :controller=>'labs', :action=>'user_labs', :id=>lab.id)%>
     </li>
   <% end %>
         </ul>
@@ -30,7 +30,7 @@
 <%end%>
 
 
-<h3><%=@lab.name %></h3>
+<h1><%=@lab.name %></h1>
 
 <div class="marked">
   <%=link_M @lab.description %>
@@ -38,7 +38,7 @@
 
 
   <% if @labs!=[] %>
-        <div class="manage_lab">
+        <div class="manage_lab loader">
             <%= link_to('Start lab',start_lab_path+"/"+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : "" ), :class=>'button submit-button sl-button') if @lab_user.start==nil %>
         </div>
     <%if @lab_user.start!=nil %>
@@ -96,11 +96,12 @@
             </td>
 
             <td style="text-align:right;">
-              <div class=" loader" ><%= link_to('Start',start_vm_path+"/"+vm.id.to_s, :class=>"button start-button") if (state!="running" && state!="paused") || vm.mac==nil%>
-              <%= link_to('Pause', pause_vm_path+"/"+vm.id.to_s, :class=>'button pause-button') if state=="running" && vm.mac!=nil %>
-              <%= link_to('Resume',resume_vm_path+"/"+vm.id.to_s, :class=>'button start-button') if state=="paused" && vm.mac!=nil%>
-              <%= link_to('Stop',stop_vm_path+"/"+vm.id.to_s, :class=>"button stop-button") if state=="running" && vm.mac!=nil%>
-
+              <% if @lab.vms_by_one %>
+                <div class=" loader" ><%= link_to('Start',start_vm_path+"/"+vm.id.to_s, :class=>"button start-button") if (state!="running" && state!="paused") || vm.mac==nil%>
+                <%= link_to('Pause', pause_vm_path+"/"+vm.id.to_s, :class=>'button pause-button') if state=="running" && vm.mac!=nil %>
+                <%= link_to('Resume',resume_vm_path+"/"+vm.id.to_s, :class=>'button start-button') if state=="paused" && vm.mac!=nil%>
+                <%= link_to('Stop',stop_vm_path+"/"+vm.id.to_s, :class=>"button stop-button") if state=="running" && vm.mac!=nil%>
+              <% end %>
               <%if state=="running" && vm.mac!=nil && vm.lab_vmt.vmt.shellinabox  %>
                   <a href="https://<%= request.host if vm.mac!=nil%>:8<%= vm.mac.ip.split('.').last %>" title="Login" target='_blank' class="button login-button">Login</a>
               <%end%>
@@ -138,14 +139,14 @@
         </span>
     <% end %>
     <% if @lab_user.start && @lab.restartable %>
-        <span>
+        <span class="loader">
           <%= link_to('Restart lab',restart_lab_path+"/"+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : "" ),
                       :class=>'add-button button rl-button',
                       :confirm => "This will delete all saved data. Are you sure?") %>
         </span>
     <%end%>
     <% unless  @lab_user.end  || !@lab.endable %>
-        <span>
+        <span class="loader">
           <%= link_to('End lab', end_lab_path+"/"+@lab_user.id.to_s,
                       :class=>'delete-button button el-button',
                       :confirm => "This will delete all saved data. Are you sure?" )   %>

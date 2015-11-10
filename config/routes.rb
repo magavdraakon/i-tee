@@ -96,12 +96,12 @@ ITee::Application.routes.draw do
   match 'vms_by_state', :to=>'vms#vms_by_state'
   match 'vms_by_state/:state', :to=>'vms#vms_by_state'
   
-  match 'my_labs/:id/:username', :to => 'labs#labs'
-  match 'my_labs/:id', :to => 'labs#labs'
-  match 'my_labs', :to =>'labs#labs'
+  match 'my_labs/:id/:username', :to => 'labs#user_labs'
+  match 'my_labs/:id', :to => 'labs#user_labs'
+  match 'my_labs', :to =>'labs#user_labs'
 
-  match 'user_labs/:username', :to=>'labs#labs'
-  match 'user_labs/:username/:id', :to => 'labs#labs'
+  match 'user_labs/:username', :to=>'labs#user_labs'
+  match 'user_labs/:username/:id', :to => 'labs#user_labs'
 
   
   # The priority is based upon order of creation:

@@ -1,12 +1,12 @@
 class LabsController < ApplicationController  
   #users can see courses, running labs and end their OWN lab
-  before_filter :authorise_as_admin, :except => [:labs, :start_lab, :end_lab, :restart_lab]
+  before_filter :authorise_as_admin, :except => [:user_labs, :start_lab, :end_lab, :restart_lab]
 
   #redirect to index view when trying to see unexisting things
   before_filter :save_from_nil, :only=>[:show, :edit, :update]
   # set the menu tab to show the user
-  before_filter :course_tab, :only=>[:labs]
-  before_filter :admin_tab, :except=>[:labs]
+  before_filter :course_tab, :only=>[:user_labs]
+  before_filter :admin_tab, :except=>[:user_labs]
     
   
   def save_from_nil
@@ -130,7 +130,7 @@ class LabsController < ApplicationController
  end
 
   # view and do labs - user view
-  def labs
+  def user_labs
     get_user # @user - either lab owner or current user
     if !@user && params[:username]
           logger.debug "There is no user named '#{params[:username]}'"

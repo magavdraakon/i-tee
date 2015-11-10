@@ -223,7 +223,7 @@ end
         logger.info @a  
         @mac.vm_id=nil
         @mac.save
-        result[:notice] = nil
+        result[:notice] = ''
         result[:alert]="Machine initialization <strong>failed</strong>."
       end
      # logger.debug "\n#{result}\n"

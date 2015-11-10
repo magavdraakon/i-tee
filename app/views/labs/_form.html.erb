@@ -25,13 +25,17 @@
     <%= f.label :host_id %><br />
     <%= f.select( :host_id,  options_from_collection_for_select(Host.all,:id, :name, @lab.host_id) ) %>
   </div>
+      <div class="field">
+        <%= f.check_box( :startAll)  %> <%= f.label :startAll ,'Start all machines with lab start' %>
+      </div>
+      <div class="field">
+        <%= f.check_box( :vms_by_one)  %> <%= f.label :vms_by_one ,'Allow managing machines one-by-one' %>
+      </div>
     <div class="field">
-      <%= f.label :restartable %><br />
-      <%= f.check_box( :restartable)  %>
+      <%= f.check_box( :restartable)  %><%= f.label :restartable %>
     </div>
       <div class="field">
-        <%= f.label :endable %><br />
-        <%= f.check_box( :endable)  %>
+        <%= f.check_box( :endable)  %><%= f.label :endable %>
       </div>
     </fieldset>
     <fieldset><legend>User management</legend>
