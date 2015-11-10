@@ -48,10 +48,7 @@ h3 {
     height:100%;
 
 }
-.user_labs #content, .vms_by_state #content, .vms_by_lab #content, .labs.edit #content, .labs.new #content {
-    padding-left:30px;
-    position:relative;
-}
+
 /* Topmenu */
 #top {
     background: black;
@@ -149,12 +146,15 @@ h3 {
 .side_visible {
     margin-left:300px;
 }
+
 #sidemenu{
     float:left;
     width: 300px;
     font-size:1.1em;
     display: none;
     margin-top:15px;
+    position: relative;
+    z-index: 2;
 }
 
 ul {margin-left:30px; list-style-type:circle; }
@@ -237,6 +237,25 @@ ul.no-bullet {
 .current_lab a {
     font-weight: normal!important;
     color:#ff0000 !important;
+}
+/* sidemenu hidden */
+.user_labs #content, .vms_by_state #content, .vms_by_lab #content, .labs.edit #content, .labs.new #content {
+    padding-left:30px;
+    position:relative;
+}
+
+/* sidemenu visible */
+.lab_users.add_users #content {
+    margin-left:300px;
+    padding-left:30px;
+    position:relative;
+}
+
+.lab_users.add_users #menu-show {
+    display: none;
+}
+.lab_users.add_users #sidemenu {
+    display: block;
 }
 
 /*  LOGIN   */
