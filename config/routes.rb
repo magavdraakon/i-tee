@@ -14,7 +14,8 @@ ITee::Application.routes.draw do
 
   match 'users/sign_up', :to=>'home#catcher'
   resources :lab_users
-
+  match "lab_users", :to=>'lab_users#destroy', via: [:delete]
+ 
   resources :lab_vmts
 
   resources :vmts

@@ -79,15 +79,17 @@ class LabUsersController < ApplicationController
       @lab_user = LabUser.new(params[:lab_user])
       respond_to do |format|
         if @lab_user.save
-        format.html { redirect_to(:back, :notice => 'successful update.') }
-        format.xml  { render :xml => @lab_user, :status => :created, :location => @lab_user }
-      else
-        format.html { render :action => 'index' }
-        format.xml  { render :xml => @lab_user.errors, :status => :unprocessable_entity}
-      end #end if
-    end #end respond_to
-  end #end else
-end
+          format.html { redirect_to(:back, :notice => 'successful update.') }
+          format.xml  { render :xml => @lab_user, :status => :created, :location => @lab_user }
+          format.json { render :json=> @lab_user, :status=> :created}
+        else
+          format.html { render :action => 'index' }
+          format.xml  { render :xml => @lab_user.errors, :status => :unprocessable_entity}
+          format.json { render :json=> @lab_user.errors, :status=> :unprocessable_entity}
+        end #end if
+      end #end respond_to
+    end #end else
+  end
 
   # PUT /lab_users/1
   # PUT /lab_users/1.xml
@@ -108,15 +110,24 @@ end
   # DELETE /lab_users/1
   # DELETE /lab_users/1.xml
   def destroy
-    @lab_user = LabUser.find(params[:id])
-    #when removing someone from a lab, you need to end their lab
-    @lab_user.end_lab
-    
-    @lab_user.destroy
+    @lab_user = LabUser.find(params[:id]) if params[:id]
+    @lab_user = LabUser.where("user_id=? and lab_id=?", params[:lab_user][:user_id], params[:lab_user][:lab_id]).first if params[:lab_user]
 
     respond_to do |format|
-      format.html { redirect_to(lab_users_path) }
-      format.xml  { head :ok }
+      unless @lab_user
+        # cant find labuser
+        format.html { redirect_to(lab_users_path) }
+        format.xml  { head :ok }
+        format.json { render :json=> { :success=> false, :message=>"lab user can't be found"} }
+      else
+        #when removing someone from a lab, you need to end their lab
+        @lab_user.end_lab
+        @lab_user.destroy
+
+        format.html { redirect_to(lab_users_path) }
+        format.xml  { head :ok }
+        format.json { render :json=> { :success=>true, :message=>"lab user removed"} }
+      end
     end
   end
   
