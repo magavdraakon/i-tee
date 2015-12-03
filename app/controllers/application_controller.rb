@@ -138,7 +138,7 @@ class ApplicationController < ActionController::Base
   def check_token
     if params[:auth_token]
       # get the user with the given token
-      user=User.find_by_token(params[:auth_token])
+      user=User.where("authentication_token=?",params[:auth_token]).first
       # if there is such a user
       if user
         expiretime = user.token_expires

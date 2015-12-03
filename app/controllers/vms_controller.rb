@@ -177,34 +177,50 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
 
   #start all the machines this user has in a given lab
   def start_all
-    @lab=Lab.find_by_id(params[:id])
-    @user=current_user
-    if params[:username] && @admin
-      @user = User.where("username = ?",params[:username]).first 
-      @user = curent_user unless @user # in case of mistyped username 
+    respond_to do |format|
+      @lab=Lab.find(params[:id])
+      get_user
+      if !@user
+        logger.debug "Can't find user: "
+        logger.debug params
+        format.html { redirect_to :back , :notice=> "Can't find user" }
+        format.json { render :json=> {:success => false , :message=>  "Can't find user" }}
+      elsif !@admin && (params[:username] || params[:user_id])
+        logger.debug '\n start_lab: Relocate user\n'
+        # simple user should not have the username in url
+        format.html { redirect_to my_labs_path+(params[:id] ? "/#{params[:id]}" : '') }
+        format.json { render :json=>{:success => false , :message=> "No permission error" }}
+      else
+        # ok, there is such lab, but does the user have it?  
+        @labuser = LabUser.where("lab_id=? and user_id=?", @lab.id, @user.id).last
+        if @labuser!=nil #user has this lab
+          result = @labuser.start_all_vms
+          format.html {redirect_to :back , :notice => result.html_safe}
+          format.json {render :json=> { :success=> true, :message=>result, :lab_user=> @labuser.id}}
+        else
+          # no this user does not have this lab
+          format.html { redirect_to my_labs_path, :notice => 'That lab was not assigned to this user!' }
+          format.json { render :json=>{:success => false, :message=> 'That lab was not assigned to this user!' }}
+        end      
+      end
     end
-
-    @labuser = LabUser.find(:last, :conditions=>["lab_id=? and user_id=?", @lab.id, @user.id]) if @lab!=nil
-    redirect = :back
-    if (@labuser == nil && @lab!=nil) || @lab==nil #either the lab doesnt exist or the user doesnt have it
-      redirect=error_401_path
-    end
-    if @labuser!=nil #user has this lab
-      flash[:notice]= @labuser.start_all_vms
-    end#end if labuser
-    flash[:notice]=flash[:notice].html_safe
-    redirect_to(redirect)
-
-  rescue Timeout::Error
-    flash[:alert]="<br/>Starting all virtual machines failed, try starting them one by one."
-    flash[:notice]=nil
-    redirect_to(:back)
-
+    rescue Timeout::Error
+      respond_to do |format|        
+        format.html {redirect_to :back , :notice => "<br/>Starting all virtual machines failed, try starting them one by one."}
+        format.json {render :json=> { :success=> false, :message=>"Starting all virtual machines failed, try starting them one by one.", :lab_user=> @labuser.id}}
+      end
+    rescue ActiveRecord::RecordNotFound
+      respond_to do |format|
+        logger.debug "Can't find lab: "
+        logger.debug params
+        format.html { redirect_to my_labs_path , :notice=> "Can't find lab" }
+        format.json { render :json=> {:success => false , :message=>  "Can't find lab" }}
+      end
     rescue ActionController::RedirectBackError # cant redirect back? go to the lab instead
       logger.info "\nNo :back error\n"
       redirect_to(my_labs_path+"/"+@lab.id.to_s)
 
-    end
+  end
   
   #start one machine
   def start_vm
@@ -233,32 +249,48 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
 
   #stop all the machines this user has in a given lab
 def stop_all
-  @lab=Lab.find_by_id(params[:id])
-  @user=current_user
-  if params[:username] && @admin
-    @user = User.where('username = ?',params[:username]).first
-    @user = curent_user unless @user # in case of mistyped username
+  respond_to do |format|
+    @lab=Lab.find(params[:id])
+    get_user
+    if !@user
+      logger.debug "Can't find user: "
+      logger.debug params
+      format.html { redirect_to :back , :notice=> "Can't find user" }
+      format.json { render :json=> {:success => false , :message=>  "Can't find user" }}
+    elsif !@admin && (params[:username] || params[:user_id])
+      logger.debug '\n start_lab: Relocate user\n'
+      # simple user should not have the username in url
+      format.html { redirect_to my_labs_path+(params[:id] ? "/#{params[:id]}" : '') }
+      format.json { render :json=>{:success => false , :message=> "No permission error" }}
+    else
+      # ok, there is such lab, but does the user have it?  
+      @labuser = LabUser.where("lab_id=? and user_id=?", @lab.id, @user.id).last
+      if @labuser!=nil #user has this lab
+        result = @labuser.stop_all_vms
+        format.html {redirect_to :back , :notice => result.html_safe}
+        format.json {render :json=> { :success=> true, :message=>result, :lab_user=> @labuser.id}}
+      else
+        # no this user does not have this lab
+        format.html { redirect_to my_labs_path, :notice => 'That lab was not assigned to this user!' }
+        format.json { render :json=>{:success => false, :message=> 'That lab was not assigned to this user!' }}
+      end  
+    end
   end
-
-  @labuser = LabUser.find(:last, :conditions=>['lab_id=? and user_id=?', @lab.id, @user.id]) if @lab!=nil
-  redirect = :back
-  if (@labuser == nil && @lab!=nil) || @lab==nil #either the lab doesnt exist or the user doesnt have it
-    redirect=error_401_path
-  end
-  if @labuser!=nil #user has this lab
-    flash[:notice] = @labuser.stop_all_vms
-  end#end if labuser
-  flash[:notice]=flash[:notice].html_safe
-  redirect_to(redirect)
-
-rescue Timeout::Error
-  flash[:alert]='<br/>Stopping all virtual machines failed, try stopping them one by one.'
-  flash[:notice]=nil
-  redirect_to(:back)
-
-rescue ActionController::RedirectBackError # cant redirect back? go to the lab instead
-  logger.info "\nNo :back error\n"
-  redirect_to(my_labs_path+"/"+@lab.id.to_s)
+  rescue Timeout::Error
+    respond_to do |format|        
+      format.html {redirect_to :back , :notice => "<br/>Starting all virtual machines failed, try stoppping them one by one."}
+      format.json {render :json=> { :success=> false, :message=>"Starting all virtual machines failed, try stoppping them one by one.", :lab_user=> @labuser.id}}
+    end
+  rescue ActiveRecord::RecordNotFound
+    respond_to do |format|
+      logger.debug "Can't find lab: "
+      logger.debug params
+      format.html { redirect_to my_labs_path , :notice=> "Can't find lab" }
+      format.json { render :json=> {:success => false , :message=>  "Can't find lab" }}
+    end
+  rescue ActionController::RedirectBackError # cant redirect back? go to the lab instead
+    logger.info "\nNo :back error\n"
+    redirect_to(my_labs_path+"/"+@lab.id.to_s)
 
 end
 
@@ -322,5 +354,17 @@ end
       redirect_to(vms_path)
     end
   end
-
+private #----------------------------------------------------------------------------------
+ 
+   def get_user
+    @user=current_user # by default get the current user
+    if  @admin  #  admins can use this to view users labs
+      if params[:username]  # if there is a username in the url
+        @user = User.where('username = ?',params[:username]).first
+      end
+      if params[:user_id]  # if there is a user_id in the url
+        @user = User.where('id = ?',params[:user_id]).first
+      end
+    end
+  end
 end

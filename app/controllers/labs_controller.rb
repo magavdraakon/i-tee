@@ -10,11 +10,11 @@ class LabsController < ApplicationController
     
   
   def get_lab
-    @lab = Lab.find_by_id(params[:id])
-    respond_to do |format|
-      if @lab==nil 
-        format.html { redirect_to my_labs_path, :notice=>"Invalid lab id." }
-        format.json { render :json => {:success=>false, :message=>"Invalid lab id"}}
+    @lab = Lab.where("id=?",params[:id]).first
+    unless @lab 
+      respond_to do |format|
+         format.html  {redirect_to my_labs_path, :notice=>"Invalid lab id." }
+         format.json  { render :json => {:success=>false, :message=>"Can't find lab"} }
       end
     end
   end
@@ -27,7 +27,7 @@ class LabsController < ApplicationController
 
     respond_to do |format|
       format.html # index.html.erb
-      format.xml  { render :xml => @labs }
+      format.json  { render :json => Lab.all }
     end
   end
 
@@ -62,11 +62,12 @@ class LabsController < ApplicationController
       v.lab_vmt_networks.build
     end
     @lab.lab_vmts.build.lab_vmt_networks.build
+    
     #@lab = Lab.find(params[:id])
     @all_users=false
     @user_count =0
-    @user_count = @lab.lab_users.size  
-    @all_users=true if User.all.size==@user_count
+    @user_count = @lab.lab_users.count  
+    @all_users=true if User.all.count==@user_count
   end
   
   # POST /labs
@@ -78,14 +79,14 @@ class LabsController < ApplicationController
     respond_to do |format|
       if @lab.save
                 
-        @lab.add_all_users  if params[:add].to_s==1.to_s
-        @lab.remove_all_users if params[:remove].to_s==1.to_s 
-                
+        @lab.add_all_users  if params[:add] && params[:add].to_s==1.to_s
+        @lab.remove_all_users if params[:remove] && params[:remove].to_s==1.to_s 
+        
         format.html { redirect_to(@lab, :notice => "Lab was successfully created. #{params[:add]}") }
-        format.xml  { render :xml => @lab, :status => :created, :location => @lab }
+        format.json  { render :json => { :success => true }.merge(@lab.as_json) }
       else
         format.html { render :action => 'new' }
-        format.xml  { render :xml => @lab.errors, :status => :unprocessable_entity }
+        format.json  { render :json => {:success=>false, :errors=>@lab.errors}, :status => :unprocessable_entity }
       end
     end
   end
@@ -93,24 +94,21 @@ class LabsController < ApplicationController
   # PUT /labs/1
   # PUT /labs/1.xml
   def update
-    @lab = Lab.find(params[:id])
-    
-    @all_users=false
-    @user_count =0
-    @user_count = @lab.lab_users.size  
-    @all_users=true if User.all.size==@user_count
-    
     respond_to do |format|
+      @all_users=false
+      @user_count =0
+      @user_count = @lab.lab_users.count  
+      @all_users=true if User.all.count==@user_count
       if @lab.update_attributes(params[:lab])
-          
+       
         @lab.add_all_users  if params[:add].to_s==1.to_s    
         @lab.remove_all_users if params[:remove].to_s==1.to_s 
-        
+          
         format.html { redirect_to(@lab, :notice => 'Lab was successfully updated.') }
-        format.xml  { head :ok }
+        format.json  { render :json => {:success=>true}.merge(@lab.as_json)}
       else
         format.html { render :action => 'edit' }
-        format.xml  { render :xml => @lab.errors, :status => :unprocessable_entity }
+        format.json  { render :json => {:success=>false, :errors=>@lab.errors}, :status => :unprocessable_entity }
       end
     end
   end
@@ -118,12 +116,17 @@ class LabsController < ApplicationController
   # DELETE /labs/1
   # DELETE /labs/1.xml
   def destroy
-    @lab = Lab.find(params[:id])
-    @lab.destroy
-
+    @lab = Lab.where("id=?",params[:id]).first
     respond_to do |format|
-      format.html { redirect_to(labs_url) }
-      format.xml  { head :ok }
+        if @lab
+          @lab.destroy
+
+          format.html { redirect_to(labs_url, :notice=>"Lab deleted") }
+          format.json  { render :json => {:success=>true, :message=>"Lab deleted"} }
+        else
+          format.html { redirect_to(labs_url, :notice=>"Can't find lab") }
+          format.json  { render :json => {:success=>false, :message=>"Can't find lab"}}
+        end
     end
   end
 

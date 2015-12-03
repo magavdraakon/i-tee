@@ -5,7 +5,7 @@ class User < ActiveRecord::Base
          :recoverable, :rememberable, :trackable, :validatable, :token_authenticatable
 
   # Setup accessible (or protected) attributes for your model
-  attr_accessible :username, :email, :password, :password_confirmation, :remember_me, :keypair, :token_expires, :role
+  attr_accessible :name, :username, :email, :password, :password_confirmation, :remember_me, :keypair, :token_expires, :role
 
   has_many :vms, :dependent => :destroy
   has_many :lab_users, :dependent => :destroy
@@ -46,6 +46,6 @@ class User < ActiveRecord::Base
   end
 
   def has_lab(lab_id)
-    LabUser.where("user_id=? and lab_id=?", self.id, lab_id).size > 0 ? true : false
+    LabUser.where("user_id=? and lab_id=?", self.id, lab_id).count > 0 ? true : false
   end
 end

@@ -2,13 +2,16 @@ class LabUsersController < ApplicationController
   #restricted to admins 
   before_filter :authorise_as_manager, :except=>[:progress]
   #redirect to index view when trying to see unexisting things
-  before_filter :save_from_nil, :only=>[:edit]
+  before_filter :save_from_nil, :only=>[:edit, :update]
   before_filter :manager_tab, :except=>[:search]
   before_filter :search_tab, :only=>[:search]
   def save_from_nil
-    @lab_user = LabUser.find_by_id(params[:id])
+    @lab_user = LabUser.where("id=?",params[:id]).first
     if @lab_user==nil 
-      redirect_to(lab_users_path,:notice=>'invalid id.')
+      respond_to do |format|
+         format.html  {redirect_to lab_users_path, :notice=>"Invalid  id." }
+         format.json  { render :json => {:success=>false, :message=>"Can't find lab user"} }
+      end
     end
   end
 
@@ -24,7 +27,7 @@ class LabUsersController < ApplicationController
     
     respond_to do |format|
       format.html # index.html.erb
-      format.xml  { render :xml => @lab_users }
+      format.json  { render :json => LabUser.all }
     end
   end
   
@@ -80,12 +83,10 @@ class LabUsersController < ApplicationController
       respond_to do |format|
         if @lab_user.save
           format.html { redirect_to(:back, :notice => 'successful update.') }
-          format.xml  { render :xml => @lab_user, :status => :created, :location => @lab_user }
-          format.json { render :json=> @lab_user, :status=> :created}
+          format.json { render :json=> {:success => true}.merge(@lab_user.as_json), :status=> :created}
         else
           format.html { render :action => 'index' }
-          format.xml  { render :xml => @lab_user.errors, :status => :unprocessable_entity}
-          format.json { render :json=> @lab_user.errors, :status=> :unprocessable_entity}
+          format.json { render :json=> {:success => false, :errors => @lab_user.errors}, :status=> :unprocessable_entity}
         end #end if
       end #end respond_to
     end #end else
@@ -94,15 +95,14 @@ class LabUsersController < ApplicationController
   # PUT /lab_users/1
   # PUT /lab_users/1.xml
   def update
-    @lab_user = LabUser.find(params[:id])
-    
     respond_to do |format|
       if @lab_user.update_attributes(params[:lab_user])
+
         format.html { redirect_to(:back, :notice => 'successful update.') }
-        format.xml  { head :ok }
+        format.json  { render :json=>{:success=>true}.merge(@lab_user.as_json) }
       else
         format.html { render :action => 'edit' }
-        format.xml  { render :xml => @lab_user.errors, :status => :unprocessable_entity }
+        format.json  { render :json => {:success=>false, :errors=> @lab_user.errors}, :status => :unprocessable_entity }
       end
     end
   end
@@ -110,14 +110,13 @@ class LabUsersController < ApplicationController
   # DELETE /lab_users/1
   # DELETE /lab_users/1.xml
   def destroy
-    @lab_user = LabUser.find(params[:id]) if params[:id]
+    @lab_user = LabUser.where("id=?",params[:id]).first if params[:id]
     @lab_user = LabUser.where("user_id=? and lab_id=?", params[:lab_user][:user_id], params[:lab_user][:lab_id]).first if params[:lab_user]
 
     respond_to do |format|
       unless @lab_user
         # cant find labuser
         format.html { redirect_to(lab_users_path) }
-        format.xml  { head :ok }
         format.json { render :json=> { :success=> false, :message=>"lab user can't be found"} }
       else
         #when removing someone from a lab, you need to end their lab
@@ -125,7 +124,6 @@ class LabUsersController < ApplicationController
         @lab_user.destroy
 
         format.html { redirect_to(lab_users_path) }
-        format.xml  { head :ok }
         format.json { render :json=> { :success=>true, :message=>"lab user removed"} }
       end
     end

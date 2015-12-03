@@ -13,8 +13,11 @@ ITee::Application.routes.draw do
   resources :operating_systems
 
   match 'users/sign_up', :to=>'home#catcher'
+  
   resources :lab_users
   match "lab_users", :to=>'lab_users#destroy', via: [:delete]
+  match "lab_users", :to=>'lab_users#update', via: [:put]
+  
  
   resources :lab_vmts
 
@@ -27,11 +30,16 @@ ITee::Application.routes.draw do
   #match 'users/edit', :to=>'devise/registrations#edit'
 
   resources :users
+  match "users", :to=>'users#destroy', via: [:delete]
+  match "users", :to=>'users#update', via: [:put]
+
   resources :vms
 
   resources :materials
   
   resources :labs
+  match "labs", :to=>'labs#destroy', via: [:delete]
+  match "labs", :to=>'labs#update', via: [:put]
 
   resources :hosts
 
