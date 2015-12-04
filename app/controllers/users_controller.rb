@@ -8,9 +8,11 @@ class UsersController < ApplicationController
     #@users= User.find_by_sql("select id, username, last_sign_in_at, ldap, email, last_sign_in_ip from users")
     #@users= @users.paginate(:page=>params[:page], :per_page=>10).order(order)
     @users = User.select('id, name, username, role, last_sign_in_ip, last_sign_in_at, ldap, email, authentication_token, token_expires').order(@order).paginate(:page=>params[:page], :per_page=>@per_page)
+    users= User.all if !params[:conditions]
+    users = User.where(params[:conditions].as_json) if params[:conditions]
     respond_to do |format|
       format.html 
-      format.json  { render :json => User.all }
+      format.json  { render :json => users }
     end
   end
   

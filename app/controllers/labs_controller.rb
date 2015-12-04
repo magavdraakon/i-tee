@@ -24,10 +24,11 @@ class LabsController < ApplicationController
   def index
     set_order_by
     @labs = Lab.order(@order).paginate(:page=>params[:page], :per_page=>@per_page)
-
+    labs = Lab.all if !params[:conditions]
+    labs = Lab.where(params[:conditions].as_json) if params[:conditions]
     respond_to do |format|
       format.html # index.html.erb
-      format.json  { render :json => Lab.all }
+      format.json  { render :json => labs }
     end
   end
 
