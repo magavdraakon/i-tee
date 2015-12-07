@@ -2,15 +2,34 @@ class LabUsersController < ApplicationController
   #restricted to admins 
   before_filter :authorise_as_manager, :except=>[:progress]
   #redirect to index view when trying to see unexisting things
-  before_filter :save_from_nil, :only=>[:edit, :update]
+  before_filter :save_from_nil, :only=>[:edit, :update, :destroy]
   before_filter :manager_tab, :except=>[:search]
   before_filter :search_tab, :only=>[:search]
+
   def save_from_nil
-    @lab_user = LabUser.where("id=?",params[:id]).first
-    if @lab_user==nil 
-      respond_to do |format|
-         format.html  {redirect_to lab_users_path, :notice=>"Invalid  id." }
-         format.json  { render :json => {:success=>false, :message=>"Can't find lab user"} }
+    if params[:id] # find by id
+      @lab_user = LabUser.where("id=?",params[:id]).first
+      if @lab_user==nil # cant find!
+        respond_to do |format|
+           format.html  {redirect_to lab_users_path, :notice=>"Invalid  id." }
+           format.json  { render :json => {:success=>false, :message=>"Can't find lab user"} }
+        end
+      end
+    elsif params[:lab_id] # find by lab_id and userid/username
+      get_user
+      if @user
+        @lab_user = LabUser.where("user_id=? and lab_id=?", @user.id, params[:lab_id]).last # last is the newest
+        if @lab_user==nil # cant find!
+          respond_to do |format|
+             format.html  {redirect_to lab_users_path, :notice=>"Invalid  id." }
+             format.json  { render :json => {:success=>false, :message=>"Can't find lab user"} }
+          end
+        end
+      else # cant find user! 
+        respond_to do |format|
+          format.html { redirect_to(lab_users_path) }
+          format.json { render :json=> { :success=> false, :message=>"user can't be found"} } 
+        end 
       end
     end
   end
@@ -54,9 +73,9 @@ class LabUsersController < ApplicationController
   # POST /lab_users.xml
   def create
     set_order_by
-    @lab_users = LabUser.order(@order)
+    @lab_users = LabUser.order(@order).paginate(:page => params[:page], :per_page => @per_page)
     # logic for when adding/removing multiple users at once to a specific lab
-    if params[:lab_user][:page]=='bulk_add'
+    if params[:lab_user] && params[:lab_user][:page]=='bulk_add'
       all_users=User.all
       checked_users=get_users_from(params[:users])
       removed_users=all_users-checked_users
@@ -78,9 +97,22 @@ class LabUsersController < ApplicationController
       end
       redirect_to(:back, :notice => 'successful update.')
     else
-      #adding a single user to a lab
-      @lab_user = LabUser.new(params[:lab_user])
       respond_to do |format|
+        #adding a single user to a lab
+        if params[:lab_user]
+          @lab_user = LabUser.new(params[:lab_user])
+        elsif params[:lab_id]
+          get_user
+          if @user
+            @lab_user = LabUser.new()
+            @lab_user.lab_id= params[:lab_id]
+            @lab_user.user_id= @user.id
+          else
+            format.html { redirect_to(lab_users_path) }
+            format.json { render :json=> { :success=> false, :message=>"user can't be found"} } 
+          end
+        end
+     
         if @lab_user.save
           format.html { redirect_to(:back, :notice => 'successful update.') }
           format.json { render :json=> {:success => true}.merge(@lab_user.as_json), :status=> :created}
@@ -110,22 +142,13 @@ class LabUsersController < ApplicationController
   # DELETE /lab_users/1
   # DELETE /lab_users/1.xml
   def destroy
-    @lab_user = LabUser.where("id=?",params[:id]).first if params[:id]
-    @lab_user = LabUser.where("user_id=? and lab_id=?", params[:lab_user][:user_id], params[:lab_user][:lab_id]).first if params[:lab_user]
-
     respond_to do |format|
-      unless @lab_user
-        # cant find labuser
-        format.html { redirect_to(lab_users_path) }
-        format.json { render :json=> { :success=> false, :message=>"lab user can't be found"} }
-      else
-        #when removing someone from a lab, you need to end their lab
-        @lab_user.end_lab
-        @lab_user.destroy
+      #when removing someone from a lab, you need to end their lab
+      @lab_user.end_lab
+      @lab_user.destroy
 
-        format.html { redirect_to(lab_users_path) }
-        format.json { render :json=> { :success=>true, :message=>"lab user removed"} }
-      end
+      format.html { redirect_to(lab_users_path) }
+      format.json { render :json=> { :success=>true, :message=>"lab user removed"} }
     end
   end
   
@@ -280,7 +303,17 @@ class LabUsersController < ApplicationController
   private #-----------------------------------------------
 
 
-
+  def get_user
+    @user=current_user # by default get the current user
+    if @admin  #  admins can use this to view users labs
+      if params[:username]  # if there is a username in the url
+        @user = User.where('username = ?',params[:username]).first
+      end
+      if params[:user_id]  # if there is a user_id in the url
+        @user = User.where('id = ?',params[:user_id]).first
+      end
+    end
+  end
 
   # return a array of users based on the input (list of checked checkboxes)
   def get_users_from(id_list)

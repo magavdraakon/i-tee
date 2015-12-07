@@ -256,7 +256,7 @@ class LabsController < ApplicationController
         format.html { redirect_to(my_labs_path+(params[:id] ? "/#{params[:id]}" : ''))}
         format.json { render :json=>{:success => false , :message=> "No permission error" }}
       else
-        @lab_user=LabUser.where('lab_id=? and user_id=?', @lab.id, @user.id).first
+        @lab_user=LabUser.where('lab_id=? and user_id=?', @lab.id, @user.id).last
         if @lab_user!=nil
           logger.debug "\nRestarting '#{@lab_user.user.username}' lab '#{@lab_user.lab.name}' as admin\n" if @admin
           # restart lab (stop ->  clear -> start)
