@@ -168,6 +168,28 @@ class LabsController < ApplicationController
       redirect_to(my_labs_path+(params[:id] ? "/#{params[:id]}" : ''))
   end
   
+  def start_lab_by_id
+    respond_to do |format|
+      if @admin && params[:labuser_id]
+        @labuser= LabUser.where("id=?", params[:labuser_id]).first
+        if @labuser
+          # generating vm info if needed
+          @labuser.start_lab
+          format.html { redirect_to(:back) }
+          format.json {render :json=>{ :success => true , :message=> "lab started", :lab_user => @labuser.id, :start_time => @labuser.start }}
+        else
+          format.html { redirect_to :back , :notice=> "Can't find lab user" }
+          format.json { render :json=> {:success => false , :message=>  "Can't find lab user" }}
+        end
+      else
+        format.html { redirect_to :back , :notice=> "Restricted access" }
+        format.json { render :json=> {:success => false , :message=>  "No permission error" }}
+      end
+    end
+    rescue ActionController::RedirectBackError # cant redirect back? go to the lab instead
+      logger.info "\nNo :back error\n"
+      redirect_to(my_labs_path)
+  end
 
   # method for starting a lab, creates virtual machine dbrows and sets the start time for the lab
   def start_lab
@@ -213,6 +235,29 @@ class LabsController < ApplicationController
       redirect_to(my_labs_path+(@lab ? "/#{@lab.id}" : '')+(@lab && params[:username] ? "/#{params[:username]}" : ''))
   end
   
+  def end_lab_by_id
+    respond_to do |format|
+      if @admin && params[:labuser_id]
+        @labuser= LabUser.where("id=?", params[:labuser_id]).first
+        if @labuser
+          @labuser.end_lab
+          # back to the view the link was in
+          format.html { redirect_to(:back) }
+          format.json {render :json=>{ :success => true , :message=> "lab ended", :lab_user => @labuser.id , :end_time => @labuser.end}}
+        else
+          format.html { redirect_to :back , :notice=> "Can't find lab user" }
+          format.json { render :json=> {:success => false , :message=>  "Can't find lab user" }}
+        end
+      else
+        format.html { redirect_to :back , :notice=> "Restricted access" }
+        format.json { render :json=> {:success => false , :message=>  "No permission error" }}
+      end
+    end
+    rescue ActionController::RedirectBackError # cant redirect back? go to the lab instead
+      logger.info "\nNo :back error\n"
+      redirect_to(my_labs_path)
+  end
+
   #method for ending a lab, deletes virtual machine db rows and sets the end date for the lab
   def end_lab
     respond_to do |format|
@@ -239,6 +284,30 @@ class LabsController < ApplicationController
       redirect_to(my_labs_path+(@lab_user.lab ? "/#{@lab_user.lab.id}" : ''))
   end
   
+
+  def restart_lab_by_id
+    respond_to do |format|
+      if @admin && params[:labuser_id]
+        @labuser= LabUser.where("id=?", params[:labuser_id]).first
+        if @labuser
+          @labuser.restart_lab
+          # back to the view the link was in
+          format.html { redirect_to(:back) }
+          format.json {render :json=>{ :success => true , :message=> "lab restarted", :lab_user => @labuser.id, :start_time => @labuser.start }}
+        else
+          format.html { redirect_to :back , :notice=> "Can't find lab user" }
+          format.json { render :json=> {:success => false , :message=>  "Can't find lab user" }}
+        end
+      else
+        format.html { redirect_to :back , :notice=> "Restricted access" }
+        format.json { render :json=> {:success => false , :message=>  "No permission error" }}
+      end
+    end
+    rescue ActionController::RedirectBackError # cant redirect back? go to the lab instead
+      logger.info "\nNo :back error\n"
+      redirect_to(my_labs_path)
+  end
+
   #restarting a lab means deleting virtual machines, removing start/end times and progress/results
   def restart_lab
     respond_to do |format|

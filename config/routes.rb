@@ -17,7 +17,7 @@ ITee::Application.routes.draw do
   resources :lab_users
   match "lab_users", :to=>'lab_users#destroy', via: [:delete]
   match "lab_users", :to=>'lab_users#update', via: [:put]
-  
+
  
   resources :lab_vmts
 
@@ -91,6 +91,10 @@ ITee::Application.routes.draw do
   match 'start_lab/:id/:username', :to=>'labs#start_lab'
   match 'start_lab/:id', :to=>'labs#start_lab'
   match 'start_lab', :to=>'labs#start_lab'
+
+  match "start_lab_by_id", :to=>"labs#start_lab_by_id", via: [:post]
+  match "end_lab_by_id", :to=>"labs#end_lab_by_id", via: [:post]
+  match "restart_lab_by_id", :to=>"labs#restart_lab_by_id", via: [:post]
 
   match 'restart_lab/:id/:username', :to=> 'labs#restart_lab'
   match 'restart_lab/:id', :to=> 'labs#restart_lab'
