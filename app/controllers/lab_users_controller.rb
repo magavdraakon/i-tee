@@ -43,10 +43,11 @@ class LabUsersController < ApplicationController
     set_order_by
     @lab_users = LabUser.order(@order).paginate(:page => params[:page], :per_page => @per_page)
     @lab_user = LabUser.new
-    
+    labusers = LabUser.all if !params[:conditions]
+    labusers = LabUser.where(params[:conditions].as_json) if params[:conditions]
     respond_to do |format|
       format.html # index.html.erb
-      format.json  { render :json => LabUser.all }
+      format.json  { render :json => labusers }
     end
   end
   
