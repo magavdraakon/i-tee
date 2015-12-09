@@ -64,9 +64,14 @@
         window.setInterval('update()', 15*1000);
       });*/
     </script>
-    <div id="updated_progress"><%= render :partial => 'shared/lab_progress' %></div>
-    <%if @lab_user.result %> result: <%= @lab_user.result%>    <br/><%end%>
-      
+    <% if false %>
+      <div id="updated_progress">
+        <%= render :partial => 'shared/lab_progress' %>
+      </div>
+      <% if @lab_user.result %> 
+        result: <%= @lab_user.result%>    <br/>
+      <%end%>
+    <% end %>
     <%if @lab_user.end==nil  %>
                 <div>
       <h3>Virtual machines</h3>
