@@ -44,7 +44,7 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
        sql= Vm.find_by_sql("select * from vms, lab_vmts where vms.lab_vmt_id=lab_vmts.id and lab_id=#{@lab.id} and user_id=#{current_user.id} #{order}") if @lab # only try to get the vms if there is a lab
       @labs=Lab.joins('labs inner join lab_users on lab_users.lab_id=labs.id').where('user_id=?', current_user.id).uniq
     end
-    @vms= sql.paginate( :page => params[:page], :per_page => 10)
+    @vms= sql.paginate( :page => params[:page], :per_page => @per_page)
     render :action=>'index'
   end
   
@@ -74,7 +74,7 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
     vms.each do |vm|
       @vm.push(vm) if vm.state==@state
     end
-    @vms=@vm.paginate(:page=>params[:page], :per_page=>10)
+    @vms=@vm.paginate(:page=>params[:page], :per_page=>@per_page)
     render :action=>'index'
   end
   
@@ -96,7 +96,7 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
     else  
       sql= "select vms.*, lab_vmts.lab_id from vms, lab_vmts where vms.lab_vmt_id=lab_vmts.id and user_id=#{current_user.id} #{order}"
     end
-    @vms= Vm.paginate_by_sql(sql, :page => params[:page], :per_page => 10)
+    @vms= Vm.paginate_by_sql(sql, :page => params[:page], :per_page => @per_page)
     
     respond_to do |format|
       format.html # index.html.erb
