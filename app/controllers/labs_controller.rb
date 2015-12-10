@@ -144,7 +144,7 @@ class LabsController < ApplicationController
           flash[:notice] = "There is no user named '#{params[:username]}'"
           redirect_to :back and return
     elsif !@admin && params[:username] then # simple user should not have the username in url
-      logger.debug '\nmy_labs: Relocate user\n'
+      logger.debug "\nmy_labs: Relocate user\n"
       # simple user should not have the username in url
       redirect_to(my_labs_path+(params[:id] ? "/#{params[:id]}" : ''))
     else
@@ -362,8 +362,8 @@ class LabsController < ApplicationController
     labusers=LabUser.order('end ASC, start DESC').where('user_id=?', user.id)
     labusers.each do |u|
       @labs<<u.lab        
-      @started<<u.lab  if u.start!=nil && u.end==nil 
-      @complete<<u.lab  if u.start!=nil && u.end!=nil 
+      @started<<u.lab  if u.start && !u.end 
+      @complete<<u.lab  if u.start && u.end 
     end 
     @not_started=@labs-@started-@complete
   end

@@ -2,22 +2,37 @@
 
 <% content_for :sidebar do %>
         <ul>
-  <% @labs.each do |lab| %>
-    <% classes="" #default
-       classes= "current_lab" if lab.id==@lab.id %>
-      <%if lab==@started.first %>
-      <li class="upper">Started</li>
-      <% end 
-         if lab==@not_started.first %>
-      <li class="upper">Not started</li>
-      <% end  
-         if lab==@complete.first %>
-      <li class="upper">Completed</li>
-      <%end%>
-      <li class="<%= classes %>">
-      <%= link_to(lab.name, :controller=>'labs', :action=>'user_labs', :id=>lab.id)%>
-    </li>
-  <% end %>
+        <% if @started!=[] %>
+          <li class="upper">Started</li>
+          <% @started.each do |lab| %>
+            <% classes="" #default
+               classes= "current_lab" if lab.id==@lab.id %>
+            <li class="<%= classes %>">
+              <%= link_to(lab.name, :controller=>'labs', :action=>'user_labs', :id=>lab.id)%>
+            </li>
+          <% end %>
+        <% end %>
+        <% if @not_started!=[] %>
+          <li class="upper">Not started</li>
+          <% @not_started.each do |lab| %>
+            <% classes="" #default
+               classes= "current_lab" if lab.id==@lab.id %>
+            <li class="<%= classes %>">
+              <%= link_to(lab.name, :controller=>'labs', :action=>'user_labs', :id=>lab.id)%>
+            </li>
+          <% end %>
+        <% end %>
+        <% if @complete!=[] %>
+          <li class="upper">Completed</li>
+          <% @complete.each do |lab| %>
+            <% classes="" #default
+               classes= "current_lab" if lab.id==@lab.id %>
+            <li class="<%= classes %>">
+              <%= link_to(lab.name, :controller=>'labs', :action=>'user_labs', :id=>lab.id)%>
+            </li>
+          <% end %>
+        <% end %>
+        
         </ul>
 <%end%>  
 
@@ -39,9 +54,9 @@
 
   <% if @labs!=[] %>
         <div class="manage_lab loader">
-            <%= link_to('Start lab',start_lab_path+"/"+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : "" ), :class=>'button submit-button sl-button') if @lab_user.start==nil %>
+            <%= link_to('Start lab',start_lab_path+"/"+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : "" ), :class=>'button submit-button sl-button') if !@lab_user.start %>
         </div>
-    <%if @lab_user.start!=nil %>
+    <% if @lab_user.start %>
       <!-- started at: <%#=@lab_user.start%><br/>
           ended at: <%#=@lab_user.end%><br/>-->
     <script>
