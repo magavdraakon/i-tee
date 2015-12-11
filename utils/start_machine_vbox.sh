@@ -1,9 +1,9 @@
 #!/bin/bash
 # Author: Margus Ernits margus.ernits@gmail.com
 
-if [ $# -ne 6 ]
+if [ $# -ne 7 ]
 then 
-echo "Five arguments as mac IP template name password"
+echo "7 arguments are needed!"
 exit 1
 fi
 
