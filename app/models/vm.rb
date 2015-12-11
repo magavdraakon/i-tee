@@ -52,7 +52,7 @@ class Vm < ActiveRecord::Base
   end
   
   def ini_vm
-    runstr = "sudo -u vbox  #{Rails.root}/utils/start_machine.sh #{mac.mac} #{mac.ip} #{lab_vmt.vmt.image} #{name} #{password} #{ENV['ENVIRONMENT']} 2>&1"
+    runstr = "sudo -u vbox  #{Rails.root}/utils/start_machine.sh #{mac.mac} #{mac.ip} #{lab_vmt.vmt.image} #{name} #{password} #{ENV['ENVIRONMENT']} #{user.name} 2>&1"
     Rails.logger.debug "ini_vm: #{runstr}"
     %x(#{runstr})
     #%x("#{@exec_line}  #{Rails.root}/utils/start_machine.sh #{mac.mac} #{mac.ip} #{lab_vmt.vmt.image} #{name} #{password} 2>&1")
