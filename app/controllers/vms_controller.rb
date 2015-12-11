@@ -44,7 +44,7 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
        sql= Vm.find_by_sql("select * from vms, lab_vmts where vms.lab_vmt_id=lab_vmts.id and lab_id=#{@lab.id} and user_id=#{current_user.id} #{order}") if @lab # only try to get the vms if there is a lab
       @labs=Lab.joins('labs inner join lab_users on lab_users.lab_id=labs.id').where('user_id=?', current_user.id).uniq
     end
-    @vms= sql.paginate( :page => params[:page], :per_page => 10)
+    @vms= sql.paginate( :page => params[:page], :per_page => @per_page)
     render :action=>'index'
   end
   
@@ -74,7 +74,7 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
     vms.each do |vm|
       @vm.push(vm) if vm.state==@state
     end
-    @vms=@vm.paginate(:page=>params[:page], :per_page=>10)
+    @vms=@vm.paginate(:page=>params[:page], :per_page=>@per_page)
     render :action=>'index'
   end
   
@@ -96,7 +96,7 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
     else  
       sql= "select vms.*, lab_vmts.lab_id from vms, lab_vmts where vms.lab_vmt_id=lab_vmts.id and user_id=#{current_user.id} #{order}"
     end
-    @vms= Vm.paginate_by_sql(sql, :page => params[:page], :per_page => 10)
+    @vms= Vm.paginate_by_sql(sql, :page => params[:page], :per_page => @per_page)
     
     respond_to do |format|
       format.html # index.html.erb
@@ -177,42 +177,50 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
 
   #start all the machines this user has in a given lab
   def start_all
-    @lab=Lab.find_by_id(params[:id])
-    @user=current_user
-    if params[:username] && @admin then
-      @user = User.where("username = ?",params[:username]).first 
-      @user = curent_user unless @user # in case of mistyped username 
+    respond_to do |format|
+      @lab=Lab.find(params[:id])
+      get_user
+      if !@user
+        logger.debug "Can't find user: "
+        logger.debug params
+        format.html { redirect_to :back , :notice=> "Can't find user" }
+        format.json { render :json=> {:success => false , :message=>  "Can't find user" }}
+      elsif !@admin && (params[:username] || params[:user_id])
+        logger.debug '\n start_lab: Relocate user\n'
+        # simple user should not have the username in url
+        format.html { redirect_to my_labs_path+(params[:id] ? "/#{params[:id]}" : '') }
+        format.json { render :json=>{:success => false , :message=> "No permission error" }}
+      else
+        # ok, there is such lab, but does the user have it?  
+        @labuser = LabUser.where("lab_id=? and user_id=?", @lab.id, @user.id).last
+        if @labuser!=nil #user has this lab
+          result = @labuser.start_all_vms
+          format.html {redirect_to :back , :notice => result.html_safe}
+          format.json {render :json=> { :success=> true, :message=>result, :lab_user=> @labuser.id}}
+        else
+          # no this user does not have this lab
+          format.html { redirect_to my_labs_path, :notice => 'That lab was not assigned to this user!' }
+          format.json { render :json=>{:success => false, :message=> 'That lab was not assigned to this user!' }}
+        end      
+      end
     end
-
-    @labuser = LabUser.find(:last, :conditions=>["lab_id=? and user_id=?", @lab.id, @user.id]) if @lab!=nil
-    redirect = :back
-    if (@labuser == nil && @lab!=nil) || @lab==nil #either the lab doesnt exist or the user doesnt have it
-      redirect=error_401_path
-    end
-    if @labuser!=nil #user has this lab
-      flash[:notice]=""
-
-      @labuser.vms.each do |vm|
-        if vm.state!="running" && vm.state!="paused" then # cant be running nor paused
-          @a = vm.start_vm 
-          logger.info vm.name
-          flash[:notice]=flash[:notice]+@a[:notice]+"<br/>"
-        end #end if not running or paused
-      end #end iterate trough vms
-    end#end if labuser
-    flash[:notice]=flash[:notice].html_safe
-    redirect_to(redirect)
-
-  rescue Timeout::Error
-    flash[:alert]="<br/>Starting all virtual machines failed, try starting them one by one."
-    flash[:notice]=nil
-    redirect_to(:back)
-
+    rescue Timeout::Error
+      respond_to do |format|        
+        format.html {redirect_to :back , :notice => "<br/>Starting all virtual machines failed, try starting them one by one."}
+        format.json {render :json=> { :success=> false, :message=>"Starting all virtual machines failed, try starting them one by one.", :lab_user=> @labuser.id}}
+      end
+    rescue ActiveRecord::RecordNotFound
+      respond_to do |format|
+        logger.debug "Can't find lab: "
+        logger.debug params
+        format.html { redirect_to my_labs_path , :notice=> "Can't find lab" }
+        format.json { render :json=> {:success => false , :message=>  "Can't find lab" }}
+      end
     rescue ActionController::RedirectBackError # cant redirect back? go to the lab instead
       logger.info "\nNo :back error\n"
       redirect_to(my_labs_path+"/"+@lab.id.to_s)
 
-    end
+  end
   
   #start one machine
   def start_vm
@@ -238,7 +246,55 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
     flash[:notice] = @vm.pause_vm.html_safe
     redirect_to(:back) 
   end
-  
+
+  #stop all the machines this user has in a given lab
+def stop_all
+  respond_to do |format|
+    @lab=Lab.find(params[:id])
+    get_user
+    if !@user
+      logger.debug "Can't find user: "
+      logger.debug params
+      format.html { redirect_to :back , :notice=> "Can't find user" }
+      format.json { render :json=> {:success => false , :message=>  "Can't find user" }}
+    elsif !@admin && (params[:username] || params[:user_id])
+      logger.debug '\n start_lab: Relocate user\n'
+      # simple user should not have the username in url
+      format.html { redirect_to my_labs_path+(params[:id] ? "/#{params[:id]}" : '') }
+      format.json { render :json=>{:success => false , :message=> "No permission error" }}
+    else
+      # ok, there is such lab, but does the user have it?  
+      @labuser = LabUser.where("lab_id=? and user_id=?", @lab.id, @user.id).last
+      if @labuser!=nil #user has this lab
+        result = @labuser.stop_all_vms
+        format.html {redirect_to :back , :notice => result.html_safe}
+        format.json {render :json=> { :success=> true, :message=>result, :lab_user=> @labuser.id}}
+      else
+        # no this user does not have this lab
+        format.html { redirect_to my_labs_path, :notice => 'That lab was not assigned to this user!' }
+        format.json { render :json=>{:success => false, :message=> 'That lab was not assigned to this user!' }}
+      end  
+    end
+  end
+  rescue Timeout::Error
+    respond_to do |format|        
+      format.html {redirect_to :back , :notice => "<br/>Starting all virtual machines failed, try stoppping them one by one."}
+      format.json {render :json=> { :success=> false, :message=>"Starting all virtual machines failed, try stoppping them one by one.", :lab_user=> @labuser.id}}
+    end
+  rescue ActiveRecord::RecordNotFound
+    respond_to do |format|
+      logger.debug "Can't find lab: "
+      logger.debug params
+      format.html { redirect_to my_labs_path , :notice=> "Can't find lab" }
+      format.json { render :json=> {:success => false , :message=>  "Can't find lab" }}
+    end
+  rescue ActionController::RedirectBackError # cant redirect back? go to the lab instead
+    logger.info "\nNo :back error\n"
+    redirect_to(my_labs_path+"/"+@lab.id.to_s)
+
+end
+
+
   #stop the machine, do not delete the vm row from the db (release mac, but allow reinitialization)
   def stop_vm
     #@vm=Vm.find(params[:id])
@@ -298,5 +354,17 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
       redirect_to(vms_path)
     end
   end
-
+private #----------------------------------------------------------------------------------
+ 
+   def get_user
+    @user=current_user # by default get the current user
+    if  @admin  #  admins can use this to view users labs
+      if params[:username]  # if there is a username in the url
+        @user = User.where('username = ?',params[:username]).first
+      end
+      if params[:user_id]  # if there is a user_id in the url
+        @user = User.where('id = ?',params[:user_id]).first
+      end
+    end
+  end
 end

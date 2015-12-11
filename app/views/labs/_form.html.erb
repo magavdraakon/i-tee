@@ -7,24 +7,39 @@
       <% end %>
     </div>
   <% end %>
+
   <div class="field">
-    <%= f.label :name %><br />
-    <%= f.text_field :name %> <span class="red" title="Required field">*</span>
+    <%= f.label :name %> <span class="red" title="Required field">*</span><br />
+    <%= f.text_field :name %>
   </div>
   <div class="field">
-    <%= f.label :short_description %> <span class="grey"><span id="charleft"></span> characters left</span><br />
-    <%= f.text_area :short_description, :rows=>3 %> <span class="red" title="Required field">*</span>
+    <%= f.label :short_description %> <span class="grey"><span id="charleft"></span> characters left</span> <span class="red" title="Required field">*</span><br />
+    <%= f.text_area :short_description, :rows=>3 %>
   </div>
   <div class="field">
     <%= f.label :description %><br />
     <%= f.text_area( :description,  :rows => 20) %>
   </div>
+    <fieldset><legend>Lab settings</legend>
    <div class="field">
     <%= f.label :host_id %><br />
     <%= f.select( :host_id,  options_from_collection_for_select(Host.all,:id, :name, @lab.host_id) ) %>
   </div>
-  
-  <div class="field">
+      <div class="field">
+        <%= f.check_box( :startAll)  %> <%= f.label :startAll ,'Start all machines with lab start' %>
+      </div>
+      <div class="field">
+        <%= f.check_box( :vms_by_one)  %> <%= f.label :vms_by_one ,'Allow managing machines one-by-one' %>
+      </div>
+    <div class="field">
+      <%= f.check_box( :restartable)  %><%= f.label :restartable %>
+    </div>
+      <div class="field">
+        <%= f.check_box( :endable)  %><%= f.label :endable %>
+      </div>
+    </fieldset>
+    <fieldset><legend>User management</legend>
+      <div class="field">
     <%if @all_users %><%#all users have this lab%>
       <%= check_box_tag("remove", '1')%>
       <%=label_tag("remove", "Remove all users")%>
@@ -37,7 +52,7 @@
       <%end%>
     <%end%>
   </div>
-
+    </fieldset>
     <h3>Virtual machines in this lab</h3>
     <div id="lab_vmts">
     <%= f.fields_for :lab_vmts do |labVmt_form| %>

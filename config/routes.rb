@@ -13,8 +13,12 @@ ITee::Application.routes.draw do
   resources :operating_systems
 
   match 'users/sign_up', :to=>'home#catcher'
+  
   resources :lab_users
+  match "lab_users", :to=>'lab_users#destroy', via: [:delete]
+  match "lab_users", :to=>'lab_users#update', via: [:put]
 
+ 
   resources :lab_vmts
 
   resources :vmts
@@ -26,11 +30,16 @@ ITee::Application.routes.draw do
   #match 'users/edit', :to=>'devise/registrations#edit'
 
   resources :users
+  match "users", :to=>'users#destroy', via: [:delete]
+  match "users", :to=>'users#update', via: [:put]
+
   resources :vms
 
   resources :materials
   
   resources :labs
+  match "labs", :to=>'labs#destroy', via: [:delete]
+  match "labs", :to=>'labs#update', via: [:put]
 
   resources :hosts
 
@@ -56,8 +65,10 @@ ITee::Application.routes.draw do
   match 'getprogress', :to=> 'home#getprogress'
   #with user
    match 'start_all/:id/:username', :to=> 'vms#start_all'
+  match 'stop_all/:id/:username', :to=> 'vms#stop_all'
   #with id
   match 'start_all/:id', :to=> 'vms#start_all'
+  match 'stop_all/:id', :to=> 'vms#stop_all'
   match 'start_vm/:id', :to=> 'vms#start_vm'
   match 'init_vm/:id', :to=> 'vms#init_vm'
   match 'pause_vm/:id', :to=> 'vms#pause_vm'
@@ -67,6 +78,7 @@ ITee::Application.routes.draw do
   match 'vms/get_progress/:id', :to=> 'vms#get_progress'
     #no id
   match 'start_all', :to=> 'vms#start_all'
+  match 'stop_all', :to=> 'vms#stop_all'
   match 'start_vm', :to=> 'vms#start_vm'
   match 'init_vm', :to=> 'vms#init_vm'
   match 'pause_vm', :to=> 'vms#pause_vm'
@@ -79,6 +91,10 @@ ITee::Application.routes.draw do
   match 'start_lab/:id/:username', :to=>'labs#start_lab'
   match 'start_lab/:id', :to=>'labs#start_lab'
   match 'start_lab', :to=>'labs#start_lab'
+
+  match "start_lab_by_id", :to=>"labs#start_lab_by_id", via: [:post]
+  match "end_lab_by_id", :to=>"labs#end_lab_by_id", via: [:post]
+  match "restart_lab_by_id", :to=>"labs#restart_lab_by_id", via: [:post]
 
   match 'restart_lab/:id/:username', :to=> 'labs#restart_lab'
   match 'restart_lab/:id', :to=> 'labs#restart_lab'
@@ -93,9 +109,12 @@ ITee::Application.routes.draw do
   match 'vms_by_state', :to=>'vms#vms_by_state'
   match 'vms_by_state/:state', :to=>'vms#vms_by_state'
   
-  match 'my_labs/:id/:username', :to => 'labs#labs'
-  match 'my_labs/:id', :to => 'labs#labs'
-  match 'my_labs', :to =>'labs#labs'
+  match 'my_labs/:id/:username', :to => 'labs#user_labs'
+  match 'my_labs/:id', :to => 'labs#user_labs'
+  match 'my_labs', :to =>'labs#user_labs'
+
+  match 'user_labs/:username', :to=>'labs#user_labs'
+  match 'user_labs/:username/:id', :to => 'labs#user_labs'
 
   
   # The priority is based upon order of creation:

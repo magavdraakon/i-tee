@@ -26,7 +26,7 @@ class LabUser < ActiveRecord::Base
       		stopped+=1
     	end
   	end
-  	info={'running'=>running, 'paused'=>paused, 'stopped'=>stopped}
+  	info={:running=>running, :paused=>paused, :stopped=>stopped}
   end
 
 # to be displayed as vm info for labs that are not running
@@ -36,7 +36,7 @@ class LabUser < ActiveRecord::Base
 
 # create needed Vm-s based on the lab templates and set start to now
   def start_lab
-  	if !self.start && !self.end  # can only start labs that are not started or finished
+  	unless self.start || self.end  # can only start labs that are not started or finished
   		self.vmts.each do |template|
         	#is there a machine like that already?
         	vm = Vm.where("lab_vmt_id=? and user_id=?", template.id, self.user.id).first
@@ -48,20 +48,20 @@ class LabUser < ActiveRecord::Base
     	# set new start time
     	self.start=Time.now
     	self.save
-	end
+			if self.lab.startAll
+				self.start_all_vms
+			end
+		end
   end
 
 # remove all Vm-s and set the end to now
   def end_lab
-  	if self.start && !self.end then # can only end labs that are started and not ended 
-  		self.vms.each do |vm|
-        	vm.destroy
-       		logger.debug "Machine #{vm.name} successfully deleted."
-      	end
+  	if self.start && !self.end  # can only end labs that are started and not ended
+  		self.destroy_all_vms
       	#end of deleting vms for this lab
     	self.end=Time.now
     	self.save 
-	end
+		end
   end
 
   def restart_lab
@@ -73,6 +73,40 @@ class LabUser < ActiveRecord::Base
   	self.result=nil
   	self.save
   	self.start_lab # start lab
-  end
+	end
+
+
+	def start_all_vms
+		feedback =''
+		self.vms.each do |vm|
+			if vm.state!='running' && vm.state!='paused'  # cant be running nor paused
+				start = vm.start_vm
+				logger.info "#{vm.name} (#{vm.lab_vmt.nickname}) started"
+				add = start[:notice] ? start[:notice] : start[:alert]
+				feedback = feedback + add +'<br/>'
+			end #end if not running or paused
+		end
+		logger.info "\nfeedback: #{feedback}\n"
+		feedback
+	end
+
+	def stop_all_vms
+		feedback=''
+		self.vms.each do |vm|
+			if vm.state=='running' || vm.state=='paused'  # has to be running or paused
+				stop = vm.stop_vm
+				logger.info "#{vm.name} (#{vm.lab_vmt.nickname}) stopped"
+				feedback=feedback+"<b>#{vm.lab_vmt.nickname}</b> stopped<br/>"
+			end #end if not running or paused
+		end
+		feedback
+	end
+
+	def destroy_all_vms
+		self.vms.each do |vm|
+			vm.destroy
+			logger.debug "Machine #{vm.name} successfully deleted."
+		end
+	end
 
 end
