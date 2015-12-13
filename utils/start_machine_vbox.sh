@@ -89,12 +89,12 @@ if [[ -r /var/labs/run/${TEMPLATE}.sh ]]
 then
 source /var/labs/run/${TEMPLATE}.sh
 
-curl -H 'Content-Type: application/json' -X DELETE -d '{"api_key":"'"${API_KEY_ADMIN}"'", "lab":"'"${LAB_ID}"'", "userName":"'"${USERNAME}"'", "reset":false}' "${LAB_URI}"
+curl -k -H 'Content-Type: application/json' -X DELETE -d '{"api_key":"'"${API_KEY_ADMIN}"'", "lab":"'"${LAB_ID}"'", "userName":"'"${USERNAME}"'", "reset":false}' "${LAB_URI}"
 
 #echo "SENT user delete" 'Content-Type: application/json' -X POST -d '{"api_key":"'"${API_KEY_ADMIN}"'", "lab":"'"${LAB_ID}"'", "username":"'"${USERNAME}"'", "password":"'"${USER_PWD}"'", "info":{"answer":"42"}}' "${LAB_URI}"
 
-#curl -H "Content-Type: application/json" -X GET -d '{"api_key":"botkey", "username":"someone"}' http://localhost:3000/api/v1/userkey
-USER_KEY=$(curl -H 'Content-Type: application/json' -X POST -d '{"api_key":"'"${API_KEY_ADMIN}"'", "lab":"'"${LAB_ID}"'", "fullname":"'"${FULLNAME}"'", "username":"'"${USERNAME}"'", "password":"'"${USER_PWD}"'", "info":{"answer":"42"}}' "${LAB_URI}" | cut -d'"' -f4 -)
+#curl -k -H "Content-Type: application/json" -X GET -d '{"api_key":"botkey", "username":"someone"}' http://localhost:3000/api/v1/userkey
+USER_KEY=$(curl -k -H 'Content-Type: application/json' -X POST -d '{"api_key":"'"${API_KEY_ADMIN}"'", "lab":"'"${LAB_ID}"'", "fullname":"'"${FULLNAME}"'", "username":"'"${USERNAME}"'", "password":"'"${USER_PWD}"'", "info":{"answer":"42"}}' "${LAB_URI}" | cut -d'"' -f4 -)
 
 echo USER_KEY is $USER_KEY
 logger -p info -t i-tee  "USER_KEY for user ${USERNAME} is $USER_KEY for VM  ${TEMPLATE}"
