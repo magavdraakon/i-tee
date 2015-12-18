@@ -110,7 +110,7 @@ marked.setOptions({
 // go over all marked class elements
 $(".marked").each(function(){
   //console.log($(this).text());
-  $(this).html(marked($(this).text()));
+  $(this).html(marked($(this).text()).split('<a href="').join('<a target="_blank" href="'));
 
 });
 
