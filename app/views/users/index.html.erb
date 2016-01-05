@@ -34,7 +34,7 @@
         </td>-->
         <td class="narrow">
           <%= link_to 'Edit', users_edit_path+"/"+user.id.to_s, :class=> 'edit-button button' %>
-          <%= link_to 'Destroy', users_path+"/"+user.id.to_s, :method=>:delete, :confirm => 'Are you sure?', :class=> 'delete-button button' %>
+          <%= link_to 'Destroy', users_path+"/"+user.id.to_s, :method => :delete, :confirm => 'Are you sure?', :class=> 'delete-button button' %>
         </td>
       </tr>
     <% end %>

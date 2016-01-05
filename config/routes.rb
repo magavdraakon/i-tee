@@ -30,6 +30,7 @@ ITee::Application.routes.draw do
   #match 'users/edit', :to=>'devise/registrations#edit'
 
   resources :users
+  match "users/:id", :to=>'users#destroy', via: [:delete]
   match "users", :to=>'users#destroy', via: [:delete]
   match "users", :to=>'users#update', via: [:put]
 

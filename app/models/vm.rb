@@ -215,7 +215,7 @@ end
         end
       }
 =end
-      if @a.include?("masin #{self.name} loodud")
+      if @a.include?("VM named: #{self.name} created")
         result[:notice] = result[:notice]+"Machine <b>#{self.lab_vmt.nickname}</b> successfully started<br/>"
         #flash[:notice]=flash[:notice].html_safe
         logger.debug @a
