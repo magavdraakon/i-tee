@@ -25,11 +25,7 @@ else
     exit 1
 fi
 
-#echo "script ended"
-
-ADMIN=mernits@itcollege.ee
-
-MAC=$1
+IT_HOST=$1
 IP_ADDR=$2
 TEMPLATE=$3
 NAME=$4
@@ -44,7 +40,7 @@ logger -p info -t i-tee VM ${NAME} starting
 [ -r "$RUNDIR"/"$NAME".sh ] && . "$RUNDIR"/"$NAME".sh || echo "no machine specific variables for customizing VM in "$RUNDIR"/"$NAME".sh" >> /var/tmp/info.log
 
 
-echo "tekitan virtuaalmasina $NAME template-ist ${TEMPLATE} Mac aadressiga $MAC"
+logger -p info -t i-tee "Creating VM: $NAME from Template: ${TEMPLATE}"
 
 
 FIRST_START=false
@@ -169,11 +165,9 @@ if [ $? -ne 0 ]
 then
 #echo "Starting VM failed"
 echo "Virtual Machine start from ${TEMPLATE} with name: $NAME Failed"
-#| mail $ADMIN -s $(hostname -f)
+logger -p info -t i-tee "Virtual Machine start from ${TEMPLATE} with name: $NAME Failed"
 exit 1
 fi
 
-#TODO - return something else (get rid of masin $NAME loodud)
-echo "masin $NAME loodud"
-#echo "VM named: $NAME created"
+echo "VM named: $NAME created"
 
