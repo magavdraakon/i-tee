@@ -466,6 +466,22 @@ function add_vmt_to_lab(){
     vmt_holder.appendChild(allowH);
     vmt_holder.appendChild(document.createTextNode(" "));
     vmt_holder.appendChild(allowV);
+    vmt_holder.appendChild( document.createElement("br") );
+    /* order */
+    var orderL=document.createElement("label");
+    orderL.setAttribute("for", "lab_lab_vmts_attributes_"+n+"_position");
+    orderL.innerHTML="Position";
+
+    var order=document.createElement("input");
+    order.setAttribute("id", "lab_lab_vmts_attributes_"+n+"_position")
+    order.setAttribute("name", "lab[lab_vmts_attributes]["+n+"][position]");
+    order.setAttribute("type", "number");
+    order.setAttribute("size", 30);
+    order.setAttribute("value", 0)
+
+    vmt_holder.appendChild(orderL);
+    vmt_holder.appendChild(document.createTextNode(" "));
+    vmt_holder.appendChild(order);
     /* networks holder*/
     var networks=document.createElement("div");
     networks.setAttribute("class", "networks");
