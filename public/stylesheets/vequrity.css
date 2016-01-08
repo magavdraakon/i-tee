@@ -491,13 +491,16 @@ body.sessions #messages {
 
 /* lab edit form */
 #lab_vmts .vmt{
-    padding:3px;
+    padding:10px;
+    line-height: 1.5em;
+    background: rgba(50,50,50,0.1);
     border:solid 1px #c0c0c0;
-    margin:3px;
+    margin:10px 0;
     border-width: 1px 0;
 }
 #lab_vmts .network{
     padding:3px;
+    background: rgba(255,255,255,0.4);
     border:solid 1px #c0c0c0;
     display:inline-block;
     margin:3px;

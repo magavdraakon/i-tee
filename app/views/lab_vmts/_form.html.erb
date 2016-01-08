@@ -30,6 +30,10 @@
       <%= f.label :allow_remote %><br />
       <%= f.check_box :allow_remote %>
     </div>
+    <div class="field">
+      <%= f.label :position %> 
+      <%= f.number_field :position %>
+    </div>
   <div class="actions">
     <%= submit_tag "Cancel" , :class=>"cancel"%>  <%= f.submit %>
   </div>

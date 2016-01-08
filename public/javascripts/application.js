@@ -110,7 +110,7 @@ marked.setOptions({
 // go over all marked class elements
 $(".marked").each(function(){
   //console.log($(this).text());
-  $(this).html(marked($(this).text()));
+  $(this).html(marked($(this).text()).split('<a href="').join('<a target="_blank" href="'));
 
 });
 
@@ -256,9 +256,112 @@ function add_network_to_vmt(el){
     var n= $(el).parents('.vmt').find('.network').size();
     var p= $(".vmt").index($(el).parents('.vmt'));
     var options=$("#networks").html();
-    console.log("sellel on võrke hetkel", n, 'vanem:', p);
+    //console.log("sellel on võrke hetkel", n, 'vanem:', p);
+
+    var net_holder=document.createElement('div');
+    net_holder.setAttribute("class", "network");
+
+    /* network id */
+    var netL=document.createElement("label");
+    netL.setAttribute("for", "lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"_network_id");
+    netL.innerHTML="Network";
+
+    var net=document.createElement("select");
+    net.setAttribute("id", "lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"_network_id")
+    net.setAttribute("name", "lab[lab_vmts_attributes]["+p+"][lab_vmt_networks_attributes]["+n+"][network_id]");
+    net.innerHTML=options;
+
+    net_holder.appendChild(netL);
+    net_holder.appendChild(document.createTextNode(" "));
+    net_holder.appendChild(net);
+    net_holder.appendChild( document.createElement("br") );
+    /* slot */
+    var slotL=document.createElement("label");
+    slotL.setAttribute("for", "lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"_slot");
+    slotL.innerHTML="Slot";
+
+    var slot=document.createElement("input");
+    slot.setAttribute("id", "lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"_slot")
+    slot.setAttribute("name", "lab[lab_vmts_attributes]["+p+"][lab_vmt_networks_attributes]["+n+"][slot]");
+    slot.setAttribute("type", "number");
+    slot.setAttribute("size", 30);
+   
+    net_holder.appendChild(slotL);
+    net_holder.appendChild(document.createTextNode(" "));
+    net_holder.appendChild(slot);
+    net_holder.appendChild( document.createElement("br") );
+    /* promiscous */
+    var promL=document.createElement("label");
+    promL.setAttribute("for", "lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"_promiscuous");
+    promL.innerHTML="Promiscuous";
+
+    var promH=document.createElement("input");
+    promH.setAttribute("name", "lab[lab_vmts_attributes]["+p+"][lab_vmt_networks_attributes]["+n+"][promiscuous]");
+    promH.setAttribute("type", "hidden");
+    promH.setAttribute("value", 0)
+
+    var promV=document.createElement("input");
+    promV.setAttribute("id", "lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"_promiscuous")
+    promV.setAttribute("name", "lab[lab_vmts_attributes]["+p+"][lab_vmt_networks_attributes]["+n+"][promiscuous]");
+    promV.setAttribute("type", "checkbox");
+    promV.setAttribute("value", 1)
+
+    net_holder.appendChild(promH);
+    net_holder.appendChild(document.createTextNode(" "));
+    net_holder.appendChild(promV);
+    net_holder.appendChild(document.createTextNode(" "));
+    net_holder.appendChild(promL);
+    net_holder.appendChild( document.createElement("br") );
+    /* reinit mac */
+    var macL=document.createElement("label");
+    macL.setAttribute("for", "lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"_reinit_mac");
+    macL.innerHTML="Reinit mac";
+
+    var macH=document.createElement("input");
+    macH.setAttribute("name", "lab[lab_vmts_attributes]["+p+"][lab_vmt_networks_attributes]["+n+"][reinit_mac]");
+    macH.setAttribute("type", "hidden");
+    macH.setAttribute("value", 0)
+
+    var macV=document.createElement("input");
+    macV.setAttribute("id", "lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"_reinit_mac")
+    macV.setAttribute("name", "lab[lab_vmts_attributes]["+p+"][lab_vmt_networks_attributes]["+n+"][reinit_mac]");
+    macV.setAttribute("type", "checkbox");
+    macV.setAttribute("value", 1)
+
+    net_holder.appendChild(macH);
+    net_holder.appendChild(document.createTextNode(" "));
+    net_holder.appendChild(macV);
+    net_holder.appendChild(document.createTextNode(" "));
+    net_holder.appendChild(macL);
+    net_holder.appendChild( document.createElement("br") );
+    net_holder.appendChild( document.createElement("br") );
+    /* delete */
+    var delH=document.createElement("input");
+    delH.setAttribute("name", "lab[lab_vmts_attributes]["+p+"][lab_vmt_networks_attributes]["+n+"][_destroy]");
+    delH.setAttribute("type", "hidden");
+    delH.setAttribute("value", 0)
+
+    var delV=document.createElement("input");
+    delV.setAttribute("id", "lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"__destroy")
+    delV.setAttribute("name", "lab[lab_vmts_attributes]["+p+"][lab_vmt_networks_attributes]["+n+"][_destroy]");
+    delV.setAttribute("type", "checkbox");
+    delV.setAttribute("value", 1)
+
+    var delL=document.createElement("label");
+    delL.setAttribute("for", "lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"__destroy");
+    delL.innerHTML="Remove";
+
+    net_holder.appendChild(delH);
+    net_holder.appendChild(document.createTextNode(" "));
+    net_holder.appendChild(delV);
+    net_holder.appendChild(document.createTextNode(" "));
+    net_holder.appendChild(delL);
+    /* EOF delete */
+    $(el).parents('.vmt').find('.networks').append(net_holder);
+    /*
     $(el).parents('.vmt').find('.networks').append("<div class=\"network\"><label for=\"lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"_network_id\">Network</label> <select id=\"lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"_network_id\" name=\"lab[lab_vmts_attributes]["+p+"][lab_vmt_networks_attributes]["+n+"][network_id]\">"+options+"</select> <br/><label for=\"lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"_slot\">Slot</label> <input id=\"lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"_slot\" name=\"lab[lab_vmts_attributes]["+p+"][lab_vmt_networks_attributes]["+n+"][slot]\" size=\"30\" type=\"number\" /><br/> <input name=\"lab[lab_vmts_attributes]["+p+"][lab_vmt_networks_attributes]["+n+"][promiscuous]\" type=\"hidden\" value=\"0\" /><input id=\"lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"_promiscuous\" name=\"lab[lab_vmts_attributes]["+p+"][lab_vmt_networks_attributes]["+n+"][promiscuous]\" type=\"checkbox\" value=\"1\" /> <label for=\"lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"_promiscuous\">Promiscuous</label><br /> <input name=\"lab[lab_vmts_attributes]["+p+"][lab_vmt_networks_attributes]["+n+"][reinit_mac]\" type=\"hidden\" value=\"0\" /><input id=\"lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"_reinit_mac\" name=\"lab[lab_vmts_attributes]["+p+"][lab_vmt_networks_attributes]["+n+"][reinit_mac]\" type=\"checkbox\" value=\"1\" /> <label for=\"lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"_reinit_mac\">Reinit mac</label><br /> <br/>  <input name=\"lab[lab_vmts_attributes]["+p+"][lab_vmt_networks_attributes]["+n+"][_destroy]\" type=\"hidden\" value=\"0\" /><input id=\"lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"__destroy\" name=\"lab[lab_vmts_attributes]["+p+"][lab_vmt_networks_attributes]["+n+"][_destroy]\" type=\"checkbox\" value=\"1\" />  <label for=\"lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"__destroy\">Remove</label> </div>");
-   // $("#images").append("<div class=\"image\"> <label for=\"item_images_attributes_"+n+"_layer_id\">Layer</label> <select id=\"item_images_attributes_"+n+"_layer_id\" name=\"item[images_attributes]["+n+"][layer_id]\">"+$("#item_layer_id").html()+"</select> <br> <label for=\"item_images_attributes_"+n+"_part\">Part</label> <input id=\"item_images_attributes_"+n+"_part\" name=\"item[images_attributes]["+n+"][part]\" type=\"number\" /> <br> <label for=\"item_images_attributes_"+n+"_partname\">Part name</label> <input id=\"item_images_attributes_"+n+"_partname\" name=\"item[images_attributes]["+n+"][partname]\" type=\"text\" /> <br> <input class=\"female\" id=\"item_images_attributes_"+n+"_f_img\" name=\"item[images_attributes]["+n+"][f_img]\" type=\"file\" /> <br> <input class=\"male\" id=\"item_images_attributes_"+n+"_m_img\" name=\"item[images_attributes]["+n+"][m_img]\" type=\"file\" /></div> ");
+    */
+  
 }
 
 // add vmts to lab in edit/new lab
@@ -266,8 +369,131 @@ function add_vmt_to_lab(){
     var n= $("#lab_vmts").find('.vmt').size();
     console.log('on ', n);
     var options=$("#vm_templates").html();
-    $("#lab_vmts").append("<div class=\"vmt\">  <div class=\"right\"> <input name=\"lab[lab_vmts_attributes]["+n+"][_destroy]\" type=\"hidden\" value=\"0\" /><input id=\"lab_lab_vmts_attributes_"+n+"__destroy\" name=\"lab[lab_vmts_attributes]["+n+"][_destroy]\" type=\"checkbox\" value=\"1\" />  <label for=\"lab_lab_vmts_attributes_"+n+"__destroy\">Remove</label></div><label for=\"lab_lab_vmts_attributes_"+n+"_name\">Name</label> <input id=\"lab_lab_vmts_attributes_"+n+"_name\" name=\"lab[lab_vmts_attributes]["+n+"][name]\" size=\"30\" placeholder=\"Unique, alphanumeric with no spaces.\" type=\"text\" /><br/> <label for=\"lab_lab_vmts_attributes_"+n+"_nickname\">Nickname</label> <input id=\"lab_lab_vmts_attributes_"+n+"_nickname\" name=\"lab[lab_vmts_attributes]["+n+"][nickname]\" placeholder=\"Name shown to user.\" size=\"30\" type=\"text\" /><br/><label for=\"lab_lab_vmts_attributes_"+n+"_vmt_id\">Vmt</label> <select id=\"lab_lab_vmts_attributes_"+n+"_vmt_id\" name=\"lab[lab_vmts_attributes]["+n+"][vmt_id]\">"+options+"</select><br/><br/><div class=\"networks\"></div></div>");
-    s=document.createElement('span');
+
+    var vmt_holder=document.createElement('div');
+    vmt_holder.setAttribute("class", "vmt");
+    /* DELETE */
+    var right=document.createElement("div");
+    right.setAttribute("class", "right");
+
+    var delH=document.createElement("input");
+    delH.setAttribute("name", "lab[lab_vmts_attributes]["+n+"][_destroy]");
+    delH.setAttribute("type", "hidden");
+    delH.setAttribute("value", 0)
+
+    var delV=document.createElement("input");
+    delV.setAttribute("id", "lab_lab_vmts_attributes_"+n+"__destroy")
+    delV.setAttribute("name", "lab[lab_vmts_attributes]["+n+"][_destroy]");
+    delV.setAttribute("type", "checkbox");
+    delV.setAttribute("value", 1)
+
+    var delL=document.createElement("label");
+    delL.setAttribute("for", "lab_lab_vmts_attributes_"+n+"__destroy");
+    delL.innerHTML="Remove";
+
+    right.appendChild(delH);
+    right.appendChild(document.createTextNode(" "));
+    right.appendChild(delV);
+    right.appendChild(document.createTextNode(" "));
+    right.appendChild(delL);
+    /* EOF DELETE*/
+    vmt_holder.appendChild(right);
+    /* name*/
+    var nameL=document.createElement("label");
+    nameL.setAttribute("for", "lab_lab_vmts_attributes_"+n+"_name");
+    nameL.innerHTML="Name";
+
+    var name=document.createElement("input");
+    name.setAttribute("id", "lab_lab_vmts_attributes_"+n+"_name")
+    name.setAttribute("name", "lab[lab_vmts_attributes]["+n+"][name]");
+    name.setAttribute("type", "text");
+    name.setAttribute("size", 30);
+    name.setAttribute("placeholder", "Unique, alphanumeric with no spaces.")
+
+    vmt_holder.appendChild(nameL);
+    vmt_holder.appendChild(document.createTextNode(" "));
+    vmt_holder.appendChild(name);
+    vmt_holder.appendChild( document.createElement("br") );
+    /* nickname */
+    var nicknameL=document.createElement("label");
+    nicknameL.setAttribute("for", "lab_lab_vmts_attributes_"+n+"_nickname");
+    nicknameL.innerHTML="Nickname";
+
+    var nickname=document.createElement("input");
+    nickname.setAttribute("id", "lab_lab_vmts_attributes_"+n+"_nickname")
+    nickname.setAttribute("name", "lab[lab_vmts_attributes]["+n+"][nickname]");
+    nickname.setAttribute("type", "text");
+    nickname.setAttribute("size", 30);
+    nickname.setAttribute("placeholder", "Name shown to user.")
+
+    vmt_holder.appendChild(nicknameL);
+    vmt_holder.appendChild(document.createTextNode(" "));
+    vmt_holder.appendChild(nickname);
+    vmt_holder.appendChild( document.createElement("br") );
+    /* vmt template */
+    var vmtL=document.createElement("label");
+    vmtL.setAttribute("for", "lab_lab_vmts_attributes_"+n+"_vmt_id");
+    vmtL.innerHTML="Vmt";
+
+    var vmt=document.createElement("select");
+    vmt.setAttribute("id", "lab_lab_vmts_attributes_"+n+"_vmt_id")
+    vmt.setAttribute("name", "lab[lab_vmts_attributes]["+n+"][vmt_id]");
+    vmt.innerHTML=options;
+
+    vmt_holder.appendChild(vmtL);
+    vmt_holder.appendChild(document.createTextNode(" "));
+    vmt_holder.appendChild(vmt);
+    vmt_holder.appendChild( document.createElement("br") );
+    /*ALLOW REMOTE*/
+    var allowL=document.createElement("label");
+    allowL.setAttribute("for", "lab_lab_vmts_attributes_"+n+"_allow_remote");
+    allowL.innerHTML="Allow remote";
+
+    var allowH=document.createElement("input");
+    allowH.setAttribute("name", "lab[lab_vmts_attributes]["+n+"][allow_remote]");
+    allowH.setAttribute("type", "hidden");
+    allowH.setAttribute("value", 0)
+
+    var allowV=document.createElement("input");
+    allowV.setAttribute("id", "lab_lab_vmts_attributes_"+n+"_allow_remote")
+    allowV.setAttribute("name", "lab[lab_vmts_attributes]["+n+"][allow_remote]");
+    allowV.setAttribute("type", "checkbox");
+    allowV.setAttribute("checked", "checked");
+    allowV.setAttribute("value", 1)
+
+    vmt_holder.appendChild(allowL);
+    vmt_holder.appendChild(document.createTextNode(" "));
+    vmt_holder.appendChild(allowH);
+    vmt_holder.appendChild(document.createTextNode(" "));
+    vmt_holder.appendChild(allowV);
+    vmt_holder.appendChild( document.createElement("br") );
+    /* order */
+    var orderL=document.createElement("label");
+    orderL.setAttribute("for", "lab_lab_vmts_attributes_"+n+"_position");
+    orderL.innerHTML="Position";
+
+    var order=document.createElement("input");
+    order.setAttribute("id", "lab_lab_vmts_attributes_"+n+"_position")
+    order.setAttribute("name", "lab[lab_vmts_attributes]["+n+"][position]");
+    order.setAttribute("type", "number");
+    order.setAttribute("size", 30);
+    order.setAttribute("value", 0)
+
+    vmt_holder.appendChild(orderL);
+    vmt_holder.appendChild(document.createTextNode(" "));
+    vmt_holder.appendChild(order);
+    /* networks holder*/
+    var networks=document.createElement("div");
+    networks.setAttribute("class", "networks");
+    vmt_holder.appendChild(networks);
+
+    console.log(vmt_holder);
+/*
+$("#lab_vmts").append("<div class=\"vmt\">  <div class=\"right\"> <input name=\"lab[lab_vmts_attributes]["+n+"][_destroy]\" type=\"hidden\" value=\"0\" /><input id=\"lab_lab_vmts_attributes_"+n+"__destroy\" name=\"lab[lab_vmts_attributes]["+n+"][_destroy]\" type=\"checkbox\" value=\"1\" />  <label for=\"lab_lab_vmts_attributes_"+n+"__destroy\">Remove</label></div>      <label for=\"lab_lab_vmts_attributes_"+n+"_name\">Name</label>       <input id=\"lab_lab_vmts_attributes_"+n+"_name\" name=\"lab[lab_vmts_attributes]["+n+"][name]\" size=\"30\" placeholder=\"Unique, alphanumeric with no spaces.\" type=\"text\" />      <br/>       <label for=\"lab_lab_vmts_attributes_"+n+"_nickname\">Nickname</label>       <input id=\"lab_lab_vmts_attributes_"+n+"_nickname\" name=\"lab[lab_vmts_attributes]["+n+"][nickname]\" placeholder=\"Name shown to user.\" size=\"30\" type=\"text\" />      <br/>      <label for=\"lab_lab_vmts_attributes_"+n+"_vmt_id\">Vmt</label>       <select id=\"lab_lab_vmts_attributes_"+n+"_vmt_id\" name=\"lab[lab_vmts_attributes]["+n+"][vmt_id]\">"+options+"</select>      <br/>      <label for=\"lab_lab_vmts_attributes_"+n+"_allow_remote\">Allow remote</label>       <input name=\"lab[lab_vmts_attributes]["+n+"][allow_remote]\" type=\"hidden\" value=\"0\" />      <input checked=\"checked\" id=\"lab_lab_vmts_attributes_"+n+"_allow_remote\" name=\"lab[lab_vmts_attributes]["+n+"][allow_remote]\" type=\"checkbox\" value=\"1\" />      <div class=\"networks\"></div>      </div>")
+*/
+    $("#lab_vmts").append(vmt_holder);
+    
+    var s=document.createElement('span');
     s.innerHTML='Add more networks';
     s.setAttribute('class', 'button add-button');
     s.onclick=function(){

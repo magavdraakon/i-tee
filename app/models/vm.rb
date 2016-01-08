@@ -52,7 +52,13 @@ class Vm < ActiveRecord::Base
   end
   
   def ini_vm
-    runstr = "sudo -u vbox  #{Rails.root}/utils/start_machine.sh #{mac.mac} #{mac.ip} #{lab_vmt.vmt.image} #{name} #{password} #{ENV['ENVIRONMENT']} '#{user.name}' 2>&1"
+    begin
+      rdp_host=ITee::Application.config.rdp_host
+    rescue
+      rdp_host=`hostname -f`.strip
+    end
+    
+    runstr = "sudo -u vbox  #{Rails.root}/utils/start_machine.sh #{rdp_host} #{mac.ip} #{lab_vmt.vmt.image} #{name} #{password} #{ENV['ENVIRONMENT']} '#{user.name}' 2>&1"
     Rails.logger.debug "ini_vm: #{runstr}"
     %x(#{runstr})
     #%x("#{@exec_line}  #{Rails.root}/utils/start_machine.sh #{mac.mac} #{mac.ip} #{lab_vmt.vmt.image} #{name} #{password} 2>&1")
@@ -215,7 +221,7 @@ end
         end
       }
 =end
-      if @a.include?("masin #{self.name} loodud")
+      if @a.include?("VM named: #{self.name} created")
         result[:notice] = result[:notice]+"Machine <b>#{self.lab_vmt.nickname}</b> successfully started<br/>"
         #flash[:notice]=flash[:notice].html_safe
         logger.debug @a

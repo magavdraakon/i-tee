@@ -9,7 +9,7 @@ class User < ActiveRecord::Base
 
   has_many :vms, :dependent => :destroy
   has_many :lab_users, :dependent => :destroy
-  has_many :user_badges, :dependent => :destroy
+ # has_many :user_badges, :dependent => :destroy
 
   validates_format_of :username, :with => /^[[:alnum:]]+[[:alnum:]_]+[[:alnum:]]$/ , :message => 'can only be alphanumeric with and dashes with no spaces'
   validates_uniqueness_of :username, :email, :case_sensitive => false

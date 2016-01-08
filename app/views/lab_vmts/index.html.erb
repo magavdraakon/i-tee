@@ -47,5 +47,9 @@
         <%=collection_select(:lab_vmt, :vmt_id, Vmt.all, :id, :image,{:prompt => "Select VM template"})%>
       <br/>
       <%= f.label :allow_remote %> <%= f.check_box :allow_remote %><br/>
+      <div class="field">
+      <%= f.label :position %> 
+      <%= f.number_field :position %>
+    </div>
       <%= f.submit "Add"%>
 <%end%>

@@ -95,7 +95,10 @@ class UsersController < ApplicationController
     @user = User.where("id=?", params[:id]).first
     respond_to do |format|
       if @user
+        logger.debug "\n user removal START \n"
+        logger.debug @user.as_json
         @user.destroy
+        logger.debug "\n user removal END \n"
         format.html { redirect_to(:back) }
         format.json { render :json=> { :success=>true, :message=>"user removed"} }
       else
