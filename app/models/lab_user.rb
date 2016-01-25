@@ -11,7 +11,6 @@ class LabUser < ActiveRecord::Base
   	vmts=LabVmt.where("lab_id = ? ", self.lab_id)
     #find vms for user in lab
   	Vm.where("user_id=? and lab_vmt_id in (?)", self.user_id, vmts)
-    
   end
 
   def vms_view
