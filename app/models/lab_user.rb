@@ -8,9 +8,13 @@ class LabUser < ActiveRecord::Base
 # get all vms that belong to this labuser (Lab attempt)
   def vms
     #find templates for lab
-  	#vmts=LabVmt.where("lab_id = ? ", self.lab_id)
+  	vmts=LabVmt.where("lab_id = ? ", self.lab_id)
     #find vms for user in lab
-  	#Vm.where("user_id=? and lab_vmt_id in (?)", self.user_id, vmts)
+  	Vm.where("user_id=? and lab_vmt_id in (?)", self.user_id, vmts)
+    
+  end
+
+  def vms_view
     Vm.joins(:lab_vmt).where("lab_vmts.lab_id=? and vms.user_id=?", self.lab_id, self.user_id).order('position asc')
   end
 

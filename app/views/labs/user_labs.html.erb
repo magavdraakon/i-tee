@@ -91,7 +91,7 @@
                 <div>
       <h3>Virtual machines</h3>
       <%= "There are no machines allocated for this lab" if @lab_user.vms.empty? %>
-      <% @lab_user.vms.each do |vm| %>
+      <% @lab_user.vms_view.each do |vm| %>
         <%state=vm.state 
           desc="Initialize the virtual machine #{vm.lab_vmt.nickname} by clicking <strong>Start</strong>"
            desc="There is no remote desktop access for #{vm.lab_vmt.nickname}" if (state=="running" || state=="paused") && !vm.lab_vmt.allow_remote
