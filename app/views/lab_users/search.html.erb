@@ -141,6 +141,7 @@
 			<tr>
 				<th style="width:1%; white-space: nowrap;"><label><%= check_box_tag 'toggle','', false,  :onclick=>"toggle_checked_all(this);", :id=>"toggle_lu" %><span> all</span></label></th>
 				<th><%=link_to("Lab name", :controller=>"lab_users",:action=>"search", :sort_by=>"labs.name", :dir=>@dir, :t=>params[:t], :l=>params[:l], :u=>params[:u])%></th>
+				<th><%=link_to("Fullname", :controller=>"lab_users",:action=>"search", :sort_by=>"users.name", :dir=>@dir, :t=>params[:t], :l=>params[:l], :u=>params[:u], :h=>params[:h])%></th>
 				<th><%=link_to("Username", :controller=>"lab_users",:action=>"search", :sort_by=>"users.username", :dir=>@dir, :t=>params[:t], :l=>params[:l], :u=>params[:u], :h=>params[:h])%></th>
 				<th><%=link_to("Start", :controller=>"lab_users",:action=>"search", :sort_by=>"lab_users.start", :dir=>@dir, :t=>params[:t], :l=>params[:l], :u=>params[:u], :h=>params[:h])%></th>
 				<th><%=link_to("End", :controller=>"lab_users",:action=>"search", :sort_by=>"lab_users.end", :dir=>@dir, :t=>params[:t], :l=>params[:l], :u=>params[:u], :h=>params[:h])%></th>
@@ -151,6 +152,7 @@
 		<tr class="found">
 			<td><%= check_box_tag 'id[]', lu.id , false, :id=>"id_#{lu.id}" %></td>
 			<td><%= link_to(lu.lab.name, "/user_labs/#{lu.user.username}/#{lu.lab.id}" )%></td>
+			<td><%= lu.user.name %></td>
 			<td><%= lu.user.username %></td>
 			<td><span title="<%= lu.start %>"><%= distance_of_time_in_words(Time.now, lu.start.to_time )+" ago" if lu.start %></span></td>
 			<td><span title="<%= lu.end %>"><%= distance_of_time_in_words(Time.now, lu.end.to_time )+" ago" if lu.end %></span></td>
