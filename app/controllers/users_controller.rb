@@ -66,27 +66,28 @@ class UsersController < ApplicationController
       unless @user
         format.html { redirect_to(:back, :notice=> "Can't find user") }
         format.json { render :json=> { :success=>false, :message=> "Can't find user"} }
-      end
-      @user.ldap=false
-      @user.ldap=true if params[:ldap_user]=='yes'
-      if user[:token_expires] # if time is sent, generate new token
-        @user.reset_authentication_token!
-      end
-      if params[:generate_token]=='yes'
-        @user.reset_authentication_token!
-        @user.token_expires=DateTime.new( params[:token]['expires(1i)'].to_i,
-                                        params[:token]['expires(2i)'].to_i,
-                                        params[:token]['expires(3i)'].to_i,
-                                        params[:token]['expires(4i)'].to_i,
-                                        params[:token]['expires(5i)'].to_i)
-      end
-    
-      if @user.update_attributes(user)
-        format.html { redirect_to(users_path, :notice => 'User was successfully updated.') }
-        format.json  { render :json=> { :success=> true}.merge(@user.as_json)}
       else
-        format.html { render :action => 'edit' }
-        format.json  { render :json => { :success=> false, :errors => @user.errors}, :status => :unprocessable_entity }
+        @user.ldap=false
+        @user.ldap=true if params[:ldap_user]=='yes'
+        if user[:token_expires] # if time is sent, generate new token
+          @user.reset_authentication_token!
+        end
+        if params[:generate_token]=='yes'
+          @user.reset_authentication_token!
+          @user.token_expires=DateTime.new( params[:token]['expires(1i)'].to_i,
+                                          params[:token]['expires(2i)'].to_i,
+                                          params[:token]['expires(3i)'].to_i,
+                                          params[:token]['expires(4i)'].to_i,
+                                          params[:token]['expires(5i)'].to_i)
+        end
+      
+        if @user.update_attributes(user)
+          format.html { redirect_to(users_path, :notice => 'User was successfully updated.') }
+          format.json  { render :json=> { :success=> true}.merge(@user.as_json)}
+        else
+          format.html { render :action => 'edit' }
+          format.json  { render :json => { :success=> false, :errors => @user.errors}, :status => :unprocessable_entity }
+        end
       end
     end
   end
