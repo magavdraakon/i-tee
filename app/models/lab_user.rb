@@ -110,8 +110,8 @@ class LabUser < ActiveRecord::Base
 
 	def destroy_all_vms
 		self.vms.each do |vm|
+      logger.debug "Machine #{vm.name} successfully deleted."
 			vm.destroy
-			logger.debug "Machine #{vm.name} successfully deleted."
 		end
 	end
 

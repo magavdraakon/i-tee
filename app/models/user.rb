@@ -7,13 +7,21 @@ class User < ActiveRecord::Base
   # Setup accessible (or protected) attributes for your model
   attr_accessible :name, :username, :email, :password, :password_confirmation, :remember_me, :keypair, :token_expires, :role
 
-  has_many :vms, :dependent => :destroy
-  has_many :lab_users, :dependent => :destroy
+  has_many :vms#, :dependent => :destroy
+  has_many :lab_users#, :dependent => :destroy 
+  before_destroy :del_labs # vms are deleted trough lab user
  # has_many :user_badges, :dependent => :destroy
 
   validates_format_of :username, :with => /^[[:alnum:]]+[[:alnum:]_]+[[:alnum:]]$/ , :message => 'can only be alphanumeric with and dashes with no spaces'
   validates_uniqueness_of :username, :email, :case_sensitive => false
 
+
+  def del_labs
+    logger.debug "removing labs"
+    self.lab_users.each do |lu|
+      lu.destroy
+    end
+  end
 
   def rolename
     if self.role==nil
