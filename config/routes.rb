@@ -65,7 +65,7 @@ ITee::Application.routes.draw do
   match 'about', :to=> 'home#about'
   match 'getprogress', :to=> 'home#getprogress'
   #with user
-   match 'start_all/:id/:username', :to=> 'vms#start_all'
+  match 'start_all/:id/:username', :to=> 'vms#start_all'
   match 'stop_all/:id/:username', :to=> 'vms#stop_all'
   #with id
   match 'start_all/:id', :to=> 'vms#start_all'
@@ -75,6 +75,10 @@ ITee::Application.routes.draw do
   match 'pause_vm/:id', :to=> 'vms#pause_vm'
   match 'resume_vm/:id', :to=> 'vms#resume_vm'
   match 'stop_vm/:id', :to=> 'vms#stop_vm'
+
+  match 'state_of', :to=> "vms#get_state"
+  match 'rdp_of', :to=> "vms#get_rdp"
+  
   match 'set_progress', :to=> 'vms#set_progress'
   match 'vms/get_progress/:id', :to=> 'vms#get_progress'
     #no id

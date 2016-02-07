@@ -1,18 +1,25 @@
 # encoding: utf-8
 class VmsController < ApplicationController
-before_filter :authorise_as_admin, :only => [:new, :edit ]
+  before_filter :authorise_as_admin, :only => [:new, :edit, :get_state, :get_rdp ]
   
   #before_filter :authorise_as_admin, :except => [:show, :index, :init_vm, :stop_vm, :pause_vm, :resume_vm, :start_vm, :start_all]
   #redirect to index view when trying to see unexisting things
-  before_filter :save_from_nil, :only=>[:show, :edit, :start_vm, :stop_vm, :pause_vm, :resume_vm]
-  before_filter :auth_as_owner, :only=>[:show, :start_vm, :stop_vm, :pause_vm, :resume_vm]       
+  before_filter :save_from_nil, :only=>[:show, :edit, :start_vm, :stop_vm, :pause_vm, :resume_vm, :get_state, :get_rdp ]
+  before_filter :auth_as_owner, :only=>[:show, :start_vm, :stop_vm, :pause_vm, :resume_vm, :get_state, :get_rdp ]       
   
   before_filter :admin_tab, :except=>[:show,:index, :vms_by_lab, :vms_by_state]
   before_filter :vm_tab, :only=>[:show,:index, :vms_by_lab, :vms_by_state]
+
   def save_from_nil
+    logger.debug "finding vm"
+
     @vm = Vm.find_by_id(params[:id])
     if @vm==nil 
-      redirect_to(vms_path,:notice=>'invalid id.')
+      logger.debug "no such vm\n"
+      respond_to do |format|
+        format.html  {redirect_to(vms_path,:notice=>'invalid id.')}
+        format.json  { render :json => {:success=>false, :message=>"Can't find vm"} }
+      end
     end
   end
   
@@ -175,6 +182,26 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
     end
   end
 
+
+  #get state of one machine-  API (admin) ONLY
+  # before filters check if owner/admin 
+  def get_state
+    get_user
+    respond_to do |format|  
+      format.html  { redirect_to(root_path, :notice =>"Permission error") }
+      format.json  { render :json => {:success=> true , :state=> @vm.state  } }
+    end
+  end
+
+  # get rdp lines of one machine- API (admin) ONLY
+  # before filters check if owner/admin 
+  def get_rdp
+    respond_to do |format|
+      format.html  { redirect_to(root_path, :notice =>"Permission error") }
+      format.json  { render :json => {:success=> true , :rdp=> @vm.get_all_rdp  } }
+    end
+  end
+
   #start all the machines this user has in a given lab
   def start_all
     respond_to do |format|
@@ -222,29 +249,58 @@ before_filter :authorise_as_admin, :only => [:new, :edit ]
 
   end
   
-  #start one machine
+  # start one machine 
+  # view is restriced to logged in users, before filter finds vm and checks if owner/admin
   def start_vm
-    result = @vm.start_vm
-    flash[:notice] = result[:notice].html_safe if result[:notice] && result[:notice]!=''
-    flash[:alert] = result[:alert].html_safe if result[:alert] && result[:alert]!=''
-    redirect_to(:back)
+    respond_to do |format|
+      logger.debug "\n start? \n "
+      result = @vm.start_vm
+        
+      is_notice= (result[:notice] && result[:notice]!='')
+      is_alert = (result[:alert] && result[:alert]!='')
+
+      flash[:notice] = result[:notice].html_safe if is_notice
+      flash[:alert] = result[:alert].html_safe if is_alert
+      
+      format.html  { redirect_to(:back) }
+      format.json  { render :json => {:success=>is_notice, :message=> is_notice ? "Machine started" : "Machine start failed"} }
+    end
+    
     rescue ActionController::RedirectBackError  # cant redirect back? go to the lab instead
       logger.info "\nNo :back error\n"
       redirect_to(my_labs_path+"/"+@vm.lab_vmt.lab.id.to_s)
   end
   
   #resume machine from pause
+  # view is restriced to logged in users, before filter finds vm and checks if owner/admin
   def resume_vm
-    #@vm=Vm.find(params[:id])
-    flash[:notice] = @vm.resume_vm 
-    redirect_to(:back)
+    respond_to do |format|
+      logger.debug "\n resume? \n "
+      result = @vm.resume_vm
+      # TODO! check if really resumed
+      format.html  { redirect_to(:back, :notice=> result[:message].html_safe) }
+      format.json  { render :json => {:success=>result[:success], :message=> result[:message]  } }
+    end
+    
+    rescue ActionController::RedirectBackError  # cant redirect back? go to the lab instead
+      logger.info "\nNo :back error\n"
+      redirect_to(my_labs_path+"/"+@vm.lab_vmt.lab.id.to_s)
   end
   
   #pause a machine
+  # view is restriced to logged in users, before filter finds vm and checks if owner/admin
   def pause_vm
-    #@vm=Vm.find(params[:id])
-    flash[:notice] = @vm.pause_vm.html_safe
-    redirect_to(:back) 
+    respond_to do |format|
+      logger.debug "\n resume? \n "
+      result = @vm.pause_vm
+      # TODO! check if really paused
+      format.html  { redirect_to(:back, :notice=> result[:message].html_safe) }
+      format.json  { render :json => {:success=>result[:success], :message=> result[:message] } }
+    end
+    
+    rescue ActionController::RedirectBackError  # cant redirect back? go to the lab instead
+      logger.info "\nNo :back error\n"
+      redirect_to(my_labs_path+"/"+@vm.lab_vmt.lab.id.to_s)
   end
 
   #stop all the machines this user has in a given lab
@@ -296,10 +352,19 @@ end
 
 
   #stop the machine, do not delete the vm row from the db (release mac, but allow reinitialization)
+  # view is restriced to logged in users, before filter finds vm and checks if owner/admin
   def stop_vm
-    #@vm=Vm.find(params[:id])
-    flash[:notice] = @vm.stop_vm
-    redirect_to(:back)
+    respond_to do |format|
+      logger.debug "\n resume? \n "
+      result = @vm.stop_vm
+      # TODO! check if really stopped
+      format.html  { redirect_to(:back, :notice=> result[:message].html_safe) }
+      format.json  { render :json => {:success=>result[:success], :message=> result[:message] } }
+    end
+    
+    rescue ActionController::RedirectBackError  # cant redirect back? go to the lab instead
+      logger.info "\nNo :back error\n"
+      redirect_to(my_labs_path+"/"+@vm.lab_vmt.lab.id.to_s)
   end
   
   #this is a method that updates a vms progress
@@ -346,12 +411,14 @@ end
   
    #redirect user if they are not admin or the machine owner but try to modify a machine
   def auth_as_owner
-    #@vm=Vm.find(params[:id])
     #is this vm this users?
     unless current_user==@vm.user || @admin
-      #You don't belong here. Go away.
-      flash[:notice]  = "Sorry, this machine doesnt belong to you!"
-      redirect_to(vms_path)
+      respond_to do |format|
+        logger.debug "not owner"
+        #You don't belong here. Go away.
+        format.html { redirect_to root_path , :notice=> "Sorry, this machine doesnt belong to you!" }
+        format.json { render :json=> {:success => false , :message=>  "Sorry, this machine doesnt belong to you!"} }
+      end
     end
   end
 private #----------------------------------------------------------------------------------

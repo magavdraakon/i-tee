@@ -66,18 +66,24 @@ class ApplicationController < ActionController::Base
    # redirect user if they are not admin but try to see things not meant for them
   def authorise_as_admin
     unless @admin
-      #You don't belong here. Go away.
-      flash[:alert]  = 'Restricted access!'
-      redirect_to(:controller=>'home', :action=>'error_401')
-      end
-   end
+      respond_to do |format|  #You don't belong here. Go away.
+        flash[:alert]  = 'Restricted access!'
+        #You don't belong here. Go away.
+        format.html { redirect_to(:controller=>'home', :action=>'error_401') }
+        format.json { render :json=> {:success => false , :message=>  "Restricted access!"} }
+      end    
+    end
+  end
   
    # redirect user if they are not manager (or admin) but try to see things not meant for them
   def authorise_as_manager
     unless @manager || @admin
-      #You don't belong here. Go away.
-      flash[:alert]  = 'Restricted access!'
-      redirect_to(:controller=>'home', :action=>'error_401')       
+      respond_to do |format|  #You don't belong here. Go away.
+        flash[:alert]  = 'Restricted access!'
+        #You don't belong here. Go away.
+        format.html { redirect_to(:controller=>'home', :action=>'error_401') }
+        format.json { render :json=> {:success => false , :message=>  "Restricted access!"} }
+      end      
     end
    end
   

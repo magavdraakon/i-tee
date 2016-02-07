@@ -129,10 +129,10 @@
             <% if vm.lab_vmt.allow_remote && state=="running" %>
                 <div class="remote_connections">
                     <span onclick="toggleOtherOsButtons(this)" class="showtoggle">&lt; more</span>
-                    <span class="button win-button Windows" onclick="show_remote(this, '<%=vm.remote('win')%>')">Windows</span>
-                    <span class="button mac-button MacOS" onclick="show_remote(this, '<%=vm.remote('mac')%>')">Mac</span>
-                    <span class="button rdesktop-button Linux UNIX" onclick="show_remote(this, '<%=vm.remote('rdesktop')%>')">Linux (rdesktop)</span>
-                    <span class="button xfreerdp-button Linux UNIX" onclick="show_remote(this, '<%=vm.remote('xfreerdp')%>')">Linux (xfreerdp)</span>
+                    <span class="button win-button Windows" onclick="show_remote(this, '<strong><%=vm.remote('win')%></strong>')">Windows</span>
+                    <span class="button mac-button MacOS" onclick="show_remote(this, '<strong><%=vm.remote('mac')%></strong>')">Mac</span>
+                    <span class="button rdesktop-button Linux UNIX" onclick="show_remote(this, '<strong><%=vm.remote('rdesktop')%></strong>')">Linux (rdesktop)</span>
+                    <span class="button xfreerdp-button Linux UNIX" onclick="show_remote(this, '<strong><%=vm.remote('xfreerdp')%></strong>')">Linux (xfreerdp)</span>
 
                   <div escape="false" class="remote copyMe">
                     <div class="parentheight hidden"><div class="helptext ">Click to copy</div></div>

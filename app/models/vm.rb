@@ -93,7 +93,9 @@ class Vm < ActiveRecord::Base
     @mac = Mac.where('vm_id=?', self.id).first
     @mac.vm_id=nil
     @mac.save
-    return 'Successful shutdown'
+    return {success: true, message: 'Successful macine shutdown'}
+  else
+    return {success: true, message: 'Machine was already shut down'}
   end
 end
 
@@ -198,12 +200,12 @@ end
       end
 =end
       desc =  '<br/>To create a connection with this machine using Windows use two commands:<br/>'
-      desc += self.remote('win')#"<strong>cmdkey /generic:#{rdp_host} /user:localhost\\#{self.user.username} /pass:#{self.password}</strong><br/>"
+      desc += '<srong>'+self.remote('win')+'</strong>' #"<strong>cmdkey /generic:#{rdp_host} /user:localhost\\#{self.user.username} /pass:#{self.password}</strong><br/>"
       #desc += "<strong>mstsc.exe /v:#{rdp_host}:#{rdp_port_prefix}#{port} /f</strong><br/>"
       self.description = 'To create a connection with this machine using linux/unix use<br/>'
-      self.description += self.remote('rdesktop')
+      self.description += '<srong>'+self.remote('rdesktop')+'</strong>' 
       self.description += '<br/> or use xfreerdp as<br/>'
-      self.description += self.remote('xfreerdp')
+      self.description += '<srong>'+self.remote('xfreerdp')+'</strong>' 
       #"<strong>rdesktop -k et -u#{self.user.username} -p#{self.password} -N -a16 #{rdp_host}:#{rdp_port_prefix}#{port}</strong></br> or use xfreerdp as</br><strong>xfreerdp  -k et --plugin cliprdr -g 90% -u #{self.user.username} -p #{self.password} #{rdp_host}:#{rdp_port_prefix}#{port}</strong></br>"
       self.description += desc
 
@@ -233,7 +235,9 @@ end
         result[:alert]="Machine initialization <strong>failed</strong>."
       end
      # logger.debug "\n#{result}\n"
-      
+    else
+      result[:notice] = ''
+      result[:alert]="Unable to start a machine that is already running"
     end
     return result   
     # removed mac address conflict rescue. Conflict management is TODO!
@@ -242,20 +246,40 @@ end
 
   #pause a machine
   def pause_vm
-    logger.info "running VM pause script"
-    a = self.pau_vm #the script is called in the model
-    logger.info a
-    return "Successful vm pause.<br/> To resume the machine click on the resume link next to the machine name."
+    if self.state=="running"
+      logger.info "running VM pause script"
+      a = self.pau_vm #the script is called in the model
+      logger.info a
+      return {success: true, message: "Successful vm pause."}
+    elsif self.state=="paused"
+      return {success: false, message:'Unable to pause a paused machine'}
+    else
+      return {success: false, message: 'unable to pause a shuth down machine'}
+    end
   end
 
   #resume machine from pause
   def resume_vm
-    logger.info "running VM resume script"
-    a=self.res_vm # the script is called in the model
-    logger.info a
-    return "Successful vm resume." 
+    if self.state=="paused"
+      logger.info "running VM resume script"
+      a=self.res_vm # the script is called in the model
+      logger.info a
+      return {success: true, message: "Successful vm resume."}
+    elsif self.state=="running"
+      return {success: false, message:'Unable to resume a running machine'}
+    else
+      return {success: false, message: 'unable to resume a shuth down machine'}
+    end
   end
 
+
+  def get_all_rdp
+    { 'win' => self.remote('win'),
+      'linux-xfreerdp' => self.remote('xfreerdp'),
+      'linux-rdesktop' => self.remote('rdesktop'),
+      'mac' => self.remote('mac')
+    }
+  end
   # connection informations
   def remote(typ)
     port=self.mac ? self.mac.ip.split('.').last : ''
@@ -272,16 +296,16 @@ end
 
     case typ
       when 'win'
-        desc = "<strong>cmdkey /generic:#{rdp_host} /user:localhost&#92;#{self.user.username} /pass:#{self.password}&amp;&amp;"
-        desc += "mstsc.exe /v:#{rdp_host}:#{rdp_port_prefix}#{port} /f</strong>"
+        desc = "cmdkey /generic:#{rdp_host} /user:localhost&#92;#{self.user.username} /pass:#{self.password}&amp;&amp;"
+        desc += "mstsc.exe /v:#{rdp_host}:#{rdp_port_prefix}#{port} /f"
       when 'rdesktop'
-        desc ="<strong>rdesktop  -u#{self.user.username} -p#{self.password} -N -a16 #{rdp_host}:#{rdp_port_prefix}#{port}</strong>"
+        desc ="rdesktop  -u#{self.user.username} -p#{self.password} -N -a16 #{rdp_host}:#{rdp_port_prefix}#{port}"
       when 'xfreerdp'
-        desc ="<strong>xfreerdp  --plugin cliprdr -g 90% -u #{self.user.username} -p #{self.password} #{rdp_host}:#{rdp_port_prefix}#{port}</strong>"
+        desc ="xfreerdp  --plugin cliprdr -g 90% -u #{self.user.username} -p #{self.password} #{rdp_host}:#{rdp_port_prefix}#{port}"
       when 'mac'
-        desc ="<strong>open rdp://#{self.user.username}:#{self.password}@#{rdp_host}:#{rdp_port_prefix}#{port}</strong>"
+        desc ="open rdp://#{self.user.username}:#{self.password}@#{rdp_host}:#{rdp_port_prefix}#{port}"
       else
-        desc ="<strong>rdesktop  -u#{self.user.username} -p#{self.password} -N -a16 #{rdp_host}:#{rdp_port_prefix}#{port}</strong>"
+        desc ="rdesktop  -u#{self.user.username} -p#{self.password} -N -a16 #{rdp_host}:#{rdp_port_prefix}#{port}"
 
     end
 
