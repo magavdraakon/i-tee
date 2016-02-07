@@ -254,7 +254,7 @@ end
     elsif self.state=="paused"
       return {success: false, message:'Unable to pause a paused machine'}
     else
-      return {success: false, message: 'unable to pause a shuth down machine'}
+      return {success: false, message: 'unable to pause a shut down machine'}
     end
   end
 
@@ -268,7 +268,7 @@ end
     elsif self.state=="running"
       return {success: false, message:'Unable to resume a running machine'}
     else
-      return {success: false, message: 'unable to resume a shuth down machine'}
+      return {success: false, message: 'unable to resume a shut down machine'}
     end
   end
 
