@@ -70,6 +70,7 @@ ITee::Application.routes.draw do
   #with id
   match 'start_all/:id', :to=> 'vms#start_all'
   match 'stop_all/:id', :to=> 'vms#stop_all'
+
   match 'start_vm/:id', :to=> 'vms#start_vm'
   match 'init_vm/:id', :to=> 'vms#init_vm'
   match 'pause_vm/:id', :to=> 'vms#pause_vm'
@@ -84,6 +85,10 @@ ITee::Application.routes.draw do
     #no id
   match 'start_all', :to=> 'vms#start_all'
   match 'stop_all', :to=> 'vms#stop_all'
+  match 'start_all_by_id', :to=> 'vms#start_all_by_id'
+  match 'stop_all_by_id', :to=> 'vms#stop_all_by_id'
+  match 'labuser_vms', :to=>"vms#labuser_vms"
+
   match 'start_vm', :to=> 'vms#start_vm'
   match 'init_vm', :to=> 'vms#init_vm'
   match 'pause_vm', :to=> 'vms#pause_vm'

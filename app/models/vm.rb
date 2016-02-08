@@ -274,11 +274,12 @@ end
 
 
   def get_all_rdp
-    { 'win' => self.remote('win'),
-      'linux-xfreerdp' => self.remote('xfreerdp'),
-      'linux-rdesktop' => self.remote('rdesktop'),
-      'mac' => self.remote('mac')
-    }
+    [
+      {os: ['Windows'], program: '', rdpline: self.remote('win') },
+      {os: ['Linux', 'UNIX'], program: 'xfreerdp', rdpline: self.remote('xfreerdp') },
+      {os: ['Linux', 'UNIX'], program: 'rdesktop', rdpline: self.remote('rdesktop') },
+      {os: ['MacOS'], program: '', rdpline: self.remote('mac') }
+    ]
   end
   # connection informations
   def remote(typ)

@@ -1,6 +1,6 @@
 # encoding: utf-8
 class VmsController < ApplicationController
-  before_filter :authorise_as_admin, :only => [:new, :edit, :get_state, :get_rdp ]
+  before_filter :authorise_as_admin, :only => [:new, :edit, :get_state, :get_rdp, :start_all_by_id, :stop_all_by_id, :labuser_vms ]
   
   #before_filter :authorise_as_admin, :except => [:show, :index, :init_vm, :stop_vm, :pause_vm, :resume_vm, :start_vm, :start_all]
   #redirect to index view when trying to see unexisting things
@@ -202,6 +202,50 @@ class VmsController < ApplicationController
     end
   end
 
+  # get vm info for labuser
+  def labuser_vms
+    respond_to do |format|
+      @labuser = LabUser.find(params[:id])
+      result = @labuser.vms_info
+      format.html {redirect_to root_path, :notice => 'Permission error'}
+      format.json {render :json=> { :success=> true, :vms=>result, :lab_user=> @labuser.id}}
+    end
+    rescue Timeout::Error
+      respond_to do |format|        
+        format.html {redirect_to :back , :notice => "Permission error"}
+        format.json {render :json=> { :success=> false, :message=>"Starting all virtual machines failed, try starting them one by one.", :lab_user=> @labuser.id}}
+      end
+    rescue ActiveRecord::RecordNotFound
+      respond_to do |format|
+        logger.debug "Can't find labuser: "
+        logger.debug params
+        format.html { redirect_to root_path , :notice=> "permission error" }
+        format.json { render :json=> {:success => false , :message=>  "Can't find mission" }}
+      end
+  end
+
+  # start all vms by labuser id - API only
+  def start_all_by_id
+    respond_to do |format|
+      @labuser = LabUser.find(params[:id])
+      result = @labuser.start_all_vms
+      format.html {redirect_to root_path, :notice => 'Permission error'}
+      format.json {render :json=> { :success=> result[:success], :message=>result[:message], :lab_user=> @labuser.id}}
+    end
+    rescue Timeout::Error
+      respond_to do |format|        
+        format.html {redirect_to :back , :notice => "Permission error"}
+        format.json {render :json=> { :success=> false, :message=>"Starting all virtual machines failed, try starting them one by one.", :lab_user=> @labuser.id}}
+      end
+    rescue ActiveRecord::RecordNotFound
+      respond_to do |format|
+        logger.debug "Can't find labuser: "
+        logger.debug params
+        format.html { redirect_to root_path , :notice=> "permission error" }
+        format.json { render :json=> {:success => false , :message=>  "Can't find mission" }}
+      end
+  end
+
   #start all the machines this user has in a given lab
   def start_all
     respond_to do |format|
@@ -222,8 +266,8 @@ class VmsController < ApplicationController
         @labuser = LabUser.where("lab_id=? and user_id=?", @lab.id, @user.id).last
         if @labuser!=nil #user has this lab
           result = @labuser.start_all_vms
-          format.html {redirect_to :back , :notice => result.html_safe}
-          format.json {render :json=> { :success=> true, :message=>result, :lab_user=> @labuser.id}}
+          format.html {redirect_to :back , :notice => result[:message].html_safe}
+          format.json {render :json=> { :success=> result[:success], :message=>result[:message], :lab_user=> @labuser.id}}
         else
           # no this user does not have this lab
           format.html { redirect_to my_labs_path, :notice => 'That lab was not assigned to this user!' }
@@ -303,6 +347,28 @@ class VmsController < ApplicationController
       redirect_to(my_labs_path+"/"+@vm.lab_vmt.lab.id.to_s)
   end
 
+  # start all vms by labuser id - API only
+  def stop_all_by_id
+    respond_to do |format|
+      @labuser = LabUser.find(params[:id])
+      result = @labuser.stop_all_vms
+      format.html {redirect_to root_path, :notice => 'Permission error'}
+      format.json {render :json=> { :success=> result[:success], :message=>result[:message], :lab_user=> @labuser.id}}
+    end
+    rescue Timeout::Error
+      respond_to do |format|        
+        format.html {redirect_to :back , :notice => "Permission error"}
+        format.json {render :json=> { :success=> false, :message=>"Starting all virtual machines failed, try starting them one by one.", :lab_user=> @labuser.id}}
+      end
+    rescue ActiveRecord::RecordNotFound
+      respond_to do |format|
+        logger.debug "Can't find labuser: "
+        logger.debug params
+        format.html { redirect_to root_path , :notice=> "permission error" }
+        format.json { render :json=> {:success => false , :message=>  "Can't find mission" }}
+      end
+  end
+
   #stop all the machines this user has in a given lab
 def stop_all
   respond_to do |format|
@@ -323,8 +389,8 @@ def stop_all
       @labuser = LabUser.where("lab_id=? and user_id=?", @lab.id, @user.id).last
       if @labuser!=nil #user has this lab
         result = @labuser.stop_all_vms
-        format.html {redirect_to :back , :notice => result.html_safe}
-        format.json {render :json=> { :success=> true, :message=>result, :lab_user=> @labuser.id}}
+        format.html {redirect_to :back , :notice => result[:message].html_safe}
+        format.json {render :json=> { :success=> result[:success], :message=>result[:message], :lab_user=> @labuser.id}}
       else
         # no this user does not have this lab
         format.html { redirect_to my_labs_path, :notice => 'That lab was not assigned to this user!' }

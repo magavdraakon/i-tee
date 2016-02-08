@@ -13,6 +13,23 @@ class LabUser < ActiveRecord::Base
   	Vm.where("user_id=? and lab_vmt_id in (?)", self.user_id, vmts)
   end
 
+  def vms_info
+    # id, nickname, state, allow_remote, position, rdp lines
+    vms = Vm.joins(:lab_vmt).where("lab_vmts.lab_id=? and vms.user_id=?", self.lab_id, self.user_id).order('position asc')
+    result= []
+    vms.each do |vm|
+      result << {
+        vm_id: vm.id,
+        nickname: vm.lab_vmt.nickname,
+        state: vm.state,
+        allow_remote: vm.lab_vmt.allow_remote,
+        position: vm.lab_vmt.position,
+        vm_rdp: vm.get_all_rdp
+      }
+    end
+    result
+  end
+
   def vms_view
     Vm.joins(:lab_vmt).where("lab_vmts.lab_id=? and vms.user_id=?", self.lab_id, self.user_id).order('position asc')
   end
@@ -83,20 +100,25 @@ class LabUser < ActiveRecord::Base
 
 
 	def start_all_vms
-		feedback =''
-		self.vms.each do |vm|
-			if vm.state!='running' && vm.state!='paused'  # cant be running nor paused
-				start = vm.start_vm
-				logger.info "#{vm.name} (#{vm.lab_vmt.nickname}) started"
-				add = start[:notice] ? start[:notice] : start[:alert]
-				feedback = feedback + add +'<br/>'
-			end #end if not running or paused
-		end
-		logger.info "\nfeedback: #{feedback}\n"
-		feedback
+    # olny if lab is started
+    if self.start && !self.end 
+  		feedback =''
+  		self.vms.each do |vm|
+  			if vm.state!='running' && vm.state!='paused'  # cant be running nor paused
+  				start = vm.start_vm
+  				logger.info "#{vm.name} (#{vm.lab_vmt.nickname}) started"
+  				add = start[:notice] ? start[:notice] : start[:alert]
+  				feedback = feedback + add +'<br/>'
+  			end #end if not running or paused
+  		end
+  		logger.info "\nfeedback: #{feedback}\n"
+  		{ success: true, message: feedback}
+    else
+      { success: false, message: 'unable to start machines in inactive lab'}
+    end
 	end
 
-	def stop_all_vms
+	def stop_all_vms # TODO: should check if lab is started?
 		feedback=''
 		self.vms.each do |vm|
 			if vm.state=='running' || vm.state=='paused'  # has to be running or paused
@@ -105,7 +127,7 @@ class LabUser < ActiveRecord::Base
 				feedback=feedback+"<b>#{vm.lab_vmt.nickname}</b> stopped<br/>"
 			end #end if not running or paused
 		end
-		feedback
+		{success: true, message:feedback}
 	end
 
 	def destroy_all_vms
