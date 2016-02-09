@@ -107,7 +107,7 @@ class LabUser < ActiveRecord::Base
   			if vm.state!='running' && vm.state!='paused'  # cant be running nor paused
   				start = vm.start_vm
   				logger.info "#{vm.name} (#{vm.lab_vmt.nickname}) started"
-  				add = start[:notice] ? start[:notice] : start[:alert]
+  				add = start[:notice]!='' ? start[:notice] : (start[:alert]!='' ? start[:alert] : "<b>#{vm.lab_vmt.nickname}</b> was not started")
   				feedback = feedback + add +'<br/>'
   			end #end if not running or paused
   		end

@@ -232,12 +232,12 @@ end
         @mac.vm_id=nil
         @mac.save
         result[:notice] = ''
-        result[:alert]="Machine initialization <strong>failed</strong>."
+        result[:alert]="Machine <b>#{self.lab_vmt.nickname}</b> initialization <b>failed</b>."
       end
      # logger.debug "\n#{result}\n"
     else
       result[:notice] = ''
-      result[:alert]="Unable to start a machine that is already running"
+      result[:alert]="Unable to start <b>#{self.lab_vmt.nickname}</b>, it is already running"
     end
     return result   
     # removed mac address conflict rescue. Conflict management is TODO!
