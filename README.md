@@ -718,6 +718,20 @@ production:
   # <<: *AUTHORIZATIONS
 ```
 
+In casse you do not have a Active Directory or LDAP server you can user token-based authentication instead.
+
+To create the first admin user use the rails console:
+
+```
+	User.create!(username: "admin", email: "admin email", name: "admin name", role: 2, token_expires: 3.years.from_now, password: "someStrongPassword")
+	u = User.first
+	u.authentication_token = "somekey"
+	u.save
+```
+
+and to log in use https://www.yourhost.com?auth_token=somekey
+
+
 ##For developers
 
 For documentation:
