@@ -230,13 +230,13 @@ end
         logger.debug @a
 
         # add last activity to labuser
-        labuser=LabUser.where("lab_id=? and user_id=?", self.lab_vmt.lab_id, self.user_id).first
+        labuser=LabUser.where("lab_id=? and user_id=?", self.lab_vmt.lab_id, self.user_id).last
         if labuser
           labuser.last_activity=Time.now
           labuser.activity="Start vm '#{self.name}'"
           labuser.save 
         end
-        
+
       else
         logger.info @a  
         @mac.vm_id=nil
