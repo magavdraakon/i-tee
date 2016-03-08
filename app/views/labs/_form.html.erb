@@ -37,6 +37,19 @@
       <div class="field">
         <%= f.check_box( :endable)  %><%= f.label :endable %>
       </div>
+      <hr/>
+    <div class="field">
+      <%= f.label :poll_freq, 'Seconds to wait before checking vm RDP connection status again (0=no polling): ' %><br/>
+      <%= f.text_field :poll_freq %>
+    </div>
+    <div class="field">
+      <%= f.label :power_timeout, 'Seconds to wait before powering off all vms due to RDP inactivity (0=no stopping): ' %><br/>
+      <%= f.text_field :power_timeout %>
+    </div>
+    <div class="field">
+      <%= f.label :end_timeout, 'Seconds to wait before ending lab due to RDP inactivity (0=no ending): ' %><br/>
+      <%= f.text_field :end_timeout %>
+    </div>
     </fieldset>
     <fieldset><legend>User management</legend>
       <div class="field">

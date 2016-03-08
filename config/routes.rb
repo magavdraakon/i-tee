@@ -1,4 +1,9 @@
 ITee::Application.routes.draw do
+
+  match 'jobs',:to=>"home#jobs"
+  match "jobs/:id", :to=>'home#delete_job', via: [:delete]
+  match "jobs/:id", :to=>'home#run_job', via: [:put]
+
   match 'networks/:id/edit', :to => "networks#index"
   resources :lab_vmt_networks
 

@@ -29,12 +29,6 @@ class Vm < ActiveRecord::Base
     @exec_line = 'sudo -u vbox '
   end
 
-  def RDP_status
-    info = %x(VBoxManage showvminfo #{name})
-    status= $?
-    logger.debug info
-    logger.debug status.exitstatus
-  end
 
   def del_vm
      %x(sudo -u vbox #{Rails.root}/utils/delete_machine.sh #{name}  2>&1)
@@ -234,6 +228,15 @@ end
         result[:notice] = result[:notice]+"Machine <b>#{self.lab_vmt.nickname}</b> successfully started<br/>"
         #flash[:notice]=flash[:notice].html_safe
         logger.debug @a
+
+        # add last activity to labuser
+        labuser=LabUser.where("lab_id=? and user_id=?", self.lab_vmt.lab_id, self.user_id).first
+        if labuser
+          labuser.last_activity=Time.now
+          labuser.activity="Start vm '#{self.name}'"
+          labuser.save 
+        end
+        
       else
         logger.info @a  
         @mac.vm_id=nil

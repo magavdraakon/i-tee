@@ -10,6 +10,9 @@
         <th class="narrow"><%=link_to("Endable", :controller=>"labs",:action=>"index", :sort_by=>"endable", :dir=>@dir)%></th>
         <th class="narrow" ><%=link_to("Start vms", labs_path+'?sort_by=startAll&dir='+@dir, :title=> 'starting the lab will start all machines')%></th>
         <th class="narrow" ><%=link_to("Manage vms by one", labs_path+'?sort_by=vms_by_one&dir='+@dir, :title =>'vms can be started/stopped one-by-one')%></th>
+        <th>Poll freq.</th>
+        <th>Power timeout</th>
+        <th>End timeout</th>
         <th class="narrow"></th>
       </tr>
     </thead>
@@ -22,6 +25,9 @@
         <td><%= lab.endable ? 'yes' : 'no' %></td>
         <td><%= lab.startAll ? 'yes' : 'no' %></td>
         <td><%= lab.vms_by_one ? 'yes' : 'no' %></td>
+        <td><%= lab.poll_freq %> sec</td>
+        <td><%= lab.power_timeout %> sec</td>
+        <td><%= lab.end_timeout %> sec</td>
         <td class="narrow">
           <%= link_to 'View', lab,:class=> 'show-button button' %>
           <%= link_to 'Edit info', edit_lab_path(lab) ,:class=> 'edit-button button'%>
