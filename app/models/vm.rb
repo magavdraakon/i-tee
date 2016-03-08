@@ -29,6 +29,13 @@ class Vm < ActiveRecord::Base
     @exec_line = 'sudo -u vbox '
   end
 
+  def RDP_status
+    info = %x(VBoxManage showvminfo #{name})
+    status= $?
+    logger.debug info
+    logger.debug status.exitstatus
+  end
+
   def del_vm
      %x(sudo -u vbox #{Rails.root}/utils/delete_machine.sh #{name}  2>&1)
   end

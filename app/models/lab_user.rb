@@ -103,16 +103,20 @@ class LabUser < ActiveRecord::Base
     # olny if lab is started
     if self.start && !self.end 
   		feedback =''
+      success = true
   		self.vms.each do |vm|
   			if vm.state!='running' && vm.state!='paused'  # cant be running nor paused
   				start = vm.start_vm
   				logger.info "#{vm.name} (#{vm.lab_vmt.nickname}) started"
   				add = start[:notice]!='' ? start[:notice] : (start[:alert]!='' ? start[:alert] : "<b>#{vm.lab_vmt.nickname}</b> was not started")
   				feedback = feedback + add +'<br/>'
+          unless add.include?('successfully started')
+            success=false # one machine fails = all fails
+          end
   			end #end if not running or paused
   		end
   		logger.info "\nfeedback: #{feedback}\n"
-  		{ success: true, message: feedback}
+  		{ success: success, message: feedback}
     else
       { success: false, message: 'unable to start machines in inactive lab'}
     end
@@ -127,7 +131,8 @@ class LabUser < ActiveRecord::Base
 				feedback=feedback+"<b>#{vm.lab_vmt.nickname}</b> stopped<br/>"
 			end #end if not running or paused
 		end
-		{success: true, message:feedback}
+    # if no feedbck then no macines were stopped
+		{success: feedback!='' , message:feedback}
 	end
 
 	def destroy_all_vms
