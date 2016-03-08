@@ -24,7 +24,7 @@ Before installing i-tee system the Ubuntu server with VirtualBox headless is nee
 * Choose btrfs filesystem for /var for virtual machines (optional)
 * Configure network
 
-Do system upgrade
+Do system upgrade and install additional packages
 
 	sudo apt-get update
 
@@ -36,16 +36,6 @@ Do system upgrade
 	
 	sudo apt-get install makepasswd -y
 
-
-
-Install GIT: 
-
-	sudo apt-get install git
-
-
-Install optional packages:
-
-	sudo apt-get install htop
 
 # Installing virtualization layer
 
@@ -654,6 +644,17 @@ END
 
 	mkdir /var/www/railsapps/i-tee/tmp
 	chown www-data:www-data /var/www/railsapps/i-tee/tmp/
+
+## Performance tuning
+
+1. mount /var/labs with noatime,nodiratime options
+
+Sample line for /etc/fstab:
+    
+    /dev/YOURDISK    /var/labs       ext4    defaults,noauto,noatime,nodiratime      0       0
+
+
+2. set  vm.dirty_background_ratio=1, vm.dirty_ratio=60 in /etc/sysctl.d/local.conf
 
 
 ## Test your installation
