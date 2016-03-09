@@ -199,7 +199,7 @@ class LabUser < ActiveRecord::Base
 
                 elsif virtual['VRDE Connection']=='active' # running RDP
                   labuser.last_activity=Time.now
-                  labuser.activity = "RDP active for '#{vm.name}'"
+                  labuser.activity = "RDP active - '#{vm.name}'"
                   puts "RDP is active - #{vm.name}"
                 end
               when "powered off"

@@ -233,7 +233,7 @@ end
         labuser=LabUser.where("lab_id=? and user_id=?", self.lab_vmt.lab_id, self.user_id).last
         if labuser
           labuser.last_activity=Time.now
-          labuser.activity="Start vm '#{self.name}'"
+          labuser.activity="Start vm - '#{self.name}'"
           labuser.save 
         end
 
