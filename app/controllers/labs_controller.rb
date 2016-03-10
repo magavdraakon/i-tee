@@ -10,10 +10,10 @@ class LabsController < ApplicationController
     
   
   def get_lab
-    @lab = Lab.where("id=?",params[:id]).first
+    @lab = Lab.where('id=?',params[:id]).first
     unless @lab 
       respond_to do |format|
-         format.html  {redirect_to my_labs_path, :notice=>"Invalid lab id." }
+         format.html  {redirect_to my_labs_path, :notice=>'Invalid lab id.' }
          format.json  { render :json => {:success=>false, :message=>"Can't find lab"} }
       end
     end
@@ -24,8 +24,11 @@ class LabsController < ApplicationController
   def index
     set_order_by
     @labs = Lab.order(@order).paginate(:page=>params[:page], :per_page=>@per_page)
-    labs = Lab.all if !params[:conditions]
-    labs = Lab.where(params[:conditions].as_json) if params[:conditions]
+    if params[:conditions]
+      labs = Lab.where(params[:conditions].as_json)
+    else
+      labs = Lab.all
+    end
     respond_to do |format|
       format.html # index.html.erb
       format.json  { render :json => labs }
@@ -117,13 +120,13 @@ class LabsController < ApplicationController
   # DELETE /labs/1
   # DELETE /labs/1.xml
   def destroy
-    @lab = Lab.where("id=?",params[:id]).first
+    @lab = Lab.where('id=?',params[:id]).first
     respond_to do |format|
         if @lab
           @lab.destroy
 
-          format.html { redirect_to(labs_url, :notice=>"Lab deleted") }
-          format.json  { render :json => {:success=>true, :message=>"Lab deleted"} }
+          format.html { redirect_to(labs_url, :notice=>'Lab deleted') }
+          format.json  { render :json => {:success=>true, :message=>'Lab deleted'} }
         else
           format.html { redirect_to(labs_url, :notice=>"Can't find lab") }
           format.json  { render :json => {:success=>false, :message=>"Can't find lab"}}
@@ -171,19 +174,19 @@ class LabsController < ApplicationController
   def start_lab_by_id
     respond_to do |format|
       if @admin && params[:labuser_id]
-        @labuser= LabUser.where("id=?", params[:labuser_id]).first
+        @labuser= LabUser.where('id=?', params[:labuser_id]).first
         if @labuser
           # generating vm info if needed
           @labuser.start_lab
           format.html { redirect_to(:back) }
-          format.json {render :json=>{ :success => true , :message=> "lab started", :lab_user => @labuser.id, :start_time => @labuser.start }}
+          format.json {render :json=>{ :success => true , :message=> 'lab started', :lab_user => @labuser.id, :start_time => @labuser.start }}
         else
           format.html { redirect_to :back , :notice=> "Can't find lab user" }
           format.json { render :json=> {:success => false , :message=>  "Can't find lab user" }}
         end
       else
-        format.html { redirect_to :back , :notice=> "Restricted access" }
-        format.json { render :json=> {:success => false , :message=>  "No permission error" }}
+        format.html { redirect_to :back , :notice=> 'Restricted access' }
+        format.json { render :json=> {:success => false , :message=>  'No permission error' }}
       end
     end
     rescue ActionController::RedirectBackError # cant redirect back? go to the lab instead
@@ -205,7 +208,7 @@ class LabsController < ApplicationController
         logger.debug '\n start_lab: Relocate user\n'
         # simple user should not have the username in url
         format.html { redirect_to my_labs_path+(params[:id] ? "/#{params[:id]}" : '') }
-        format.json { render :json=>{:success => false , :message=> "No permission error" }}
+        format.json { render :json=>{:success => false , :message=> 'No permission error' }}
       else
         # ok, there is such lab, but does the user have it?
         @lab_user = LabUser.where('lab_id=? and user_id=?', @lab.id, @user.id).last
@@ -220,7 +223,7 @@ class LabsController < ApplicationController
         end
         # what is done is done, redirect the user back to view the lab
         format.html { redirect_to(:back) }
-        format.json {render :json=>{ :success => true , :message=> "lab started", :lab_user => @lab_user.id, :start_time => @lab_user.start }}
+        format.json {render :json=>{ :success => true , :message=> 'lab started', :lab_user => @lab_user.id, :start_time => @lab_user.start }}
       end #is ok
     end
     rescue ActiveRecord::RecordNotFound
@@ -238,19 +241,19 @@ class LabsController < ApplicationController
   def end_lab_by_id
     respond_to do |format|
       if @admin && params[:labuser_id]
-        @labuser= LabUser.where("id=?", params[:labuser_id]).first
+        @labuser= LabUser.where('id=?', params[:labuser_id]).first
         if @labuser
           @labuser.end_lab
           # back to the view the link was in
           format.html { redirect_to(:back) }
-          format.json {render :json=>{ :success => true , :message=> "lab ended", :lab_user => @labuser.id , :end_time => @labuser.end}}
+          format.json {render :json=>{ :success => true , :message=> 'lab ended', :lab_user => @labuser.id , :end_time => @labuser.end}}
         else
           format.html { redirect_to :back , :notice=> "Can't find lab user" }
           format.json { render :json=> {:success => false , :message=>  "Can't find lab user" }}
         end
       else
-        format.html { redirect_to :back , :notice=> "Restricted access" }
-        format.json { render :json=> {:success => false , :message=>  "No permission error" }}
+        format.html { redirect_to :back , :notice=> 'Restricted access' }
+        format.json { render :json=> {:success => false , :message=>  'No permission error' }}
       end
     end
     rescue ActionController::RedirectBackError # cant redirect back? go to the lab instead
@@ -268,10 +271,10 @@ class LabsController < ApplicationController
         @lab_user.end_lab
         # back to the view the link was in
         format.html { redirect_to(:back) }
-        format.json {render :json=>{ :success => true , :message=> "lab ended", :lab_user => @lab_user.id , :end_time => @lab_user.end}}
+        format.json {render :json=>{ :success => true , :message=> 'lab ended', :lab_user => @lab_user.id , :end_time => @lab_user.end}}
       else #this lab doesnt belong to this user, permission error
         format.html { redirect_to error_401_path , :notice=> 'Restricted access!' }
-        format.json {render :json=>{ :success => false , :message=> "No permission error" }}
+        format.json {render :json=>{ :success => false , :message=> 'No permission error' }}
       end # end- this users lab
     end
     rescue ActiveRecord::RecordNotFound
@@ -288,19 +291,19 @@ class LabsController < ApplicationController
   def restart_lab_by_id
     respond_to do |format|
       if @admin && params[:labuser_id]
-        @labuser= LabUser.where("id=?", params[:labuser_id]).first
+        @labuser= LabUser.where('id=?', params[:labuser_id]).first
         if @labuser
           @labuser.restart_lab
           # back to the view the link was in
           format.html { redirect_to(:back) }
-          format.json {render :json=>{ :success => true , :message=> "lab restarted", :lab_user => @labuser.id, :start_time => @labuser.start }}
+          format.json {render :json=>{ :success => true , :message=> 'lab restarted', :lab_user => @labuser.id, :start_time => @labuser.start }}
         else
           format.html { redirect_to :back , :notice=> "Can't find lab user" }
           format.json { render :json=> {:success => false , :message=>  "Can't find lab user" }}
         end
       else
-        format.html { redirect_to :back , :notice=> "Restricted access" }
-        format.json { render :json=> {:success => false , :message=>  "No permission error" }}
+        format.html { redirect_to :back , :notice=> 'Restricted access' }
+        format.json { render :json=> {:success => false , :message=>  'No permission error' }}
       end
     end
     rescue ActionController::RedirectBackError # cant redirect back? go to the lab instead
@@ -323,7 +326,7 @@ class LabsController < ApplicationController
         logger.debug "\nuser '#{current_user.username}' tried to load '#{user}' lab and was redirected to own lab\n"
         # simple user should not have the username in url
         format.html { redirect_to(my_labs_path+(params[:id] ? "/#{params[:id]}" : ''))}
-        format.json { render :json=>{:success => false , :message=> "No permission error" }}
+        format.json { render :json=>{:success => false , :message=> 'No permission error' }}
       else
         @lab_user=LabUser.where('lab_id=? and user_id=?', @lab.id, @user.id).last
         if @lab_user!=nil
@@ -336,7 +339,7 @@ class LabsController < ApplicationController
         end
         # redirect back to the view the link was in
         format.html { redirect_to(:back) }
-        format.json {render :json=>{ :success => true , :message=> "lab restarted", :lab_user => @lab_user.id, :start_time => @lab_user.start }}
+        format.json {render :json=>{ :success => true , :message=> 'lab restarted', :lab_user => @lab_user.id, :start_time => @lab_user.start }}
       end
     end
     rescue ActiveRecord::RecordNotFound

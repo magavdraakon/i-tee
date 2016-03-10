@@ -5,21 +5,21 @@ class VmtsControllerTest < ActionController::TestCase
     @vmt = vmts(:one)
     sign_in users(:ttanav)
     #setting a previous page
-    request.env["HTTP_REFERER"] = vmts_path
+    request.env['HTTP_REFERER'] = vmts_path
   end
 
-  test "should get index" do
+  test 'should get index' do
     get :index
     assert_response :success
     assert_not_nil assigns(:vmts)
   end
 
-  test "should get new" do
+  test 'should get new' do
     get :new
     assert_response :success
   end
 
-  test "should create vmt" do
+  test 'should create vmt' do
     vmt=Vmt.new
     vmt.username='student'
     vmt.image='image'
@@ -31,17 +31,17 @@ class VmtsControllerTest < ActionController::TestCase
     assert_redirected_to vmt_path(assigns(:vmt))
   end
 
-  test "should show vmt" do
+  test 'should show vmt' do
     get :show, :id => @vmt.to_param
     assert_response :success
   end
 
-  test "should get edit" do
+  test 'should get edit' do
     get :edit, :id => @vmt.to_param
     assert_response :success
   end
 
-  test "should update vmt" do
+  test 'should update vmt' do
     vmt=Vmt.new
     vmt.username='newstudent'
     vmt.image='newimage'
@@ -50,7 +50,7 @@ class VmtsControllerTest < ActionController::TestCase
     assert_redirected_to vmt_path(assigns(:vmt))
   end
 
-  test "should destroy vmt" do
+  test 'should destroy vmt' do
     assert_difference('Vmt.count', -1) do
       delete :destroy, :id => @vmt.to_param
     end

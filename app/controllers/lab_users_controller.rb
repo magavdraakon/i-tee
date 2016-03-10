@@ -8,20 +8,20 @@ class LabUsersController < ApplicationController
 
   def save_from_nil
     if params[:id] # find by id
-      @lab_user = LabUser.where("id=?",params[:id]).first
+      @lab_user = LabUser.where('id=?',params[:id]).first
       if @lab_user==nil # cant find!
         respond_to do |format|
-           format.html  {redirect_to lab_users_path, :notice=>"Invalid  id." }
+           format.html  {redirect_to lab_users_path, :notice=>'Invalid  id.' }
            format.json  { render :json => {:success=>false, :message=>"Can't find lab user"} }
         end
       end
     elsif params[:lab_id] # find by lab_id and userid/username
       get_user
       if @user
-        @lab_user = LabUser.where("user_id=? and lab_id=?", @user.id, params[:lab_id]).last # last is the newest
+        @lab_user = LabUser.where('user_id=? and lab_id=?', @user.id, params[:lab_id]).last # last is the newest
         if @lab_user==nil # cant find!
           respond_to do |format|
-             format.html  {redirect_to lab_users_path, :notice=>"Invalid  id." }
+             format.html  {redirect_to lab_users_path, :notice=>'Invalid  id.' }
              format.json  { render :json => {:success=>false, :message=>"Can't find lab user"} }
           end
         end
@@ -43,13 +43,14 @@ class LabUsersController < ApplicationController
     set_order_by
     @lab_users = LabUser.order(@order).paginate(:page => params[:page], :per_page => @per_page)
     @lab_user = LabUser.new
+    @users= User.order('username')
     if request.format == 'json'
       if params[:conditions]
         #fix start and end
-        if params[:conditions][:end] && params[:conditions][:end]==""
+        if params[:conditions][:end] && params[:conditions][:end]==''
           params[:conditions][:end]=nil
         end
-        if params[:conditions] && params[:conditions][:start]==""
+        if params[:conditions] && params[:conditions][:start]==''
           params[:conditions][:start]=nil
         end
         logger.debug "\n query params #{params[:conditions]}\n"
@@ -67,7 +68,7 @@ class LabUsersController < ApplicationController
 
   def show
     @lab_user = LabUser.find_by_id(params[:id])
-    @info={'running'=>[], 'paused'=>[], 'stopped'=>[]}
+    @info={:running=>[], :paused=>[], :stopped=>[]}
     @lab_user.vms.each do |v|
       v['username']=@lab_user.user.username
       v['port']='10'+v.mac.ip.split('.').last if v.mac!=nil
@@ -118,7 +119,7 @@ class LabUsersController < ApplicationController
         elsif params[:lab_id]
           get_user
           if @user
-            @lab_user = LabUser.new()
+            @lab_user = LabUser.new
             @lab_user.lab_id= params[:lab_id]
             @lab_user.user_id= @user.id
           else
@@ -162,7 +163,7 @@ class LabUsersController < ApplicationController
       @lab_user.destroy
 
       format.html { redirect_to(lab_users_path) }
-      format.json { render :json=> { :success=>true, :message=>"lab user removed"} }
+      format.json { render :json=> { :success=>true, :message=>'lab user removed'} }
     end
   end
   
@@ -282,8 +283,11 @@ class LabUsersController < ApplicationController
           manage_vms(lab.vms) if params[:vm]
         end
       end # end updates
-      @labs = Lab.joins('left join hosts on hosts.id=labs.host_id').order(@order).where('LOWER(labs.name) like ?', "%#{params[:l].downcase}%").all if params[:h]==''
-      @labs = Lab.joins('left join hosts on hosts.id=labs.host_id').order(@order).where('LOWER(labs.name) like ? and LOWER(hosts.name) like ?', "%#{params[:l].downcase}%", "%#{(params[:h] ? params[:h] : '').downcase}%").all if params[:h]!=''
+      if params[:h]==''
+        @labs = Lab.joins('left join hosts on hosts.id=labs.host_id').order(@order).where('LOWER(labs.name) like ?', "%#{params[:l].downcase}%").all
+      else
+        @labs = Lab.joins('left join hosts on hosts.id=labs.host_id').order(@order).where('LOWER(labs.name) like ? and LOWER(hosts.name) like ?', "%#{params[:l].downcase}%", "%#{(params[:h] ? params[:h] : '').downcase}%").all
+      end
     elsif params[:t] && params[:t]=='Lab user'
       if params[:id]
         lab_users=get_lab_users_from(params[:id])
@@ -350,7 +354,7 @@ class LabUsersController < ApplicationController
       elsif params[:lab]=='restart' # restart all labs
         # TODO! should restart only stopped labs?
         lu.restart_lab
-      elsif params[:lab]=="remove" # remove all labs
+      elsif params[:lab]=='remove' # remove all labs
         lu.destroy
       end
     end

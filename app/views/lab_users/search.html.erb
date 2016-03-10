@@ -1,16 +1,16 @@
-<% host=request.host host=host+":3000" if host=="localhost" %>
-<%= form_tag("/search", method: "get") do %>
+<% host=request.host host=host+':3000' if host=='localhost' %>
+<%= form_tag('/search', method: 'get') do %>
   <div id="search-form">
-  	<%= label_tag(:t, "Search for:") %>
-  	<%= select_tag :t, options_for_select(["User", "Lab", "Lab user"] , params[:t]), :onchange=>"load_form(this.value);" %>
+  	<%= label_tag(:t, 'Search for:') %>
+  	<%= select_tag :t, options_for_select(['User', 'Lab', 'Lab user'] , params[:t]), :onchange=>'load_form(this.value);' %>
   	<%= text_field_tag(:u, params[:u], :placeholder=>'Username') %>
   	<%= text_field_tag(:l, params[:l], :placeholder=>'lab name') %>
   	<%= select_tag(:h, options_from_collection_for_select(Host.all,:name, :name ,params[:h]), :prompt=>'All hosts') %>
-  	<%= submit_tag("Search") %>
+  	<%= submit_tag('Search') %>
   </div>
 <% end %>
 <div id="index_t">
-<% if @users && @users.size>0 then %>
+<% if @users && @users.size>0  %>
 	<p>Found <%= @users.size %> users</p>
 	<%= form_for @users, :url => search_path do |f| %>
 		<input type="hidden" name="t" value="User" />
@@ -18,13 +18,13 @@
 		<table >
 			<thead>
 			<tr>
-				<th style="width:1%; white-space: nowrap;"><label><%= check_box_tag 'toggle','', false,  :onclick=>"toggle_checked_all(this);", :id=>"toggle_u"  %><span> all</span></label></th>
+				<th style="width:1%; white-space: nowrap;"><label><%= check_box_tag 'toggle','', false,  :onclick=>'toggle_checked_all(this);', :id=>'toggle_u'  %><span> all</span></label></th>
 				<th>Username</th>
-				<th><%=link_to("Fullname", :controller=>"lab_users",:action=>"search", :sort_by=>"name", :dir=>@dir, :t=>params[:t], :u=>params[:u])%></th>
+				<th><%=link_to('Fullname', :controller=>'lab_users',:action=>'search', :sort_by=>'name', :dir=>@dir, :t=>params[:t], :u=>params[:u])%></th>
 				<th>labs</th>
-				<th><%=link_to("Last login", :controller=>"lab_users",:action=>"search", :sort_by=>"last_sign_in_at", :dir=>@dir, :t=>params[:t], :u=>params[:u])%></th>
+				<th><%=link_to('Last login', :controller=>'lab_users',:action=>'search', :sort_by=>'last_sign_in_at', :dir=>@dir, :t=>params[:t], :u=>params[:u])%></th>
 				<th>Token</th>
-				<th><%=link_to("Token expires", :controller=>"lab_users",:action=>"search", :sort_by=>"token_expires", :dir=>@dir, :t=>params[:t], :u=>params[:u])%></th>
+				<th><%=link_to('Token expires', :controller=>'lab_users',:action=>'search', :sort_by=>'token_expires', :dir=>@dir, :t=>params[:t], :u=>params[:u])%></th>
 				<th></th>
 			</tr>
 			</thead>
@@ -34,9 +34,9 @@
 			<td><%= link_to(user.username, "/user_labs/#{user.username}" )%></td>
 			<td><%= user.name %></td>
 			<td><%= user.lab_users.count %></td>
-			<td><span title="<%= user.last_sign_in_at %>"><%= distance_of_time_in_words(Time.now, user.last_sign_in_at.to_time )+" ago" if user.last_sign_in_at %></span></td>
-			<td><%=user.authentication_token.blank? ? "No token" : link_to("#{host}#{root_path(:auth_token => user.authentication_token)}", root_path(:auth_token => user.authentication_token)) %></td>
-			<td><span title="<%=user.token_expires %>"><%= (user.token_expires.to_time>Time.now ? "in ": "")+distance_of_time_in_words(Time.now, user.token_expires.to_time)+(user.token_expires.to_time>Time.now ? "": " ago") if user.token_expires %></span></td>
+			<td><span title="<%= user.last_sign_in_at %>"><%= distance_of_time_in_words(Time.now, user.last_sign_in_at.to_time )+' ago' if user.last_sign_in_at %></span></td>
+			<td><%=user.authentication_token.blank? ? 'No token' : link_to("#{host}#{root_path(:auth_token => user.authentication_token)}", root_path(:auth_token => user.authentication_token)) %></td>
+			<td><span title="<%=user.token_expires %>"><%= (user.token_expires.to_time>Time.now ? 'in ': '')+distance_of_time_in_words(Time.now, user.token_expires.to_time)+(user.token_expires.to_time>Time.now ? '': ' ago') if user.token_expires %></span></td>
 			<td onclick="expandnext(this);">Expand</td>
 		</tr>
 		<tr class="hidden">
@@ -44,27 +44,27 @@
 				<% user.lab_users.each do |lab_user| %>
 					<div style="padding:3px;">
 						<%= link_to lab_user.lab.name, "/user_labs/#{user.username}/#{lab_user.lab.id}"  %>
-						<%= lab_user.start ? (lab_user.end ? "( Completed @ "+lab_user.end.to_s+" )" : "( Running )") : "( Uninitialized )" %>
+						<%= lab_user.start ? (lab_user.end ? '( Completed @ '+lab_user.end.to_s+' )' : '( Running )') : '( Uninitialized )' %>
 						<%= "#{lab_user.vms.size} Vms" if lab_user.vms.size>0 %> 
-						<%= link_to('Start lab',start_lab_path+"/"+lab_user.lab.id.to_s+"/"+lab_user.user.username , :class=>'submit-button button') if lab_user.start==nil %>
-                      <%= link_to('Restart lab',restart_lab_path+"/"+lab_user.lab.id.to_s+"/"+lab_user.user.username, :class=>'add-button button', :confirm => "This will delete all saved data. Are you sure?") if lab_user.start %>
-                      <%= link_to('End lab', end_lab_path+"/"+lab_user.id.to_s, :class=>'delete-button button', :confirm => "This will delete all saved data. Are you sure?" ) if lab_user.start && !lab_user.end %>
+						<%= link_to('Start lab',start_lab_path+'/'+lab_user.lab.id.to_s+'/'+lab_user.user.username , :class=>'submit-button button') if lab_user.start==nil %>
+                      <%= link_to('Restart lab',restart_lab_path+'/'+lab_user.lab.id.to_s+'/'+lab_user.user.username, :class=>'add-button button', :confirm => 'This will delete all saved data. Are you sure?') if lab_user.start %>
+                      <%= link_to('End lab', end_lab_path+'/'+lab_user.id.to_s, :class=>'delete-button button', :confirm => 'This will delete all saved data. Are you sure?' ) if lab_user.start && !lab_user.end %>
 					</div>
 				<% end %>
 			</td>
 		</tr>
 		<% end # per user%>
 		</table>
-		<label><%= check_box_tag "lab", "end", false, :id=>"end_labs", :onclick=>"manage_checkboxes(['restart_labs', 'rem_labs'])"%>End all labs</label>
-		<label><%= check_box_tag "lab", "restart", false, :id=>"restart_labs", :onclick=>"manage_checkboxes(['end_labs', 'rem_labs'])"%>Restart all labs</label>
-		<label><%= check_box_tag "lab", "remove", false, :id=>"rem_labs", :onclick=>"manage_checkboxes(['restart_labs', 'end_labs'])"%>Remove all labs</label>
+		<label><%= check_box_tag 'lab', 'end', false, :id=>'end_labs', :onclick=>"manage_checkboxes(['restart_labs', 'rem_labs'])"%>End all labs</label>
+		<label><%= check_box_tag 'lab', 'restart', false, :id=>'restart_labs', :onclick=>"manage_checkboxes(['end_labs', 'rem_labs'])"%>Restart all labs</label>
+		<label><%= check_box_tag 'lab', 'remove', false, :id=>'rem_labs', :onclick=>"manage_checkboxes(['restart_labs', 'end_labs'])"%>Remove all labs</label>
 		<br/>
 		<label><input type="checkbox" name="vm" value="poweroff" id="power_vms" onclick="manage_checkboxes(['start_vms']);"/>Power off all VMs</label>
 		<label><input type="checkbox" name="vm" value="poweron" id="start_vms" onclick="manage_checkboxes(['power_vms']);" />Power on all VMs</label>
 		<br/>
 		<label><input type="checkbox" id="reset_t" name="reset_token" onclick="manage_checkboxes(['rem_t'])" />reset token</label>
 		<label><input type="checkbox" id="reset_ex" name="reset_token_expire" onclick="show_date(this);manage_checkboxes([ 'rem_t'])" />set token expire date</label>
-		<span id="expires" class="hidden"><%= datetime_select("user", "token_expires", :default => 2.weeks.from_now) %></span>
+		<span id="expires" class="hidden"><%= datetime_select('user', 'token_expires', :default => 2.weeks.from_now) %></span>
 		<label><input type="checkbox" id="rem_t" name="remove_token" onclick="manage_checkboxes(['reset_ex', 'reset_t']); show_date(document.getElementById('reset_ex'));"/>remove token</label>
 		<br/>
           <label><input type="checkbox" name="user" value="destroy" /> Destroy user(s)</label><br/>
@@ -79,18 +79,18 @@
 		<table >
 			<thead>
 			<tr>
-				<th style="width:1%; white-space: nowrap;"><label><%= check_box_tag 'toggle','', false,  :onclick=>"toggle_checked_all(this);" , :id=>"toggle_l" %><span> all</span></label></th>
-				<th><%=link_to("Lab name", :controller=>"lab_users",:action=>"search", :sort_by=>"name", :dir=>@dir, :t=>params[:t], :l=>params[:l], :h=>params[:h])%></th>
+				<th style="width:1%; white-space: nowrap;"><label><%= check_box_tag 'toggle','', false,  :onclick=>'toggle_checked_all(this);' , :id=>'toggle_l' %><span> all</span></label></th>
+				<th><%=link_to('Lab name', :controller=>'lab_users',:action=>'search', :sort_by=>'name', :dir=>@dir, :t=>params[:t], :l=>params[:l], :h=>params[:h])%></th>
 				<th>VM templates</th>
 				<th colspan="4">lab users</th>
-				<th><%=link_to("Host", :controller=>"lab_users",:action=>"search", :sort_by=>"host_id", :dir=>@dir, :t=>params[:t], :l=>params[:l], :h=>params[:h])%></th>
+				<th><%=link_to('Host', :controller=>'lab_users',:action=>'search', :sort_by=>'host_id', :dir=>@dir, :t=>params[:t], :l=>params[:l], :h=>params[:h])%></th>
 				<th></th>
 			</tr>
 		</thead>
 		<% @labs.each do |lab| %>
-		<%  started =  lab.lab_users.where("start is not ? and end is ?", nil, nil).size
-			ended = lab.lab_users.where("start is not ? and end is not ?", nil, nil).size
-			uninitialized = lab.lab_users.where("start is ? and end is ?", nil, nil).size
+		<%  started =  lab.lab_users.where('start is not ? and end is ?', nil, nil).size
+			ended = lab.lab_users.where('start is not ? and end is not ?', nil, nil).size
+			uninitialized = lab.lab_users.where('start is ? and end is ?', nil, nil).size
 		%>
 		<tr class="found">
 			<td><%= check_box_tag 'id[]', lab.id , false, :id=>"id_#{lab.id}" %></td>
@@ -124,7 +124,7 @@
 		<br/>
 		<label><input type="checkbox" id="reset_t" name="reset_token" onclick="manage_checkboxes(['rem_t'])" />reset token</label>
 		<label><input type="checkbox" id="reset_ex" name="reset_token_expire" onclick="show_date(this);manage_checkboxes(['rem_t'])" />set token expire date</label>
-		<span id="expires" class="hidden"><%= datetime_select("user", "token_expires", :default => 2.weeks.from_now) %></span>
+		<span id="expires" class="hidden"><%= datetime_select('user', 'token_expires', :default => 2.weeks.from_now) %></span>
 		<label><input type="checkbox" id="rem_t" name="remove_token"  onclick="manage_checkboxes([ 'reset_ex', 'reset_t']); show_date(document.getElementById('reset_ex'));"/>remove token</label>
 		<br/>
 		<%= f.submit 'Update labs', :confirm => 'Are you sure?'%>
@@ -139,12 +139,12 @@
 		<table >
 			<thead>
 			<tr>
-				<th style="width:1%; white-space: nowrap;"><label><%= check_box_tag 'toggle','', false,  :onclick=>"toggle_checked_all(this);", :id=>"toggle_lu" %><span> all</span></label></th>
-				<th><%=link_to("Lab name", :controller=>"lab_users",:action=>"search", :sort_by=>"labs.name", :dir=>@dir, :t=>params[:t], :l=>params[:l], :u=>params[:u])%></th>
-				<th><%=link_to("Fullname", :controller=>"lab_users",:action=>"search", :sort_by=>"users.name", :dir=>@dir, :t=>params[:t], :l=>params[:l], :u=>params[:u], :h=>params[:h])%></th>
-				<th><%=link_to("Username", :controller=>"lab_users",:action=>"search", :sort_by=>"users.username", :dir=>@dir, :t=>params[:t], :l=>params[:l], :u=>params[:u], :h=>params[:h])%></th>
-				<th><%=link_to("Start", :controller=>"lab_users",:action=>"search", :sort_by=>"lab_users.start", :dir=>@dir, :t=>params[:t], :l=>params[:l], :u=>params[:u], :h=>params[:h])%></th>
-				<th><%=link_to("End", :controller=>"lab_users",:action=>"search", :sort_by=>"lab_users.end", :dir=>@dir, :t=>params[:t], :l=>params[:l], :u=>params[:u], :h=>params[:h])%></th>
+				<th style="width:1%; white-space: nowrap;"><label><%= check_box_tag 'toggle','', false,  :onclick=>'toggle_checked_all(this);', :id=>'toggle_lu' %><span> all</span></label></th>
+				<th><%=link_to('Lab name', :controller=>'lab_users',:action=>'search', :sort_by=>'labs.name', :dir=>@dir, :t=>params[:t], :l=>params[:l], :u=>params[:u])%></th>
+				<th><%=link_to('Fullname', :controller=>'lab_users',:action=>'search', :sort_by=>'users.name', :dir=>@dir, :t=>params[:t], :l=>params[:l], :u=>params[:u], :h=>params[:h])%></th>
+				<th><%=link_to('Username', :controller=>'lab_users',:action=>'search', :sort_by=>'users.username', :dir=>@dir, :t=>params[:t], :l=>params[:l], :u=>params[:u], :h=>params[:h])%></th>
+				<th><%=link_to('Start', :controller=>'lab_users',:action=>'search', :sort_by=>'lab_users.start', :dir=>@dir, :t=>params[:t], :l=>params[:l], :u=>params[:u], :h=>params[:h])%></th>
+				<th><%=link_to('End', :controller=>'lab_users',:action=>'search', :sort_by=>'lab_users.end', :dir=>@dir, :t=>params[:t], :l=>params[:l], :u=>params[:u], :h=>params[:h])%></th>
 				<th></th>
 			</tr>
 			</thead>
@@ -154,8 +154,8 @@
 			<td><%= link_to(lu.lab.name, "/user_labs/#{lu.user.username}/#{lu.lab.id}" )%></td>
 			<td><%= lu.user.name %></td>
 			<td><%= lu.user.username %></td>
-			<td><span title="<%= lu.start %>"><%= distance_of_time_in_words(Time.now, lu.start.to_time )+" ago" if lu.start %></span></td>
-			<td><span title="<%= lu.end %>"><%= distance_of_time_in_words(Time.now, lu.end.to_time )+" ago" if lu.end %></span></td>
+			<td><span title="<%= lu.start %>"><%= distance_of_time_in_words(Time.now, lu.start.to_time )+' ago' if lu.start %></span></td>
+			<td><span title="<%= lu.end %>"><%= distance_of_time_in_words(Time.now, lu.end.to_time )+' ago' if lu.end %></span></td>
 			<td onclick="get_vm_info(this, <%=lu.id%>);">Expand</td>
 		</tr>
 		<tr class="hidden">

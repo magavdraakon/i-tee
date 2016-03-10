@@ -1,7 +1,7 @@
 <%= form_for(@lab_badge) do |f| %>
   <% if @lab_badge.errors.any? %>
     <div id="error_explanation">
-      <h2><%= pluralize(@lab_badge.errors.count, "error") %> prohibited this lab_badge from being saved:</h2>
+      <h2><%= pluralize(@lab_badge.errors.count, 'error') %> prohibited this lab_badge from being saved:</h2>
 
       <ul>
       <% @lab_badge.errors.full_messages.each do |msg| %>

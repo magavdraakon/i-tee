@@ -1,7 +1,7 @@
 <%= form_for(@lab_vmt) do |f| %>
   <% if @lab_vmt.errors.any? %>
     <div id="error_explanation">
-      <h2><%= pluralize(@lab_vmt.errors.count, "error") %> prohibited this lab_vmt from being saved:</h2>
+      <h2><%= pluralize(@lab_vmt.errors.count, 'error') %> prohibited this lab_vmt from being saved:</h2>
 
       <% @lab_vmt.errors.full_messages.each do |msg| %>
         <%= msg %><br/>
@@ -35,6 +35,6 @@
       <%= f.number_field :position %>
     </div>
   <div class="actions">
-    <%= submit_tag "Cancel" , :class=>"cancel"%>  <%= f.submit %>
+    <%= submit_tag 'Cancel', :class=> 'cancel' %>  <%= f.submit %>
   </div>
 <% end %>

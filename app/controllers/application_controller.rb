@@ -70,7 +70,7 @@ class ApplicationController < ActionController::Base
         flash[:alert]  = 'Restricted access!'
         #You don't belong here. Go away.
         format.html { redirect_to(:controller=>'home', :action=>'error_401') }
-        format.json { render :json=> {:success => false , :message=>  "Restricted access!"} }
+        format.json { render :json=> {:success => false , :message=> 'Restricted access!'} }
       end    
     end
   end
@@ -82,7 +82,7 @@ class ApplicationController < ActionController::Base
         flash[:alert]  = 'Restricted access!'
         #You don't belong here. Go away.
         format.html { redirect_to(:controller=>'home', :action=>'error_401') }
-        format.json { render :json=> {:success => false , :message=>  "Restricted access!"} }
+        format.json { render :json=> {:success => false , :message=> 'Restricted access!'} }
       end      
     end
    end
@@ -144,7 +144,7 @@ class ApplicationController < ActionController::Base
   def check_token
     if params[:auth_token]
       # get the user with the given token
-      user=User.where("authentication_token=?",params[:auth_token]).first
+      user=User.where('authentication_token=?', params[:auth_token]).first
       # if there is such a user
       if user
         expiretime = user.token_expires

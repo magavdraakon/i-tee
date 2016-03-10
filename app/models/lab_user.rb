@@ -10,14 +10,14 @@ class LabUser < ActiveRecord::Base
 # OLD: get all vms that belong to this labuser (Lab attempt)
   def vms_manual
     #find templates for lab
-  	vmts=LabVmt.where("lab_id = ? ", self.lab_id)
+  	vmts=LabVmt.where('lab_id = ? ', self.lab_id)
     #find vms for user in lab
-  	Vm.where("user_id=? and lab_vmt_id in (?)", self.user_id, vmts)
+  	Vm.where('user_id=? and lab_vmt_id in (?)', self.user_id, vmts)
   end
 
   def vms_info
     # id, nickname, state, allow_remote, position, rdp lines
-    vms = Vm.joins(:lab_vmt).where("lab_vmts.lab_id=? and vms.user_id=?", self.lab_id, self.user_id).order('position asc')
+    vms = Vm.joins(:lab_vmt).where('lab_vmts.lab_id=? and vms.user_id=?', self.lab_id, self.user_id).order('position asc')
     result= []
     vms.each do |vm|
       result << {
@@ -33,7 +33,7 @@ class LabUser < ActiveRecord::Base
   end
 
   def vms_view
-    Vm.joins(:lab_vmt).where("lab_vmts.lab_id=? and vms.user_id=?", self.lab_id, self.user_id).order('position asc')
+    Vm.joins(:lab_vmt).where('lab_vmts.lab_id=? and vms.user_id=?', self.lab_id, self.user_id).order('position asc')
   end
 
   def vm_statistic
@@ -56,7 +56,7 @@ class LabUser < ActiveRecord::Base
 
 # to be displayed as vm info for labs that are not running
   def vmts
-  	LabVmt.where("lab_id = ? ", self.lab_id)
+  	LabVmt.where('lab_id = ? ', self.lab_id)
   end
 
 # create needed Vm-s based on the lab templates and set start to now
@@ -64,18 +64,18 @@ class LabUser < ActiveRecord::Base
   	unless self.start || self.end  # can only start labs that are not started or finished
   		self.vmts.each do |template|
         	#is there a machine like that already?
-        	vm = Vm.where("lab_vmt_id=? and lab_user_id=?", template.id, self.id).first
+        	vm = Vm.where('lab_vmt_id=? and lab_user_id=?', template.id, self.id).first
         	if vm==nil  #no there is not
-          		vm = Vm.create(:name=>"#{template.name}-#{self.user.username}", :lab_vmt=>template, :user=>self.user, :description=>"Initialize the virtual machine by clicking <strong>Start</strong>.", :lab_user_id=>self.id)
+          		vm = Vm.create(:name=>"#{template.name}-#{self.user.username}", :lab_vmt=>template, :user=>self.user, :description=> 'Initialize the virtual machine by clicking <strong>Start</strong>.', :lab_user_id=>self.id)
           		logger.debug "Machine #{template.name}-#{self.user.username} successfully generated."
         	end    
     	end #end of making vms based of templates
       # start delayed jobs for keeping up with the last activity
-      LabUser.RDP_status(self.id)
+      LabUser.rdp_status(self.id)
     	# set new start time
     	self.start=Time.now
       self.last_activity=Time.now
-      self.activity="Lab start"
+      self.activity='Lab start'
     	self.save
 			if self.lab.startAll
 				self.start_all_vms
@@ -91,7 +91,7 @@ class LabUser < ActiveRecord::Base
     	self.end=Time.now
     	self.save 
       # remove pending delayed jobs
-      Delayed::Job.where("queue=?", "labuser-#{self.id}").destroy_all
+      Delayed::Job.where('queue=?', "labuser-#{self.id}").destroy_all
 		end
   end
 
@@ -151,7 +151,7 @@ class LabUser < ActiveRecord::Base
 	end
 
 
-  def self.RDP_status(id)
+  def self.rdp_status(id)
     # vms exist only for running labs 
     labuser = LabUser.find_by_id(id)
     if labuser==nil 
@@ -204,10 +204,12 @@ class LabUser < ActiveRecord::Base
                   labuser.activity = "RDP active - '#{vm.name}'"
                   puts "RDP is active - #{vm.name}"
                 end
-              when "powered off"
+              when 'powered off'
                 puts "MACHINE IS SHUT DOWN - #{vm.name}"
-              when "saved"
+              when 'saved'
                 puts "MACHINE IS PAUSED - #{vm.name}"
+              else
+                # do nothing
               end #case state
             else
               # TODO! what to do if rdp is disabled in vm itself?
@@ -224,7 +226,7 @@ class LabUser < ActiveRecord::Base
       if lab.poll_freq>0 && !labuser.end # poll until labuser ends
         # run this again in x seconds
         logger.debug "\nDO THIS AGAIN!\n"
-        LabUser.delay(queue: "labuser-#{labuser.id}" ,run_at: lab.poll_freq.seconds.from_now ).RDP_status(labuser.id)
+        LabUser.delay(queue: "labuser-#{labuser.id}" ,run_at: lab.poll_freq.seconds.from_now ).rdp_status(labuser.id)
       end
     end # labuser exists
   end

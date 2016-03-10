@@ -2,67 +2,67 @@ require 'test_helper'
 
 class VmTest < ActiveSupport::TestCase
   # Replace this with your real tests.
-   test "second vm existance" do
+   test 'second vm existance' do
     assert_not_nil vms(:two)
   end
   
-   test "first vm existance" do
+   test 'first vm existance' do
     assert_not_nil vms(:one)
   end
   
   # testing validations:  :name, :lab_vmt_id, :user_id
-  test "vm doesnt save without name labvmt and user" do
+  test 'vm doesnt save without name labvmt and user' do
     vm=Vm.new
     #without all 3
-    assert !vm.save, "vm doesnt save without name labvmt and user"
+    assert !vm.save, 'vm doesnt save without name labvmt and user'
     #without 2 of them
     vm.name=nil
     vm.user=users(:ttanav)
     vm.lab_vmt=nil
-    assert !vm.save, "vm doesnt save without name and labvmt"
+    assert !vm.save, 'vm doesnt save without name and labvmt'
     vm.name=nil
     vm.user=nil
     vm.lab_vmt=lab_vmts(:one)
-    assert !vm.save, "vm doesnt save without name and user"
-    vm.name="name"
+    assert !vm.save, 'vm doesnt save without name and user'
+    vm.name='name'
     vm.user=nil
     vm.lab_vmt=nil
-    assert !vm.save, "vm doesnt save without user and labvmt"
+    assert !vm.save, 'vm doesnt save without user and labvmt'
     #without 1 of them
     vm.name=nil
     vm.user=users(:ttanav)
     vm.lab_vmt=lab_vmts(:one)
-    assert !vm.save, "vm doesnt save without name"
-    vm.name="name"
+    assert !vm.save, 'vm doesnt save without name'
+    vm.name='name'
     vm.user=users(:ttanav)
     vm.lab_vmt=nil
-    assert !vm.save, "vm doesnt save without labvmt "
-    vm.name="name"
+    assert !vm.save, 'vm doesnt save without labvmt '
+    vm.name='name'
     vm.user=nil
     vm.lab_vmt=lab_vmts(:one)
-    assert !vm.save, "vm doesnt save without user "
+    assert !vm.save, 'vm doesnt save without user '
   
   end
   
-  test "vm saves with name labvmt and user" do
+  test 'vm saves with name labvmt and user' do
     vm=Vm.new
-    vm.name="name"
+    vm.name='name'
     vm.user=users(:ttanav)
     vm.lab_vmt=lab_vmts(:one)
-    assert vm.save, "vm saves with name labvmt and user"  
+    assert vm.save, 'vm saves with name labvmt and user'
   end
   
   #testing relations: has one :mac belongs to :user :lab_vmt
-  test "first vm has a mac" do
+  test 'first vm has a mac' do
     vm=vms(:one)
     assert vm.mac
     assert_equal vm.mac, macs(:one)
   end
-   test "second vm doesnt have a mac" do
+   test 'second vm doesnt have a mac' do
     vm=vms(:two)
     assert !vm.mac
   end
-  test "vms belonging to user and labvmt" do
+  test 'vms belonging to user and labvmt' do
     vm=vms(:one)
     user=vm.user
     labvmt=vm.lab_vmt
@@ -80,7 +80,7 @@ class VmTest < ActiveSupport::TestCase
     assert_equal labvmt, lab_vmts(:two)
   end
   # testing methods: rel_mac, add_pw(8)
-  test "method rel mac" do
+  test 'method rel mac' do
     vm=vms(:one)
     vm.rel_mac
     mac=vm.mac
@@ -88,17 +88,17 @@ class VmTest < ActiveSupport::TestCase
     assert_nil mac
     assert_nil r_mac_vm
   end
-  test "method add pw" do
+  test 'method add pw' do
      vm=vms(:one)
-     assert (vm.password=="generatedone")
+     assert (vm.password=='generatedone')
     vm.add_pw
-    assert !(vm.password=="generatedone")
+    assert !(vm.password=='generatedone')
     assert (vm.password.length==8)
   end
   # testing filters: before destroy rel_mac, before save add_pw
-  test "before save" do
+  test 'before save' do
     vm=Vm.new
-    vm.name="name"
+    vm.name='name'
     vm.user=users(:ttanav)
     vm.lab_vmt=lab_vmts(:one)
     
@@ -107,7 +107,7 @@ class VmTest < ActiveSupport::TestCase
     vm.save
     assert (vm.password.length==8)
   end
-  test "before destroy" do
+  test 'before destroy' do
     vm=vms(:one)
     assert vm.mac
     vm.destroy

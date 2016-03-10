@@ -3,7 +3,7 @@
 <%= form_tag(token_authentication_path , :method => :put) do  %>
   <% if @user.errors.any? %>
     <div id="error_explanation">
-      <h2><%= pluralize(@user.errors.count, "error") %> prohibited this token from being saved:</h2>
+      <h2><%= pluralize(@user.errors.count, 'error') %> prohibited this token from being saved:</h2>
       <ul>
         <% @user.errors.full_messages.each do |msg| %>
           <%= msg %><br/>
@@ -13,7 +13,7 @@
   <% end %>
   <%= hidden_field_tag 'id', @user.id %>
    <div class="field">
-    <label for="reset"><%=@user.authentication_token.blank? ? "Create token" : "Create a new token" %>
+    <label for="reset"><%=@user.authentication_token.blank? ? 'Create token' : 'Create a new token' %>
     </label>  
     <%= check_box_tag :reset, 'yes' %>
    </div>
@@ -23,8 +23,8 @@
     <% else %>
       Current token expiry time: <%=@user.token_expires%><br/> New 
     <% end %>
-    token expiry time: <%=datetime_select("user", "token_expires", :default => 3.days.from_now) %>
+    token expiry time: <%=datetime_select('user', 'token_expires', :default => 3.days.from_now) %>
   </div>
-  <%= submit_tag "cancel" , :class=>"cancel"%> <%= submit_tag "Submit", :confirm => "Are you sure?"%> 
+  <%= submit_tag 'cancel', :class=> 'cancel' %> <%= submit_tag 'Submit', :confirm => 'Are you sure?'%>
    
 <%end%>

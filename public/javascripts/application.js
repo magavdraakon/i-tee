@@ -11,12 +11,6 @@ jQuery(document).ready(function() {
     load_form($("#search-form select").val());
   }
 
-jQuery(function ($) {
-		$('#basic-modal .modal').click(function (e) {
-			$('#basic-modal-content').modal();
-			return false;
-		});
-    });
 	$("#menu-hide").click(function() {
 		$('#sidemenu').hide(0,function(){
             $('#content').animate({"margin-left": 0}, 500);
@@ -77,7 +71,7 @@ $('#lab_short_description').keydown(function(){
             description.val(description.val().substring(0,255));
             $('#charleft').css({ color: "red"});
             clearTimeout(character_flash);
-            character_flash = setTimeout(function(){
+            var character_flash = setTimeout(function(){
                 $('#charleft').css({ color: "black"});
             }, 900);
             return false;
@@ -150,9 +144,9 @@ function toggle_checked_all(el){
 function expandnext(el){
   $(el).parents("tr").next("tr").toggle();
   if ( $(el).text()=="Expand") 
-     $(el).text("Collapse")
+     $(el).text("Collapse");
   else 
-     $(el).text("Expand")
+     $(el).text("Expand");
 }
 // search token
 function show_date(el){
@@ -185,11 +179,11 @@ function load_form(For){
 }
 
 function get_vm_info(el, id){
-    to=$(el).parents("tr").next("tr");
+    var to=$(el).parents("tr").next("tr");
     if ( $(el).text()=="Expand"){
         $(el).text("Collapse");
         $.getJSON('/lab_users/'+id+".json", function(data) {
-            html="";
+           var html="";
             $.each(data, function(index, cat){
 
                 html+="<div>";
@@ -198,7 +192,7 @@ function get_vm_info(el, id){
                     html+="None<br/>";
                 } else {
                     $.each(cat, function(id, el){
-                        vm=el.vm;
+                        var vm=el.vm;
                         //console.log(vm);
                         html+= vm.name;
                         if (index=="running")
@@ -267,7 +261,7 @@ function add_network_to_vmt(el){
     netL.innerHTML="Network";
 
     var net=document.createElement("select");
-    net.setAttribute("id", "lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"_network_id")
+    net.setAttribute("id", "lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"_network_id");
     net.setAttribute("name", "lab[lab_vmts_attributes]["+p+"][lab_vmt_networks_attributes]["+n+"][network_id]");
     net.innerHTML=options;
 
@@ -281,7 +275,7 @@ function add_network_to_vmt(el){
     slotL.innerHTML="Slot";
 
     var slot=document.createElement("input");
-    slot.setAttribute("id", "lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"_slot")
+    slot.setAttribute("id", "lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"_slot");
     slot.setAttribute("name", "lab[lab_vmts_attributes]["+p+"][lab_vmt_networks_attributes]["+n+"][slot]");
     slot.setAttribute("type", "number");
     slot.setAttribute("size", 30);
@@ -298,13 +292,13 @@ function add_network_to_vmt(el){
     var promH=document.createElement("input");
     promH.setAttribute("name", "lab[lab_vmts_attributes]["+p+"][lab_vmt_networks_attributes]["+n+"][promiscuous]");
     promH.setAttribute("type", "hidden");
-    promH.setAttribute("value", 0)
+    promH.setAttribute("value", 0);
 
     var promV=document.createElement("input");
-    promV.setAttribute("id", "lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"_promiscuous")
+    promV.setAttribute("id", "lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"_promiscuous");
     promV.setAttribute("name", "lab[lab_vmts_attributes]["+p+"][lab_vmt_networks_attributes]["+n+"][promiscuous]");
     promV.setAttribute("type", "checkbox");
-    promV.setAttribute("value", 1)
+    promV.setAttribute("value", 1);
 
     net_holder.appendChild(promH);
     net_holder.appendChild(document.createTextNode(" "));
@@ -320,13 +314,13 @@ function add_network_to_vmt(el){
     var macH=document.createElement("input");
     macH.setAttribute("name", "lab[lab_vmts_attributes]["+p+"][lab_vmt_networks_attributes]["+n+"][reinit_mac]");
     macH.setAttribute("type", "hidden");
-    macH.setAttribute("value", 0)
+    macH.setAttribute("value", 0);
 
     var macV=document.createElement("input");
-    macV.setAttribute("id", "lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"_reinit_mac")
+    macV.setAttribute("id", "lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"_reinit_mac");
     macV.setAttribute("name", "lab[lab_vmts_attributes]["+p+"][lab_vmt_networks_attributes]["+n+"][reinit_mac]");
     macV.setAttribute("type", "checkbox");
-    macV.setAttribute("value", 1)
+    macV.setAttribute("value", 1);
 
     net_holder.appendChild(macH);
     net_holder.appendChild(document.createTextNode(" "));
@@ -339,13 +333,13 @@ function add_network_to_vmt(el){
     var delH=document.createElement("input");
     delH.setAttribute("name", "lab[lab_vmts_attributes]["+p+"][lab_vmt_networks_attributes]["+n+"][_destroy]");
     delH.setAttribute("type", "hidden");
-    delH.setAttribute("value", 0)
+    delH.setAttribute("value", 0);
 
     var delV=document.createElement("input");
-    delV.setAttribute("id", "lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"__destroy")
+    delV.setAttribute("id", "lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"__destroy");
     delV.setAttribute("name", "lab[lab_vmts_attributes]["+p+"][lab_vmt_networks_attributes]["+n+"][_destroy]");
     delV.setAttribute("type", "checkbox");
-    delV.setAttribute("value", 1)
+    delV.setAttribute("value", 1);
 
     var delL=document.createElement("label");
     delL.setAttribute("for", "lab_lab_vmts_attributes_"+p+"_lab_vmt_networks_attributes_"+n+"__destroy");
@@ -379,13 +373,13 @@ function add_vmt_to_lab(){
     var delH=document.createElement("input");
     delH.setAttribute("name", "lab[lab_vmts_attributes]["+n+"][_destroy]");
     delH.setAttribute("type", "hidden");
-    delH.setAttribute("value", 0)
+    delH.setAttribute("value", 0);
 
     var delV=document.createElement("input");
-    delV.setAttribute("id", "lab_lab_vmts_attributes_"+n+"__destroy")
+    delV.setAttribute("id", "lab_lab_vmts_attributes_"+n+"__destroy");
     delV.setAttribute("name", "lab[lab_vmts_attributes]["+n+"][_destroy]");
     delV.setAttribute("type", "checkbox");
-    delV.setAttribute("value", 1)
+    delV.setAttribute("value", 1);
 
     var delL=document.createElement("label");
     delL.setAttribute("for", "lab_lab_vmts_attributes_"+n+"__destroy");
@@ -404,11 +398,11 @@ function add_vmt_to_lab(){
     nameL.innerHTML="Name";
 
     var name=document.createElement("input");
-    name.setAttribute("id", "lab_lab_vmts_attributes_"+n+"_name")
+    name.setAttribute("id", "lab_lab_vmts_attributes_"+n+"_name");
     name.setAttribute("name", "lab[lab_vmts_attributes]["+n+"][name]");
     name.setAttribute("type", "text");
     name.setAttribute("size", 30);
-    name.setAttribute("placeholder", "Unique, alphanumeric with no spaces.")
+    name.setAttribute("placeholder", "Unique, alphanumeric with no spaces.");
 
     vmt_holder.appendChild(nameL);
     vmt_holder.appendChild(document.createTextNode(" "));
@@ -420,11 +414,11 @@ function add_vmt_to_lab(){
     nicknameL.innerHTML="Nickname";
 
     var nickname=document.createElement("input");
-    nickname.setAttribute("id", "lab_lab_vmts_attributes_"+n+"_nickname")
+    nickname.setAttribute("id", "lab_lab_vmts_attributes_"+n+"_nickname");
     nickname.setAttribute("name", "lab[lab_vmts_attributes]["+n+"][nickname]");
     nickname.setAttribute("type", "text");
     nickname.setAttribute("size", 30);
-    nickname.setAttribute("placeholder", "Name shown to user.")
+    nickname.setAttribute("placeholder", "Name shown to user.");
 
     vmt_holder.appendChild(nicknameL);
     vmt_holder.appendChild(document.createTextNode(" "));
@@ -436,7 +430,7 @@ function add_vmt_to_lab(){
     vmtL.innerHTML="Vmt";
 
     var vmt=document.createElement("select");
-    vmt.setAttribute("id", "lab_lab_vmts_attributes_"+n+"_vmt_id")
+    vmt.setAttribute("id", "lab_lab_vmts_attributes_"+n+"_vmt_id");
     vmt.setAttribute("name", "lab[lab_vmts_attributes]["+n+"][vmt_id]");
     vmt.innerHTML=options;
 
@@ -452,14 +446,14 @@ function add_vmt_to_lab(){
     var allowH=document.createElement("input");
     allowH.setAttribute("name", "lab[lab_vmts_attributes]["+n+"][allow_remote]");
     allowH.setAttribute("type", "hidden");
-    allowH.setAttribute("value", 0)
+    allowH.setAttribute("value", 0);
 
     var allowV=document.createElement("input");
-    allowV.setAttribute("id", "lab_lab_vmts_attributes_"+n+"_allow_remote")
+    allowV.setAttribute("id", "lab_lab_vmts_attributes_"+n+"_allow_remote");
     allowV.setAttribute("name", "lab[lab_vmts_attributes]["+n+"][allow_remote]");
     allowV.setAttribute("type", "checkbox");
     allowV.setAttribute("checked", "checked");
-    allowV.setAttribute("value", 1)
+    allowV.setAttribute("value", 1);
 
     vmt_holder.appendChild(allowL);
     vmt_holder.appendChild(document.createTextNode(" "));
@@ -473,11 +467,11 @@ function add_vmt_to_lab(){
     orderL.innerHTML="Position";
 
     var order=document.createElement("input");
-    order.setAttribute("id", "lab_lab_vmts_attributes_"+n+"_position")
+    order.setAttribute("id", "lab_lab_vmts_attributes_"+n+"_position");
     order.setAttribute("name", "lab[lab_vmts_attributes]["+n+"][position]");
     order.setAttribute("type", "number");
     order.setAttribute("size", 30);
-    order.setAttribute("value", 0)
+    order.setAttribute("value", 0);
 
     vmt_holder.appendChild(orderL);
     vmt_holder.appendChild(document.createTextNode(" "));

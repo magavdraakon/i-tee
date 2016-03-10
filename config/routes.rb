@@ -1,10 +1,10 @@
 ITee::Application.routes.draw do
 
-  match 'jobs',:to=>"home#jobs"
-  match "jobs/:id", :to=>'home#delete_job', via: [:delete]
-  match "jobs/:id", :to=>'home#run_job', via: [:put]
+  match 'jobs',:to=> 'home#jobs'
+  match 'jobs/:id', :to=>'home#delete_job', via: [:delete]
+  match 'jobs/:id', :to=>'home#run_job', via: [:put]
 
-  match 'networks/:id/edit', :to => "networks#index"
+  match 'networks/:id/edit', :to => 'networks#index'
   resources :lab_vmt_networks
 
   resources :networks
@@ -20,32 +20,30 @@ ITee::Application.routes.draw do
   match 'users/sign_up', :to=>'home#catcher'
   
   resources :lab_users
-  match "lab_users", :to=>'lab_users#destroy', via: [:delete]
-  match "lab_users", :to=>'lab_users#update', via: [:put]
+  match 'lab_users', :to=>'lab_users#destroy', via: [:delete]
+  match 'lab_users', :to=>'lab_users#update', via: [:put]
 
  
   resources :lab_vmts
 
   resources :vmts
 
-  resources :lab_materials  
-
-  devise_for :users,  :controllers => { :registrations => "users/registrations", :passwords=>"users/passwords" }
+  devise_for :users,  :controllers => {:registrations => 'users/registrations', :passwords=> 'users/passwords'}
 
   #match 'users/edit', :to=>'devise/registrations#edit'
 
   resources :users
-  match "users/:id", :to=>'users#destroy', via: [:delete]
-  match "users", :to=>'users#destroy', via: [:delete]
-  match "users", :to=>'users#update', via: [:put]
+  match 'users/:id', :to=>'users#destroy', via: [:delete]
+  match 'users', :to=>'users#destroy', via: [:delete]
+  match 'users', :to=>'users#update', via: [:put]
 
   resources :vms
 
   resources :materials
   
   resources :labs
-  match "labs", :to=>'labs#destroy', via: [:delete]
-  match "labs", :to=>'labs#update', via: [:put]
+  match 'labs', :to=>'labs#destroy', via: [:delete]
+  match 'labs', :to=>'labs#update', via: [:put]
 
   resources :hosts
 
@@ -53,7 +51,7 @@ ITee::Application.routes.draw do
 
   # route, :to => 'controller#action'
   
-  match 'search', :to=>"lab_users#search"
+  match 'search', :to=> 'lab_users#search'
 
 
   match 'lab_users/import', :to=>'lab_users#import'
@@ -82,8 +80,8 @@ ITee::Application.routes.draw do
   match 'resume_vm/:id', :to=> 'vms#resume_vm'
   match 'stop_vm/:id', :to=> 'vms#stop_vm'
 
-  match 'state_of', :to=> "vms#get_state"
-  match 'rdp_of', :to=> "vms#get_rdp"
+  match 'state_of', :to=> 'vms#get_state'
+  match 'rdp_of', :to=> 'vms#get_rdp'
   
   match 'set_progress', :to=> 'vms#set_progress'
   match 'vms/get_progress/:id', :to=> 'vms#get_progress'
@@ -92,7 +90,7 @@ ITee::Application.routes.draw do
   match 'stop_all', :to=> 'vms#stop_all'
   match 'start_all_by_id', :to=> 'vms#start_all_by_id'
   match 'stop_all_by_id', :to=> 'vms#stop_all_by_id'
-  match 'labuser_vms', :to=>"vms#labuser_vms"
+  match 'labuser_vms', :to=> 'vms#labuser_vms'
 
   match 'start_vm', :to=> 'vms#start_vm'
   match 'init_vm', :to=> 'vms#init_vm'
@@ -107,9 +105,9 @@ ITee::Application.routes.draw do
   match 'start_lab/:id', :to=>'labs#start_lab'
   match 'start_lab', :to=>'labs#start_lab'
 
-  match "start_lab_by_id", :to=>"labs#start_lab_by_id", via: [:post]
-  match "end_lab_by_id", :to=>"labs#end_lab_by_id", via: [:post]
-  match "restart_lab_by_id", :to=>"labs#restart_lab_by_id", via: [:post]
+  match 'start_lab_by_id', :to=> 'labs#start_lab_by_id', via: [:post]
+  match 'end_lab_by_id', :to=> 'labs#end_lab_by_id', via: [:post]
+  match 'restart_lab_by_id', :to=> 'labs#restart_lab_by_id', via: [:post]
 
   match 'restart_lab/:id/:username', :to=> 'labs#restart_lab'
   match 'restart_lab/:id', :to=> 'labs#restart_lab'
@@ -181,7 +179,7 @@ ITee::Application.routes.draw do
 
   # You can have the root of your site routed with "root"
   # just remember to delete public/index.html.
-   root :to => "home#index"
+   root :to => 'home#index'
 
   
   # This is a catch-all for routes that don't exist, visitor is redirected to home page.
