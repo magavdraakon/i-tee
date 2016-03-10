@@ -2,6 +2,7 @@ class Vm < ActiveRecord::Base
   has_one :mac
   belongs_to :user
   belongs_to :lab_vmt
+  belongs_to :lab_user
   before_destroy :del_vm
   before_destroy :rel_mac
   before_create :add_pw

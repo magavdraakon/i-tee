@@ -1,12 +1,14 @@
 class LabUser < ActiveRecord::Base
   belongs_to :user
   belongs_to :lab
+  has_many :vms
   
   validates_presence_of :user_id, :lab_id
 
 	before_destroy :end_lab
-# get all vms that belong to this labuser (Lab attempt)
-  def vms
+
+# OLD: get all vms that belong to this labuser (Lab attempt)
+  def vms_manual
     #find templates for lab
   	vmts=LabVmt.where("lab_id = ? ", self.lab_id)
     #find vms for user in lab
@@ -62,9 +64,9 @@ class LabUser < ActiveRecord::Base
   	unless self.start || self.end  # can only start labs that are not started or finished
   		self.vmts.each do |template|
         	#is there a machine like that already?
-        	vm = Vm.where("lab_vmt_id=? and user_id=?", template.id, self.user.id).first
+        	vm = Vm.where("lab_vmt_id=? and lab_user_id=?", template.id, self.id).first
         	if vm==nil  #no there is not
-          		vm = Vm.create(:name=>"#{template.name}-#{self.user.username}", :lab_vmt=>template, :user=>self.user, :description=>"Initialize the virtual machine by clicking <strong>Start</strong>.")
+          		vm = Vm.create(:name=>"#{template.name}-#{self.user.username}", :lab_vmt=>template, :user=>self.user, :description=>"Initialize the virtual machine by clicking <strong>Start</strong>.", :lab_user_id=>self.id)
           		logger.debug "Machine #{template.name}-#{self.user.username} successfully generated."
         	end    
     	end #end of making vms based of templates
