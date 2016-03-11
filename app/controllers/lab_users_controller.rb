@@ -367,6 +367,8 @@ class LabUsersController < ApplicationController
         v.stop_vm
       elsif params[:vm]=='poweron'
         v.start_vm
+      elsif params[:vm]=='reset_rdp'
+        v.reset_rdp
       end
     end
   end

@@ -61,6 +61,7 @@
 		<br/>
 		<label><input type="checkbox" name="vm" value="poweroff" id="power_vms" onclick="manage_checkboxes(['start_vms']);"/>Power off all VMs</label>
 		<label><input type="checkbox" name="vm" value="poweron" id="start_vms" onclick="manage_checkboxes(['power_vms']);" />Power on all VMs</label>
+		<label><input type="checkbox" name="vm" value="reset_rdp" id="restart_rdp" onclick="manage_checkboxes(['power_vms', 'start_vms']);"/>Reset RDP for all VMs</label>
 		<br/>
 		<label><input type="checkbox" id="reset_t" name="reset_token" onclick="manage_checkboxes(['rem_t'])" />reset token</label>
 		<label><input type="checkbox" id="reset_ex" name="reset_token_expire" onclick="show_date(this);manage_checkboxes([ 'rem_t'])" />set token expire date</label>
@@ -121,6 +122,7 @@
 		<br/>
 		<label><input type="checkbox" name="vm" value="poweroff" id="power_vms" onclick="manage_checkboxes(['start_vms']);" />Power off all VMs</label>
 		<label><input type="checkbox" name="vm" value="poweron" id="start_vms" onclick="manage_checkboxes(['power_vms']);" />Power on all VMs</label>
+		<label><input type="checkbox" name="vm" value="reset_rdp" id="restart_rdp" onclick="manage_checkboxes(['power_vms', 'start_vms']);"/>Reset RDP for all VMs</label>
 		<br/>
 		<label><input type="checkbox" id="reset_t" name="reset_token" onclick="manage_checkboxes(['rem_t'])" />reset token</label>
 		<label><input type="checkbox" id="reset_ex" name="reset_token_expire" onclick="show_date(this);manage_checkboxes(['rem_t'])" />set token expire date</label>
@@ -171,8 +173,9 @@
 		<br/>
 		<label><input type="checkbox" name="lab" value="remove" id="rem_users" onclick="manage_checkboxes(['restart_labs', 'end_labs', 'add_users'])" />Remove lab user</label>
 		<br/>
-		<label><input type="checkbox" name="vm" value="poweroff" id="power_vms" onclick="manage_checkboxes(['start_vms']);" />Power off all VMs</label>
-		<label><input type="checkbox" name="vm" value="poweron" id="start_vms" onclick="manage_checkboxes(['power_vms']);" />Power on all VMs</label>
+		<label><input type="checkbox" name="vm" value="poweroff" id="power_vms" onclick="manage_checkboxes(['start_vms', 'restart_rdp']);" />Power off all VMs</label>
+		<label><input type="checkbox" name="vm" value="poweron" id="start_vms" onclick="manage_checkboxes(['power_vms', 'restart_rdp']);" />Power on all VMs</label>
+		<label><input type="checkbox" name="vm" value="reset_rdp" id="restart_rdp" onclick="manage_checkboxes(['power_vms', 'start_vms']);"/>Reset RDP for all VMs</label>
 		<br/>
 		<%= f.submit 'Update lab users', :confirm => 'Are you sure?'%>
 	<% end #form  %>

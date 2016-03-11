@@ -61,6 +61,7 @@ class Vm < ActiveRecord::Base
 
   def reset_rdp
     result = self.res_rdp
+    logger.debug result
     if result[:status]==0
       {success: true, message: "Vm rdp reset successful"}
     else
