@@ -122,6 +122,7 @@
                 <%= link_to('Resume', resume_vm_path+'/'+vm.id.to_s, :class=>'button start-button') if state=='paused' && vm.mac!=nil%>
                 <%= link_to('Stop', stop_vm_path+'/'+vm.id.to_s, :class=> 'button stop-button') if state=='running' && vm.mac!=nil%>
               <% end %>
+              <%= link_to('Reset RDP', rdp_reset_path+'/'+vm.id.to_s, :class=>'button start-button') if state=='running' && vm.mac!=nil %>
               <%if state=='running' && vm.mac!=nil && vm.lab_vmt.vmt.shellinabox  %>
                   <a href="https://<%= request.host if vm.mac!=nil%>:8<%= vm.mac.ip.split('.').last %>" title="Login" target='_blank' class="button login-button">Login</a>
               <%end%>

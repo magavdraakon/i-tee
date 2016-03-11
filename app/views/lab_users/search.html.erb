@@ -10,8 +10,8 @@
   </div>
 <% end %>
 <div id="index_t">
-<% if @users && @users.size>0  %>
-	<p>Found <%= @users.size %> users</p>
+<% if @users && @users.count>0  %>
+	<p>Found <%= @users.count %> users</p>
 	<%= form_for @users, :url => search_path do |f| %>
 		<input type="hidden" name="t" value="User" />
 		<input type="hidden" name="u" value="<%= params[:u] %>" />
@@ -40,12 +40,12 @@
 			<td onclick="expandnext(this);">Expand</td>
 		</tr>
 		<tr class="hidden">
-			<td colspan="7">
+			<td colspan="8">
 				<% user.lab_users.each do |lab_user| %>
 					<div style="padding:3px;">
 						<%= link_to lab_user.lab.name, "/user_labs/#{user.username}/#{lab_user.lab.id}"  %>
 						<%= lab_user.start ? (lab_user.end ? '( Completed @ '+lab_user.end.to_s+' )' : '( Running )') : '( Uninitialized )' %>
-						<%= "#{lab_user.vms.size} Vms" if lab_user.vms.size>0 %> 
+						<%= "#{lab_user.vms.count} Vms" if lab_user.vms.count>0 %> 
 						<%= link_to('Start lab',start_lab_path+'/'+lab_user.lab.id.to_s+'/'+lab_user.user.username , :class=>'submit-button button') if lab_user.start==nil %>
                       <%= link_to('Restart lab',restart_lab_path+'/'+lab_user.lab.id.to_s+'/'+lab_user.user.username, :class=>'add-button button', :confirm => 'This will delete all saved data. Are you sure?') if lab_user.start %>
                       <%= link_to('End lab', end_lab_path+'/'+lab_user.id.to_s, :class=>'delete-button button', :confirm => 'This will delete all saved data. Are you sure?' ) if lab_user.start && !lab_user.end %>
@@ -70,8 +70,8 @@
           <label><input type="checkbox" name="user" value="destroy" /> Destroy user(s)</label><br/>
 		<%= f.submit 'Update users', :confirm => 'Are you sure?'%>
 	<% end #form %>
-<% elsif @labs && @labs.size>0 then %>
-<p>Found <%= @labs.size %> labs</p>
+<% elsif @labs && @labs.count>0 then %>
+<p>Found <%= @labs.count %> labs</p>
 	<%= form_for @labs, :url => search_path do |f| %>
 		<input type="hidden" name="t" value="Lab" />
 		<input type="hidden" name="l" value="<%= params[:l] %>" />
@@ -88,18 +88,18 @@
 			</tr>
 		</thead>
 		<% @labs.each do |lab| %>
-		<%  started =  lab.lab_users.where('start is not ? and end is ?', nil, nil).size
-			ended = lab.lab_users.where('start is not ? and end is not ?', nil, nil).size
-			uninitialized = lab.lab_users.where('start is ? and end is ?', nil, nil).size
+		<%  started =  lab.lab_users.where('start is not ? and end is ?', nil, nil).count
+			ended = lab.lab_users.where('start is not ? and end is not ?', nil, nil).count
+			uninitialized = lab.lab_users.where('start is ? and end is ?', nil, nil).count
 		%>
 		<tr class="found">
 			<td><%= check_box_tag 'id[]', lab.id , false, :id=>"id_#{lab.id}" %></td>
 			<td><%= lab.name %></td>
-			<td><%= lab.lab_vmts.size %></td>
+			<td><%= lab.lab_vmts.count %></td>
 			<td><%= started %> Started</td>
 			<td><%= ended %> ended</td>
 			<td><%= uninitialized %> uninitialized</td>
-			<td>Total <%= lab.lab_users.size %></td>
+			<td>Total <%= lab.lab_users.count %></td>
 			<td><%= lab.host.name if lab.host %></td>
 			<td onclick="expandnext(this);">Expand</td>
 		</tr>
@@ -129,8 +129,8 @@
 		<br/>
 		<%= f.submit 'Update labs', :confirm => 'Are you sure?'%>
 	<% end #form  %>
-<% elsif @lab_users && @lab_users.size>0 then %>
-<p>Found <%= @lab_users.size %> lab users</p>
+<% elsif @lab_users && @lab_users.count>0 then %>
+<p>Found <%= @lab_users.count %> lab users</p>
 	<%= form_for @lab_users, :url => search_path do |f| %>
 		<input type="hidden" name="t" value="Lab user" />
 		<input type="hidden" name="u" value="<%= params[:u] %>" />
@@ -159,7 +159,7 @@
 			<td onclick="get_vm_info(this, <%=lu.id%>);">Expand</td>
 		</tr>
 		<tr class="hidden">
-			<td colspan="6" >
+			<td colspan="7" >
 								
 			</td>
 		</tr>

@@ -198,7 +198,8 @@ function get_vm_info(el, id){
                         if (index=="running")
                          html+=' <b>RDP info:</b> elab.itcollege.ee:'+vm.port+' <b>username:</b> '+vm.username+' <b>password:</b> '+vm.password+
                                 ' <a href="/pause_vm/'+vm.id+'" class="button pause-button">Pause</a>'+
-                                ' <a href="/stop_vm/'+vm.id+'" class="button stop-button">Stop</a>';
+                                ' <a href="/stop_vm/'+vm.id+'" class="button stop-button">Stop</a>'+
+                                ' <a href="/rdp_reset/'+vm.id+'" class="button stop-button">Reset RDP</a>';
                         else if (index=="paused"){
                             html+=' <a href="/resume_vm/'+vm.id+'" class="button start-button">Resume</a>'
                         } else { // stopped

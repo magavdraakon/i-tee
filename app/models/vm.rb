@@ -52,6 +52,21 @@ class Vm < ActiveRecord::Base
   def pau_vm
     %x(sudo -u vbox #{Rails.root}/utils/pause_machine.sh #{name}  2>&1)
   end
+
+  def res_rdp
+    info = %x(sudo -u vbox #{Rails.root}/utils/reset_vbox_rdp.sh #{name}  2>&1)
+    status= $?
+    {status: status.exitstatus, answer: info}
+  end
+
+  def reset_rdp
+    result = self.res_rdp
+    if result[:status]==0
+      {success: true, message: "Vm rdp reset successful"}
+    else
+      {success: true, message: "Vm rdp reset failed"}
+    end
+  end
   
   def ini_vm
     begin

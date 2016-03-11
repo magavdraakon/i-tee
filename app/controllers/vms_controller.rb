@@ -4,8 +4,8 @@ class VmsController < ApplicationController
   
   #before_filter :authorise_as_admin, :except => [:show, :index, :init_vm, :stop_vm, :pause_vm, :resume_vm, :start_vm, :start_all]
   #redirect to index view when trying to see unexisting things
-  before_filter :save_from_nil, :only=>[:show, :edit, :start_vm, :stop_vm, :pause_vm, :resume_vm, :get_state, :get_rdp ]
-  before_filter :auth_as_owner, :only=>[:show, :start_vm, :stop_vm, :pause_vm, :resume_vm, :get_state, :get_rdp ]       
+  before_filter :save_from_nil, :only=>[:show, :edit, :start_vm, :stop_vm, :pause_vm, :resume_vm, :get_state, :get_rdp, :rdp_reset ]
+  before_filter :auth_as_owner, :only=>[:show, :start_vm, :stop_vm, :pause_vm, :resume_vm, :get_state, :get_rdp, :rdp_reset ]       
   
   before_filter :admin_tab, :except=>[:show,:index, :vms_by_lab, :vms_by_state]
   before_filter :vm_tab, :only=>[:show,:index, :vms_by_lab, :vms_by_state]
@@ -433,6 +433,20 @@ end
       redirect_to(my_labs_path+'/'+@vm.lab_vmt.lab.id.to_s)
   end
   
+  def rdp_reset
+    respond_to do |format|
+      logger.debug "\n reset rdp? \n "
+      result = @vm.reset_rdp
+      
+      format.html  { redirect_to(:back, :notice=> result[:message]) }
+      format.json  { render :json => {:success=>result[:success], :message=> result[:message] } }
+    end
+    
+    rescue ActionController::RedirectBackError  # cant redirect back? go to the lab instead
+      logger.info "\nNo :back error\n"
+      redirect_to(my_labs_path+'/'+@vm.lab_vmt.lab.id.to_s)
+  end
+
   #this is a method that updates a vms progress
   #input parameters: ip (the machine, the report is about)
   #           progress (the progress for the machine)

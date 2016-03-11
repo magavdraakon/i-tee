@@ -72,7 +72,8 @@ class LabUsersController < ApplicationController
     @lab_user.vms.each do |v|
       v['username']=@lab_user.user.username
       v['port']='10'+v.mac.ip.split('.').last if v.mac!=nil
-      @info[v.state]<< v
+      logger.debug "state is #{v.state}"
+      @info[:"#{v.state}"]<< v
     end
     respond_to do |format|
       format.json  { render :json => @info }
