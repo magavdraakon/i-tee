@@ -17,7 +17,7 @@ class Lab < ActiveRecord::Base
     self.lab_vmts.each do |l|
       lvs<<l.id
     end
-    Vm.where("lab_vmt_id in (?)", lvs)
+    Vm.where('lab_vmt_id in (?)', lvs)
   end
 
 # return list of users in this lab
@@ -26,7 +26,7 @@ class Lab < ActiveRecord::Base
   	self.lab_users.each do |lu|
   		ids << lu.user_id
   	end
-  	User.where("id in (?)", ids)
+  	User.where('id in (?)', ids)
   end
 
 # add any user that doesnt have this lab yet
@@ -36,7 +36,7 @@ class Lab < ActiveRecord::Base
       l=LabUser.new
       l.lab_id=self.id
       l.user_id=u.id
-      l.save if LabUser.where("lab_id=? and user_id=?", l.lab_id, l.user_id).first==nil
+      l.save if LabUser.where('lab_id=? and user_id=?', l.lab_id, l.user_id).first==nil
     end
   end
   

@@ -25,7 +25,7 @@
           <%User.order('username').each do |u|%>
             <li class="user_li letter_<%=u.username[0,1].downcase if alphabet.include? u.username[0,1].downcase%>">
               <%# check_box_tag('users[]',u.id, :checked=>@users_in.include?(u))%> 
-              <%= check_box_tag("users[]",u.id, @users_in.include?(u), :id=>u.username)%>
+              <%= check_box_tag('users[]',u.id, @users_in.include?(u), :id=>u.username)%>
               <%=label_tag(u.username, u.username)%>
             </li>
           <%end%>
@@ -36,7 +36,7 @@
   </table>
 
 
-  <%= f.submit "Update"%>
+  <%= f.submit 'Update'%>
 
 <%end%>
 <h3>Or importing (users that dont exist will be created with token as the password!)</h3>
@@ -56,9 +56,9 @@
 <% content_for :sidebar do %>
     <ul>
   <% Lab.all.each do |l|%>
-    <% classes="" #default
-       classes= "bold" if l.id==@lab.id %>
-    <li class="<%= classes %>"><%=link_to(l.name, :controller=>"lab_users", :action=>"add_users", :id=>l.id)%></li>
+    <% classes='' #default
+       classes= 'bold' if l.id==@lab.id %>
+    <li class="<%= classes %>"><%=link_to(l.name, :controller=>'lab_users', :action=>'add_users', :id=>l.id)%></li>
   <%end%>
     </ul>
 <%end%>

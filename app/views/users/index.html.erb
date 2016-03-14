@@ -3,38 +3,38 @@
   <table>
     <thead>
       <tr>
-        <th><%=link_to("Username", :controller=>"users",:action=>"index", :sort_by=>"username", :dir=>@dir)%></th>
-        <th><%=link_to("Name", :controller=>"users",:action=>"index", :sort_by=>"name", :dir=>@dir)%></th>
+        <th><%=link_to('Username', :controller=>'users',:action=>'index', :sort_by=>'username', :dir=>@dir)%></th>
+        <th><%=link_to('Name', :controller=>'users',:action=>'index', :sort_by=>'name', :dir=>@dir)%></th>
         <th>Email</th>
-        <th><%=link_to("Last sign in", :controller=>"users",:action=>"index", :sort_by=>"last_sign_in_at", :dir=>@dir)%></th>
+        <th><%=link_to('Last sign in', :controller=>'users',:action=>'index', :sort_by=>'last_sign_in_at', :dir=>@dir)%></th>
         <th>Last IP</th>
-        <th><%=link_to("LDAP user", :controller=>"users",:action=>"index", :sort_by=>"ldap", :dir=>@dir)%></th>
-        <th><%=link_to("Role", :controller=>"users",:action=>"index", :sort_by=>"role", :dir=>@dir)%></th>
-        <!-- <th><%#=link_to("Token", :controller=>"users",:action=>"index", :sort_by=>"authentication_token", :dir=>@dir)%></th>
-        <th><%#=link_to("Token expires", :controller=>"users",:action=>"index", :sort_by=>"token_expires", :dir=>@dir)%></th>
+        <th><%=link_to('LDAP user', :controller=>'users',:action=>'index', :sort_by=>'ldap', :dir=>@dir)%></th>
+        <th><%=link_to('Role', :controller=>'users',:action=>'index', :sort_by=>'role', :dir=>@dir)%></th>
+        <!-- <th><%#=link_to("Token", :controller=>'users',:action=>'index', :sort_by=>"authentication_token", :dir=>@dir)%></th>
+        <th><%#=link_to("Token expires", :controller=>'users',:action=>'index', :sort_by=>"token_expires", :dir=>@dir)%></th>
         <th>Token</th>-->
         <th><!--User--></th>
       </tr>
-    </thead><% host=request.host host=host+":3000" if host=="localhost" %>
+    </thead><% host=request.host host=host+':3000' if host=='localhost' %>
     <% @users.each do |user| %>
       <tr>
         <td><%= user.username %></td>
         <td><%= user.name %></td>
         <td><%= user.email %></td>
-        <td><span title="<%= user.last_sign_in_at %>"><%= distance_of_time_in_words(Time.now, user.last_sign_in_at.to_time )+" ago" if user.last_sign_in_at %></span></td>
+        <td><span title="<%= user.last_sign_in_at %>"><%= distance_of_time_in_words(Time.now, user.last_sign_in_at.to_time )+' ago' if user.last_sign_in_at %></span></td>
         <td><%= user.last_sign_in_ip %></td>
         <td><%= user.ldap %></td>
         <td><%= user.rolename %></td>
 
      <!--   <td><%#=user.authentication_token.blank? ? "No token" : link_to("#{host}#{root_path(:auth_token => user.authentication_token)}", root_path(:auth_token => user.authentication_token)) %></td>
-        <td><span title="<%#=user.token_expires %>"><%#= (user.token_expires.to_time>Time.now ? "in ": "")+distance_of_time_in_words(Time.now, user.token_expires.to_time)+(user.token_expires.to_time>Time.now ? "": " ago") if user.token_expires %></span></td>
+        <td><span title="<%#=user.token_expires %>"><%#= (user.token_expires.to_time>Time.now ? "in ": "")+distance_of_time_in_words(Time.now, user.token_expires.to_time)+(user.token_expires.to_time>Time.now ? "": ' ago') if user.token_expires %></span></td>
         <td class="narrow">
-          <%#= link_to "Create", edit_token_path+"/"+user.id.to_s, :class=>'button add-button' if user.authentication_token.blank? %>
+          <%#= link_to "Create", edit_token_path+'/'+user.id.to_s, :class=>'button add-button' if user.authentication_token.blank? %>
           <%#= link_to "Delete", token_authentication_path(:id => user.id),:class=>'button delete-button', :method => :delete, :confirm => "Are you sure?" if !user.authentication_token.blank? %>
         </td>-->
         <td class="narrow">
-          <%= link_to 'Edit', users_edit_path+"/"+user.id.to_s, :class=> 'edit-button button' %>
-          <%= link_to 'Destroy', users_path+"/"+user.id.to_s, :method => :delete, :confirm => 'Are you sure?', :class=> 'delete-button button' %>
+          <%= link_to 'Edit', users_edit_path+'/'+user.id.to_s, :class=> 'edit-button button' %>
+          <%= link_to 'Destroy', users_path+'/'+user.id.to_s, :method => :delete, :confirm => 'Are you sure?', :class=> 'delete-button button' %>
         </td>
       </tr>
     <% end %>

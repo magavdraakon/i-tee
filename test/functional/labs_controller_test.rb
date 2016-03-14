@@ -5,21 +5,21 @@ class LabsControllerTest < ActionController::TestCase
     sign_in users(:ttanav)
     @lab = labs(:ntp)
     #setting a previous page
-    request.env["HTTP_REFERER"] = labs_path
+    request.env['HTTP_REFERER'] = labs_path
   end
 
-  test "should get index" do
+  test 'should get index' do
     get :index
     assert_response :success
     assert_not_nil assigns(:labs)
   end
 
-  test "should get new" do
+  test 'should get new' do
     get :new
     assert_response :success
   end
 
-  test "should create lab" do
+  test 'should create lab' do
     assert_difference('Lab.count') do
       post :create, :lab => @lab.attributes
     end
@@ -27,22 +27,22 @@ class LabsControllerTest < ActionController::TestCase
     assert_redirected_to lab_path(assigns(:lab))
   end
 
-  test "should show lab" do
+  test 'should show lab' do
     get :show, :id => @lab.to_param
     assert_response :success
   end
 
-  test "should get edit" do
+  test 'should get edit' do
     get :edit, :id => @lab.to_param
     assert_response :success
   end
 
-  test "should update lab" do
+  test 'should update lab' do
     put :update, :id => @lab.to_param, :lab => @lab.attributes
     assert_redirected_to lab_path(assigns(:lab))
   end
 
-  test "should destroy lab" do
+  test 'should destroy lab' do
     assert_difference('Lab.count', -1) do
       delete :destroy, :id => @lab.to_param
     end

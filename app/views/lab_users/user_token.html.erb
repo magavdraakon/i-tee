@@ -1,26 +1,26 @@
-<% host=request.host host=host+":3000" if host=="localhost" %>
+<% host=request.host host=host+':3000' if host=='localhost' %>
 <h3>Listing user tokens</h3>
 <div id="index_t">
   <table>
     <thead>
       <tr>
-        <th><%=link_to("User",manage_tokens_path+"?sort_by=username&dir="+@dir)%></th>
-        <th><%=link_to("Last login",manage_tokens_path+"?sort_by=last_sign_in_at&dir="+@dir)%></th>
-        <th><%= link_to("Token",manage_tokens_path+"?sort_by=authentication_token&dir="+@dir)%></th>
-        <th><%= link_to("Expiry time",manage_tokens_path+"?sort_by=token_expires&dir="+@dir)%></th>
+        <th><%=link_to('User',manage_tokens_path+'?sort_by=username&dir='+@dir)%></th>
+        <th><%=link_to('Last login',manage_tokens_path+'?sort_by=last_sign_in_at&dir='+@dir)%></th>
+        <th><%= link_to('Token',manage_tokens_path+'?sort_by=authentication_token&dir='+@dir)%></th>
+        <th><%= link_to('Expiry time',manage_tokens_path+'?sort_by=token_expires&dir='+@dir)%></th>
         <th></th> 
       </tr>
     </thead>
     <% @users.each do |u| %>
       <tr>
         <td><%= u.username %></td>
-        <td><span title="<%= u.last_sign_in_at %>"><%= distance_of_time_in_words(Time.now, u.last_sign_in_at.to_time )+" ago" if u.last_sign_in_at %></span></td>
-        <td><%=u.authentication_token.blank? ? "No token" : link_to("#{host}#{root_path(:auth_token => u.authentication_token)}", root_path(:auth_token => u.authentication_token)) %></td>
-        <td><span title="<%=u.token_expires %>"><%= (u.token_expires.to_time>Time.now ? "in ": "")+distance_of_time_in_words(Time.now, u.token_expires.to_time)+(u.token_expires.to_time>Time.now ? "": " ago") if u.token_expires %></span></td>
+        <td><span title="<%= u.last_sign_in_at %>"><%= distance_of_time_in_words(Time.now, u.last_sign_in_at.to_time )+' ago' if u.last_sign_in_at %></span></td>
+        <td><%=u.authentication_token.blank? ? 'No token' : link_to("#{host}#{root_path(:auth_token => u.authentication_token)}", root_path(:auth_token => u.authentication_token)) %></td>
+        <td><span title="<%=u.token_expires %>"><%= (u.token_expires.to_time>Time.now ? 'in ': '')+distance_of_time_in_words(Time.now, u.token_expires.to_time)+(u.token_expires.to_time>Time.now ? '': ' ago') if u.token_expires %></span></td>
         <td class="narrow">
-          <%= link_to "Create", edit_token_path+"/"+u.id.to_s, :class=>'button add-button' if u.authentication_token.blank? %>
-          <%= link_to "Edit", edit_token_path+"/"+u.id.to_s, :class=>'button edit-button' if !u.authentication_token.blank? %>
-          <%= link_to "Delete", token_authentication_path(:id => u.id),:class=>'button delete-button', :method => :delete, :confirm => "Are you sure?" if !u.authentication_token.blank? %>
+          <%= link_to 'Create', edit_token_path+'/'+u.id.to_s, :class=>'button add-button' if u.authentication_token.blank? %>
+          <%= link_to 'Edit', edit_token_path+'/'+u.id.to_s, :class=>'button edit-button' unless u.authentication_token.blank? %>
+          <%= link_to 'Delete', token_authentication_path(:id => u.id),:class=>'button delete-button', :method => :delete, :confirm => 'Are you sure?' unless u.authentication_token.blank? %>
         </td>
       </tr>
     <%end%>

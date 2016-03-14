@@ -898,7 +898,7 @@ Parser.prototype.tok = function() {
       body += '</tr>\n</thead>\n';
 
       // body
-      body += '<tbody>\n'
+      body += '<tbody>\n';
       for (i = 0; i < this.token.cells.length; i++) {
         row = this.token.cells[i];
         body += '<tr>\n';

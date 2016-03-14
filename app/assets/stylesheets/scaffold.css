@@ -45,7 +45,7 @@ div.field, div.actions {
   padding: 5px 5px 5px 15px;
   font-size: 12px;
   margin: -7px;
-  margin-bottom: 0px;
+  margin-bottom: 0;
   background-color: #c00;
   color: #fff;
 }

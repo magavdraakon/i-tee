@@ -2,7 +2,7 @@ class AddDefaultData < ActiveRecord::Migration
   def self.up
     Material.create(:name=> 'Veebiserveri labor', :source=>'https://wiki.itcollege.ee/index.php/Veebiserveri_labor_v.2')
     Lab.create(:name=>'Veebiserveri labor',
-    :short_description=>"firma veebilehe loomine", 
+    :short_description=> 'firma veebilehe loomine',
     :description=>'Firmale on vaja luua kaks veebilehte: 
     www.firma.ee 
     sales.firma.ee 

@@ -4,14 +4,14 @@ class VmsController < ApplicationController
   
   #before_filter :authorise_as_admin, :except => [:show, :index, :init_vm, :stop_vm, :pause_vm, :resume_vm, :start_vm, :start_all]
   #redirect to index view when trying to see unexisting things
-  before_filter :save_from_nil, :only=>[:show, :edit, :start_vm, :stop_vm, :pause_vm, :resume_vm, :get_state, :get_rdp ]
-  before_filter :auth_as_owner, :only=>[:show, :start_vm, :stop_vm, :pause_vm, :resume_vm, :get_state, :get_rdp ]       
+  before_filter :save_from_nil, :only=>[:show, :edit, :start_vm, :stop_vm, :pause_vm, :resume_vm, :get_state, :get_rdp, :rdp_reset ]
+  before_filter :auth_as_owner, :only=>[:show, :start_vm, :stop_vm, :pause_vm, :resume_vm, :get_state, :get_rdp, :rdp_reset ]       
   
   before_filter :admin_tab, :except=>[:show,:index, :vms_by_lab, :vms_by_state]
   before_filter :vm_tab, :only=>[:show,:index, :vms_by_lab, :vms_by_state]
 
   def save_from_nil
-    logger.debug "finding vm"
+    logger.debug 'finding vm'
 
     @vm = Vm.find_by_id(params[:id])
     if @vm==nil 
@@ -88,18 +88,18 @@ class VmsController < ApplicationController
   # GET /vms
   # GET /vms.xml
   def index
-    if params[:dir]=="asc" then
-      dir = "ASC"
-      @dir = "&dir=desc"
+    if params[:dir]=='asc'
+      dir = 'ASC'
+      @dir = '&dir=desc'
     else 
-      dir = "DESC"
-      @dir = "&dir=asc"
+      dir = 'DESC'
+      @dir = '&dir=asc'
     end
-    order = params[:sort_by] ? " order by #{params[:sort_by]} #{dir}" : ""
+    order = params[:sort_by] ? " order by #{params[:sort_by]} #{dir}" : ''
 
-    if params[:admin]!=nil && @admin then
+    if params[:admin]!=nil && @admin
       sql= "select vms.*, lab_vmts.lab_id from vms, lab_vmts where vms.lab_vmt_id=lab_vmts.id #{order}"
-      @tab="admin"
+      @tab='admin'
     else  
       sql= "select vms.*, lab_vmts.lab_id from vms, lab_vmts where vms.lab_vmt_id=lab_vmts.id and user_id=#{current_user.id} #{order}"
     end
@@ -145,10 +145,10 @@ class VmsController < ApplicationController
   
     respond_to do |format|
       if @vm.save
-        format.html { redirect_to(vms_path+"?admin=1", :notice => 'Vm was successfully created.') }
+        format.html { redirect_to(vms_path+'?admin=1', :notice => 'Vm was successfully created.') }
         format.xml  { render :xml => @vm, :status => :created, :location => @vm }
       else
-        format.html { render :action => "new" }
+        format.html { render :action => 'new' }
         format.xml  { render :xml => @vm.errors, :status => :unprocessable_entity }
       end
     end
@@ -161,10 +161,10 @@ class VmsController < ApplicationController
 
     respond_to do |format|
       if @vm.update_attributes(params[:vm])
-        format.html { redirect_to(vms_path+"?admin=1", :notice => 'Vm was successfully updated.') }
+        format.html { redirect_to(vms_path+'?admin=1', :notice => 'Vm was successfully updated.') }
         format.xml  { head :ok }
       else
-        format.html { render :action => "edit" }
+        format.html { render :action => 'edit' }
         format.xml  { render :xml => @vm.errors, :status => :unprocessable_entity }
       end
     end
@@ -177,7 +177,7 @@ class VmsController < ApplicationController
     @vm.destroy
 
     respond_to do |format|
-      format.html { redirect_to(vms_path+"?admin=1") }
+      format.html { redirect_to(vms_path+'?admin=1') }
       format.xml  { head :ok }
     end
   end
@@ -188,7 +188,7 @@ class VmsController < ApplicationController
   def get_state
     get_user
     respond_to do |format|  
-      format.html  { redirect_to(root_path, :notice =>"Permission error") }
+      format.html  { redirect_to(root_path, :notice =>'Permission error') }
       format.json  { render :json => {:success=> true , :state=> @vm.state  } }
     end
   end
@@ -197,7 +197,7 @@ class VmsController < ApplicationController
   # before filters check if owner/admin 
   def get_rdp
     respond_to do |format|
-      format.html  { redirect_to(root_path, :notice =>"Permission error") }
+      format.html  { redirect_to(root_path, :notice =>'Permission error') }
       format.json  { render :json => {:success=> true , :rdp=> @vm.get_all_rdp  } }
     end
   end
@@ -212,14 +212,14 @@ class VmsController < ApplicationController
     end
     rescue Timeout::Error
       respond_to do |format|        
-        format.html {redirect_to :back , :notice => "Permission error"}
-        format.json {render :json=> { :success=> false, :message=>"Starting all virtual machines failed, try starting them one by one.", :lab_user=> @labuser.id}}
+        format.html {redirect_to :back , :notice => 'Permission error'}
+        format.json {render :json=> { :success=> false, :message=>'Starting all virtual machines failed, try starting them one by one.', :lab_user=> @labuser.id}}
       end
     rescue ActiveRecord::RecordNotFound
       respond_to do |format|
         logger.debug "Can't find labuser: "
         logger.debug params
-        format.html { redirect_to root_path , :notice=> "permission error" }
+        format.html { redirect_to root_path , :notice=> 'permission error' }
         format.json { render :json=> {:success => false , :message=>  "Can't find mission" }}
       end
   end
@@ -234,14 +234,14 @@ class VmsController < ApplicationController
     end
     rescue Timeout::Error
       respond_to do |format|        
-        format.html {redirect_to :back , :notice => "Permission error"}
-        format.json {render :json=> { :success=> false, :message=>"Starting all virtual machines failed, try starting them one by one.", :lab_user=> @labuser.id}}
+        format.html {redirect_to :back , :notice => 'Permission error'}
+        format.json {render :json=> { :success=> false, :message=>'Starting all virtual machines failed, try starting them one by one.', :lab_user=> @labuser.id}}
       end
     rescue ActiveRecord::RecordNotFound
       respond_to do |format|
         logger.debug "Can't find labuser: "
         logger.debug params
-        format.html { redirect_to root_path , :notice=> "permission error" }
+        format.html { redirect_to root_path , :notice=> 'permission error' }
         format.json { render :json=> {:success => false , :message=>  "Can't find mission" }}
       end
   end
@@ -260,10 +260,10 @@ class VmsController < ApplicationController
         logger.debug '\n start_lab: Relocate user\n'
         # simple user should not have the username in url
         format.html { redirect_to my_labs_path+(params[:id] ? "/#{params[:id]}" : '') }
-        format.json { render :json=>{:success => false , :message=> "No permission error" }}
+        format.json { render :json=>{:success => false , :message=> 'No permission error' }}
       else
         # ok, there is such lab, but does the user have it?  
-        @labuser = LabUser.where("lab_id=? and user_id=?", @lab.id, @user.id).last
+        @labuser = LabUser.where('lab_id=? and user_id=?', @lab.id, @user.id).last
         if @labuser!=nil #user has this lab
           result = @labuser.start_all_vms
           format.html {redirect_to :back , :notice => result[:message].html_safe}
@@ -277,8 +277,8 @@ class VmsController < ApplicationController
     end
     rescue Timeout::Error
       respond_to do |format|        
-        format.html {redirect_to :back , :notice => "<br/>Starting all virtual machines failed, try starting them one by one."}
-        format.json {render :json=> { :success=> false, :message=>"Starting all virtual machines failed, try starting them one by one.", :lab_user=> @labuser.id}}
+        format.html {redirect_to :back , :notice => '<br/>Starting all virtual machines failed, try starting them one by one.'}
+        format.json {render :json=> { :success=> false, :message=>'Starting all virtual machines failed, try starting them one by one.', :lab_user=> @labuser.id}}
       end
     rescue ActiveRecord::RecordNotFound
       respond_to do |format|
@@ -289,7 +289,7 @@ class VmsController < ApplicationController
       end
     rescue ActionController::RedirectBackError # cant redirect back? go to the lab instead
       logger.info "\nNo :back error\n"
-      redirect_to(my_labs_path+"/"+@lab.id.to_s)
+      redirect_to(my_labs_path+'/'+@lab.id.to_s)
 
   end
   
@@ -307,12 +307,12 @@ class VmsController < ApplicationController
       flash[:alert] = result[:alert].html_safe if is_alert
       
       format.html  { redirect_to(:back) }
-      format.json  { render :json => {:success=>is_notice, :message=> is_notice ? "Machine started" : "Machine start failed"} }
+      format.json  { render :json => {:success=>is_notice, :message=> is_notice ? 'Machine started' : 'Machine start failed'} }
     end
     
     rescue ActionController::RedirectBackError  # cant redirect back? go to the lab instead
       logger.info "\nNo :back error\n"
-      redirect_to(my_labs_path+"/"+@vm.lab_vmt.lab.id.to_s)
+      redirect_to(my_labs_path+'/'+@vm.lab_vmt.lab.id.to_s)
   end
   
   #resume machine from pause
@@ -328,7 +328,7 @@ class VmsController < ApplicationController
     
     rescue ActionController::RedirectBackError  # cant redirect back? go to the lab instead
       logger.info "\nNo :back error\n"
-      redirect_to(my_labs_path+"/"+@vm.lab_vmt.lab.id.to_s)
+      redirect_to(my_labs_path+'/'+@vm.lab_vmt.lab.id.to_s)
   end
   
   #pause a machine
@@ -344,7 +344,7 @@ class VmsController < ApplicationController
     
     rescue ActionController::RedirectBackError  # cant redirect back? go to the lab instead
       logger.info "\nNo :back error\n"
-      redirect_to(my_labs_path+"/"+@vm.lab_vmt.lab.id.to_s)
+      redirect_to(my_labs_path+'/'+@vm.lab_vmt.lab.id.to_s)
   end
 
   # start all vms by labuser id - API only
@@ -357,14 +357,14 @@ class VmsController < ApplicationController
     end
     rescue Timeout::Error
       respond_to do |format|        
-        format.html {redirect_to :back , :notice => "Permission error"}
-        format.json {render :json=> { :success=> false, :message=>"Starting all virtual machines failed, try starting them one by one.", :lab_user=> @labuser.id}}
+        format.html {redirect_to :back , :notice => 'Permission error'}
+        format.json {render :json=> { :success=> false, :message=>'Starting all virtual machines failed, try starting them one by one.', :lab_user=> @labuser.id}}
       end
     rescue ActiveRecord::RecordNotFound
       respond_to do |format|
         logger.debug "Can't find labuser: "
         logger.debug params
-        format.html { redirect_to root_path , :notice=> "permission error" }
+        format.html { redirect_to root_path , :notice=> 'permission error' }
         format.json { render :json=> {:success => false , :message=>  "Can't find mission" }}
       end
   end
@@ -383,10 +383,10 @@ def stop_all
       logger.debug '\n start_lab: Relocate user\n'
       # simple user should not have the username in url
       format.html { redirect_to my_labs_path+(params[:id] ? "/#{params[:id]}" : '') }
-      format.json { render :json=>{:success => false , :message=> "No permission error" }}
+      format.json { render :json=>{:success => false , :message=> 'No permission error' }}
     else
       # ok, there is such lab, but does the user have it?  
-      @labuser = LabUser.where("lab_id=? and user_id=?", @lab.id, @user.id).last
+      @labuser = LabUser.where('lab_id=? and user_id=?', @lab.id, @user.id).last
       if @labuser!=nil #user has this lab
         result = @labuser.stop_all_vms
         format.html {redirect_to :back , :notice => result[:message].html_safe}
@@ -400,8 +400,8 @@ def stop_all
   end
   rescue Timeout::Error
     respond_to do |format|        
-      format.html {redirect_to :back , :notice => "<br/>Starting all virtual machines failed, try stoppping them one by one."}
-      format.json {render :json=> { :success=> false, :message=>"Starting all virtual machines failed, try stoppping them one by one.", :lab_user=> @labuser.id}}
+      format.html {redirect_to :back , :notice => '<br/>Starting all virtual machines failed, try stoppping them one by one.'}
+      format.json {render :json=> { :success=> false, :message=>'Starting all virtual machines failed, try stoppping them one by one.', :lab_user=> @labuser.id}}
     end
   rescue ActiveRecord::RecordNotFound
     respond_to do |format|
@@ -412,7 +412,7 @@ def stop_all
     end
   rescue ActionController::RedirectBackError # cant redirect back? go to the lab instead
     logger.info "\nNo :back error\n"
-    redirect_to(my_labs_path+"/"+@lab.id.to_s)
+    redirect_to(my_labs_path+'/'+@lab.id.to_s)
 
 end
 
@@ -430,37 +430,52 @@ end
     
     rescue ActionController::RedirectBackError  # cant redirect back? go to the lab instead
       logger.info "\nNo :back error\n"
-      redirect_to(my_labs_path+"/"+@vm.lab_vmt.lab.id.to_s)
+      redirect_to(my_labs_path+'/'+@vm.lab_vmt.lab.id.to_s)
   end
   
+  def rdp_reset
+    respond_to do |format|
+      logger.debug "\n reset rdp? \n "
+      result = @vm.reset_rdp
+      
+      format.html  { redirect_to(:back, :notice=> result[:message]) }
+      format.json  { render :json => {:success=>result[:success], :message=> result[:message] } }
+    end
+    
+    rescue ActionController::RedirectBackError  # cant redirect back? go to the lab instead
+      logger.info "\nNo :back error\n"
+      redirect_to(my_labs_path+'/'+@vm.lab_vmt.lab.id.to_s)
+  end
+
   #this is a method that updates a vms progress
   #input parameters: ip (the machine, the report is about)
   #           progress (the progress for the machine)
   def set_progress
     #who sent the info? 
     @client_ip = request.remote_ip
-    @remote_ip = request.env["HTTP_X_FORWARDED_FOR"]
+    @remote_ip = request.env['HTTP_X_FORWARDED_FOR']
     
     #get the vms based on the ip aadress and update the vm.progress based on the input
     @target_ip=params[:ip]
-    if @target_ip==nil then 
-      @target_ip="error" 
+    if @target_ip==nil
+      @target_ip='error'
     else
       #check if the param was actually in a form of a ip
       @check=@target_ip.split('.')
-      if @target_ip==@client_ip && ((Integer(@check[0]) rescue nil) && (Integer(@check[1]) rescue nil) && (Integer(@check[2]) rescue nil) && (Integer(@check[3]) rescue nil)) then#TODO- once the allowed ip range is known, update
+      if @target_ip==@client_ip && ((Integer(@check[0]) rescue nil) && (Integer(@check[1]) rescue nil) && (Integer(@check[2]) rescue nil) && (Integer(@check[3]) rescue nil))
+        #TODO- once the allowed ip range is known, update
         @progress=params[:progress]
-        if @progress!=nil then
+        if @progress!=nil
           @progress.gsub!(/_/) do
-            "<br/>"
+            '<br/>'
           end
         end
-        @mac=Mac.find(:first, :conditions=>['ip=?', @target_ip])
+        @mac=Mac.where('ip=?', @target_ip).first
         @vm=@mac.vm
-        if @vm!=nil then
+        if @vm!=nil
           #the mac exists and has a vm
           @vm.progress=@progress
-          @vm.save() 
+          @vm.save
         end#end vm exists        
       end#end the target sent the progress
     end#end the ip parameter is set
@@ -469,7 +484,7 @@ end
   def get_progress
     
     @vm=Vm.find_by_id(params[:id])
-    unless @vm || @vm.user.id==current_user.id || @admin then 
+    unless @vm || @vm.user.id==current_user.id || @admin
       @vm=Vm.new #dummy
     end
     render :partial => 'shared/vm_progress' 
@@ -480,10 +495,10 @@ end
     #is this vm this users?
     unless current_user==@vm.user || @admin
       respond_to do |format|
-        logger.debug "not owner"
+        logger.debug 'not owner'
         #You don't belong here. Go away.
-        format.html { redirect_to root_path , :notice=> "Sorry, this machine doesnt belong to you!" }
-        format.json { render :json=> {:success => false , :message=>  "Sorry, this machine doesnt belong to you!"} }
+        format.html { redirect_to root_path , :notice=> 'Sorry, this machine doesnt belong to you!' }
+        format.json { render :json=> {:success => false , :message=>  'Sorry, this machine does not belong to you!'} }
       end
     end
   end

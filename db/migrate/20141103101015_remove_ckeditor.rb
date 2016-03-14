@@ -24,8 +24,8 @@ class RemoveCkeditor < ActiveRecord::Migration
       t.timestamps
     end
     
-    add_index "ckeditor_assets", ["assetable_type", "type", "assetable_id"], :name => "idx_assetable_type"
-		add_index "ckeditor_assets", ["assetable_type", "assetable_id"], :name => "fk_assetable"
-		add_index "ckeditor_assets", ["user_id"], :name => "fk_user"
+    add_index 'ckeditor_assets', ['assetable_type', 'type', 'assetable_id'], :name => 'idx_assetable_type'
+		add_index 'ckeditor_assets', ['assetable_type', 'assetable_id'], :name => 'fk_assetable'
+		add_index 'ckeditor_assets', ['user_id'], :name => 'fk_user'
   end
 end

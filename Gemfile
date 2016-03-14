@@ -21,10 +21,13 @@ end
 
 gem 'paperclip', '2.7'
 
-gem "devise"
-gem "devise_ldap_authenticatable", "0.4.5"
+gem 'devise'
+gem 'devise_ldap_authenticatable', '0.4.5'
 
 gem 'marked-rails'
+
+# https://github.com/collectiveidea/delayed_job
+gem 'delayed_job_active_record'
 
 # Use unicorn as the web server
 # gem 'unicorn'

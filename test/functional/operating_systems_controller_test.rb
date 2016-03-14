@@ -5,21 +5,21 @@ class OperatingSystemsControllerTest < ActionController::TestCase
     @operating_system = operating_systems(:ubuntu)
     sign_in users(:ttanav)
     #setting a previous page
-    request.env["HTTP_REFERER"] = root_path
+    request.env['HTTP_REFERER'] = root_path
   end
 
-  test "should get index" do
+  test 'should get index' do
     get :index
     assert_response :success
     assert_not_nil assigns(:operating_systems)
   end
 
-  test "should get new" do
+  test 'should get new' do
     get :new
     assert_response :success
   end
 
-  test "should create operating_system" do
+  test 'should create operating_system' do
     assert_difference('OperatingSystem.count') do
       post :create, :operating_system => @operating_system.attributes
     end
@@ -27,22 +27,22 @@ class OperatingSystemsControllerTest < ActionController::TestCase
     assert_redirected_to operating_system_path(assigns(:operating_system))
   end
 
-  test "should show operating_system" do
+  test 'should show operating_system' do
     get :show, :id => @operating_system.to_param
     assert_response :success
   end
 
-  test "should get edit" do
+  test 'should get edit' do
     get :edit, :id => @operating_system.to_param
     assert_response :success
   end
 
-  test "should update operating_system" do
+  test 'should update operating_system' do
     put :update, :id => @operating_system.to_param, :operating_system => @operating_system.attributes
     assert_redirected_to operating_system_path(assigns(:operating_system))
   end
 
-  test "should destroy operating_system" do
+  test 'should destroy operating_system' do
     assert_difference('OperatingSystem.count', -1) do
       delete :destroy, :id => @operating_system.to_param
     end

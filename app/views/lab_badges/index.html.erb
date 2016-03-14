@@ -13,7 +13,7 @@
 <% @lab_badges.each do |lab_badge| %>
   <tr>
     <td><%= lab_badge.lab.name %></td>
-    <td><%= image_tag lab_badge.badge.icon, :size => "25x30", :alt=> lab_badge.name %></td>
+    <td><%= image_tag lab_badge.badge.icon, :size => '25x30', :alt=> lab_badge.name %></td>
     <td><%= lab_badge.name %></td>
     <td class="narrow">
       <%= link_to 'Show', lab_badge, :class=> 'show-button button' %>
@@ -26,4 +26,4 @@
 
 </div>
 
-<%= link_to 'New Lab badge', new_lab_badge_path , :class=>"add-button button" %>
+<%= link_to 'New Lab badge', new_lab_badge_path , :class=> 'add-button button' %>

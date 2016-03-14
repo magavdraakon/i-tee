@@ -19,9 +19,9 @@
     <td><%= lab_vmt_network.promiscuous %></td>
     <td><%= lab_vmt_network.reinit_mac %></td>
     <td class="narrow">
-      <%= link_to 'Show', lab_vmt_network, :class=>"show-button button"  %>
-      <%= link_to 'Edit', edit_lab_vmt_network_path(lab_vmt_network), :class=>"edit-button button"  %>
-      <%= link_to 'Destroy', lab_vmt_network, confirm: 'Are you sure?', method: :delete, :class=>"delete-button button"  %>
+      <%= link_to 'Show', lab_vmt_network, :class=> 'show-button button' %>
+      <%= link_to 'Edit', edit_lab_vmt_network_path(lab_vmt_network), :class=> 'edit-button button' %>
+      <%= link_to 'Destroy', lab_vmt_network, confirm: 'Are you sure?', method: :delete, :class=> 'delete-button button' %>
     </td>
   </tr>
 <% end %>
@@ -29,4 +29,4 @@
 
 </div>
 
-<%= link_to 'New Lab vmt network', new_lab_vmt_network_path, :class=>"add-button button" %>
+<%= link_to 'New Lab vmt network', new_lab_vmt_network_path, :class=> 'add-button button' %>

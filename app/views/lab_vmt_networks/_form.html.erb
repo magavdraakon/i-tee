@@ -2,7 +2,7 @@
 <%= form_for(@lab_vmt_network) do |f| %>
   <% if @lab_vmt_network.errors.any? %>
     <div id="error_explanation">
-      <h2><%= pluralize(@lab_vmt_network.errors.count, "error") %> prohibited this lab_vmt_network from being saved:</h2>
+      <h2><%= pluralize(@lab_vmt_network.errors.count, 'error') %> prohibited this lab_vmt_network from being saved:</h2>
 
       <ul>
       <% @lab_vmt_network.errors.full_messages.each do |msg| %>

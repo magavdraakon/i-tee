@@ -1,0 +1,29 @@
+<h1>Delayed jobs</h1>
+<div id="index_t">
+  <table>
+    <thead>
+		<tr>
+			<th>ID</th>
+			<th>Priority</th>
+			<th>Attempts</th>
+			<th>Last error</th>
+			<th>Run at</th>
+			<th>Queue</th>
+			<th></th>
+		</tr>
+	</thead>
+	<% @jobs.each do |job| %>
+	<tr>
+		<td><%= job.id %></td>
+		<td><%= job.priority %></td>
+		<td><%= job.attempts %></td>
+		<td><%= job.last_error %></td>
+		<td><%= job.run_at %></td>
+		<td><%= job.queue %></td>
+		<td>
+		<%= link_to 'run again', jobs_path+"/#{job.id}", :confirm => 'Are you sure?', :method => :put,:class=> 'edit-button button' %>
+		<%= link_to 'Destroy', jobs_path+"/#{job.id}", :confirm => 'Are you sure?', :method => :delete,:class=> 'delete-button button' %></td>
+	</tr>
+	<%end%>
+</table>
+</div>

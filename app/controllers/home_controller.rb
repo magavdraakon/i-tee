@@ -1,5 +1,5 @@
 class HomeController < ApplicationController
-  before_filter :authorise_as_admin, :only=>[:system_info, :template_info]
+  before_filter :authorise_as_admin, :only=>[:system_info, :template_info, :jobs, :delete_job, :run_job]
   before_filter :home_tab, :except=>[:about]
 
 
@@ -17,6 +17,23 @@ class HomeController < ApplicationController
     @tab='home' if user_signed_in?
   end
   
+
+  def jobs
+    @jobs=Delayed::Job.all
+  end
+
+  def delete_job
+    job=Delayed::Job.find_by_id(params[:id])
+    job.destroy
+    redirect_to :back
+  end
+
+  def run_job
+    job=Delayed::Job.find_by_id(params[:id])
+    job.invoke_job
+    redirect_to :back
+  end
+
   #this is a method that updates a lab_users progress
   #input parameters: ip (the machine, the report is about)
   #                  progress (the progress for the machine)
@@ -48,7 +65,7 @@ class HomeController < ApplicationController
           if @lab_user!=nil
             #the vm helped find its lab_user
             @lab_user.progress=@progress
-            @lab_user.save() 
+            @lab_user.save
             
           end#end labuser exists
         end#end vm exists

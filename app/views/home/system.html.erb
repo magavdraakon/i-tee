@@ -2,9 +2,9 @@
 <p>Passenger info:</p>
 <p>
   <%output=%x(/var/www/railsapps/i-tee/utils/info.sh 2>&1)
-    group=output.split(" ")[3]
-    user= output.split(" ")[2]
-    user="nobody" if user=="root"%>
+    group=output.split(' ')[3]
+    user= output.split(' ')[2]
+    user='nobody' if user=='root'%>
     user: <%= user%><br/>
   group: <%= group%>
 </p>
