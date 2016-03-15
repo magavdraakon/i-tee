@@ -193,7 +193,6 @@ mysql -uroot -p$MYSQLPWD << EOF
 create database itee_production character set utf8;
 create user 'itee'@'localhost' identified by '$RANDOMPASSWORD';
 grant all privileges on itee_production.* to 'itee'@'localhost';
-quit;
 EOF
 
 cat > /var/www/railsapps/i-tee/config/database.yml << EOF
