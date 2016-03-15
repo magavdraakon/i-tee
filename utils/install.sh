@@ -234,7 +234,7 @@ su - vbox -c'VBoxManage setproperty vrdeauthlibrary "VBoxAuthSimple"'
 
 echo "CREATE PROPER LDAP CONFIG"
 
-sudo apt-get install bundler -y
+sudo gem install bundler
 cd /var/www/railsapps/i-tee/
 sudo bundle install
 sudo rake db:migrate RAILS_ENV="production"
