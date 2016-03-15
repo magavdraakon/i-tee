@@ -159,71 +159,71 @@ class LabUser < ActiveRecord::Base
     else
       # get lab
       lab = labuser.lab
-      # iterate over vms for this lab
-      labuser.vms.each do |vm|
-        # check if rdp is allowed for user
-        if vm.lab_vmt.allow_remote 
-          
-          info = %x(VBoxManage showvminfo #{vm.name})
-          status= $?
-          if status.exitstatus > 0
-            logger.debug "Exit with error: #{status.exitstatus}"
-            # machine not found / virtualbox error
-          else
-            #logger.debug info.split(/\n+/)
-            virtual = {}
-            info.split(/\n+/).each do |row|
-              r=row.split(':', 2)
-              if r[0] && r[1]
-                virtual[ r[0] ]=r[1].strip
-                #puts "#{r[0]} : #{r[1]}\n"
-              end
-            end
+      if lab && lab.poll_freq>0 && !labuser.end # poll until labuser ends
+        # iterate over vms for this lab
+        labuser.vms.each do |vm|
+          # check if rdp is allowed for user
+          if vm.lab_vmt.allow_remote 
             
-            # uninitialized machine - exit code 1, no vminfo
-              #VBoxManage: error: Could not find a registered machine named 'webserver-Tiia'
-              #VBoxManage: error: Details: code VBOX_E_OBJECT_NOT_FOUND (0x80bb0001), component VirtualBoxWrap, interface IVirtualBox, callee nsISupports
-              #VBoxManage: error: Context: "FindMachine(Bstr(VMNameOrUuid).raw(), machine.asOutParam())" at line 2719 of file VBoxManageInfo.cpp
-            # started machine, no rdp since init - 'Clients so far' == 0 && 'VRDE Connection'  == 'not active' && 'state' starts with 'running'
-            # started machine, live rdp - 'VRDE Connection' == 'active' 'Clients so far' != 0 && 'Start time' && 'state' starts with 'running'
-            # started machine, rdp closed - 'VRDE Connection'  == 'not active' && 'Last started' && 'Last ended' && 'state' starts with 'running'
-            # stopped / paused machine - 'VRDE' contains 'enabled', no ^ fields! 'State' starts with 'powered off' / 'saved'
-
-            # NB! if a machine is stopped and started again, 'Clients so far' starts from 0
-
-            # if RDP is allowed
-            if virtual['VRDE'].include?('enabled')
-              # check state 
-              case virtual['State'].split('(').first.strip
-              when 'running'
-                puts "MACHINE IS RUNNING - #{vm.name}"
-                if virtual['VRDE Connection']=='not active' # no running RDP
-
-                elsif virtual['VRDE Connection']=='active' # running RDP
-                  labuser.last_activity=Time.now
-                  labuser.activity = "RDP active - '#{vm.name}'"
-                  puts "RDP is active - #{vm.name}"
-                end
-              when 'powered off'
-                puts "MACHINE IS SHUT DOWN - #{vm.name}"
-              when 'saved'
-                puts "MACHINE IS PAUSED - #{vm.name}"
-              else
-                # do nothing
-              end #case state
+            info = %x(VBoxManage showvminfo #{vm.name})
+            status= $?
+            if status.exitstatus > 0
+              logger.debug "Exit with error: #{status.exitstatus}"
+              # machine not found / virtualbox error
             else
-              # TODO! what to do if rdp is disabled in vm itself?
-            end # if rdp
-          end # if statuscode 0
-          
-        else # rdp is not enabled
-          # do nothing
-        end
-      end # end foreach vms
+              #logger.debug info.split(/\n+/)
+              virtual = {}
+              info.split(/\n+/).each do |row|
+                r=row.split(':', 2)
+                if r[0] && r[1]
+                  virtual[ r[0] ]=r[1].strip
+                  #puts "#{r[0]} : #{r[1]}\n"
+                end
+              end
+              
+              # uninitialized machine - exit code 1, no vminfo
+                #VBoxManage: error: Could not find a registered machine named 'webserver-Tiia'
+                #VBoxManage: error: Details: code VBOX_E_OBJECT_NOT_FOUND (0x80bb0001), component VirtualBoxWrap, interface IVirtualBox, callee nsISupports
+                #VBoxManage: error: Context: "FindMachine(Bstr(VMNameOrUuid).raw(), machine.asOutParam())" at line 2719 of file VBoxManageInfo.cpp
+              # started machine, no rdp since init - 'Clients so far' == 0 && 'VRDE Connection'  == 'not active' && 'state' starts with 'running'
+              # started machine, live rdp - 'VRDE Connection' == 'active' 'Clients so far' != 0 && 'Start time' && 'state' starts with 'running'
+              # started machine, rdp closed - 'VRDE Connection'  == 'not active' && 'Last started' && 'Last ended' && 'state' starts with 'running'
+              # stopped / paused machine - 'VRDE' contains 'enabled', no ^ fields! 'State' starts with 'powered off' / 'saved'
 
-      labuser.save
+              # NB! if a machine is stopped and started again, 'Clients so far' starts from 0
 
-      if lab.poll_freq>0 && !labuser.end # poll until labuser ends
+              # if RDP is allowed
+              if virtual['VRDE'].include?('enabled')
+                # check state 
+                case virtual['State'].split('(').first.strip
+                when 'running'
+                  puts "MACHINE IS RUNNING - #{vm.name}"
+                  if virtual['VRDE Connection']=='not active' # no running RDP
+
+                  elsif virtual['VRDE Connection']=='active' # running RDP
+                    labuser.last_activity=Time.now
+                    labuser.activity = "RDP active - '#{vm.name}'"
+                    puts "RDP is active - #{vm.name}"
+                  end
+                when 'powered off'
+                  puts "MACHINE IS SHUT DOWN - #{vm.name}"
+                when 'saved'
+                  puts "MACHINE IS PAUSED - #{vm.name}"
+                else
+                  # do nothing
+                end #case state
+              else
+                # TODO! what to do if rdp is disabled in vm itself?
+              end # if rdp
+            end # if statuscode 0
+            
+          else # rdp is not enabled
+            # do nothing
+          end
+        end # end foreach vms
+
+        labuser.save
+      
         # run this again in x seconds
         logger.debug "\nDO THIS AGAIN!\n"
         LabUser.delay(queue: "labuser-#{labuser.id}" ,run_at: lab.poll_freq.seconds.from_now ).rdp_status(labuser.id)
