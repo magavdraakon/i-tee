@@ -24,7 +24,7 @@
 <%#= f.check_box :remember_me %> <%#= f.label :remember_me %> 
   <%# end -%>
   
-  <p><%= f.submit "Sign in" %></p>
+  <p><%= f.submit 'Sign in' %></p>
 <% end %>
   <div id="login_messages">
     <%= content_tag(:div, flash[:error], :id => 'flash_error', :escape=>false) if flash[:error] %>

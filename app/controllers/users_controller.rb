@@ -8,8 +8,11 @@ class UsersController < ApplicationController
     #@users= User.find_by_sql("select id, username, last_sign_in_at, ldap, email, last_sign_in_ip from users")
     #@users= @users.paginate(:page=>params[:page], :per_page=>10).order(order)
     @users = User.select('id, name, username, role, last_sign_in_ip, last_sign_in_at, ldap, email, authentication_token, token_expires').order(@order).paginate(:page=>params[:page], :per_page=>@per_page)
-    users= User.all if !params[:conditions]
-    users = User.where(params[:conditions].as_json) if params[:conditions]
+    if params[:conditions]
+      users = User.where(params[:conditions].as_json)
+    else
+      users = User.all
+    end
     respond_to do |format|
       format.html 
       format.json  { render :json => users }
@@ -61,12 +64,9 @@ class UsersController < ApplicationController
   
   def update
     user = params[:user] ? params[:user] : params[:new_user]
-    @user = User.where("id=?",params[:id]).first
+    @user = User.where('id=?', params[:id]).first
     respond_to do |format| 
-      unless @user
-        format.html { redirect_to(:back, :notice=> "Can't find user") }
-        format.json { render :json=> { :success=>false, :message=> "Can't find user"} }
-      else
+      if @user
         @user.ldap=false
         @user.ldap=true if params[:ldap_user]=='yes'
         if user[:token_expires] # if time is sent, generate new token
@@ -75,12 +75,12 @@ class UsersController < ApplicationController
         if params[:generate_token]=='yes'
           @user.reset_authentication_token!
           @user.token_expires=DateTime.new( params[:token]['expires(1i)'].to_i,
-                                          params[:token]['expires(2i)'].to_i,
-                                          params[:token]['expires(3i)'].to_i,
-                                          params[:token]['expires(4i)'].to_i,
-                                          params[:token]['expires(5i)'].to_i)
+                                            params[:token]['expires(2i)'].to_i,
+                                            params[:token]['expires(3i)'].to_i,
+                                            params[:token]['expires(4i)'].to_i,
+                                            params[:token]['expires(5i)'].to_i)
         end
-      
+
         if @user.update_attributes(user)
           format.html { redirect_to(users_path, :notice => 'User was successfully updated.') }
           format.json  { render :json=> { :success=> true}.merge(@user.as_json)}
@@ -88,12 +88,15 @@ class UsersController < ApplicationController
           format.html { render :action => 'edit' }
           format.json  { render :json => { :success=> false, :errors => @user.errors}, :status => :unprocessable_entity }
         end
+      else
+        format.html { redirect_to(:back, :notice=> "Can't find user") }
+        format.json { render :json=> { :success=>false, :message=> "Can't find user"} }
       end
     end
   end
   
   def destroy
-    @user = User.where("id=?", params[:id]).first
+    @user = User.where('id=?', params[:id]).first
     respond_to do |format|
       if @user
         logger.debug "\n user removal START \n"
@@ -101,7 +104,7 @@ class UsersController < ApplicationController
         @user.destroy
         logger.debug "\n user removal END \n"
         format.html { redirect_to(:back) }
-        format.json { render :json=> { :success=>true, :message=>"user removed"} }
+        format.json { render :json=> { :success=>true, :message=> 'user removed'} }
       else
         format.html { redirect_to(:back, :notice=> "Can't find user") }
         format.json { render :json=> { :success=>false, :message=> "Can't find user"} }

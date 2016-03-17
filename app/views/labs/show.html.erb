@@ -5,7 +5,7 @@
 </div>
 <h3>Description visible to users</h3>
 <div class="marked">
-  <%= link_M @lab.description %>
+  <%= link_m @lab.description %>
 </div>
 <p><%= link_to 'Edit lab', edit_lab_path(@lab), :class=>'button edit-button' if @admin%></p>
 
@@ -13,16 +13,16 @@
 <h3>Virtual machine templates in this lab</h3>
 <p>
   <% @lab.lab_vmts.each do |vmt| %>
-    <%= link_to(vmt.name+" (#{vmt.nickname})", vmt_path(vmt.id),  :target => '_blank', :class=>"button info-button", :title=>"View the template") %>
-    <%=link_to("edit", edit_lab_vmt_path(vmt.id),  :target => '_blank', :class=>"button edit-button", :title=>"Edit the template in this lab")%>  
-    <%= link_to("remove", vmt,:confirm => 'Are you sure?', :method=>:delete, :class=>"button delete-button", :title=>"Remove the template from this lab")%> <br/>
+    <%= link_to(vmt.name+" (#{vmt.nickname})", vmt_path(vmt.id), :target => '_blank', :class=> 'button info-button', :title=> 'View the template') %>
+    <%=link_to('edit', edit_lab_vmt_path(vmt.id), :target => '_blank', :class=> 'button edit-button', :title=> 'Edit the template in this lab')%>
+    <%= link_to('remove', vmt, :confirm => 'Are you sure?', :method=>:delete, :class=> 'button delete-button', :title=> 'Remove the template from this lab')%> <br/>
   <%end%>
 </p> 
 
 <%= form_for(@lab_vmt) do |f| %>
  <% if @lab_vmt.errors.any? %>
     <div id="error_explanation">
-      <h2><%= pluralize(@lab_vmt.errors.count, "error") %> prohibited this machine template from being saved for the lab:</h2>
+      <h2><%= pluralize(@lab_vmt.errors.count, 'error') %> prohibited this machine template from being saved for the lab:</h2>
       <% @lab_vmt.errors.full_messages.each do |msg| %>
         <%= msg %> <br/>
       <% end %>      
@@ -30,15 +30,15 @@
   <% end %>
   <table>
     <tr>
-      <td>Add: <%= f.text_field :name, :placeholder=>"Unique, alphanumeric with no spaces." %> <%= f.text_field :nickname, :placeholder=>"Nickname shown to user" %></td>
+      <td>Add: <%= f.text_field :name, :placeholder=> 'Unique, alphanumeric with no spaces.' %> <%= f.text_field :nickname, :placeholder=> 'Nickname shown to user' %></td>
       <td>
         <%=f.hidden_field :lab_id, :value=>@lab.id%>
-        <%= hidden_field_tag "from", "labs/show"%>
+        <%= hidden_field_tag 'from', 'labs/show'%>
       </td>
       <td>
-        <%=collection_select(:lab_vmt, :vmt_id, Vmt.all, :id, :image,{:prompt => "Select VM template"})%>
+        <%=collection_select(:lab_vmt, :vmt_id, Vmt.all, :id, :image,{:prompt => 'Select VM template'})%>
       </td>
-      <td><%= f.submit "Add"%> </td>
+      <td><%= f.submit 'Add'%> </td>
     </tr>
   </table>
 <%end%>
@@ -48,16 +48,16 @@
 <h3>Badges in this lab</h3>
 <p>
   <% @lab.lab_badges.each do |lab_badge| %>
-    <%= image_tag( lab_badge.badge.icon, :size => "50x60", :alt=> lab_badge.name) %>
-    <%=link_to("edit", edit_lab_badge_path(lab_badge.id), :class=>"button edit-button", :title=>"Edit the badge in this lab")%>  
-    <%= link_to("remove", lab_badge ,:confirm => 'Are you sure?', :method=>:delete, :class=>"button delete-button", :title=>"Remove the template from this lab")%> <br/>
+    <%= image_tag(lab_badge.badge.icon, :size => '50x60', :alt=> lab_badge.name) %>
+    <%=link_to('edit', edit_lab_badge_path(lab_badge.id), :class=> 'button edit-button', :title=> 'Edit the badge in this lab')%>
+    <%= link_to('remove', lab_badge , :confirm => 'Are you sure?', :method=>:delete, :class=> 'button delete-button', :title=> 'Remove the template from this lab')%> <br/>
   <%end%>
 </p> 
 
 <%= form_for(@lab_badge) do |f| %>
  <% if @lab_badge.errors.any? %>
     <div id="error_explanation">
-      <h2><%= pluralize(@lab_badge.errors.count, "error") %> prohibited this badge from being saved for the lab:</h2>
+      <h2><%= pluralize(@lab_badge.errors.count, 'error') %> prohibited this badge from being saved for the lab:</h2>
       <% @lab_badge.errors.full_messages.each do |msg| %>
         <%= msg %> <br/>
       <% end %>      
@@ -65,15 +65,15 @@
   <% end %>
   <table>
     <tr>
-      <td>Add: <%= f.text_field :name, :title=>"Name for the badge in this lab. Alphanumeric with no spaces." %></td>
+      <td>Add: <%= f.text_field :name, :title=> 'Name for the badge in this lab. Alphanumeric with no spaces.' %></td>
       <td>
         <%=f.hidden_field :lab_id, :value=>@lab.id%>
-        <%= hidden_field_tag "from", "labs/show", :id => "from2"%>
+        <%= hidden_field_tag 'from', 'labs/show', :id => 'from2'%>
       </td>
       <td>
-        <%=collection_select(:lab_badge, :badge_id, Badge.all, :id, :icon,{:prompt => "Select Badge"})%>
+        <%=collection_select(:lab_badge, :badge_id, Badge.all, :id, :icon,{:prompt => 'Select Badge'})%>
       </td>
-      <td><%= f.submit "Add"%> </td>
+      <td><%= f.submit 'Add'%> </td>
     </tr>
   </table>
 <%end%>

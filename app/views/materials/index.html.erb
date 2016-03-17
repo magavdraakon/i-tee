@@ -11,7 +11,7 @@
     <% @materials.each do |material| %>
       <tr>
         <td><%= material.name %></td>
-        <td><%=truncate(material.source, :length => 100, :separator =>"...") %></td>
+        <td><%=truncate(material.source, :length => 100, :separator =>'...') %></td>
         <td class="narrow">
           <%= link_to 'View', material,:class=> 'show-button button' %>
           <%= link_to 'Edit', edit_material_path(material),:class=> 'edit-button button' %>
@@ -23,4 +23,4 @@
    <%= will_paginate @materials %><div class="page_info"><%= page_entries_info @materials %></div>
 </div>
 <br/>
-<%= link_to 'New material', new_material_path, :class=>"add-button button" %>
+<%= link_to 'New material', new_material_path, :class=>'add-button button' %>

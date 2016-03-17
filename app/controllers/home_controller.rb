@@ -65,7 +65,7 @@ class HomeController < ApplicationController
           if @lab_user!=nil
             #the vm helped find its lab_user
             @lab_user.progress=@progress
-            @lab_user.save() 
+            @lab_user.save
             
           end#end labuser exists
         end#end vm exists

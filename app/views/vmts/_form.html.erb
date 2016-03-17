@@ -1,7 +1,7 @@
 <%= form_for(@vmt) do |f| %>
   <% if @vmt.errors.any? %>
     <div id="error_explanation">
-      <h2><%= pluralize(@vmt.errors.count, "error") %> prohibited this vmt from being saved:</h2>
+      <h2><%= pluralize(@vmt.errors.count, 'error') %> prohibited this vmt from being saved:</h2>
       <% @vmt.errors.full_messages.each do |msg| %>
         <%= msg %><br/>
       <% end %>
@@ -25,7 +25,7 @@
   </div>
   
   <div class="field">
-    <%= f.check_box :shellinabox %><%= f.label :shellinabox, "ShellInaBox" %>
+    <%= f.check_box :shellinabox %><%= f.label :shellinabox, 'ShellInaBox' %>
   </div>
 
   <div class="field">
@@ -37,6 +37,6 @@
     <%= f.text_area :private %>
   </div>
   <div class="actions">
-     <%= submit_tag "Cancel" , :class=>"cancel"%> <%= f.submit %>
+     <%= submit_tag 'Cancel', :class=> 'cancel' %> <%= f.submit %>
   </div>
 <% end %>

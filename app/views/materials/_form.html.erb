@@ -1,7 +1,7 @@
 <%= form_for(@material) do |f| %>
   <% if @material.errors.any? %>
     <div id="error_explanation">
-      <h2><%= pluralize(@material.errors.count, "error") %> prohibited this material from being saved:</h2>
+      <h2><%= pluralize(@material.errors.count, 'error') %> prohibited this material from being saved:</h2>
       <% @material.errors.full_messages.each do |msg| %>
         <%= msg %><br/>
       <% end %>
@@ -20,7 +20,7 @@
 
 
   <div class="actions">
-     <%= submit_tag "Cancel" , :class=>"cancel"%> <%= f.submit %>
+     <%= submit_tag 'Cancel' , :class=>'cancel'%> <%= f.submit %>
   </div>
 <% end %>
 

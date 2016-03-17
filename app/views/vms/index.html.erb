@@ -1,7 +1,7 @@
 <%#=@a%><%#this is a variable that holds the response from the init script%>
 <%#debug @vms%>
 
-<h3>Listing <span class="specify">all<%=" "+@state if @state!=nil%></span> virtual machines <span class="inlab"><%="in "+@lab.name if @b_by=="lab" && @lab %></span></h3>
+<h3>Listing <span class="specify">all<%=' '+@state if @state!=nil%></span> virtual machines <span class="inlab"><%='in '+@lab.name if @b_by=='lab' && @lab %></span></h3>
 <div id="index_t">
   <table>
     <thead>
@@ -11,20 +11,20 @@
         <%end%>
         <th>Name</th>
         <%if @admin && @tab=='admin' %>
-          <th><%=link_to('Template', vms_by_state_path+"/"+@state+"?admin=1&sort_by=lab_vmt_id"+@dir) if @b_by=="state" %>
-              <%=link_to('Template', vms_by_lab_path+"/"+@lab.id.to_s+"?admin=1&sort_by=lab_vmt_id"+@dir) if @b_by=="lab" %>
-              <%=link_to('Template', vms_path+"?admin=1&sort_by=lab_vmt_id"+@dir) if @b_by==nil %>      
+          <th><%=link_to('Template', vms_by_state_path+'/'+@state+'?admin=1&sort_by=lab_vmt_id'+@dir) if @b_by=='state' %>
+              <%=link_to('Template', vms_by_lab_path+'/'+@lab.id.to_s+'?admin=1&sort_by=lab_vmt_id'+@dir) if @b_by=='lab' %>
+              <%=link_to('Template', vms_path+'?admin=1&sort_by=lab_vmt_id'+@dir) if @b_by==nil %>      
           </th>
         <%end%>
         <th><%if @admin && @tab=='admin' %>
-              <%=link_to('Lab',vms_by_state_path+"/"+@state+"?admin=1&sort_by=lab_id"+@dir) if @b_by=="state" %>
-              <%=link_to('Lab',vms_by_lab_path+"/"+@lab.id.to_s+"?admin=1&sort_by=lab_id"+@dir) if @b_by=="lab"%>
-              <%=link_to('Lab',vms_path+"?admin=1&sort_by=lab_id"+@dir) if @b_by==nil%>
+              <%=link_to('Lab',vms_by_state_path+'/'+@state+'?admin=1&sort_by=lab_id'+@dir) if @b_by=='state' %>
+              <%=link_to('Lab',vms_by_lab_path+'/'+@lab.id.to_s+'?admin=1&sort_by=lab_id'+@dir) if @b_by=='lab'%>
+              <%=link_to('Lab',vms_path+'?admin=1&sort_by=lab_id'+@dir) if @b_by==nil%>
             <%else%>Lab<%end%></th>
         <%if @admin && @tab=='admin' %>
-          <th><%=link_to('User',vms_by_state_path+"/"+@state+"?admin=1&sort_by=user_id"+@dir) if @b_by=="state" %>
-              <%=link_to('User',vms_by_lab_path+"/"+@lab.id.to_s+"?admin=1&sort_by=user_id"+@dir) if @b_by=="lab" %>
-              <%=link_to('User',vms_path+"?admin=1&sort_by=user_id"+@dir) if @b_by==nil %>
+          <th><%=link_to('User',vms_by_state_path+'/'+@state+'?admin=1&sort_by=user_id'+@dir) if @b_by=='state' %>
+              <%=link_to('User',vms_by_lab_path+'/'+@lab.id.to_s+'?admin=1&sort_by=user_id'+@dir) if @b_by=='lab' %>
+              <%=link_to('User',vms_path+'?admin=1&sort_by=user_id'+@dir) if @b_by==nil %>
           </th><%end%>
         <th>Password</th>
         <th>state</th>
@@ -35,10 +35,10 @@
       <%state=vm.state %>
 
       <tr class="vm 
-                <%if state=="running" || state=="paused" || state=="stopped" %>
+                <%if state=='running' || state=='paused' || state=='stopped' %>
                   <%=state%>  
                 <%else%>
-                  <%state="error"%>
+                  <%state='error'%>
                    uninit
                 <%end%> 
                 lab<%= vm.lab_vmt.lab.id%>">
@@ -49,12 +49,13 @@
         <%if @admin && @tab=='admin' %><td><%= vm.user.username %></td><%end%>
         <td class="narrow"><% if vm.lab_vmt.allow_remote %><%=vm.password%><%end%></td>
         <td class="narrow">
-          <%="("+state+")" unless vm.mac==nil || state=="error"%>
+          <%='('+state+')' unless vm.mac==nil || state=='error'%>
           <span class="loader">
-            <%= link_to('Start',start_vm_path+"/"+vm.id.to_s, :class=>"button start-button") if (state!="running" && state!="paused") || vm.mac==nil%>
-            <%= link_to('Pause', pause_vm_path+"/"+vm.id.to_s, :class=>'button pause-button') if state=="running" && vm.mac!=nil %>
-            <%= link_to('Resume',resume_vm_path+"/"+vm.id.to_s, :class=>'button start-button') if state=="paused" && vm.mac!=nil%>
-            <%= link_to('Stop',stop_vm_path+"/"+vm.id.to_s, :class=>"button stop-button") if state=="running" && vm.mac!=nil%>
+            <%= link_to('Start',start_vm_path+'/'+vm.id.to_s, :class=>'button start-button') if (state!='running' && state!='paused') || vm.mac==nil%>
+            <%= link_to('Pause', pause_vm_path+'/'+vm.id.to_s, :class=>'button pause-button') if state=='running' && vm.mac!=nil %>
+            <%= link_to('Resume',resume_vm_path+'/'+vm.id.to_s, :class=>'button start-button') if state=='paused' && vm.mac!=nil%>
+            <%= link_to('Stop',stop_vm_path+'/'+vm.id.to_s, :class=>'button stop-button') if state=='running' && vm.mac!=nil%>
+            <%= link_to('Reset RDP', rdp_reset_path+'/'+vm.id.to_s, :class=>'button start-button') if state=='running' && vm.mac!=nil %>
           </span>
         </td>
   <%#no delete button, because there is no need to delete the row, it will be deleted either by 
@@ -62,14 +63,14 @@
 
 
         <td class="narrow"> <% if vm.lab_vmt.allow_remote or (@admin && @tab=='admin') %>
-          <% desc="Initialize the virtual machine by clicking <strong>Start</strong>."
-             desc=vm.description if (state=="running" || state=="paused") && vm.mac!=nil%>
+          <% desc='Initialize the virtual machine by clicking <strong>Start</strong>.'
+             desc=vm.description if (state=='running' || state=='paused') && vm.mac!=nil%>
           <span class="button info-button" onclick="shownotice('<%=desc%>');">Info</span>
-              <% if vm.lab_vmt.vmt.shellinabox && state=="running" && vm.mac!=nil %>
+              <% if vm.lab_vmt.vmt.shellinabox && state=='running' && vm.mac!=nil %>
                   <a href="https://<%= request.host if vm.mac!=nil%>:8<%= vm.mac.ip.split('.').last %>" title="Login" target='_blank' class="button login-button">Login</a>
               <%end%>
-              <%= link_to 'Edit', edit_vm_path(vm),:class=> 'edit-button button' if @admin && @tab=="admin"%>
-              <%= link_to 'Destroy', vm, :confirm => 'Are you sure?', :method => :delete,:class=> 'delete-button button' if @admin && @tab=="admin"%>
+              <%= link_to 'Edit', edit_vm_path(vm),:class=> 'edit-button button' if @admin && @tab=='admin'%>
+              <%= link_to 'Destroy', vm, :confirm => 'Are you sure?', :method => :delete,:class=> 'delete-button button' if @admin && @tab=='admin'%>
             <% end %>
           </td>
       </tr>
@@ -77,35 +78,35 @@
   </table>
   <%= will_paginate @vms %><div class="page_info"><%= page_entries_info @vms %></div>
 </div>
-<span class="startall"><%=link_to('Start all machines',start_all_path+"/"+@lab.id.to_s, :class=>"button start-button") unless @tab=="admin" || @vms.empty? || @b_by!="lab" %></span>
+<span class="startall"><%=link_to('Start all machines',start_all_path+'/'+@lab.id.to_s, :class=>'button start-button') unless @tab=='admin' || @vms.empty? || @b_by!='lab' %></span>
 
 <br/>
-<%= link_to 'New virtual machine', new_vm_path, :class=>"add-button button"  if @admin && @tab=="admin" %> 
+<%= link_to 'New virtual machine', new_vm_path, :class=>'add-button button'  if @admin && @tab=='admin' %>
 
 <% content_for :sidebar_head do %>
-  <% if @b_by=='state' then%>Choose state<%end%><%if @b_by=="lab" then%>Choose lab<%end%>
+  <% if @b_by=='state' then%>Choose state<%end%><%if @b_by=='lab' then%>Choose lab<%end%>
 <%end%>
 
 <%= content_for :sidebar do %>
  <ul>
   <% if @b_by=='state' %>
     <%if @admin && @tab=='admin' %>
-    <li><%=link_to("Running", vms_by_state_path+"/running?admin=1") %></li>
-    <li><%=link_to("Paused", vms_by_state_path+"/paused?admin=1") %></li>
-    <li><%=link_to("Stopped", vms_by_state_path+"/stopped?admin=1") %></li>
+    <li><%=link_to('Running', vms_by_state_path+'/running?admin=1') %></li>
+    <li><%=link_to('Paused', vms_by_state_path+'/paused?admin=1') %></li>
+    <li><%=link_to('Stopped', vms_by_state_path+'/stopped?admin=1') %></li>
         <% else %>
-        <li><%=link_to("Running",vms_by_state_path+"/running") %></li>
-        <li><%=link_to("Paused",vms_by_state_path+"/paused") %></li>
-        <li><%=link_to("Stopped",vms_by_state_path+"/stopped") %></li>
+        <li><%=link_to('Running',vms_by_state_path+'/running') %></li>
+        <li><%=link_to('Paused',vms_by_state_path+'/paused') %></li>
+        <li><%=link_to('Stopped',vms_by_state_path+'/stopped') %></li>
         <% end %>
     <%end%>
   <% if @b_by=='lab' %>
    <% @labs.each do |l| %>
        <li>
         <%if @admin && @tab=='admin' %>
-          <%=link_to(l.name,vms_by_lab_path+"/"+l.id.to_s+"?admin=1") %>
+          <%=link_to(l.name,vms_by_lab_path+'/'+l.id.to_s+'?admin=1') %>
         <% else %>
-          <%=link_to(l.name,vms_by_lab_path+"/"+l.id.to_s) %>
+          <%=link_to(l.name,vms_by_lab_path+'/'+l.id.to_s) %>
         <% end %>
       </li>
     <%end%>

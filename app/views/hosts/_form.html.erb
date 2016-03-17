@@ -1,7 +1,7 @@
 <%= form_for(@host) do |f| %>
   <% if @host.errors.any? %>
     <div id="error_explanation">
-      <h2><%= pluralize(@host.errors.count, "error") %> prohibited this host from being saved:</h2>
+      <h2><%= pluralize(@host.errors.count, 'error') %> prohibited this host from being saved:</h2>
 
       <ul>
       <% @host.errors.full_messages.each do |msg| %>
@@ -44,6 +44,6 @@
     <%= f.text_field :priority %>
   </div>
   <div class="actions">
-     <%= submit_tag "Cancel" , :class=>"cancel"%> <%= f.submit %>
+     <%= submit_tag 'Cancel', :class=> 'cancel' %> <%= f.submit %>
   </div>
 <% end %>

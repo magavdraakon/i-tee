@@ -6,8 +6,8 @@
 		<%=u_lab.lab.name%>
 	</span>
 	<% u_lab.lab.lab_badges.each do |l_badge| %>
-		<%= image_tag( l_badge.badge.icon, :size => "50x60", :alt => l_badge.name, :class=>"ProfileBadge" ) if @user.has_badge(l_badge.id) %>
-		<%= image_tag( l_badge.badge.placeholder, :size => "50x60", :alt => l_badge.name, :class=>"ProfileBadge" ) unless @user.has_badge(l_badge.id) %>
+		<%= image_tag( l_badge.badge.icon, :size => '50x60', :alt => l_badge.name, :class=>'ProfileBadge' ) if @user.has_badge(l_badge.id) %>
+		<%= image_tag( l_badge.badge.placeholder, :size => '50x60', :alt => l_badge.name, :class=>'ProfileBadge' ) unless @user.has_badge(l_badge.id) %>
 	<%end%>
 </div>
 

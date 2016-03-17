@@ -8,7 +8,7 @@
 <%= form_for(@network) do |f| %>
   <% if @network.errors.any? %>
     <div id="error_explanation">
-      <h2><%= pluralize(@network.errors.count, "error") %> prohibited this network from being saved:</h2>
+      <h2><%= pluralize(@network.errors.count, 'error') %> prohibited this network from being saved:</h2>
 
       <ul>
       <% @network.errors.full_messages.each do |msg| %>

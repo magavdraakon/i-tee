@@ -17,7 +17,7 @@ class User < ActiveRecord::Base
 
 
   def del_labs
-    logger.debug "removing labs"
+    logger.debug 'removing labs'
     self.lab_users.each do |lu|
       lu.destroy
     end
@@ -45,15 +45,15 @@ class User < ActiveRecord::Base
 
   # find first user that has the given token
   def self.find_by_token(token)
-    User.where("authentication_token=?", token).first
+    User.where('authentication_token=?', token).first
   end
 
   def has_badge(lab_badge_id)
-    ub=UserBadge.where("lab_badge_id=? and user_id=?", lab_badge_id, id).all
+    ub=UserBadge.where('lab_badge_id=? and user_id=?', lab_badge_id, id).all
     ub.count>0
   end
 
   def has_lab(lab_id)
-    LabUser.where("user_id=? and lab_id=?", self.id, lab_id).count > 0 ? true : false
+    LabUser.where('user_id=? and lab_id=?', self.id, lab_id).count > 0 ? true : false
   end
 end

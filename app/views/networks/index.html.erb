@@ -15,15 +15,15 @@
     <td><%=network.net_type %></td>
     <td class="narrow">
       <%#= link_to 'Show', network, :class=>"show-button button" %>
-      <%= link_to 'Edit', edit_network_path(network), :class=>"edit-button button" %>
-      <%= link_to 'Destroy', network, confirm: 'Are you sure?', method: :delete, :class=>"delete-button button" %>
+      <%= link_to 'Edit', edit_network_path(network), :class=>'edit-button button' %>
+      <%= link_to 'Destroy', network, confirm: 'Are you sure?', method: :delete, :class=>'delete-button button' %>
     </td>
   </tr>
 <% end %>
 </table>
   </div>
 <br />
-<%= link_to 'New Network', networks_path, :class=>"add-button button" if params[:id] %>
+<%= link_to 'New Network', networks_path, :class=>'add-button button' if params[:id] %>
 
 <p>Use the following patterns:</p>
 <ul>
@@ -35,7 +35,7 @@
 <%= form_for(@network) do |f| %>
   <% if @network.errors.any? %>
     <div id="error_explanation">
-      <h2><%= pluralize(@network.errors.count, "error") %> prohibited this network from being saved:</h2>
+      <h2><%= pluralize(@network.errors.count, 'error') %> prohibited this network from being saved:</h2>
 
       <ul>
       <% @network.errors.full_messages.each do |msg| %>

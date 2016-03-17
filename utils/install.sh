@@ -87,7 +87,7 @@ openssl x509 -req -days 3650 -in /root/YOUR-FQDN.req -signkey /etc/ssl/private/Y
 openssl x509 -in /etc/ssl/certs/YOUR-FQDN.pem -text -noout
 
 
-PHPVIRTUALBOX=5.0-2.zip
+PHPVIRTUALBOX=5.0-5.zip
 
 wget https://github.com/imoore76/phpvirtualbox/archive/$PHPVIRTUALBOX -O $PHPVIRTUALBOX
 
@@ -157,7 +157,7 @@ apt-get install -y python-software-properties
 apt-add-repository ppa:brightbox/ruby-ng
 apt-get update
 apt-get install -y ruby2.2 ruby-switch
-ruby-switch --set ruby2.2 ruby2.2-dev
+ruby-switch --set ruby2.2
 
 apt-get install ruby ruby-dev git-core curl zlib1g-dev -y
 apt-get install libssl-dev libreadline-dev -y
@@ -193,7 +193,6 @@ mysql -uroot -p$MYSQLPWD << EOF
 create database itee_production character set utf8;
 create user 'itee'@'localhost' identified by '$RANDOMPASSWORD';
 grant all privileges on itee_production.* to 'itee'@'localhost';
-quit;
 EOF
 
 cat > /var/www/railsapps/i-tee/config/database.yml << EOF
@@ -235,7 +234,7 @@ su - vbox -c'VBoxManage setproperty vrdeauthlibrary "VBoxAuthSimple"'
 
 echo "CREATE PROPER LDAP CONFIG"
 
-sudo apt-get install bundler -y
+sudo gem install bundler
 cd /var/www/railsapps/i-tee/
 sudo bundle install
 sudo rake db:migrate RAILS_ENV="production"

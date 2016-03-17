@@ -2,6 +2,7 @@ class Vm < ActiveRecord::Base
   has_one :mac
   belongs_to :user
   belongs_to :lab_vmt
+  belongs_to :lab_user
   before_destroy :del_vm
   before_destroy :rel_mac
   before_create :add_pw
@@ -51,6 +52,22 @@ class Vm < ActiveRecord::Base
   def pau_vm
     %x(sudo -u vbox #{Rails.root}/utils/pause_machine.sh #{name}  2>&1)
   end
+
+  def res_rdp
+    info = %x(sudo -u vbox #{Rails.root}/utils/reset_vbox_rdp.sh #{name}  2>&1)
+    status= $?
+    {status: status.exitstatus, answer: info}
+  end
+
+  def reset_rdp
+    result = self.res_rdp
+    logger.debug result
+    if result[:status]==0
+      {success: true, message: "Vm rdp reset successful"}
+    else
+      {success: true, message: "Vm rdp reset failed"}
+    end
+  end
   
   def ini_vm
     begin
@@ -94,9 +111,9 @@ class Vm < ActiveRecord::Base
     @mac = Mac.where('vm_id=?', self.id).first
     @mac.vm_id=nil
     @mac.save
-    return {success: true, message: 'Successful macine shutdown'}
+    {success: true, message: 'Successful macine shutdown'}
   else
-    return {success: true, message: 'Machine was already shut down'}
+    {success: true, message: 'Machine was already shut down'}
   end
 end
 
@@ -116,8 +133,8 @@ end
       logger.debug '\nVm already had a mac.\n'
     end # end if nil
       
-    if self.state!="running" && self.state!="paused"
-      logger.info "running Machine start script"
+    if self.state!='running' && self.state!='paused'
+      logger.info 'running Machine start script'
 
       ###########################################################
       #Create custom environment file for start_machine.sh script
@@ -140,7 +157,7 @@ end
         f.write("export NIC1='#{Rails.root}'\n")
         f.write("#NIC count #{self.lab_vmt.lab_vmt_networks.count}\n\n")
 
-        if self.lab_vmt.lab_vmt_networks.count > 0 then
+        if self.lab_vmt.lab_vmt_networks.count > 0
           f.write("function set_networks {\n\n#function for seting NICs for VM")
           #Writing NIC information
           vbox_cmd = ''
@@ -186,7 +203,7 @@ end
 
 
 
-      @a=self.ini_vm #the script is called in the model
+      @ini_result=self.ini_vm #the script is called in the model
 =begin
       port=@mac.ip.split('.').last
       begin
@@ -215,8 +232,8 @@ end
       require 'timeout'
       status = Timeout::timeout(60) {
         # Something that should be interrupted if it takes too much time...
-        if @a!=nil
-          until @a.include?("masin #{self.name} loodud")
+        if @ini_result!=nil
+          until @ini_result.include?("masin #{self.name} loodud")
           #do nothing, just wait
             sleep(5)
             logger.debug "\nwaiting ...\n"
@@ -224,13 +241,13 @@ end
         end
       }
 =end
-      if @a.include?("VM named: #{self.name} created")
+      if @ini_result.include?("VM named: #{self.name} created")
         result[:notice] = result[:notice]+"Machine <b>#{self.lab_vmt.nickname}</b> successfully started<br/>"
         #flash[:notice]=flash[:notice].html_safe
-        logger.debug @a
+        logger.debug @ini_result
 
         # add last activity to labuser
-        labuser=LabUser.where("lab_id=? and user_id=?", self.lab_vmt.lab_id, self.user_id).last
+        labuser=LabUser.where('lab_id=? and user_id=?', self.lab_vmt.lab_id, self.user_id).last
         if labuser
           labuser.last_activity=Time.now
           labuser.activity="Start vm - '#{self.name}'"
@@ -238,7 +255,7 @@ end
         end
 
       else
-        logger.info @a  
+        logger.info @ini_result
         @mac.vm_id=nil
         @mac.save
         result[:notice] = ''
@@ -249,36 +266,36 @@ end
       result[:notice] = ''
       result[:alert]="Unable to start <b>#{self.lab_vmt.nickname}</b>, it is already running"
     end
-    return result   
+    result
     # removed mac address conflict rescue. Conflict management is TODO!
   end
 
 
   #pause a machine
   def pause_vm
-    if self.state=="running"
-      logger.info "running VM pause script"
+    if self.state=='running'
+      logger.info 'running VM pause script'
       a = self.pau_vm #the script is called in the model
       logger.info a
-      return {success: true, message: "Successful vm pause."}
-    elsif self.state=="paused"
-      return {success: false, message:'Unable to pause a paused machine'}
+      {success: true, message: 'Successful vm pause.'}
+    elsif self.state=='paused'
+      {success: false, message:'Unable to pause a paused machine'}
     else
-      return {success: false, message: 'unable to pause a shut down machine'}
+      {success: false, message: 'unable to pause a shut down machine'}
     end
   end
 
   #resume machine from pause
   def resume_vm
-    if self.state=="paused"
-      logger.info "running VM resume script"
+    if self.state=='paused'
+      logger.info 'running VM resume script'
       a=self.res_vm # the script is called in the model
       logger.info a
-      return {success: true, message: "Successful vm resume."}
-    elsif self.state=="running"
+      {success: true, message: 'Successful vm resume.'}
+    elsif self.state=='running'
       return {success: false, message:'Unable to resume a running machine'}
     else
-      return {success: false, message: 'unable to resume a shut down machine'}
+      {success: false, message: 'unable to resume a shut down machine'}
     end
   end
 

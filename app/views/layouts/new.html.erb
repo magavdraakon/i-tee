@@ -2,10 +2,10 @@
 <html>
   <head>
     <title>ITee</title>
-    <%= stylesheet_link_tag "reset", :cache=>true %>
+    <%= stylesheet_link_tag 'reset', :cache=>true %>
     <%# stylesheet_link_tag "../javascripts/prettify/sons-of-obsidian", :cache=>true %>
     <%= stylesheet_link_tag 'EIK' %>
-    <%= stylesheet_link_tag "prettify" %>
+    <%= stylesheet_link_tag 'prettify' %>
     <%= javascript_include_tag :all, :cache=>true %>
     <%# javascript_include_tag "Marked/lib/marked", :cache=>true %>
     <%#= javascript_include_tag "prettify/prettify", :cache=>true %>
@@ -21,36 +21,36 @@
         <div id="top"><%=link_to 'I-Tee', root_path%></div>
         <div id="m_menu">
           <%if user_signed_in?%>  
-            <div class="hb b_menu <% if @tab== "home"%>current_tab<%end%>">
+            <div class="hb b_menu <% if @tab== 'home' %>current_tab<% end%>">
               <%=link_to 'Home', root_path%>
             </div>
-            <div class="cb b_menu <% if @tab == "courses"%>current_tab<%end%>">
+            <div class="cb b_menu <% if @tab == 'courses' %>current_tab<% end%>">
               <%=link_to('Labs', my_labs_path)%>
             </div>
-            <div class="vb b_menu <% if @tab == "vms" %>current_tab<%end%>">
+            <div class="vb b_menu <% if @tab == 'vms' %>current_tab<% end%>">
               <%=link_to 'My machines', vms_path %>
             </div>
             <%if  @admin   %>
-              <div class="ab b_menu <% if @tab=="admin"%>current_tab<%end%>">
+              <div class="ab b_menu <% if @tab=='admin' %>current_tab<% end%>">
                 <%=link_to 'Manage labs', labs_path %>
               </div>
             <%end%>
             <%if @manager || @admin  %>
-              <div class="mb b_menu <%if @tab=="manager"%>current_tab<%end%>">
+              <div class="mb b_menu <%if @tab=='manager' %>current_tab<% end%>">
                 <%=link_to 'Manage users', users_path %>
               </div>
-              <div class="sb b_menu <%if @tab=="search"%>current_tab<%end%>">
+              <div class="sb b_menu <%if @tab=='search' %>current_tab<% end%>">
                 <%=link_to 'Search', search_path %>
               </div>
             <%end%>
             <div class="r_menu b_menu">
               <%# if user_signed_in? %>
-              <%= link_to "Sign out", destroy_user_session_path %>
+              <%= link_to 'Sign out', destroy_user_session_path %>
               <%# elsif @logged_in %>
               <%#= link_to "Sign out", destroy_user_session_path %>
               <%# end %>
             </div>
-             <div class="r_menu b_menu <%if @tab=="user"%>current_tab<%end%>">
+             <div class="r_menu b_menu <%if @tab=='user' %>current_tab<% end%>">
               <%# if user_signed_in? %>
               <%= link_to "#{current_user.username}", current_user %>
               <%# elsif @logged_in %>
@@ -62,22 +62,22 @@
    
         <div id="s_menu"></div>
         <div id="wrap">
-          <div class="home s_menu <% if @tab == "home"%>current_tab<%end%>">
+          <div class="home s_menu <% if @tab == 'home' %>current_tab<% end%>">
             <%if @admin %>
               <%=link_to_unless_current('Index', root_path)%>
               <%=link_to_unless_current('Template guide', template_path) %>
               <%=link_to_unless_current('System guide', system_path) %>  
             <%end%>
           </div>
-          <div class="course s_menu <% if @tab == "courses" %>current_tab<%end%>"></div>
-          <div class="vms s_menu <% if @tab== "vms"%>current_tab<%end%>">
+          <div class="course s_menu <% if @tab == 'courses' %>current_tab<% end%>"></div>
+          <div class="vms s_menu <% if @tab== 'vms' %>current_tab<% end%>">
             <%= link_to_unless_current 'All virtual machines', vms_path %>
             <%= link_to_unless_current('Virtual machines by state', vms_by_state_path) %>
             <%= link_to_unless_current('Virtual machines by lab', vms_by_lab_path) %>
           </div>
-          <div class="course s_menu <% if @tab == "user" %>current_tab<%end%>"> </div>
+          <div class="course s_menu <% if @tab == 'user' %>current_tab<% end%>"> </div>
           <%if  @admin   %>
-            <div class="admin s_menu <% if @tab=="admin"%>current_tab<%end%>">
+            <div class="admin s_menu <% if @tab=='admin' %>current_tab<% end%>">
               <table>
                 <tr>
                   <td>
@@ -85,9 +85,9 @@
                     <%= link_to_unless_current 'Materials', materials_path %>
                   </td>
                   <td>
-                    <%= link_to_unless_current 'All virtual machines', vms_path+"?admin=1" %><br/>
-                    <%= link_to_unless_current('VMs by state', vms_by_state_path+"?admin=1") %><br/>
-                    <%= link_to_unless_current('VMs by lab', vms_by_lab_path+"?admin=1") %>  
+                    <%= link_to_unless_current 'All virtual machines', vms_path+'?admin=1' %><br/>
+                    <%= link_to_unless_current('VMs by state', vms_by_state_path+'?admin=1') %><br/>
+                    <%= link_to_unless_current('VMs by lab', vms_by_lab_path+'?admin=1') %>
                   </td>
                   <td>
                     <%= link_to_unless_current 'VM templates', vmts_path %><br/>
@@ -111,7 +111,7 @@
             </div>
           <%end%>
           <% if @manager || @admin %>
-            <div class="manager s_menu <% if @tab=="manager"%>current_tab<%end%>">
+            <div class="manager s_menu <% if @tab=='manager' %>current_tab<% end%>">
               <table>
                 <tr>
                   <td>
@@ -141,9 +141,9 @@
             <div id="content" class="side_visible">
               <div id="menu-show"></div>
               <div id="messages">
-              <%= content_tag(:div, flash[:error], :id => "flash_error", :escape=>false) if flash[:error] %>
-              <%= content_tag(:div, flash[:notice], :id => "flash_notice", :escape=>false) if flash[:notice] %>
-              <%= content_tag(:div, flash[:alert], :id => "flash_alert", :escape=>false) if flash[:alert] %>
+              <%= content_tag(:div, flash[:error], :id => 'flash_error', :escape=>false) if flash[:error] %>
+              <%= content_tag(:div, flash[:notice], :id => 'flash_notice', :escape=>false) if flash[:notice] %>
+              <%= content_tag(:div, flash[:alert], :id => 'flash_alert', :escape=>false) if flash[:alert] %>
               </div>
               
               <%= yield  %>

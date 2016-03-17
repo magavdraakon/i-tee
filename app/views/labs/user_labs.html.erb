@@ -5,8 +5,8 @@
         <% if @started!=[] %>
           <li class="upper">Started</li>
           <% @started.each do |lab| %>
-            <% classes="" #default
-               classes= "current_lab" if lab.id==@lab.id %>
+            <% classes='' #default
+               classes= 'current_lab' if lab.id==@lab.id %>
             <li class="<%= classes %>">
               <%= link_to(lab.name, :controller=>'labs', :action=>'user_labs', :id=>lab.id)%>
             </li>
@@ -15,8 +15,8 @@
         <% if @not_started!=[] %>
           <li class="upper">Not started</li>
           <% @not_started.each do |lab| %>
-            <% classes="" #default
-               classes= "current_lab" if lab.id==@lab.id %>
+            <% classes='' #default
+               classes= 'current_lab' if lab.id==@lab.id %>
             <li class="<%= classes %>">
               <%= link_to(lab.name, :controller=>'labs', :action=>'user_labs', :id=>lab.id)%>
             </li>
@@ -25,8 +25,8 @@
         <% if @complete!=[] %>
           <li class="upper">Completed</li>
           <% @complete.each do |lab| %>
-            <% classes="" #default
-               classes= "current_lab" if lab.id==@lab.id %>
+            <% classes='' #default
+               classes= 'current_lab' if lab.id==@lab.id %>
             <li class="<%= classes %>">
               <%= link_to(lab.name, :controller=>'labs', :action=>'user_labs', :id=>lab.id)%>
             </li>
@@ -48,13 +48,13 @@
 <h1><%=@lab.name %></h1>
 
 <div class="marked">
-  <%=link_M @lab.description %>
+  <%= link_m @lab.description %>
 </div>
 
 
   <% if @labs!=[] %>
         <div class="manage_lab loader">
-            <%= link_to('Start lab',start_lab_path+"/"+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : "" ), :class=>'button submit-button sl-button') if !@lab_user.start %>
+            <%= link_to('Start lab', start_lab_path+'/'+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : '' ), :class=>'button submit-button sl-button') unless @lab_user.start %>
         </div>
     <% if @lab_user.start %>
       <!-- started at: <%#=@lab_user.start%><br/>
@@ -90,26 +90,26 @@
     <%if @lab_user.end==nil  %>
                 <div>
       <h3>Virtual machines</h3>
-      <%= "There are no machines allocated for this lab" if @lab_user.vms.empty? %>
+      <%= 'There are no machines allocated for this lab' if @lab_user.vms.count==0 %>
       <% @lab_user.vms_view.each do |vm| %>
         <%state=vm.state 
           desc="Initialize the virtual machine #{vm.lab_vmt.nickname} by clicking <strong>Start</strong>"
-           desc="There is no remote desktop access for #{vm.lab_vmt.nickname}" if (state=="running" || state=="paused") && !vm.lab_vmt.allow_remote
-           desc=vm.description if (state=="running" || state=="paused") && vm.mac!=nil && vm.lab_vmt.allow_remote %>
+           desc="There is no remote desktop access for #{vm.lab_vmt.nickname}" if (state=='running' || state=='paused') && !vm.lab_vmt.allow_remote
+           desc=vm.description if (state=='running' || state=='paused') && vm.mac!=nil && vm.lab_vmt.allow_remote %>
         <table class="vm_s">
           <tr>
 
             <td class="narrow" >
           <b><%=vm.lab_vmt.nickname ? vm.lab_vmt.nickname : vm.name %></b>
-          <span class="vm_links"><%="("+state+")" if vm.mac!=nil && (state=="running" || state=="paused") %></span>
-          <%if vm.mac!=nil && state=="running" && vm.lab_vmt.allow_remote %><br/>
+          <span class="vm_links"><%= '('+state+')' if vm.mac!=nil && (state=='running' || state=='paused') %></span>
+          <%if vm.mac!=nil && state=='running' && vm.lab_vmt.allow_remote %><br/>
             <b>RDP info:</b> <%= ITee::Application.config.rdp_host %>:10<%=vm.mac.ip.split('.').last if vm.mac!=nil%><br/>
             <b>user:</b> <%= @lab_user.user.username %><br/>
             <b>pwd:</b> <%= vm.password %>
           <%end%>
 
           <div id="vm_progress<%=vm.id%>">
-            <%if state=="running" || state=="paused" %>
+            <%if state=='running' || state=='paused' %>
                 <%=vm.progress%>
             <%end%>
           </div>
@@ -117,16 +117,17 @@
 
             <td style="text-align:right;">
               <% if @lab.vms_by_one %>
-                <div class=" loader" ><%= link_to('Start',start_vm_path+"/"+vm.id.to_s, :class=>"button start-button") if (state!="running" && state!="paused") || vm.mac==nil%>
-                <%= link_to('Pause', pause_vm_path+"/"+vm.id.to_s, :class=>'button pause-button') if state=="running" && vm.mac!=nil %>
-                <%= link_to('Resume',resume_vm_path+"/"+vm.id.to_s, :class=>'button start-button') if state=="paused" && vm.mac!=nil%>
-                <%= link_to('Stop',stop_vm_path+"/"+vm.id.to_s, :class=>"button stop-button") if state=="running" && vm.mac!=nil%>
+                <div class=" loader" ><%= link_to('Start', start_vm_path+'/'+vm.id.to_s, :class=> 'button start-button') if (state!='running' && state!='paused') || vm.mac==nil%>
+                <%= link_to('Pause', pause_vm_path+'/'+vm.id.to_s, :class=>'button pause-button') if state=='running' && vm.mac!=nil %>
+                <%= link_to('Resume', resume_vm_path+'/'+vm.id.to_s, :class=>'button start-button') if state=='paused' && vm.mac!=nil%>
+                <%= link_to('Stop', stop_vm_path+'/'+vm.id.to_s, :class=> 'button stop-button') if state=='running' && vm.mac!=nil%>
               <% end %>
-              <%if state=="running" && vm.mac!=nil && vm.lab_vmt.vmt.shellinabox  %>
+              <%= link_to('Reset RDP', rdp_reset_path+'/'+vm.id.to_s, :class=>'button start-button') if state=='running' && vm.mac!=nil %>
+              <%if state=='running' && vm.mac!=nil && vm.lab_vmt.vmt.shellinabox  %>
                   <a href="https://<%= request.host if vm.mac!=nil%>:8<%= vm.mac.ip.split('.').last %>" title="Login" target='_blank' class="button login-button">Login</a>
               <%end%>
               </div>
-            <% if vm.lab_vmt.allow_remote && state=="running" %>
+            <% if vm.lab_vmt.allow_remote && state=='running' %>
                 <div class="remote_connections">
                     <span onclick="toggleOtherOsButtons(this)" class="showtoggle">&lt; more</span>
                     <span class="button win-button Windows" onclick="show_remote(this, '<strong><%=vm.remote('win')%></strong>')">Windows</span>
@@ -148,28 +149,28 @@
     </div>
   <%end #has vms%>
 <div class="manage_lab">
-    <% if @lab_user.end==nil && !@lab_user.vms.empty? %>
+    <% if @lab_user.end==nil && @lab_user.vms.count>0 %>
         <span class="loader">
-          <%= link_to('Start all',start_all_path+"/"+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : "" ),
-                      :class=>"button start-button sl-button")  %>
+          <%= link_to('Start all',start_all_path+'/'+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : ''),
+                      :class=> 'button start-button sl-button')  %>
         </span>
          <span class="loader">
-          <%= link_to('Stop all',stop_all_path+"/"+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : "" ),
-                      :class=>"button stop-button sl-button")  %>
+          <%= link_to('Stop all',stop_all_path+'/'+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : ''),
+                      :class=> 'button stop-button sl-button')  %>
         </span>
     <% end %>
     <% if @lab_user.start && @lab.restartable %>
         <span class="loader">
-          <%= link_to('Restart lab',restart_lab_path+"/"+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : "" ),
+          <%= link_to('Restart lab',restart_lab_path+'/'+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : ''),
                       :class=>'add-button button rl-button',
-                      :confirm => "This will delete all saved data. Are you sure?") %>
+                      :confirm => 'This will delete all saved data. Are you sure?') %>
         </span>
     <%end%>
     <% unless  @lab_user.end  || !@lab.endable %>
         <span class="loader">
-          <%= link_to('End lab', end_lab_path+"/"+@lab_user.id.to_s,
+          <%= link_to('End lab', end_lab_path+'/'+@lab_user.id.to_s,
                       :class=>'delete-button button el-button',
-                      :confirm => "This will delete all saved data. Are you sure?" )   %>
+                      :confirm => 'This will delete all saved data. Are you sure?')   %>
         </span>
     <%end%>
 </div>

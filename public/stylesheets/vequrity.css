@@ -228,7 +228,7 @@ ul.no-bullet {
     height: 30px;
     width: 30px;
     position: absolute;
-    left: 0px;
+    left: 0;
     background: transparent url("../images/Right4-50.png") no-repeat; /*https://icons8.com/web-app/7233/Right4*/
     background-size:contain;
     cursor: pointer;
