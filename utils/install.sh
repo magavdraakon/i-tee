@@ -311,6 +311,7 @@ www-data ALL=(vbox) NOPASSWD: /var/www/railsapps/i-tee/utils/stop_machine.sh
 www-data ALL=(vbox) NOPASSWD: /var/www/railsapps/i-tee/utils/resume_machine.sh
 www-data ALL=(vbox) NOPASSWD: /var/www/railsapps/i-tee/utils/pause_machine.sh
 www-data ALL=(vbox) NOPASSWD: /var/www/railsapps/i-tee/utils/delete_machine.sh
+www-data ALL=(vbox) NOPASSWD: /var/www/railsapps/i-tee/utils/reset_vbox_rdp.sh
 www-data ALL=(vbox) NOPASSWD: /usr/bin/VBoxManage
 END
 
