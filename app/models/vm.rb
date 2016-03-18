@@ -309,7 +309,8 @@ end
     ]
   end
   # connection informations
-  def remote(typ)
+  def remote(typ, resolution='')
+    logger.debug "\n resolution is #{resolution}"
     port=self.mac ? self.mac.ip.split('.').last : ''
     begin
       rdp_host=ITee::Application.config.rdp_host
