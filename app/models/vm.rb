@@ -10,10 +10,14 @@ class Vm < ActiveRecord::Base
   validates_presence_of :name, :lab_vmt_id, :user_id
   validates_uniqueness_of :name
   def rel_mac
-    mac=Mac.where('vm_id=?', id).first
-    if mac!=nil
+    logger.debug "\n trying to release mac for #{self.id} - #{self.name} \n"
+    mac=Mac.where('vm_id=?', self.id).first
+    if mac
       mac.vm_id=nil
       mac.save
+      logger.debug "mac released from #{self.id} - #{self.name}\n"
+    else
+      logger.debug "\n no mac \n"
     end
   end
 
@@ -217,17 +221,21 @@ end
         rdp_port_prefix = '10'
       end
 =end
-      desc =  '<br/>To create a connection with this machine using Windows use two commands:<br/>'
+      
+      desc = 'To create a connection with this machine using linux/unix use<br/>'
+      desc += '<srong>'+self.remote('rdesktop')+'</strong>' 
+      desc += '<br/> or use xfreerdp as<br/>'
+      desc += '<srong>'+self.remote('xfreerdp')+'</strong>' 
+      #"<strong>rdesktop -k et -u#{self.user.username} -p#{self.password} -N -a16 #{rdp_host}:#{rdp_port_prefix}#{port}</strong></br> or use xfreerdp as</br><strong>xfreerdp  -k et --plugin cliprdr -g 90% -u #{self.user.username} -p #{self.password} #{rdp_host}:#{rdp_port_prefix}#{port}</strong></br>"
+      
+      desc +=  '<br/>To create a connection with this machine using Windows use two commands:<br/>'
       desc += '<srong>'+self.remote('win')+'</strong>' #"<strong>cmdkey /generic:#{rdp_host} /user:localhost\\#{self.user.username} /pass:#{self.password}</strong><br/>"
       #desc += "<strong>mstsc.exe /v:#{rdp_host}:#{rdp_port_prefix}#{port} /f</strong><br/>"
-      self.description = 'To create a connection with this machine using linux/unix use<br/>'
-      self.description += '<srong>'+self.remote('rdesktop')+'</strong>' 
-      self.description += '<br/> or use xfreerdp as<br/>'
-      self.description += '<srong>'+self.remote('xfreerdp')+'</strong>' 
-      #"<strong>rdesktop -k et -u#{self.user.username} -p#{self.password} -N -a16 #{rdp_host}:#{rdp_port_prefix}#{port}</strong></br> or use xfreerdp as</br><strong>xfreerdp  -k et --plugin cliprdr -g 90% -u #{self.user.username} -p #{self.password} #{rdp_host}:#{rdp_port_prefix}#{port}</strong></br>"
-      self.description += desc
+      logger.debug "\n setting #{self.id} description to \n #{desc}"
+      self.description = desc
 
       self.save
+      logger.debug "\n save successful "
 =begin
       require 'timeout'
       status = Timeout::timeout(60) {
@@ -310,7 +318,9 @@ end
   end
   # connection informations
   def remote(typ, resolution='')
-    logger.debug "\n resolution is #{resolution}"
+    if resolution!="" 
+      logger.debug "\n resolution is #{resolution}"
+    end
     port=self.mac ? self.mac.ip.split('.').last : ''
     begin
       rdp_host=ITee::Application.config.rdp_host
@@ -335,7 +345,6 @@ end
         desc ="open rdp://#{self.user.username}:#{self.password}@#{rdp_host}:#{rdp_port_prefix}#{port}"
       else
         desc ="rdesktop  -u#{self.user.username} -p#{self.password} -N -a16 #{rdp_host}:#{rdp_port_prefix}#{port}"
-
     end
 
   end

@@ -66,8 +66,9 @@ class LabUser < ActiveRecord::Base
         	#is there a machine like that already?
         	vm = Vm.where('lab_vmt_id=? and lab_user_id=?', template.id, self.id).first
         	if vm==nil  #no there is not
-          		vm = Vm.create(:name=>"#{template.name}-#{self.user.username}", :lab_vmt=>template, :user=>self.user, :description=> 'Initialize the virtual machine by clicking <strong>Start</strong>.', :lab_user_id=>self.id)
-          		logger.debug "Machine #{template.name}-#{self.user.username} successfully generated."
+          		vm = Vm.create(:name=>"#{template.name}-#{self.user.username}", :lab_vmt=>template, :user=>self.user, :description=> 'Initialize the virtual machine by clicking <strong>Start</strong>.', :lab_user=>self)
+
+          		logger.debug "\n #{vm.lab_user.id} Machine #{vm.id} - #{template.name}-#{self.user.username} successfully generated.\n"
         	end    
     	end #end of making vms based of templates
       # start delayed jobs for keeping up with the last activity
@@ -77,6 +78,9 @@ class LabUser < ActiveRecord::Base
       self.last_activity=Time.now
       self.activity='Lab start'
     	self.save
+      logger.debug "\n all machines\n"
+      logger.debug self.vms.as_json
+      logger.debug "\n -end- \n"
 			if self.lab.startAll
 				self.start_all_vms
 			end
@@ -86,8 +90,10 @@ class LabUser < ActiveRecord::Base
 # remove all Vm-s and set the end to now
   def end_lab
   	if self.start && !self.end  # can only end labs that are started and not ended
-  		self.destroy_all_vms
-      	#end of deleting vms for this lab
+  		Vm.destroy_all(lab_user_id: self)
+      #self.destroy_all_vms
+      #end of deleting vms for this lab
+
     	self.end=Time.now
     	self.save 
       # remove pending delayed jobs
@@ -145,8 +151,12 @@ class LabUser < ActiveRecord::Base
 
 	def destroy_all_vms
 		self.vms.each do |vm|
-      logger.debug "Machine #{vm.name} successfully deleted."
 			vm.destroy
+      if vm.destroyed? 
+        logger.debug "\nMachine #{vm.id} - #{vm.name} successfully deleted.\n"
+      else
+        logger.debug "\nMachine #{vm.id} - #{vm.name} NOT deleted.\n"
+      end
 		end
 	end
 
@@ -227,7 +237,7 @@ class LabUser < ActiveRecord::Base
         # run this again in x seconds
         logger.debug "\nDO THIS AGAIN!\n"
         LabUser.delay(queue: "labuser-#{labuser.id}" ,run_at: lab.poll_freq.seconds.from_now ).rdp_status(labuser.id)
-      end
+      end #lab exsist and has polling
     end # labuser exists
   end
 
