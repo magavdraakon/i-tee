@@ -93,8 +93,8 @@ Enable automatic shutdown when acpi power button is pressed
 gsettings set org.gnome.settings-daemon.plugins.power button-power shutdown
 ```
 
-Automaatne uuenduste kontrollimine ära keelata.
-Uuendused peale.
+disable automatic checking for updates.
+install updates.
 
 
 Writing LAB descriptions and materials
