@@ -7,10 +7,15 @@ This guide gives hints and tips for templating VMs for virtual laboratory.
 Simplest way to create Guest virtual machine is local VirtualBox installation.
 
 1. Install guest operating system on local machine or using phpVirtualBox on server
+
 1. Install packages and VirtualBox Guest Additions
-1. Disable USB2 amd 3D acceleration
+
+1. Disable USB2, USB3 and 3D acceleration
+
 1. Enable RDP
+
 1. Export virtual machine to .ova
+
 1. Copy .ova to server and import it using phpVirtualBox
 
 
@@ -19,7 +24,7 @@ Simplest way to create Guest virtual machine is local VirtualBox installation.
 GNU/Linux Ubuntu and other GNU Debian Linux based systems
 ---------------------------------------------------------
 
-
+Choose right mirror 
 
 Update local package repository cache
 ```bash
@@ -39,6 +44,12 @@ Cleanup and remove unnecessary packages
 apt-get autoremove
 apt-get clean
 ```
+
+Install gnome-session-flashback because unity don't work well with no 3D graphics accelerator
+
+
+
+
 TODO: zerofill and shrink disks
 
 
@@ -82,6 +93,16 @@ Enable automatic shutdown when acpi power button is pressed
 gsettings set org.gnome.settings-daemon.plugins.power button-power shutdown
 ```
 
+Automaatne uuenduste kontrollimine ära keelata.
+Uuendused peale.
+
+
 Writing LAB descriptions and materials
 ======================================
 https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet
+
+Tuning disk io for Guest
+=================================
+
+1. mount partitions with noatime,nodiratime mount options
+2. remove  services
