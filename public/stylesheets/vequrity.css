@@ -35,7 +35,7 @@ h3 {
     line-height: normal;
 }
 #contain {position:relative;
-    background: url('../images/sisutaust.jpeg');
+    background: url('../images/sisutaust.jpeg') no-repeat fixed;
     background-size: cover;
     min-height:100%;
     line-height:1.25em;
@@ -511,6 +511,7 @@ body.sessions #messages {
     font-size:0.8em;
     text-align:right;
     color: #666666;
+    margin: 0.5em 0;
 }
 
 .pagination a, .previous_page, .next_page, .current {
