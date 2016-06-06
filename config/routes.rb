@@ -149,6 +149,8 @@ ITee::Application.routes.draw do
   match 'user_labs/:username/:id', :to => 'labs#user_labs'
 
   
+  match 'not_found', :to=>"home#error_404"
+
   # The priority is based upon order of creation:
   # first created -> highest priority.
 

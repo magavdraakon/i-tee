@@ -27,14 +27,15 @@ class User < ActiveRecord::Base
   end
 
   def rolename
-    if self.role==nil
-      'NaN'
-    elsif self.role==0
+    case self.role
+    when 0
       'user'
-    elsif self.role==1
+    when 1
       'manager'
-    elsif self.role==2
+    when 2
       'admin'
+    else
+      'NaN'
     end
   end
 

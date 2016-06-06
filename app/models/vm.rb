@@ -372,4 +372,95 @@ end
 
   end
 
+  def open_guacamole
+    # check if vm has guacamole enabled
+    if self.state=='running'
+      if self.lab_vmt.allow_remote && self.lab_vmt.guacamole_type!="none"
+        port = self.mac ? self.mac.ip.split('.').last : ''
+        begin
+          rdp_host=ITee::Application.config.rdp_host
+        rescue
+          rdp_host=`hostname -f`.strip
+        end
+        begin
+          rdp_port_prefix = ITee::Application.config.rdp_port_prefix
+        rescue
+          rdp_port_prefix = '10'
+        end
+        # check if the labuser has a guacamole user
+        unless self.lab_user.g_user && Guacamole.find_user_by_id(self.lab_user.g_user)
+          # create user
+          self.lab_user.g_username = ITee::Application.config.guacamole_user_prefix+"#{self.lab_user.id}"
+          self.lab_user.g_password = SecureRandom.base64
+          result = Guacamole.insert_user(self.lab_user.g_username, self.lab_user.g_password)
+          if result[:id] && result[:id]>0
+            # save to labuser
+            self.lab_user.g_user = result[:id]
+            self.lab_user.save
+          else 
+            logger.debug result
+            return {success: false, message: 'unable to add user to guacamole'} 
+          end
+        end # has no user
+        # check if there is a connection
+        unless self.g_connection && Guacamole.find_connection_by_id(self.g_connection)
+          # create connection
+          # data format {connection_name, protocol, max_connections, max_connections_per_user, params {hostname, port, username, password, color-depth}}
+          data = {
+            connection_name:  ITee::Application.config.guacamole_user_prefix+self.name, 
+            protocol: self.lab_vmt.guacamole_type , 
+            max_connections: ITee::Application::config.guacamole_max_connections, 
+            max_connections_per_user: ITee::Application::config.guacamole_max_connections_per_user, 
+            params: {
+              hostname: rdp_host, 
+              port: "#{rdp_port_prefix}#{port}".to_i, 
+              username: self.user.username,
+              password: self.password, 
+             # :'color-depth' => 
+              }
+            }
+          result = Guacamole.insert_connection(data)
+          if result[:id] && result[:id]>0
+            self.g_connection = result[:id]
+            self.save
+            # allow connection
+            result = Guacamole.allow_connection(self.lab_user.g_user, self.g_connection)
+            unless result[:id] && result[:id]>0
+              logger.debug result
+              return {success: false, message: 'unable to allow connection in guacamole'} 
+            end
+          else
+            logger.debug result
+            return {success: false, message: 'unable to create connection in guacamole'} 
+          end
+        else # connection existed
+          #the port had changed?- change row where connection id is x and parameter is 'port'
+          result = Guacamole.update_parameter(self.g_connection, 'port', "#{rdp_port_prefix}#{port}".to_i)
+          # puts result
+        end # has no connection
+        # check if the connection persist/has been created
+        if self.g_connection
+          # log in 
+          # puts ITee::Application::config.guacamole_host+"/guacamole/api/tokens"
+          post = Http.post(ITee::Application::config.guacamole_host+"/guacamole/api/tokens", {username: self.lab_user.g_username, password:self.lab_user.g_password})
+          # puts post.body
+          if post.body && post.body['authToken']
+            # get machine url
+            uri = Guacamole.get_url(self.g_connection)
+            path = ITee::Application::config.guacamole_host+"/guacamole/#/client/#{uri}"
+            { success: true, url: path, token: post.body}
+          else
+            {success: false, message: 'unable to log in'}
+          end
+        else
+          { success: false, message: 'unable to get machine connection'}
+        end
+      else
+        {success: false, message: 'this virtual machine does not allow this connection'}
+      end
+    else
+      {success: false, message: 'please start this virtual machine before trying to establish a connection'}
+    end
+  end
+
 end
