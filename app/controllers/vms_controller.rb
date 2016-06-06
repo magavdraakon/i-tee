@@ -447,6 +447,33 @@ end
       redirect_to(my_labs_path+'/'+@vm.lab_vmt.lab.id.to_s)
   end
 
+  # guacamole related method that gives needed info for a guacamole connection as json
+  def open_guacamole
+    # vm by id in params
+    respond_to do |format|
+      result = @vm.open_guacamole
+      if result && result[:success]
+      format.html {
+        # set cookie
+        cookies[:GUAC_AUTH] = {
+          value: result[:token],
+          #expires: 1.hour.from_now,
+          domain: ITee::Application::config.guacamole_host #%w(rangeforce.com), # %w(.example.com .example.org)
+          #path: '/guacamole',
+          #:secure,
+          #:httponly
+        }
+        #redirect to url https://xxx.yyy.com/guacamole/#/client/zzz
+        redirect_to( result[:url] )
+      }
+      format.json  { render :json => result }
+      else
+        format.html  { redirect_to( not_found_path, :notice=> result[:message]) }
+        format.json  { render :json => {:success=>result[:success], :message=> result[:message] } }
+      end
+    end
+  end
+
   #this is a method that updates a vms progress
   #input parameters: ip (the machine, the report is about)
   #           progress (the progress for the machine)
