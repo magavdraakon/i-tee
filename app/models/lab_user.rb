@@ -63,13 +63,14 @@ class LabUser < ActiveRecord::Base
   def start_lab
   	unless self.start || self.end  # can only start labs that are not started or finished
   		self.vmts.each do |template|
-        	#is there a machine like that already?
-        	vm = Vm.where('lab_vmt_id=? and lab_user_id=?', template.id, self.id).first
-        	if vm==nil  #no there is not
-          		vm = Vm.create(:name=>"#{template.name}-#{self.user.username}", :lab_vmt=>template, :user=>self.user, :description=> 'Initialize the virtual machine by clicking <strong>Start</strong>.', :lab_user=>self)
+        #is there a machine like that already?
+        vm = Vm.where('lab_vmt_id=? and lab_user_id=?', template.id, self.id).first
+        if vm==nil  #no there is not
+         		vm = Vm.create(:name=>"#{template.name}-#{self.user.username}", :lab_vmt=>template, :user=>self.user, :description=> 'Initialize the virtual machine by clicking <strong>Start</strong>.', :lab_user=>self)
 
-          		logger.debug "\n #{vm.lab_user.id} Machine #{vm.id} - #{template.name}-#{self.user.username} successfully generated.\n"
-        	end    
+         		logger.debug "\n #{vm.lab_user.id} Machine #{vm.id} - #{template.name}-#{self.user.username} successfully generated.\n"
+        end  
+
     	end #end of making vms based of templates
       # start delayed jobs for keeping up with the last activity
       LabUser.rdp_status(self.id)

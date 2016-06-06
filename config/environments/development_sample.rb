@@ -33,6 +33,21 @@ ITee::Application.configure do
   # set log level to debug for development env
   config.log_level = :debug
 
+  # guacamole db parameters
+  config.guacamole_db_host = ''
+  config.guacamole_db_user = ''
+  config.guacamole_db_pass = ''
+  config.guacamole_db_port = ''
+  config.guacamole_db_name = ''
+
+  config.guacamole_user_prefix = 'dev'
+
+  config.guacamole_host = ''
+  config.guacamole_user = ''
+  config.guacamole_pass = ''
+  config.guacamole_max_connections = ''
+  config.guacamole_max_connections_per_user = ''
+
   # In the development environment your application's code is reloaded on
   # every request.  This slows down response time but is perfect for development
   # since you don't have to restart the webserver when you make code changes.

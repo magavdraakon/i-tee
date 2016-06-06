@@ -8,6 +8,20 @@ class LabVmt < ActiveRecord::Base
   validates_presence_of  :vmt_id, :name, :nickname
   validates_format_of :name, :with => /^[[:alnum:]\d-]+$/, :message => 'can only be alphanumeric with no spaces'
   validates_uniqueness_of :name
+
+   def guacamole_type
+    case self.g_type
+    when 1
+      'rdp'
+    when 2
+      'vnc'
+    when 3
+      'ssh'
+    else
+      'none'
+    end
+  end
+
   def menustr
     "#{name} (#{lab.name})"
   end

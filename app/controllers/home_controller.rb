@@ -9,6 +9,9 @@ class HomeController < ApplicationController
   def error_401
     
   end
+  def error_404
+    render :layout => false
+  end
   
   def system_info
   end

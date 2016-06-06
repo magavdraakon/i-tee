@@ -37,6 +37,21 @@ ITee::Application.configure do
   #Virtualbox User and command line for launching scripts
   config.cmd_perfix = 'sudo -u vbox'
 
+  # guacamole db parameters
+  config.guacamole_db_host = ''
+  config.guacamole_db_user = ''
+  config.guacamole_db_pass = ''
+  config.guacamole_db_port = ''
+  config.guacamole_db_name = ''
+
+  config.guacamole_user_prefix = 'dev'
+
+  config.guacamole_host = ''
+  config.guacamole_user = ''
+  config.guacamole_pass = ''
+  config.guacamole_max_connections = ''
+  config.guacamole_max_connections_per_user = ''
+
   # For nginx:
   # config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect'
 

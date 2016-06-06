@@ -128,10 +128,16 @@ ITee::Application.routes.draw do
   match 'my_labs/:id', :to => 'labs#user_labs'
   match 'my_labs', :to =>'labs#user_labs'
 
+  match 'my_labs2/:id/:username', :to => 'labs#user_labs2'
+  match 'my_labs2/:id', :to => 'labs#user_labs2'
+  match 'my_labs2', :to =>'labs#user_labs2'
+
   match 'user_labs/:username', :to=>'labs#user_labs'
   match 'user_labs/:username/:id', :to => 'labs#user_labs'
 
   
+  match 'not_found', :to=>"home#error_404"
+
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
@@ -191,6 +197,7 @@ ITee::Application.routes.draw do
 #end
 match ':controller/:action/:id',  :to=>'home#catcher' 
 match '*path',  :to=>'home#catcher'
+
 
   # See how all your routes lay out with "rake routes"
 
