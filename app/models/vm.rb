@@ -413,15 +413,14 @@ end
         else # connection existed
           #the port had changed?- change row where connection id is x and parameter is 'port'
           result = Guacamole.update_parameter(self.g_connection, 'port', "#{rdp_port_prefix}#{port}".to_i)
-          puts result
+          # puts result
         end # has no connection
         # check if the connection exists/has been created
         if self.g_connection
           # log in 
-          puts ITee::Application::config.guacamole_host+"/guacamole/api/tokens"
-
+          # puts ITee::Application::config.guacamole_host+"/guacamole/api/tokens"
           post = Http.post(ITee::Application::config.guacamole_host+"/guacamole/api/tokens", {username: self.lab_user.g_username, password:self.lab_user.g_password})
-          puts post.body
+          # puts post.body
           if post.body && post.body['authToken']
             # get machine url
             uri = Guacamole.get_url(self.g_connection)

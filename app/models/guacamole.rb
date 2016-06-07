@@ -59,9 +59,22 @@ class Guacamole < ActiveRecord::Base
 	end
 
 	def self.update_parameter(connection_id, parameter_name, parameter_value)
-		s = @@client.prepare("UPDATE guacamole_connection_parameter SET parameter_value = ? WHERE connection_id = ? AND parameter_name = ?") 
-		r = s.execute(parameter_value, connection_id, parameter_name)
-		@@client.affected_rows
+		# check if parameter is set
+
+		s = @@client.prepare("SELECT * FROM guacamole_connection_parameter WHERE connection_id = ? AND parameter_name = ?")
+		r = s.execute(connection_id, parameter_name)
+		par = r.first
+		if par
+			# update
+			s = @@client.prepare("UPDATE guacamole_connection_parameter SET parameter_value = ? WHERE connection_id = ? AND parameter_name = ?") 
+			r = s.execute(parameter_value, connection_id, parameter_name)
+			@@client.affected_rows
+		else
+			# insert
+			s = @@client.prepare("INSERT INTO guacamole_connection_parameter (connection_id, parameter_name, parameter_value) VALUES (?, ?, ?)") 
+			r = s.execute(connection_id, parameter_name, parameter_value)
+			@@client.last_id
+		end
 		rescue Exception => e
   			{ error: e}
 	end
