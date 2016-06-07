@@ -73,7 +73,7 @@ class Guacamole < ActiveRecord::Base
 			# insert
 			s = @@client.prepare("INSERT INTO guacamole_connection_parameter (connection_id, parameter_name, parameter_value) VALUES (?, ?, ?)") 
 			r = s.execute(connection_id, parameter_name, parameter_value)
-			@@client.last_id
+			@@client.affected_rows
 		end
 		rescue Exception => e
   			{ error: e}
@@ -144,7 +144,7 @@ Each of these components separated from the other by a single NULL character (U+
 			# guacamole_connection_permission : user_id, connection_id, READ
 			statement = @@client.prepare("INSERT INTO guacamole_connection_permission (user_id, connection_id, permission) VALUES (?, ?, ?)") 
 			result = statement.execute(user_id, connection_id, 'READ')
-			per_id = @@client.last_id
+			per_id = @@client.affected_rows
 			{id: per_id}
 		end
 		rescue Exception => e

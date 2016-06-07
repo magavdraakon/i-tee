@@ -458,7 +458,7 @@ end
         cookies[:GUAC_AUTH] = {
           value: result[:token],
           #expires: 1.hour.from_now,
-          domain: ITee::Application::config.domain #%w(rangeforce.com), # %w(.example.com .example.org)
+          domain: result[:domain] #%w(rangeforce.com), # %w(.example.com .example.org)
           #path: '/guacamole',
           #:secure,
           #:httponly
