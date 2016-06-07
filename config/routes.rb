@@ -128,9 +128,8 @@ ITee::Application.routes.draw do
   match 'my_labs/:id', :to => 'labs#user_labs'
   match 'my_labs', :to =>'labs#user_labs'
 
-  match 'my_labs2/:id/:username', :to => 'labs#user_labs2'
-  match 'my_labs2/:id', :to => 'labs#user_labs2'
-  match 'my_labs2', :to =>'labs#user_labs2'
+  match 'open_guacamole', :to=>'vms#open_guacamole'
+  match 'open_guacamole/:id', :to=>'vms#open_guacamole' 
 
   match 'user_labs/:username', :to=>'labs#user_labs'
   match 'user_labs/:username/:id', :to => 'labs#user_labs'

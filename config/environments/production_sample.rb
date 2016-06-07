@@ -37,6 +37,9 @@ ITee::Application.configure do
   #Virtualbox User and command line for launching scripts
   config.cmd_perfix = 'sudo -u vbox'
 
+  # master domain name for setting universal cookies for the subdomains
+  config.domain = ''
+
   # guacamole db parameters
   config.guacamole_db_host = ''
   config.guacamole_db_user = ''

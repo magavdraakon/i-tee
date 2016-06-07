@@ -33,6 +33,9 @@ ITee::Application.configure do
   # set log level to debug for development env
   config.log_level = :debug
 
+  # master domain name for setting universal cookies for the subdomains
+  config.domain = ''
+
   # guacamole db parameters
   config.guacamole_db_host = ''
   config.guacamole_db_user = ''

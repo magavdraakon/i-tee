@@ -170,38 +170,6 @@ class LabsController < ApplicationController
       logger.info '\nNo :back error\n'
       redirect_to(my_labs_path+(params[:id] ? "/#{params[:id]}" : ''))
   end
-  
-  # view and do labs - user view
-  def user_labs2
-    get_user # @user - either lab owner or current user
-    if !@user && params[:username]
-          logger.debug "There is no user named '#{params[:username]}'"
-          flash[:notice] = "There is no user named '#{params[:username]}'"
-          redirect_to :back and return
-    elsif !@admin && params[:username] then # simple user should not have the username in url
-      logger.debug "\nmy_labs: Relocate user\n"
-      # simple user should not have the username in url
-      redirect_to(my_labs2_path+(params[:id] ? "/#{params[:id]}" : ''))
-    else
-      get_user_labs(@user) # @labs (all labs), @started, @complete, @not_started
-      # if no course is selected show the first one
-      if params[:id]!=nil
-        @lab = Lab.find(params[:id])
-      else
-        @lab=@labs.first 
-      end
-
-      if @labs!=[] && @labs.include?(@lab)
-        @lab_user = LabUser.where('lab_id=? and user_id=?', @lab.id, @user.id).last if @lab
-      elsif @labs!=[]  # users with labs, that try to see others labs are redirected to error
-        logger.debug "\n'#{current_user.username}' redirected: dont have lab '#{@lab.name}' (#{@lab.id}) \n"
-        redirect_to(error_401_path) and return
-      end
-    end
-    rescue ActionController::RedirectBackError # cant redirect back? go to the lab instead
-      logger.info '\nNo :back error\n'
-      redirect_to(my_labs2_path+(params[:id] ? "/#{params[:id]}" : ''))
-  end
 
 
   def start_lab_by_id

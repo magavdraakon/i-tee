@@ -4,8 +4,8 @@ class VmsController < ApplicationController
   
   #before_filter :authorise_as_admin, :except => [:show, :index, :init_vm, :stop_vm, :pause_vm, :resume_vm, :start_vm, :start_all]
   #redirect to index view when trying to see unexisting things
-  before_filter :save_from_nil, :only=>[:show, :edit, :start_vm, :stop_vm, :pause_vm, :resume_vm, :get_state, :get_rdp, :rdp_reset ]
-  before_filter :auth_as_owner, :only=>[:show, :start_vm, :stop_vm, :pause_vm, :resume_vm, :get_state, :get_rdp, :rdp_reset ]       
+  before_filter :save_from_nil, :only=>[:show, :edit, :start_vm, :stop_vm, :pause_vm, :resume_vm, :get_state, :get_rdp, :rdp_reset,:open_guacamole ]
+  before_filter :auth_as_owner, :only=>[:show, :start_vm, :stop_vm, :pause_vm, :resume_vm, :get_state, :get_rdp, :rdp_reset ,:open_guacamole]       
   
   before_filter :admin_tab, :except=>[:show,:index, :vms_by_lab, :vms_by_state]
   before_filter :vm_tab, :only=>[:show,:index, :vms_by_lab, :vms_by_state]
@@ -458,7 +458,7 @@ end
         cookies[:GUAC_AUTH] = {
           value: result[:token],
           #expires: 1.hour.from_now,
-          domain: ITee::Application::config.guacamole_host #%w(rangeforce.com), # %w(.example.com .example.org)
+          domain: ITee::Application::config.domain #%w(rangeforce.com), # %w(.example.com .example.org)
           #path: '/guacamole',
           #:secure,
           #:httponly
