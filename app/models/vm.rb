@@ -423,12 +423,7 @@ end
           if result[:id] && result[:id]>0
             self.g_connection = result[:id]
             self.save
-            # allow connection
-            result = Guacamole.allow_connection(self.lab_user.g_user, self.g_connection)
-            unless result[:id] && result[:id]>0
-              logger.debug result
-              return {success: false, message: 'unable to allow connection in guacamole'} 
-            end
+            
           else
             logger.debug result
             return {success: false, message: 'unable to create connection in guacamole'} 
@@ -440,6 +435,11 @@ end
         end # has no connection
         # check if the connection persist/has been created
         if self.g_connection
+          # allow connection
+          result = Guacamole.allow_connection(self.lab_user.g_user, self.g_connection)
+          unless result[:id] && result[:id]>0
+            return {success: false, message: 'unable to allow connection in guacamole'} 
+          end
           # log in 
           # puts ITee::Application::config.guacamole_host+"/guacamole/api/tokens"
           post = Http.post(ITee::Application::config.guacamole_host+"/guacamole/api/tokens", {username: self.lab_user.g_username, password:self.lab_user.g_password})
@@ -448,7 +448,7 @@ end
             # get machine url
             uri = Guacamole.get_url(self.g_connection)
             path = ITee::Application::config.guacamole_host+"/guacamole/#/client/#{uri}"
-            { success: true, url: path, token: post.body}
+            { success: true, url: path, token: post.body, domain: ITee::Application::config.domain}
           else
             {success: false, message: 'unable to log in'}
           end
