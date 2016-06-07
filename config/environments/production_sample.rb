@@ -50,6 +50,9 @@ ITee::Application.configure do
   # Virtualbox user and command line for launching scripts
   config.cmd_perfix = 'sudo -Hu vbox'
 
+  # master domain name for setting universal cookies for the subdomains
+  config.domain = ''
+
   # Guacamole configuration
   if configFile.key?('guacamole')
     config.guacamole_user_prefix = configFile['guacamole'].key?('prefix') ?
