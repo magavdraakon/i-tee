@@ -25,6 +25,7 @@ class LabUser < ActiveRecord::Base
         nickname: vm.lab_vmt.nickname,
         state: vm.state,
         allow_remote: vm.lab_vmt.allow_remote,
+        guacamole_type: vm.lab_vmt.guacamole_type,
         position: vm.lab_vmt.position,
         vm_rdp: vm.get_all_rdp
       }
