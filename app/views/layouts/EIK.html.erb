@@ -42,6 +42,9 @@
               <div class="sb b_menu <%if @tab=='search' %>current_tab<% end%>">
                 <%=link_to 'Search', search_path %>
               </div>
+              <div class="vb b_menu <%if @tab=='virtual' %>current_tab<% end%>">
+                <%=link_to 'Virtualization', virtualization_path %>
+              </div>
             <%end%>
             <div class="r_menu b_menu">
               <%# if user_signed_in? %>
@@ -128,6 +131,23 @@
                 </tr>
               </table>
             </div>
+            <div class="virtual s_menu <% if @tab == 'virtual' %>current_tab<%end%>">
+            <table>
+              <tr>
+                <td>
+                  <%=link_to 'Running machines', virtualization_path %> <br/>
+                  <%=link_to 'All machines', virtualization_path+"?state=all" %><br/>
+                  <%=link_to 'Stopped machines', virtualization_path+"?state=stopped" %>
+                </td>
+                <td>
+                  <%=link_to 'RDP password', rdp_password_path %>
+                </td>
+                <td>
+                  
+                </td>
+              </tr>
+            </table>
+          </div>
           <% end %>
           <div id="c_wrap">
             <div id="sidemenu">

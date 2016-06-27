@@ -130,6 +130,10 @@ class ApplicationController < ActionController::Base
     @tab='search'
   end
 
+  def virtualization_tab
+    @tab='virtual'
+  end
+
   def check_for_cancel
     if params[:commit] == 'Cancel'
       if params[:controller]=='vms'
