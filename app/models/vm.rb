@@ -365,7 +365,7 @@ end
           rdp_port_prefix = '10'
         end
         # check if the labuser has a guacamole user
-        unless self.lab_user.g_user
+        unless self.lab_user.g_user && Guacamole.find_user_by_id(self.lab_user.g_user)
           # create user
           self.lab_user.g_username = ITee::Application.config.guacamole_user_prefix+"#{self.lab_user.id}"
           self.lab_user.g_password = SecureRandom.base64
@@ -379,12 +379,12 @@ end
             return {success: false, message: 'unable to add user to guacamole'} 
           end
         end # has no user
-        unless self.g_connection
+        # check if there is a connection
+        unless self.g_connection && Guacamole.find_connection_by_id(self.g_connection)
           # create connection
-          
           # data format {connection_name, protocol, max_connections, max_connections_per_user, params {hostname, port, username, password, color-depth}}
           data = {
-            connection_name: self.name, 
+            connection_name:  ITee::Application.config.guacamole_user_prefix+self.name, 
             protocol: self.lab_vmt.guacamole_type , 
             max_connections: ITee::Application::config.guacamole_max_connections, 
             max_connections_per_user: ITee::Application::config.guacamole_max_connections_per_user, 
@@ -410,7 +410,7 @@ end
           result = Guacamole.update_parameter(self.g_connection, 'port', "#{rdp_port_prefix}#{port}".to_i)
           # puts result
         end # has no connection
-        # check if the connection exists/has been created
+        # check if the connection persist/has been created
         if self.g_connection
           # allow connection
           result = Guacamole.allow_connection(self.lab_user.g_user, self.g_connection)

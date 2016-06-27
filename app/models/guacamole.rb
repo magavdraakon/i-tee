@@ -21,12 +21,17 @@ class Guacamole < ActiveRecord::Base
   			{ error: e}
 	end
 
-	def self.find_user(username)
+	def self.find_user_by_username(username)
 		statement = @@client.prepare("SELECT * FROM guacamole_user where username=?") 
 		result = statement.execute(username)
 		result.first
 	end
 
+	def self.find_user_by_id(user_id)
+		statement = @@client.prepare("SELECT * FROM guacamole_user where user_id=?") 
+		result = statement.execute(user_id)
+		result.first
+	end
 # remove user by id
 	def self.remove_user(user_id)
 		# remove user
@@ -93,7 +98,7 @@ Each of these components separated from the other by a single NULL character (U+
  		Base64.encode64("#{id}\0#{type}\0#{db}").strip
 	end
 
-	def self.find_connection(connection_name)
+	def self.find_connection_by_name(connection_name)
 		# find connection by name
 		statement = @@client.prepare("SELECT * FROM guacamole_connection WHERE connection_name=?") 
 		result = statement.execute(connection_name)
@@ -112,7 +117,30 @@ Each of these components separated from the other by a single NULL character (U+
 			false
 		end
 		rescue Exception => e
-  			{ error: e}
+			puts e
+  			false
+	end
+	def self.find_connection_by_id(connection_id)
+		# find connection by name
+		statement = @@client.prepare("SELECT * FROM guacamole_connection WHERE connection_id=?") 
+		result = statement.execute(connection_id)
+		conn = result.first
+		if conn
+			conn[:params]={}
+			# get connection parameters and add them to the connection object
+			statement = @@client.prepare("SELECT * FROM guacamole_connection_parameter WHERE connection_id=?") 
+			result = statement.execute(conn['connection_id'])
+			# add to connection
+			result.each do |row|
+				conn[:params][row['parameter_name']] = row['parameter_value']
+			end
+			conn
+		else
+			false
+		end
+		rescue Exception => e
+			puts e
+  			false
 	end
 
 # remove connection by id
