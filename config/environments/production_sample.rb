@@ -1,4 +1,14 @@
+require 'yaml'
+
 ITee::Application.configure do
+
+  configFile = { }
+
+  # .yaml is recommended extensions, so let's use that
+  if File.exist?('/etc/i-tee/config.yaml')
+    configFile = YAML.load_file("/etc/i-tee/config.yaml")
+  end
+
   # Settings specified here will take precedence over those in config/environment.rb
 
   # The production environment is meant for finished, "live" apps.
@@ -12,21 +22,21 @@ ITee::Application.configure do
   # Specifies the header that your server uses for sending files
   config.action_dispatch.x_sendfile_header = 'X-Sendfile'
 
-   #Administrator and manager usernames
-  config.admins = ['admin']
-  config.managers = ['manager']
+  # Administrator and manager usernames
+  config.admins = configFile.key?('admins') ? configFile['admins'] : [ ]
+  config.managers = configFile.key?('managers') ? configFile['managers'] : [ ]
 
   # hostname for rdp sessions
-  config.rdp_host = 'elab.itcollege.ee'
+  config.rdp_host = configFile['rdp_host'] #'elab.itcollege.ee'
   # port prefix for rdp sessions
-  config.rdp_port_prefix = '10'
+  config.rdp_port_prefix = configFile.key?('rdp_port_prefix') ? configFile['rdp_port_prefix'] : '10'
   config.rdp_password_length = 14
 
    # determine how many instances are shown per page
   config.per_page=15
 
-   # determine what layout to use
-  config.default_skin = 'EIK'
+  # determine what layout to use
+  config.default_skin = configFile.key?('skin') ? configFile['skin'] : 'EIK'
   config.skins = { 'host1'=> 'EIK'}
 
   #place for temporar files like VM customization files
