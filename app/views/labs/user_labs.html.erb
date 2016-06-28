@@ -87,7 +87,7 @@
         result: <%= @lab_user.result%>    <br/>
       <%end%>
     <% end %>
-    <%if @lab_user.end==nil  %>
+    <%if !@lab_user.end  %>
                 <div>
       <h3>Virtual machines</h3>
       <%= 'There are no machines allocated for this lab' if @lab_user.vms.count==0 %>
@@ -149,7 +149,7 @@
     </div>
   <%end #has vms%>
 <div class="manage_lab">
-    <% if @lab_user.end==nil && @lab_user.vms.count>0 %>
+    <% if !@lab_user.end && @lab_user.vms.count>0 %>
         <span class="loader">
           <%= link_to('Start all',start_all_path+'/'+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : ''),
                       :class=> 'button start-button sl-button')  %>

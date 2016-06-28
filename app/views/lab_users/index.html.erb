@@ -29,7 +29,7 @@
         </td>
         <td><% if lab_user.activity && lab_user.last_activity %><%= lab_user.activity %> @ <%= lab_user.last_activity %><%end%></td>
         <td class="narrow">
-          <%= link_to('Start lab',start_lab_path+'/'+lab_user.lab.id.to_s+'/'+lab_user.user.username , :class=>'submit-button button') if lab_user.start==nil %>
+          <%= link_to('Start lab',start_lab_path+'/'+lab_user.lab.id.to_s+'/'+lab_user.user.username , :class=>'submit-button button') if !lab_user.start %>
           <%= link_to('Restart lab',restart_lab_path+'/'+lab_user.lab.id.to_s+'/'+lab_user.user.username, :class=>'add-button button', :confirm => 'This will delete all saved data. Are you sure?') if lab_user.start %>
           <%= link_to('End lab', end_lab_path+'/'+lab_user.id.to_s, :class=>'delete-button button', :confirm => 'This will delete all saved data. Are you sure?' ) if lab_user.start && !lab_user.end %>
         </td>
