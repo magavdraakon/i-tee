@@ -1,10 +1,38 @@
 class VirtualboxController < ApplicationController
-	before_filter :authorise_as_manager
+	before_filter :authorise_as_admin
 	before_filter :set_user, only: [:update_password, :remove_password]
 	before_filter :virtualization_tab
 
 	def index
+		@vms = Virtualbox.get_machines(params[:state], params[:where])
+	end
 
+	def templates
+		@vms = Virtualbox.get_machines('template', params[:where])
+	end
+
+	def vm_details
+		@vm= Virtualbox.get_vm_info(params[:name])
+	end
+
+	def manage_vm
+		if params[:name]
+			vms = [ params[:name] ]
+		else
+			vms = params[:names]
+		end
+
+		result = Virtualbox.manage_vms(vms, params[:do])
+
+        if result 
+          if result['success']
+            redirect_to :back, notice: result['message'].html_safe
+          else
+            redirect_to :back, alert: result['message'].html_safe
+          end 
+        else
+          redirect_to :back, :flash=>{ error: "Unable to #{params[:do]} machines #{vms}"}
+        end
 	end
 
 	def rdp_password

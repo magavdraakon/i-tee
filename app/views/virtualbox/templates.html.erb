@@ -1,17 +1,4 @@
-<h3>Listing virtual machines</h3>
-
-<%= form_tag('/virtualization', method: 'get') do %>
-	<label>Name: <%= text_field_tag 'where[name]', (params[:where] && params[:where][:name] ? params[:where][:name] : '') %></label>
-	<label>Group: <%= text_field_tag 'where[group]', (params[:where] && params[:where][:group] ? params[:where][:group] : '') %></label>
-	<label>State: <%= select_tag "state", options_for_select(['all', 'running', 'stopped' ], params[:state] ? params[:state] : 'all') %></label>
-	RDP <label> active: <%= radio_button_tag 'where[VRDEActiveConnection]', 'on', (params[:where] && params[:where][:VRDEActiveConnection] && params[:where][:VRDEActiveConnection]=='on' ? true : false) %></label>
-	<label> inactive: <%= radio_button_tag 'where[VRDEActiveConnection]', 'off', (params[:where] && params[:where][:VRDEActiveConnection] && params[:where][:VRDEActiveConnection]=='off' ? true : false) %></label>
-	<label> any: <%= radio_button_tag 'where[VRDEActiveConnection]', 'any', (params[:where] && params[:where][:VRDEActiveConnection] && params[:where][:VRDEActiveConnection]=='any' ? true : false) %></label>
-	<%= submit_tag('Filter') %>
-
-<% end %>
-
-<% if @vms.count>0 %>
+<h3>Listing virtual machine templates</h3>
 <%= form_tag('/manage_vm', method: 'post') do %>
 <div id="index_t">
   <table>
@@ -19,12 +6,13 @@
       <tr>
       	<th style="width:1%; white-space: nowrap;"><label><%= check_box_tag 'toggle','', false,  :onclick=>'toggle_checked_all(this);', :id=>'toggle_u'  %><span> all</span></label></th>
         <th>Name</th>
-        <th>Group</th>
         <th>State</th>
         <th>Since</th>
+        <th>Allow RDP</th>
         <th>Active Port / range</th>
         <th>RDP</th>
         <th>Connect</th>
+        <th>Snapshot</th>
         <th></th>
       </tr>
     </thead>
@@ -32,16 +20,16 @@
       <tr class="found">
       	<td><%= check_box_tag 'names[]', vm['name'] , false, :id=>"id_#{vm['name']}" %></td>
         <td><%= link_to vm['name'], "/vm_details/#{vm['name']}" %></td>
-        <td><%= vm['groups'].join(', ') %></td>
         <td><%= vm['VMState'] %></td>
         <td><%= vm['VMStateChangeTime'].to_time %></td>
+        <td><%= vm['vrde'] ? vm['vrde'] : '-disabled-' %></td>
         <td>
         	<%= vm['vrdeport'].to_i >0 ? vm['vrdeport'] : '-none-' %>
         	 / 
         	<%= vm['vrdeports'].to_i >0 ? vm['vrdeports'] : '-none-' %>
         	
         </td>
-        <td><%= vm['VRDEActiveConnection']+'line' if vm['VRDEActiveConnection'] %></td>
+        <td><%= vm['VRDEActiveConnection'] if vm['VRDEActiveConnection'] %></td>
         <td>
         	<% if vm['VMState']=='running' %>
                 <div class="remote_connections">
@@ -59,6 +47,7 @@
             <% end %>
 
         </td>
+        <td><%= vm['CurrentSnapshotName'] ? vm['CurrentSnapshotName'] : '-none-' %></td>
         <td>
         	<%= link_to "start", "/manage_vm/start/#{vm['name']}" if vm['VMState']!='running' %>
         	<%= link_to "stop", "/manage_vm/stop/#{vm['name']}" if vm['VMState']=='running'%>
@@ -70,9 +59,5 @@
 </div>
 <%= submit_tag('start', name:'do') %>
 <%= submit_tag('stop', name:'do') %>
-<%= submit_tag('reset_rdp', name:'do') %>
 
-<% end %>
-<% else %>
-	<p>No machines</p>
 <% end %>

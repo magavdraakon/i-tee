@@ -34,6 +34,9 @@
               <div class="ab b_menu <% if @tab=='admin' %>current_tab<% end%>">
                 <%=link_to 'Manage labs', labs_path %>
               </div>
+              <div class="vb b_menu <%if @tab=='virtual' %>current_tab<% end%>">
+                <%=link_to 'Virtualization', virtualization_path %>
+              </div>
             <%end%>
             <%if @manager || @admin  %>
               <div class="mb b_menu <%if @tab=='manager' %>current_tab<% end%>">
@@ -41,9 +44,6 @@
               </div>
               <div class="sb b_menu <%if @tab=='search' %>current_tab<% end%>">
                 <%=link_to 'Search', search_path %>
-              </div>
-              <div class="vb b_menu <%if @tab=='virtual' %>current_tab<% end%>">
-                <%=link_to 'Virtualization', virtualization_path %>
               </div>
             <%end%>
             <div class="r_menu b_menu">
@@ -112,6 +112,23 @@
                 </tr>
               </table>
             </div>
+            <div class="virtual s_menu <% if @tab == 'virtual' %>current_tab<%end%>">
+              <table>
+                <tr>
+                  <td>
+                    <%=link_to 'All machines', virtualization_path %> <br/>
+                    <%=link_to 'Running machines', virtualization_path+"?state=running" %><br/>
+                    <%=link_to 'Stopped machines', virtualization_path+"?state=stopped" %>
+                  </td>
+                  <td>
+                    <%=link_to 'Templates', templates_path %>
+                  </td>
+                  <td>
+                    <%=link_to 'RDP password', rdp_password_path %>
+                  </td>
+                </tr>
+              </table>
+            </div>
           <%end%>
           <% if @manager || @admin %>
             <div class="manager s_menu <% if @tab=='manager' %>current_tab<% end%>">
@@ -131,23 +148,7 @@
                 </tr>
               </table>
             </div>
-            <div class="virtual s_menu <% if @tab == 'virtual' %>current_tab<%end%>">
-            <table>
-              <tr>
-                <td>
-                  <%=link_to 'Running machines', virtualization_path %> <br/>
-                  <%=link_to 'All machines', virtualization_path+"?state=all" %><br/>
-                  <%=link_to 'Stopped machines', virtualization_path+"?state=stopped" %>
-                </td>
-                <td>
-                  <%=link_to 'RDP password', rdp_password_path %>
-                </td>
-                <td>
-                  
-                </td>
-              </tr>
-            </table>
-          </div>
+            
           <% end %>
           <div id="c_wrap">
             <div id="sidemenu">
