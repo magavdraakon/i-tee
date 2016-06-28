@@ -93,7 +93,7 @@ def self.template_machines
 	end
 end
 
-def self.get_vm_info(name)
+def self.get_vm_info(name, static=false)
 	info = %x(sudo -u vbox VBoxManage showvminfo #{name} --machinereadable )
 	status = $?
 	#logger.debug info
@@ -144,20 +144,26 @@ def self.get_vm_info(name)
 		# field-specific parsing
 		if vm['groups']
 			vm['groups'] = vm['groups'].split(',')
-			vmname = vm['groups'][0] ? vm['groups'][0].gsub('/', '').strip : '' # first group is machine name
-			if vmname!='' 
-				vmt = LabVmt.where('name=?', vmname).first
-				if vmt
-					vm.merge!(Lab.select('id, name').where("id=?", vmt.lab_id).first.as_json)
+			unless static
+				vmname = vm['groups'][0] ? vm['groups'][0].gsub('/', '').strip : '' # first group is machine name
+				if vmname!='' 
+					vmt = LabVmt.where('name=?', vmname).first
+					if vmt
+						vm.merge!(Lab.select('id, name').where("id=?", vmt.lab_id).first.as_json)
+					end
+				end
+				username = vm['groups'][1] ? vm['groups'][1].gsub('/', '').strip : '' # second group is user name
+				if username!='' 
+					user = User.select('id, username').where('username=?', username).first
+					if user
+						vm.merge!(user.as_json)
+					end
 				end
 			end
-			username = vm['groups'][1] ? vm['groups'][1].gsub('/', '').strip : '' # second group is user name
-			if username!='' 
-				user = User.select('id, username').where('username=?', username).first
-				if user
-					vm.merge!(user.as_json)
-				end
-			end
+		end
+
+		if vm['CurrentSnapshotNode']
+			vm['CurrentSnapshotDescription']=vm[vm['CurrentSnapshotNode'].gsub('Name', 'Description')]
 		end
 
 		vm
@@ -213,6 +219,8 @@ def self.get_all_rdp(user, port)
           r = Virtualbox.resume_vm(vm)
         when 'reset_rdp'
           r= Virtualbox.reset_vm_rdp(vm)
+      	when 'take_snapshot'
+      	  r= Virtualbox.take_snapshot(vm)
         else
           r = {'success'=>false, 'message' => "unknown action"}
         end
@@ -300,6 +308,32 @@ def self.get_all_rdp(user, port)
 		end
 	end
  end
+
+ def self.take_snapshot(vm)
+ 	info = Virtualbox.get_vm_info(vm, true) # get info without searching for lab and user
+ 	if info
+ 		if info['VMState']=='poweroff'
+	 		vmname=vm.gsub("-template",'')
+	 		nr = info['CurrentSnapshotName'] ? info['CurrentSnapshotName'].gsub("#{vmname}-",'').gsub('-template','').to_i+1 : 1
+		 	name = "#{vmname}-#{nr}-template"
+
+		 	info = %x(sudo -u vbox VBoxManage snapshot #{vm} take #{name} --description "#{Time.now}" )
+			status= $?
+			logger.debug info
+			logger.debug status
+			if status.exitstatus===0
+				{'success'=>true, 'message'=> "snapshot of #{vm} successfully created"}
+			else
+				{'success'=>false, 'message'=> "unable to take snapshot of #{vm}"}
+			end
+		else
+			{'success'=>false, 'message'=> "unable to take snapshot of #{vm} while it is running"}
+		end
+	else
+		{'success'=>false, 'message'=> "unable to find #{vm}"}
+	end
+ end
+
 
 
 # create the password hash to be fed to the set_password method

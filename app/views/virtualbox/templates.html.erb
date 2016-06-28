@@ -12,7 +12,7 @@
         <th>Active Port / range</th>
         <th>RDP</th>
         <th>Connect</th>
-        <th>Snapshot</th>
+        <th colspan="3">Snapshot</th>
         <th></th>
       </tr>
     </thead>
@@ -47,7 +47,9 @@
             <% end %>
 
         </td>
-        <td><%= vm['CurrentSnapshotName'] ? vm['CurrentSnapshotName'] : '-none-' %></td>
+        <td><%= vm['CurrentSnapshotName'] ? vm['CurrentSnapshotName'] : '-none-' %> </td>
+        <td><%= vm['CurrentSnapshotDescription'] ? vm['CurrentSnapshotDescription'].to_time : '-none-' %></td>
+        <td><%= link_to "Take new snapshot", "/manage_vm/take_snapshot/#{vm['name']}" if vm['VMState']!='running' %></td>
         <td>
         	<%= link_to "start", "/manage_vm/start/#{vm['name']}" if vm['VMState']!='running' %>
         	<%= link_to "stop", "/manage_vm/stop/#{vm['name']}" if vm['VMState']=='running'%>
@@ -59,5 +61,7 @@
 </div>
 <%= submit_tag('start', name:'do') %>
 <%= submit_tag('stop', name:'do') %>
+<%= submit_tag('take_snapshot', name:'do') %>
+
 
 <% end %>

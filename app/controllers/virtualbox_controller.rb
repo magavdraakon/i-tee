@@ -33,6 +33,9 @@ class VirtualboxController < ApplicationController
         else
           redirect_to :back, :flash=>{ error: "Unable to #{params[:do]} machines #{vms}"}
         end
+      rescue ActionController::RedirectBackError # cant redirect back? go to the list instead
+	      logger.info '\nNo :back error\n'
+	      redirect_to( virtualization_path )
 	end
 
 	def rdp_password
