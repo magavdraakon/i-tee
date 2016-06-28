@@ -24,21 +24,27 @@ def self.get_machines(state='', where={}, sort='')
     vms_info=[]
     vms.each do |vm|
     	add = true
-    	if where.key?(:name) && where[:name]!=''# check if name is similar
+
+	    if where.key?(:name) && where[:name]!=''# check if name is similar
     		add = vm.downcase.include? where[:name].downcase
     	end
+
     	if add
 	    	info = Virtualbox.get_vm_info(vm)  # get detiled info
-	    	if where.key?(:VRDEActiveConnection) # check if connection is active
+
+	    	if where.key?(:lab) && where[:lab]!='' # only for this lab
+		    	add = info['lab'] ? info['lab']['id'].to_i == where[:lab].to_i : false
+		    end
+	    	if add && where.key?(:group) && where[:group]!=''
+	    		add = info['groups'] ? info['groups'].any? {|group| group.downcase.include? where[:group].downcase} : false
+	    	end
+
+	    	if add && where.key?(:VRDEActiveConnection) # check if connection is active
 	    		if where[:VRDEActiveConnection]=="any"
-	    			add=true
+	    			add = true
 	    		else
 	    			add = where[:VRDEActiveConnection] == info['VRDEActiveConnection']
 	    		end
-	    	end
-
-	    	if add && where.key?(:group) && where[:group]!=''
-	    		add = info['groups'] ? info['groups'].any? {|group| group.downcase.include? where[:group].downcase} : false
 	    	end
 
 	    	vms_info << info if add
@@ -138,6 +144,20 @@ def self.get_vm_info(name)
 		# field-specific parsing
 		if vm['groups']
 			vm['groups'] = vm['groups'].split(',')
+			vmname = vm['groups'][0] ? vm['groups'][0].gsub('/', '').strip : '' # first group is machine name
+			if vmname!='' 
+				vmt = LabVmt.where('name=?', vmname).first
+				if vmt
+					vm.merge!(Lab.select('id, name').where("id=?", vmt.lab_id).first.as_json)
+				end
+			end
+			username = vm['groups'][1] ? vm['groups'][1].gsub('/', '').strip : '' # second group is user name
+			if username!='' 
+				user = User.select('id, username').where('username=?', username).first
+				if user
+					vm.merge!(user.as_json)
+				end
+			end
 		end
 
 		vm
