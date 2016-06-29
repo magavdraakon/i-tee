@@ -21,20 +21,20 @@ class ApplicationController < ActionController::Base
   def set_layout
     logger.info('REQUEST: ' + request.host)
     begin
-       ITee::Application.config.skins[request.host]
-    rescue
-      logger.info('No skin set for this host, trying to get default skin')
-      begin
-        ITee::Application.config.default_skin
-      rescue
-        logger.info('no default skin set in config, use EIK skin')
-        'EIK'
+      if ITee::Application.config.skins.key?(request.host)
+        return ITee::Application.config.skins[request.host]
       end
+    rescue
     end
 
-   # layout ITee::Application.config.skins[request.host] ? ITee::Application.config.skins[request.host]  : ITee::Application.config.default_skin ? ITee::Application.config.default_skin : 'EIK'
+    logger.info('No skin set for this host, trying to get default skin')
+    begin
+      return ITee::Application.config.default_skin
+    rescue
+      logger.info('no default skin set in config, use EIK skin')
+      return 'EIK'
+    end
   end
-
 
   def per_page
     @per_page = ITee::Application.config.per_page
