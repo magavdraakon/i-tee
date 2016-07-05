@@ -29,7 +29,7 @@ ITee::Application.configure do
   ENV['ENVIRONMENT']="#{ITee::Application.config.run_dir}/environment.sh"
 
   #Virtualbox User and command line for launching scripts
-  config.cmd_perfix = 'sudo -u vbox'
+  config.cmd_perfix = 'sudo -Hu vbox'
 
   # set log level to debug for development env
   config.log_level = :debug

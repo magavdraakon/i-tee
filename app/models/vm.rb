@@ -31,34 +31,34 @@ class Vm < ActiveRecord::Base
   if ITee::Application::config.respond_to? :cmd_perfix
     @exec_line = ITee::Application::config.cmd_perfix.chomp
   else
-    @exec_line = 'sudo -u vbox '
+    @exec_line = 'sudo -Hu vbox '
   end
 
 
   def del_vm
-     %x(sudo -u vbox #{Rails.root}/utils/delete_machine.sh #{name}  2>&1)
+     %x(sudo -Hu vbox #{Rails.root}/utils/delete_machine.sh #{name}  2>&1)
   end
   
   def poweroff_vm
     #TODO script .. pooleli
-     %x(sudo -u vbox #{Rails.root}/utils/stop_machine.sh #{name}  2>&1)
+     %x(sudo -Hu vbox #{Rails.root}/utils/stop_machine.sh #{name}  2>&1)
   end
   
   def poweron_vm
     #TODO script .. pooleli
-    %x("sudo -u vbox  #{Rails.root}/utils/poweron_machine.sh #{name}  2>&1".strip)
+    %x("sudo -Hu vbox  #{Rails.root}/utils/poweron_machine.sh #{name}  2>&1".strip)
   end
   
   def res_vm
-    %x(sudo -u vbox #{Rails.root}/utils/resume_machine.sh #{name}  2>&1)
+    %x(sudo -Hu vbox #{Rails.root}/utils/resume_machine.sh #{name}  2>&1)
   end
   
   def pau_vm
-    %x(sudo -u vbox #{Rails.root}/utils/pause_machine.sh #{name}  2>&1)
+    %x(sudo -Hu vbox #{Rails.root}/utils/pause_machine.sh #{name}  2>&1)
   end
 
   def res_rdp
-    info = %x(sudo -u vbox #{Rails.root}/utils/reset_vbox_rdp.sh #{name}  2>&1)
+    info = %x(sudo -Hu vbox #{Rails.root}/utils/reset_vbox_rdp.sh #{name}  2>&1)
     status= $?
     {status: status.exitstatus, answer: info}
   end
@@ -80,14 +80,14 @@ class Vm < ActiveRecord::Base
       rdp_host=`hostname -f`.strip
     end
     
-    runstr = "sudo -u vbox  #{Rails.root}/utils/start_machine.sh #{rdp_host} #{mac.ip} #{lab_vmt.vmt.image} #{name} #{password} #{ENV['ENVIRONMENT']} '#{user.name}' 2>&1"
+    runstr = "sudo -Hu vbox  #{Rails.root}/utils/start_machine.sh #{rdp_host} #{mac.ip} #{lab_vmt.vmt.image} #{name} #{password} #{ENV['ENVIRONMENT']} '#{user.name}' 2>&1"
     Rails.logger.debug "ini_vm: #{runstr}"
     %x(#{runstr})
     #%x("#{@exec_line}  #{Rails.root}/utils/start_machine.sh #{mac.mac} #{mac.ip} #{lab_vmt.vmt.image} #{name} #{password} 2>&1")
   end
   
   def state
-    ret = %x[sudo -u vbox /usr/bin/VBoxManage showvminfo #{name}|grep -E '^State:']
+    ret = %x[sudo -Hu vbox /usr/bin/VBoxManage showvminfo #{name}|grep -E '^State:']
     r = "#{ret}".split(' ')[1]
 
     #Rails.logger.warn ret.split(' ')[1]

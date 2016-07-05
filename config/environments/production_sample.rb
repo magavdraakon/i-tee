@@ -36,7 +36,7 @@ ITee::Application.configure do
   ENV['ENVIRONMENT']="#{ITee::Application.config.run_dir}/environment.sh"
 
   #Virtualbox User and command line for launching scripts
-  config.cmd_perfix = 'sudo -u vbox'
+  config.cmd_perfix = 'sudo -Hu vbox'
 
   # For nginx:
   # config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect'
