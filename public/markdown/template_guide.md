@@ -66,6 +66,15 @@ guest addidons can be done with remounting cdrom with exec options.
     mount -o remount,exec,ro /dev/cdrom
 
 
+
+###Disable apport
+
+On Ubuntu you can disable apport error lollecting and disable apport:
+
+```bash
+sed 's/enabled=1/enabled=0/' -i /etc/default/apport
+```
+
 ###Optional packages and settings
 
 
