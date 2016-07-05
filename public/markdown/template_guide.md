@@ -120,3 +120,15 @@ Tuning disk io for Ubuntu Guest
 
 1. mount partitions with noatime,nodiratime mount options (replaze UUID=XXXX to your disk blkid or name)
 UUID=XXXXXXX / ext4 defaults,noatime,nodiratime 0 1
+
+1. change disk scheduler to noop
+
+vim /etc/default/grub
+GRUB_CMDLINE_LINUX_DEFAULT="elevator=noop quiet"
+
+Tuning Host TODO
+===================================
+https://lonesysadmin.net/2013/12/22/better-linux-disk-caching-performance-vm-dirty_ratio/
+
+vm.dirty_background_ratio = 1
+vm.dirty_ratio = 80
