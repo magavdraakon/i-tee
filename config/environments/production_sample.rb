@@ -20,6 +20,7 @@ ITee::Application.configure do
   config.rdp_host = 'elab.itcollege.ee'
   # port prefix for rdp sessions
   config.rdp_port_prefix = '10'
+  config.rdp_password_length = 14
 
    # determine how many instances are shown per page
   config.per_page=15

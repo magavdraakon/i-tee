@@ -1,5 +1,15 @@
 ITee::Application.routes.draw do
 
+  match 'rdp_password', :to=>'virtualbox#rdp_password', via: [:get]
+  match 'rdp_password', :to=>'virtualbox#update_password', via: [:post]
+  match 'rdp_password', :to=>'virtualbox#remove_password', via: [:delete]
+
+  match 'virtualization', :to =>'virtualbox#index'
+  match 'templates', :to =>'virtualbox#templates'
+  match 'manage_vm/:do/:name', :to=>'virtualbox#manage_vm', via:[:get]
+  match 'manage_vm', :to=>'virtualbox#manage_vm', via:[:post]
+  match 'vm_details/:name', :to=>'virtualbox#vm_details'
+
   match 'jobs',:to=> 'home#jobs'
   match 'jobs/:id', :to=>'home#delete_job', via: [:delete]
   match 'jobs/:id', :to=>'home#run_job', via: [:put]

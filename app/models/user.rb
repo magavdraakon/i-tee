@@ -56,4 +56,37 @@ class User < ActiveRecord::Base
   def has_lab(lab_id)
     LabUser.where('user_id=? and lab_id=?', self.id, lab_id).count > 0 ? true : false
   end
+
+# RDP password for virtualbox
+
+  def set_rdp_password(password='')
+    if password.size < 1
+      logger.debug 'Generating new password'
+      chars = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+      password = ''
+      begin
+        pw_length = ITee::Application::config.rdp_password_length 
+      rescue
+        pw_length = 14
+      end
+      pw_length.times { |i| password << chars[rand(chars.length)] }
+    end
+    hash = Virtualbox.create_password_hash(self.username, password)
+    if hash
+      Virtualbox.set_password(hash)
+      # set for user
+      self.rdp_password=password
+      # save
+      self.save
+    end
+
+  end
+
+  def unset_rdp_password
+    Virtualbox.unset_password(self.username)
+    # unset for user
+    self.rdp_password=''
+    # save
+    self.save
+  end
 end
