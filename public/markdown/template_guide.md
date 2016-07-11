@@ -14,6 +14,8 @@ Simplest way to create Guest virtual machine is local VirtualBox installation.
 
 1. Enable RDP
 
+1. Enable external authentication for RDP
+
 1. Export virtual machine to .ova
 
 1. Copy .ova to server and import it using phpVirtualBox
@@ -45,9 +47,12 @@ apt-get autoremove
 apt-get clean
 ```
 
-Install gnome-session-flashback because unity don't work well with no 3D graphics accelerator
+Install gnome-session-flashback because unity don't work well with no 3D graphics accelerator or Mate desktop and switch off client side acceleration.
 
 
+TODO: disc scheduler to realtime
+
+TODO: /etc/fstab noatime,nodiratime
 
 
 TODO: zerofill and shrink disks
@@ -60,6 +65,15 @@ guest addidons can be done with remounting cdrom with exec options.
 
     mount -o remount,exec,ro /dev/cdrom
 
+
+
+###Disable apport
+
+On Ubuntu you can disable apport error lollecting and disable apport:
+
+```bash
+sed 's/enabled=1/enabled=0/' -i /etc/default/apport
+```
 
 ###Optional packages and settings
 
@@ -101,8 +115,20 @@ Writing LAB descriptions and materials
 ======================================
 https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet
 
-Tuning disk io for Guest
+Tuning disk io for Ubuntu Guest
 =================================
 
-1. mount partitions with noatime,nodiratime mount options
-2. remove  services
+1. mount partitions with noatime,nodiratime mount options (replaze UUID=XXXX to your disk blkid or name)
+UUID=XXXXXXX / ext4 defaults,noatime,nodiratime 0 1
+
+1. change disk scheduler to noop
+
+vim /etc/default/grub
+GRUB_CMDLINE_LINUX_DEFAULT="elevator=noop quiet"
+
+Tuning Host TODO
+===================================
+https://lonesysadmin.net/2013/12/22/better-linux-disk-caching-performance-vm-dirty_ratio/
+
+vm.dirty_background_ratio = 1
+vm.dirty_ratio = 80
