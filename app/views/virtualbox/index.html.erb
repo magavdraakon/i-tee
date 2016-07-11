@@ -2,6 +2,7 @@
 
 <%= form_tag('/virtualization', method: 'get') do %>
 	<label>Lab: <%= select_tag "where[lab]", options_from_collection_for_select(Lab.all, :id, :name, (params[:where] && params[:where][:lab] ? params[:where][:lab] : '') ), prompt: "Any lab" %></label>
+  <label>User: <%= select_tag "where[user]", options_from_collection_for_select(User.all, :id, :select_name, (params[:where] && params[:where][:user] ? params[:where][:user] : '') ), prompt: "Any user" %></label>
 
 	<label>Name: <%= text_field_tag 'where[name]', (params[:where] && params[:where][:name] ? params[:where][:name] : '') %></label>
 
@@ -26,7 +27,8 @@
     <thead>
       <tr>
       	<th style="width:1%; white-space: nowrap;"><label><%= check_box_tag 'toggle','', false,  :onclick=>'toggle_checked_all(this);', :id=>'toggle_u'  %><span> all</span></label></th>
-      	<th>Lab</th>
+      	<th>[id] Lab</th>
+        <th>[id] User</th>
         <th>Name</th>
         <th>Group</th>
         <th>State</th>
@@ -40,7 +42,8 @@
     <% @vms.each do |vm| %>
       <tr class="found">
       	<td><%= check_box_tag 'names[]', vm['name'] , false, :id=>"id_#{vm['name']}" %></td>
-      	<td><%= vm['lab'] ? vm['lab']['name'] : '-none-'%></td>
+      	<td><%= vm['lab'] ? "[#{vm['lab']['id']}] #{vm['lab']['name']}" : '-none-'%></td>
+        <td><%= vm['user'] ? "[#{vm['user']['id']}] #{vm['user']['name']}" : '-none-'%></td>
         <td><%= link_to vm['name'], "/vm_details/#{vm['name']}" %></td>
         <td><%= vm['groups'].join(', ') %></td>
         <td><%= vm['VMState'] %></td>

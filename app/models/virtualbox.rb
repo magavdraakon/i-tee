@@ -35,6 +35,9 @@ def self.get_machines(state='', where={}, sort='')
 	    	if where.key?(:lab) && where[:lab]!='' # only for this lab
 		    	add = info['lab'] ? info['lab']['id'].to_i == where[:lab].to_i : false
 		    end
+		    if where.key?(:user) && where[:user]!='' # only for this user
+		    	add = info['user'] ? info['user']['id'].to_i == where[:user].to_i : false
+		    end
 	    	if add && where.key?(:group) && where[:group]!=''
 	    		add = info['groups'] ? info['groups'].any? {|group| group.downcase.include? where[:group].downcase} : false
 	    	end
@@ -154,7 +157,7 @@ def self.get_vm_info(name, static=false)
 				end
 				username = vm['groups'][1] ? vm['groups'][1].gsub('/', '').strip : '' # second group is user name
 				if username!='' 
-					user = User.select('id, username').where('username=?', username).first
+					user = User.select('id, username, name').where('username=?', username).first
 					if user
 						vm.merge!(user.as_json)
 					end

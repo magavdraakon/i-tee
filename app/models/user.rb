@@ -15,6 +15,9 @@ class User < ActiveRecord::Base
   validates_format_of :username, :with => /^[[:alnum:]]+[[:alnum:]_]+[[:alnum:]]$/ , :message => 'can only be alphanumeric with and dashes with no spaces'
   validates_uniqueness_of :username, :email, :case_sensitive => false
 
+  def select_name
+    "[#{id}] #{name}"
+  end
 
   def del_labs
     logger.debug 'removing labs'
