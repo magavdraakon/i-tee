@@ -1,12 +1,12 @@
 class LabsController < ApplicationController  
   #users can see courses, running labs and end their OWN lab
-  before_filter :authorise_as_admin, :except => [:user_labs,:user_labs2, :start_lab, :end_lab, :restart_lab]
+  before_filter :authorise_as_admin, :except => [:user_labs, :start_lab, :end_lab, :restart_lab]
 
   #redirect to index view when trying to see unexisting things
   before_filter :get_lab, :only=>[:show, :edit, :update]
   # set the menu tab to show the user
-  before_filter :course_tab, :only=>[:user_labs,:user_labs2]
-  before_filter :admin_tab, :except=>[:user_labs,:user_labs2]
+  before_filter :course_tab, :only=>[:user_labs]
+  before_filter :admin_tab, :except=>[:user_labs]
     
   
   def get_lab

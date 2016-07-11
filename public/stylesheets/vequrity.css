@@ -239,7 +239,7 @@ ul.no-bullet {
     color:#ff0000 !important;
 }
 /* sidemenu hidden */
-.user_labs #content,.user_labs2 #content, .vms_by_state #content, .vms_by_lab #content, .labs.edit #content, .labs.new #content {
+.user_labs #content, .vms_by_state #content, .vms_by_lab #content, .labs.edit #content, .labs.new #content {
     padding-left:30px;
     position:relative;
 }
