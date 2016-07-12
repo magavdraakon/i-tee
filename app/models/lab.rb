@@ -10,7 +10,7 @@ class Lab < ActiveRecord::Base
   accepts_nested_attributes_for :lab_badges, :reject_if => :all_blank, :allow_destroy => true
   
   validates_presence_of :name, :short_description
-
+  validates_uniqueness_of :name
 #return all vms in this lab
   def vms
     lvs=[]
