@@ -391,8 +391,8 @@ end
             params: {
               hostname: rdp_host, 
               port: "#{rdp_port_prefix}#{port}".to_i, 
-              username: ITee::Application::config.guacamole_user,
-              password: ITee::Application::config.guacamole_pass, 
+              username: self.user.username,
+              password: self.password, 
              # :'color-depth' => 
               }
             }
