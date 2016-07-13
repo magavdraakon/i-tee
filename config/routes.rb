@@ -1,5 +1,9 @@
 ITee::Application.routes.draw do
 
+  match 'backup', :to=> 'home#backup', via: [ :get]
+  match 'import/:name', :to=> 'home#import', via: [ :get]
+  match 'export/:id', :to=> 'home#export', via: [ :get]
+
   match 'rdp_password', :to=>'virtualbox#rdp_password', via: [:get]
   match 'rdp_password', :to=>'virtualbox#update_password', via: [:post]
   match 'rdp_password', :to=>'virtualbox#remove_password', via: [:delete]

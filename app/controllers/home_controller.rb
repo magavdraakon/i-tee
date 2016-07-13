@@ -1,7 +1,51 @@
 class HomeController < ApplicationController
-  before_filter :authorise_as_admin, :only=>[:system_info, :template_info, :jobs, :delete_job, :run_job]
+  before_filter :authorise_as_admin, :only=>[:backup, :export, :import, :system_info, :template_info, :jobs, :delete_job, :run_job]
   before_filter :home_tab, :except=>[:about]
 
+  # ist labs and import/export links
+  def backup 
+    @labs = Lab.all
+    @import = ImportLabs.list_importable_labs
+    logger.debug "\nimport labs: #{@import}\n"
+  end
+
+  # import from folder
+  def import
+    if params[:name]
+      result =ImportLabs.import_from_folder(params[:name])
+      if result
+        if result[:success]
+          redirect_to backup_path, notice: result[:message]
+        else
+          redirect_to backup_path, alert: result[:message]
+        end
+      else
+        redirect_to backup_path, alert: 'import failed unexpectedly'
+      end
+    else
+      redirect_to backup_path, alert: 'No folder specified'
+    end
+  end
+
+  # export to folder
+  def export
+    if params[:id]
+      result = ImportLabs.export_lab(params[:id])
+
+      logger.debug result 
+      if result
+        if result[:success]
+          redirect_to backup_path, notice: result[:message]
+        else
+          redirect_to backup_path, alert: result[:message]
+        end
+      else
+        redirect_to backup_path, alert: 'export failed unexpectedly'
+      end
+    else
+      redirect_to backup_path, alert: 'No lab id specified'
+    end
+  end
 
   def index
   end

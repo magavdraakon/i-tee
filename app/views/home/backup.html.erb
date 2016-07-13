@@ -1,0 +1,59 @@
+<h2>Import / export labs</h2>
+<p>Place labs to be imported in: <%=ImportLabs.get_folder %><br/>
+Exported lab folders will be created in the same folder</p>
+<% unless @labs.empty? %>
+<div id="index_t">
+  <table>
+    <thead>
+      	<tr>
+      		<th>Lab name</th>
+      		<th>Last update</th>
+      		<th>Folder name</th>
+      		<th>Export time</th>
+      		<th></th>
+      	</tr>
+    </thead>
+    <tbody>
+    	<% @labs.each do |l| %>
+    		<% i = ImportLabs.get_lab_timestamp(l.name) %>
+    	<tr>
+    		<td><%= l.name %></td>
+    		<td style="<%= i[:time]=='' || i[:time] < l.updated_at ? 'background: skyblue;' : '' %>"><%= l.updated_at %></td>
+    		<td><%= i[:folder] %></td>
+	    	<td style="<%= i[:time]!='' && i[:time] > l.updated_at ? 'background: skyblue;' : '' %>"><%= i[:time] %></td>
+    		<td>
+    			<%= link_to 'import',  '/import/'+ i[:folder] if i[:folder]!='-none-'%> 
+    			<%= link_to 'export', '/export/'+ l.id.to_s %>
+    			
+    		</td>
+    	</tr>
+    	<% end %>
+    </tbody>
+  </table>
+</div>
+<% else %>
+	-no labs-
+<% end %>
+<% unless @import.empty? %>
+	<h3>Labs to import</h3>
+	<div id="index_t">
+	  <table>
+	    <thead>
+	      	<tr>
+	      		<th>Folder name</th>
+	      		<th>Export time</th>
+	      		<th></th>
+	      	</tr>
+	    </thead>
+	    <tbody>
+	    	<% @import.each do |i| %>
+	    	<tr>
+	    		<td><%= i[:folder] %></td>
+	    		<td><%= i[:time] %></td>
+	    		<td><%= link_to 'import'  '/import/'+ i[:folder] %></td>
+	    	</tr>
+	    	<% end %>
+	    </tbody>
+	  </table>
+	</div>
+<% end %>
