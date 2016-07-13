@@ -41,6 +41,8 @@ ITee::Application.configure do
 
   # place for temporal files like VM customization files
   config.run_dir = '/var/labs/run'
+  # place for lab export / import jsons
+  config.export_location= '/var/labs/exports'
 
   # envidonment for bash scripts executed by rails
   ENV['ENVIRONMENT']="#{ITee::Application.config.run_dir}/environment.sh"
