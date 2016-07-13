@@ -1,7 +1,7 @@
 class HomeController < ApplicationController
   before_filter :authorise_as_admin, :only=>[:backup, :export, :import, :system_info, :template_info, :jobs, :delete_job, :run_job]
   before_filter :home_tab, :except=>[:about]
-
+  require 'zip'
   # ist labs and import/export links
   def backup 
     @labs = Lab.all
