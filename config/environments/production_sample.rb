@@ -39,14 +39,17 @@ ITee::Application.configure do
   config.default_skin = configFile.key?('skin') ? configFile['skin'] : 'EIK'
   config.skins = { 'host1'=> 'EIK'}
 
-  #place for temporar files like VM customization files
+  # place for temporal files like VM customization files
   config.run_dir = '/var/labs/run'
 
-  #envidonment for bash scripts executed by rails
+  # envidonment for bash scripts executed by rails
   ENV['ENVIRONMENT']="#{ITee::Application.config.run_dir}/environment.sh"
 
-  #Virtualbox User and command line for launching scripts
+  # Virtualbox user and command line for launching scripts
   config.cmd_perfix = 'sudo -Hu vbox'
+
+  # Location for exported labs
+  config.export_location = '/var/labs/export'
 
   # For nginx:
   # config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect'
