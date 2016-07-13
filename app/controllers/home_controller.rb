@@ -47,6 +47,47 @@ class HomeController < ApplicationController
     end
   end
 
+  def download_export
+    if params[:name]
+      #Attachment name
+      filename = params[:name]+'.zip'
+      temp_file = Tempfile.new(filename)
+      dir = Rails.configuration.export_location ? Rails.configuration.export_location : '/var/labs/exports'
+      dirname =  dir+'/'+params[:name]
+      begin
+        #This is the tricky part
+        #Initialize the temp file as a zip file
+        input_filenames = ['lab.json', 'timestamp.txt', 'host.json', 'lab_vmts.json']
+        Zip::OutputStream.open(temp_file) { |zos| }
+       
+        #Add files to the zip file as usual
+        Zip::File.open(temp_file.path, Zip::File::CREATE) do |zip|
+          #Put files in here
+          input_filenames.each do |filename|
+            # Two arguments:
+            # - The name of the file as it will appear in the archive
+            # - The original file, including the path to find it
+            zip.add(filename, dirname + '/' + filename)
+          end
+        end
+       
+        #Read the binary data from the file
+        zip_data = File.read(temp_file.path)
+       
+        #Send the data to the browser as an attachment
+        #We do not send the file directly because it will
+        #get deleted before rails actually starts sending it
+        send_data(zip_data, :type => 'application/zip', :filename => filename)
+      ensure
+        #Close and delete the temp file
+        temp_file.close
+        temp_file.unlink
+      end
+    else 
+      redirect_to backup_path, alert: 'No folder specified'
+    end
+  end
+
   def index
   end
 
