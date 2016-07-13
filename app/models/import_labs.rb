@@ -221,12 +221,15 @@ def self.export_lab_separate(id)
 		end
 		dirname = @@dir+'/'+l.name.gsub(' ', '_')
 		# check if folder exists
-		unless File.exists?(dirname) && File.directory?(dirname)
+		unless File.directory?(dirname)
 			# make folder
-			info = %x(sudo -u vbox mkdir #{dirname} )
-			status = $?
-			unless status.exitstatus===0
-				return {success: false, message: "Unable to create folder #{dirname}"}
+			begin
+				Dir.mkdir(dirname) 
+				#info = %x(sudo -u vbox mkdir #{dirname} )
+				#status = $?
+				#unless status.exitstatus===0
+			rescue Exception => e
+				return {success: false, message: "Unable to create folder #{dirname} - #{e.message}"}
 			end
 		end
 		# write to file
@@ -293,10 +296,13 @@ def self.export_lab(id)
 		# check if folder exists
 		unless File.directory?(dirname)
 			# make folder
-			info = %x(sudo -u vbox mkdir #{dirname} )
-			status = $?
-			unless status.exitstatus===0
-				return {success: false, message: "Unable to create folder #{dirname}"}
+			begin
+				Dir.mkdir(dirname) 
+				#info = %x(sudo -u vbox mkdir #{dirname} )
+				#status = $?
+				#unless status.exitstatus===0
+			rescue Exception => e
+				return {success: false, message: "Unable to create folder #{dirname} - #{e.message}"}
 			end
 		end
 		# write to file
