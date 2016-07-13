@@ -158,7 +158,7 @@ def self.import_from_folder(foldername)
 								return {success: false, message: "lab vmt can not be updated #{lvmt['name']}"}
 							end
 						else
-							lab_vmt = Vmt.new(lvmt)
+							lab_vmt = LabVmt.new(lvmt)
 							unless lab_vmt.save
 								return {success: false, message: "lab vmt can not be created #{lvmt['name']}"}
 							end
