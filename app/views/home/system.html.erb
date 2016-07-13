@@ -6,7 +6,7 @@
 
 <p>Passenger info:</p>
 <p>
-  <%output=%x(/var/www/railsapps/i-tee/utils/info.sh 2>&1)
+  <%output=%x(utils/info.sh 2>&1)
     group=output.split(' ')[3]
     user= output.split(' ')[2]
     user='nobody' if user=='root'%>
@@ -14,8 +14,8 @@
   group: <%= group%>
 </p>
 <p>
-  Number of virtual machines total: <%=%x(sudo -u vbox /usr/bin/VBoxManage list vms|wc -l)%><br/>
-  Number of running virtual machines: <%=%x(sudo -u vbox /usr/bin/VBoxManage list runningvms|wc -l)%></p>
+  Number of virtual machines total: <%=%x(sudo -Hu vbox /usr/bin/VBoxManage list vms|wc -l)%><br/>
+  Number of running virtual machines: <%=%x(sudo -Hu vbox /usr/bin/VBoxManage list runningvms|wc -l)%></p>
   Memory information [GB]<hr>
   <pre><%=%x(free -g)%></pre>
   Disk information<hr>

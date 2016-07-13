@@ -18,7 +18,7 @@ File.open(path, 'w+') { |f|
   if ITee::Application::config.respond_to? :cmd_perfix
     exec_line = ITee::Application::config.cmd_perfix
   else
-    exec_line = 'sudo -u vbox '
+    exec_line = 'sudo -Hu vbox '
   end
 
   f.write("export CMD_LINE='#{exec_line}'\n")
