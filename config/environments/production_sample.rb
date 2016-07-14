@@ -50,9 +50,6 @@ ITee::Application.configure do
   # Virtualbox user and command line for launching scripts
   config.cmd_perfix = 'sudo -Hu vbox'
 
-  # Location for exported labs
-  config.export_location = '/var/labs/export'
-
   # For nginx:
   # config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect'
 

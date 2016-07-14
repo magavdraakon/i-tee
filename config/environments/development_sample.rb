@@ -33,9 +33,6 @@ ITee::Application.configure do
   # Virtualbox user and command line for launching scripts
   config.cmd_perfix = 'sudo -Hu vbox'
 
-  # Location for exported labs
-  config.export_location = '/var/labs/export'
-
   # set log level to debug for development env
   config.log_level = :debug
 
