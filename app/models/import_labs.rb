@@ -225,7 +225,7 @@ def self.export_lab_separate(id)
 			# make folder
 			begin
 				Dir.mkdir(dirname) 
-				#info = %x(sudo -u vbox mkdir #{dirname} )
+				#info = %x(sudo -Hu vbox mkdir #{dirname} )
 				#status = $?
 				#unless status.exitstatus===0
 			rescue Exception => e
@@ -298,7 +298,7 @@ def self.export_lab(id)
 			# make folder
 			begin
 				Dir.mkdir(dirname) 
-				#info = %x(sudo -u vbox mkdir #{dirname} )
+				#info = %x(sudo -Hu vbox mkdir #{dirname} )
 				#status = $?
 				#unless status.exitstatus===0
 			rescue Exception => e

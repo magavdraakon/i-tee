@@ -57,7 +57,7 @@ def self.get_machines(state='', where={}, sort='')
 end
 
 def self.running_machines
-	info = %x(sudo -u vbox VBoxManage list runningvms | cut -f1 -d' '| tr -d '"' )
+	info = %x(sudo -Hu vbox VBoxManage list runningvms | cut -f1 -d' '| tr -d '"' )
 	status= $?
 	#logger.debug info
 	if status.exitstatus===0
@@ -75,7 +75,7 @@ def self.stopped_machines
 end
 
 def self.all_machines
-	info = %x(sudo -u vbox VBoxManage list vms | cut -f1 -d' '| tr -d '"' )
+	info = %x(sudo -Hu vbox VBoxManage list vms | cut -f1 -d' '| tr -d '"' )
 	status = $?
 	#logger.debug info
 	if status.exitstatus===0
@@ -86,7 +86,7 @@ def self.all_machines
 end
 
 def self.template_machines
-	info = %x(sudo -u vbox VBoxManage list vms | grep template|cut -d' ' -f1|tr '"' ' ')
+	info = %x(sudo -Hu vbox VBoxManage list vms | grep template|cut -d' ' -f1|tr '"' ' ')
 	status= $?
 	#logger.debug info
 	if status.exitstatus===0
@@ -97,7 +97,7 @@ def self.template_machines
 end
 
 def self.get_vm_info(name, static=false)
-	info = %x(sudo -u vbox VBoxManage showvminfo #{name} --machinereadable )
+	info = %x(sudo -Hu vbox VBoxManage showvminfo #{name} --machinereadable )
 	status = $?
 	#logger.debug info
 	vm = {}
@@ -245,7 +245,7 @@ def self.get_all_rdp(user, port)
   end
 
  def self.start_vm(vm)
- 	info = %x(sudo -u vbox VBoxManage startvm #{vm} --type headless  2>&1)
+ 	info = %x(sudo -Hu vbox VBoxManage startvm #{vm} --type headless  2>&1)
 	status= $?
 	#logger.debug info
 	#logger.debug status
@@ -261,7 +261,7 @@ def self.get_all_rdp(user, port)
  end
 
  def self.stop_vm(vm)
- 	info = %x(sudo -u vbox VBoxManage controlvm #{vm} poweroff 2>&1)
+ 	info = %x(sudo -Hu vbox VBoxManage controlvm #{vm} poweroff 2>&1)
 	status= $?
 	#logger.debug info
 	#logger.debug status
@@ -285,12 +285,12 @@ def self.get_all_rdp(user, port)
  end
 
  def self.reset_vm_rdp(vm)
- 	info = %x(sudo -u vbox VBoxManage controlvm #{vm} vrde off 2>&1)
+ 	info = %x(sudo -Hu vbox VBoxManage controlvm #{vm} vrde off 2>&1)
 	status= $?
 	#logger.debug info
 	#logger.debug status
 	if status.exitstatus===0
-		info = %x(sudo -u vbox VBoxManage controlvm #{vm} vrde on 2>&1)
+		info = %x(sudo -Hu vbox VBoxManage controlvm #{vm} vrde on 2>&1)
 		status= $?
 		#logger.debug info
 		#logger.debug status
@@ -320,7 +320,7 @@ def self.get_all_rdp(user, port)
 	 		nr = info['CurrentSnapshotName'] ? info['CurrentSnapshotName'].gsub("#{vmname}-",'').gsub('-template','').to_i+1 : 1
 		 	name = "#{vmname}-#{nr}-template"
 
-		 	info = %x(sudo -u vbox VBoxManage snapshot #{vm} take #{name} --description "#{Time.now}" )
+		 	info = %x(sudo -Hu vbox VBoxManage snapshot #{vm} take #{name} --description "#{Time.now}" )
 			status= $?
 			logger.debug info
 			logger.debug status
@@ -341,7 +341,7 @@ def self.get_all_rdp(user, port)
 
 # create the password hash to be fed to the set_password method
 def self.create_password_hash(username, password)
-	info = %x(sudo -u vbox VBoxManage internalcommands passwordhash #{password} | cut -f 3 -d' ')
+	info = %x(sudo -Hu vbox VBoxManage internalcommands passwordhash #{password} | cut -f 3 -d' ')
 	status= $?
 	#logger.debug info
 	if status.exitstatus===0
@@ -355,13 +355,13 @@ end
 # set password for vms
 # TODO: allow sending a list of vm-s instead of applying to all machines
 def self.set_password(hash)
-	info = %x(sudo -u vbox VBoxManage list vms| cut -f1 -d' '| tr -d '"' )
+	info = %x(sudo -Hu vbox VBoxManage list vms| cut -f1 -d' '| tr -d '"' )
 	status = $?
 	error=false
 	# logger.debug info
 	info.split(/\n+/).each do |line|
 		#puts "vm is: #{line}"
-		ex = %x(sudo -u vbox VBoxManage setextradata #{line} #{hash})
+		ex = %x(sudo -Hu vbox VBoxManage setextradata #{line} #{hash})
 		st = $?
 		#puts line
 		#puts st
@@ -376,13 +376,13 @@ def self.set_password(hash)
 end
 
 def self.unset_password(username)
-	info = %x(sudo -u vbox VBoxManage list vms| cut -f1 -d' '| tr -d '"' )
+	info = %x(sudo -Hu vbox VBoxManage list vms| cut -f1 -d' '| tr -d '"' )
 	status = $?
 	error=false
 	# logger.debug info
 	info.split(/\n+/).each do |line|
 		#puts "vm is: #{line}"
-		ex = %x(sudo -u vbox VBoxManage setextradata #{line} VBoxAuthSimple/users/#{username} )
+		ex = %x(sudo -Hu vbox VBoxManage setextradata #{line} VBoxAuthSimple/users/#{username} )
 		st = $?
 		#puts line
 		#puts st
