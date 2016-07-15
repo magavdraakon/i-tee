@@ -46,8 +46,6 @@ ITee::Application.configure do
   config.guacamole_user_prefix = 'dev'
 
   config.guacamole_host = ''
-  config.guacamole_user = ''
-  config.guacamole_pass = ''
   config.guacamole_max_connections = ''
   config.guacamole_max_connections_per_user = ''
 
