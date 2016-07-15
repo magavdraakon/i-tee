@@ -6,7 +6,7 @@ group :development, :test do
     gem 'railroady'
     gem 'test-unit'
     gem 'sqlite3', :require => 'sqlite3'
-    gem 'mysql2' # for guacamole
+    gem 'mysql2', '~> 0.3.11' # for guacamole
 end
 
 # Bundle edge Rails instead:
