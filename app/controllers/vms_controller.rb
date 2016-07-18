@@ -458,12 +458,12 @@ end
         cookies[:GUAC_AUTH] = {
           value: result[:token],
           #expires: 1.hour.from_now,
-          domain: result[:domain] #%w(rangeforce.com), # %w(.example.com .example.org)
-          #path: '/guacamole',
+          domain: result[:domain], #%w(rangeforce.com), # %w(.example.com .example.org)
+          path: URI(ITee::Application::config.guacamole_host).path,
           #:secure,
           #:httponly
         }
-        #redirect to url https://xxx.yyy.com/guacamole/#/client/zzz
+        #redirect to url https://xxx.yyy.com/#/client/zzz
         redirect_to( result[:url] )
       }
       format.json  { render :json => result }

@@ -441,13 +441,12 @@ end
             return {success: false, message: 'unable to allow connection in guacamole'} 
           end
           # log in 
-          # puts ITee::Application::config.guacamole_host+"/guacamole/api/tokens"
-          post = Http.post(ITee::Application::config.guacamole_host+"/guacamole/api/tokens", {username: self.lab_user.g_username, password:self.lab_user.g_password})
-          # puts post.body
+          # puts ITee::Application::config.guacamole_host+"/api/tokens"
+          post = Http.post(ITee::Application::config.guacamole_host+"/api/tokens", { username: self.lab_user.g_username, password: self.lab_user.g_password })
           if post.body && post.body['authToken']
             # get machine url
             uri = Guacamole.get_url(self.g_connection)
-            path = ITee::Application::config.guacamole_host+"/guacamole/#/client/#{uri}"
+            path = ITee::Application::config.guacamole_host+"/#/client/#{uri}"
             { success: true, url: path, token: post.body, domain: ITee::Application::config.domain}
           else
             {success: false, message: 'unable to log in'}
