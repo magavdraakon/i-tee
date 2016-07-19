@@ -68,9 +68,13 @@ end
 
   def self.request( method, path, params = {})
     #params.merge!({:auth_token=> self.token }) # always add admin token
+    unless path.starts_with?('https://') || path.starts_with?('http://')
+      path = "http://"+path
+    end
     uri = URI.parse(path)
     http = Net::HTTP.new(uri.host, uri.port)
       
+
     if path.starts_with?('https://')
       http.use_ssl = true
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE # TODO: IMPORTANT!! read into this
