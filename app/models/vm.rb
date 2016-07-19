@@ -354,25 +354,58 @@ end
     if self.state=='running'
       if self.lab_vmt.allow_remote && self.lab_vmt.guacamole_type!="none"
         port = self.mac ? self.mac.ip.split('.').last : ''
+        
         begin
           rdp_host=ITee::Application.config.rdp_host
         rescue
           rdp_host=`hostname -f`.strip
         end
+        
         begin
           rdp_port_prefix = ITee::Application.config.rdp_port_prefix
         rescue
           rdp_port_prefix = '10'
         end
+
+        begin
+          user_prefix = ITee::Application.config.guacamole_user_prefix
+        rescue
+          user_prefix = 'dev-' # TODO 
+        end
+
+        begin
+          max_connections = ITee::Application::config.guacamole_max_connections
+        rescue
+          max_connections = 10
+        end
+
+        begin
+          max_user_connections = ITee::Application::config.guacamole_max_connections_per_user
+        rescue
+          max_user_connections = 10
+        end
+
+        begin
+          guacamole_host = ITee::Application::config.guacamole_host
+        rescue
+          guacamole_host = `hostname -f`.strip
+        end
+
+        begin
+          domain = ITee::Application::config.domain
+        rescue
+          domain = 'hostname -d' # TODO get uri without subdomain ie 'rangeforce.com'
+        end
+
         # check if the labuser has a guacamole user
-        unless self.lab_user.g_user && Guacamole.find_user_by_id(self.lab_user.g_user)
+        unless self.lab_user.g_user && GuacamoleUser.find(self.lab_user.g_user)
           # create user
-          self.lab_user.g_username = ITee::Application.config.guacamole_user_prefix+"#{self.lab_user.id}"
+          self.lab_user.g_username = user_prefix+"#{self.lab_user.id}"
           self.lab_user.g_password = SecureRandom.base64
-          result = Guacamole.insert_user(self.lab_user.g_username, self.lab_user.g_password)
-          if result[:id] && result[:id]>0
+          result = GuacamoleUser.create(username: self.lab_user.g_username, password_hash: self.lab_user.g_password, timezone: 'Etc/GMT+0')
+          if result
             # save to labuser
-            self.lab_user.g_user = result[:id]
+            self.lab_user.g_user = result.user_id
             self.lab_user.save
           else 
             logger.debug result
@@ -380,51 +413,57 @@ end
           end
         end # has no user
         # check if there is a connection
-        unless self.g_connection && Guacamole.find_connection_by_id(self.g_connection)
+        unless self.g_connection && GuacamoleConnection.find(self.g_connection)
           # create connection
           # data format {connection_name, protocol, max_connections, max_connections_per_user, params {hostname, port, username, password, color-depth}}
-          data = {
-            connection_name:  ITee::Application.config.guacamole_user_prefix+self.name, 
+          
+          result = GuacamoleConnection.create( connection_name: user_prefix+self.name, 
             protocol: self.lab_vmt.guacamole_type , 
-            max_connections: ITee::Application::config.guacamole_max_connections, 
-            max_connections_per_user: ITee::Application::config.guacamole_max_connections_per_user, 
-            params: {
-              hostname: rdp_host, 
-              port: "#{rdp_port_prefix}#{port}".to_i, 
-              username: self.user.username,
-              password: self.password, 
-             # :'color-depth' => 
-              }
-            }
-          result = Guacamole.insert_connection(data)
-          if result[:id] && result[:id]>0
-            self.g_connection = result[:id]
+            max_connections: max_connections, 
+            max_connections_per_user: max_user_connections )
+          
+          if result
+            result.add_parameters([
+              { parameter_name: 'hostname', parameter_value: rdp_host }, 
+              {parameter_name: 'port', parameter_value: "#{rdp_port_prefix}#{port}".to_i}, 
+              {parameter_name: 'username', parameter_value: self.user.username},
+              {parameter_name: 'password', parameter_value: self.password}, 
+             #{ parameter_name: 'color-depth', : 255 }
+              ])
+            self.g_connection = result.connection_id
             self.save
-            
           else
             logger.debug result
             return {success: false, message: 'unable to create connection in guacamole'} 
           end
         else # connection existed
           #the port had changed?- change row where connection id is x and parameter is 'port'
-          result = Guacamole.update_parameter(self.g_connection, 'port', "#{rdp_port_prefix}#{port}".to_i)
-          # puts result
-        end # has no connection
+          # find parameter 
+          param = GuacamoleConnectionParameter.where("connection_id=? and parameter_name=?", self.g_connection, 'port').first
+          if param #update
+            GuacamoleConnectionParameter.where("connection_id=? and parameter_name=?", self.g_connection, 'port').limit(1).update_all(parameter_value: "#{rdp_port_prefix}#{port}".to_i)
+          else # create
+            GuacamoleConnectionParameter.create(connection_id: self.g_connection, parameter_name: 'port', parameter_value: "#{rdp_port_prefix}#{port}".to_i )
+          end
+          
+        end #EOF connection check
         # check if the connection persist/has been created
         if self.g_connection
-          # allow connection
-          result = Guacamole.allow_connection(self.lab_user.g_user, self.g_connection)
-          unless result[:id] && result[:id]>0
-            return {success: false, message: 'unable to allow connection in guacamole'} 
+          # allow connection if none exists
+          permission = GuacamoleConnectionPermission.where("user_id=? and connection_id=? and permission=?", self.lab_user.g_user, self.g_connection, 'READ').first
+          unless permission # if no permission, create one
+            result = GuacamoleConnectionPermission.create(user_id: self.lab_user.g_user, connection_id: self.g_connection, permission: 'READ')
+            unless result
+              return {success: false, message: 'unable to allow connection in guacamole'} 
+            end
           end
           # log in 
-          # puts ITee::Application::config.guacamole_host+"/api/tokens"
-          post = Http.post(ITee::Application::config.guacamole_host+"/api/tokens", { username: self.lab_user.g_username, password: self.lab_user.g_password })
+          post = Http.post(guacamole_host+"/api/tokens", {username: self.lab_user.g_username, password:self.lab_user.g_password})
           if post.body && post.body['authToken']
             # get machine url
-            uri = Guacamole.get_url(self.g_connection)
-            path = ITee::Application::config.guacamole_host+"/#/client/#{uri}"
-            { success: true, url: path, token: post.body, domain: ITee::Application::config.domain}
+            uri = GuacamoleConnection.get_url(self.g_connection)
+            path = guacamole_host+"/#/client/#{uri}"
+            { success: true, url: path, token: post.body, domain: domain}
           else
             {success: false, message: 'unable to log in'}
           end
