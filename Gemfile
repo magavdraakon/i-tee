@@ -27,6 +27,9 @@ gem 'marked-rails'
 # https://github.com/collectiveidea/delayed_job
 gem 'delayed_job_active_record'
 
+# Use passenger as web server
+gem 'passenger'
+
 # Use unicorn as the web server
 # gem 'unicorn'
 

@@ -33,13 +33,10 @@ curl http://download.virtualbox.org/virtualbox/debian/oracle_vbox_2016.asc | apt
 apt-get update
 
 
-apt-get install -y sudo apache2 libapache2-mod-php7.0 php-soap php-xml virtualbox-5.0
+apt-get install -y sudo apache2 libapache2-mod-php7.0 php-soap php-xml virtualbox-5.0 \
+                   libyaml-0-2 libgmp-dev libmysqlclient-dev libsqlite3-dev
 
-
-a2enmod rewrite headers
-rm /etc/apache2/sites-enabled/*
-echo "Listen 80" > /etc/apache2/ports.conf
-echo "Listen 4433" >> /etc/apache2/ports.conf
+gem install bundler
 
 
 ### Setup users and persissions
@@ -81,6 +78,8 @@ VBoxManage extpack install "/tmp/Oracle_VM_VirtualBox_Extension_Pack-$SUBVERSION
 sed "s@var \$password = 'pass';@var \$password = '$VBOX_PASSWD';@" \
 	/var/www/phpvirtualbox/config.php-example > /var/www/phpvirtualbox/config.php
 
+echo > /etc/apache2/ports.conf
+rm /etc/apache2/sites-enabled/*
 a2ensite phpvirtualbox
 
 
@@ -93,29 +92,11 @@ then
 
 	apt-get install -y git
 
+else
+
+	cp /var/www/i-tee/config/environments/production_sample.rb \
+		 /var/www/i-tee/config/environments/production.rb
+
 fi
 
-
-# FIXME: ensure that all these packages are really needed
-apt-get install -y apache2-dev libapr1-dev libaprutil1-dev libcurl4-openssl-dev \
-                   libgmp-dev libmysqlclient-dev libreadline-dev libsqlite3-dev \
-                   libssl-dev libxml2-dev libxslt1-dev libyaml-dev sqlite3 zlib1g-dev
-
-# Deep Magic below
-
-#./gen_config.sh
-
-cp /var/www/i-tee/config/environments/production_sample.rb \
-	/var/www/i-tee/config/environments/production.rb
-
-gem install bundler passenger
-
-cd /var/www/i-tee
-bundle install
-
-passenger-install-apache2-module --snippet > /etc/apache2/mods-available/passenger.load
-a2enmod passenger
-
-passenger-install-apache2-module -a --languages ruby
-a2ensite i-tee
 
