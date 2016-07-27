@@ -36,15 +36,16 @@ ITee::Application.configure do
   # set log level to debug for development env
   config.log_level = :debug
 
-  # master domain name for setting universal cookies for the subdomains
-  config.domain = ''
-
   # Guacamole configuration
-  config.guacamole_user_prefix = 'dev'
+  config.guacamole = {
+    cookie_domain: '',
+    user_prefix: 'dev',
+    url_prefix: '',
+    rdp_host: '',
+    max_connections: 5,
+    max_connections_per_user: 2
+  }
 
-  config.guacamole_host = ''
-  config.guacamole_max_connections = 5
-  config.guacamole_max_connections_per_user = 2
 
   # In the development environment your application's code is reloaded on
   # every request.  This slows down response time but is perfect for development

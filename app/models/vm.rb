@@ -376,49 +376,24 @@ end
     # check if vm has guacamole enabled
     if self.state=='running'
       if self.lab_vmt.allow_remote && self.lab_vmt.guacamole_type!="none"
+
         port = self.mac ? self.mac.ip.split('.').last : ''
-        
-        begin
-          rdp_host=ITee::Application.config.rdp_host
-        rescue
-          rdp_host=`hostname -f`.strip
-        end
-        
-        begin
-          rdp_port_prefix = ITee::Application.config.rdp_port_prefix
-        rescue
-          rdp_port_prefix = '10'
-        end
+        rdp_port_prefix = ITee::Application.config.rdp_port_prefix
+        rdp_port = "#{rdp_port_prefix}#{port}".to_i
 
+        user_prefix = ITee::Application.config.guacamole[:user_prefix]
+        max_connections = ITee::Application::config.guacamole[:max_connections]
+        max_user_connections = ITee::Application::config.guacamole[:max_connections_per_user]
+        url_prefix = ITee::Application::config.guacamole[:url_prefix]
         begin
-          user_prefix = ITee::Application.config.guacamole_user_prefix
+          rdp_host = ITee::Application::config.guacamole[:rdp_host]
         rescue
-          user_prefix = 'dev-' # TODO 
+          logger.warn "RDP host for Guacamole not specified"
+          rdp_host = ITee::Application::config.rdp_host
         end
+        cookie_domain = ITee::Application::config.guacamole[:cookie_domain]
 
-        begin
-          max_connections = ITee::Application::config.guacamole_max_connections
-        rescue
-          max_connections = 10
-        end
 
-        begin
-          max_user_connections = ITee::Application::config.guacamole_max_connections_per_user
-        rescue
-          max_user_connections = 10
-        end
-
-        begin
-          guacamole_host = ITee::Application::config.guacamole_host
-        rescue
-          guacamole_host = `hostname -f`.strip
-        end
-
-        begin
-          domain = ITee::Application::config.domain
-        rescue
-          domain = 'hostname -d' # TODO get uri without subdomain ie 'rangeforce.com'
-        end
 
         # check if the labuser has a guacamole user
         unless self.lab_user.g_user && GuacamoleUser.find(self.lab_user.g_user)
@@ -447,12 +422,12 @@ end
           
           if result
             result.add_parameters([
-              { parameter_name: 'hostname', parameter_value: rdp_host }, 
-              {parameter_name: 'port', parameter_value: "#{rdp_port_prefix}#{port}".to_i}, 
-              {parameter_name: 'username', parameter_value: self.user.username},
-              {parameter_name: 'password', parameter_value: self.password}, 
-             #{ parameter_name: 'color-depth', : 255 }
-              ])
+              { parameter_name: 'hostname', parameter_value: rdp_host },
+              { parameter_name: 'port', parameter_value: rdp_port },
+              { parameter_name: 'username', parameter_value: self.user.username },
+              { parameter_name: 'password', parameter_value: self.password },
+#             { parameter_name: 'color-depth', parameter_value: 255 }
+            ])
             self.g_connection = result.connection_id
             self.save
           else
@@ -464,9 +439,9 @@ end
           # find parameter 
           param = GuacamoleConnectionParameter.where("connection_id=? and parameter_name=?", self.g_connection, 'port').first
           if param #update
-            GuacamoleConnectionParameter.where("connection_id=? and parameter_name=?", self.g_connection, 'port').limit(1).update_all(parameter_value: "#{rdp_port_prefix}#{port}".to_i)
+            GuacamoleConnectionParameter.where("connection_id=? and parameter_name=?", self.g_connection, 'port').limit(1).update_all(parameter_value: rdp_port)
           else # create
-            GuacamoleConnectionParameter.create(connection_id: self.g_connection, parameter_name: 'port', parameter_value: "#{rdp_port_prefix}#{port}".to_i )
+            GuacamoleConnectionParameter.create(connection_id: self.g_connection, parameter_name: 'port', parameter_value: rdp_port )
           end
           
         end #EOF connection check
@@ -481,12 +456,12 @@ end
             end
           end
           # log in 
-          post = Http.post(guacamole_host+"/api/tokens", {username: self.lab_user.g_username, password:self.lab_user.g_password})
+          post = Http.post(url_prefix + "/api/tokens", {username: self.lab_user.g_username, password:self.lab_user.g_password})
           if post.body && post.body['authToken']
             # get machine url
             uri = GuacamoleConnection.get_url(self.g_connection)
-            path = guacamole_host+"/#/client/#{uri}"
-            { success: true, url: path, token: post.body, domain: domain}
+            path = url_prefix + "/#/client/#{uri}"
+            { success: true, url: path, token: post.body, domain: cookie_domain}
           else
             {success: false, message: 'unable to log in'}
           end
