@@ -459,7 +459,7 @@ end
           value: result[:token],
           #expires: 1.hour.from_now,
           domain: result[:domain], #%w(rangeforce.com), # %w(.example.com .example.org)
-          path: URI(ITee::Application::config.guacamole_host).path,
+          path: URI(ITee::Application::config.guacamole[:url_prefix]).path,
           #:secure,
           #:httponly
         }

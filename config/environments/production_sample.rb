@@ -55,14 +55,20 @@ ITee::Application.configure do
 
   # Guacamole configuration
   if configFile.key?('guacamole')
-    config.guacamole_user_prefix = configFile['guacamole'].key?('prefix') ?
-                                   configFile['guacamole']['prefix'] : 'dev'
-
-    config.guacamole_host = configFile['guacamole']['host']
+    config.guacamole = {
+      user_prefix: configFile['guacamole'].key?('prefix') ?
+                   configFile['guacamole']['prefix'] : 'dev',
+      url_prefix: configFile['guacamole']['url_prefix'],
+      max_connections: 5,
+      max_connections_per_user: 2,
+      cookie_domain: configFile['guacamole'].key?('cookie_domain') ?
+                     configFile['guacamole']['cookie_domain'] : ''
+    }
+    if configFile['guacamole'].key?('rdp_host')
+      config.guacamole[:rdp_host] = configFile['guacamole']['rdp_host']
+    end
   end
-  
-  config.guacamole_max_connections = 5
-  config.guacamole_max_connections_per_user = 2
+
 
   # For nginx:
   # config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect'
