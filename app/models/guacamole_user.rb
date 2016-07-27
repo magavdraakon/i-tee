@@ -7,8 +7,8 @@ class GuacamoleUser < ActiveRecord::Base
 	before_create :apply_salt
 
 	def apply_salt
-		self.password_salt = GuacamoleUser.select('UNHEX(SHA2(UUID(), 256)) as salt').first.salt
-		self.password_hash = GuacamoleUser.select("UNHEX(SHA2(CONCAT('#{self.password_hash}', HEX('#{self.password_salt}')), 256)) as password_hash").first.password_hash
+		self.password_salt = SecureRandom.random_bytes(32)
+		salt_hex = self.password_salt.unpack('H*').first.upcase
+		self.password_hash = Digest::SHA256.digest "#{self.password_hash}#{salt_hex}";
 	end
 end
-
