@@ -97,6 +97,10 @@ else
 	cp /var/www/i-tee/config/environments/production_sample.rb \
 		 /var/www/i-tee/config/environments/production.rb
 
+	cd /var/www/i-tee
+	
+	bundle install
+
 fi
 
 
