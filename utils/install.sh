@@ -48,7 +48,6 @@ adduser www-data vboxusers
 chown :vboxusers /etc/vbox
 chown www-data:www-data /var/www -R
 chown vbox:vbox /var/labs/ -R
-chown vbox:www-data /var/labs/run
 chmod g+sw /var/labs
 chmod 0440 /etc/sudoers.d/i-tee
 
@@ -71,6 +70,8 @@ SUBVERSION=$(apt-cache policy virtualbox-5.0 |grep Installed:| cut -f2 -d: |cut 
 curl "http://download.virtualbox.org/virtualbox/$VERSION/Oracle_VM_VirtualBox_Extension_Pack-$SUBVERSION.vbox-extpack" > \
 	"/tmp/Oracle_VM_VirtualBox_Extension_Pack-$SUBVERSION.vbox-extpack"
 VBoxManage extpack install "/tmp/Oracle_VM_VirtualBox_Extension_Pack-$SUBVERSION.vbox-extpack"
+
+rm /tmp/.vbox-*-ipc -r
 
 
 ### Install phpvirtualbox
