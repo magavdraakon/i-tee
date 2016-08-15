@@ -265,7 +265,7 @@ class LabsController < ApplicationController
   def end_lab_by_values
     respond_to do |format|
       if @admin
-        user = User.where("username=?", params[:user]).first
+        user = User.where("username=?", params[:user_name]).first
         if user
           @labuser = LabUser.where('lab_id=? and user_id=?', params[:lab_id], user.id ).first
           if @labuser
