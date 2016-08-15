@@ -126,6 +126,8 @@ ITee::Application.routes.draw do
   match 'end_lab_by_id', :to=> 'labs#end_lab_by_id', via: [:post]
   match 'restart_lab_by_id', :to=> 'labs#restart_lab_by_id', via: [:post]
 
+  match 'end_lab_by_values', :to=> 'labs#end_lab_by_values', via: [:post]
+
   match 'restart_lab/:id/:username', :to=> 'labs#restart_lab'
   match 'restart_lab/:id', :to=> 'labs#restart_lab'
   match 'restart_lab', :to=> 'labs#restart_lab'

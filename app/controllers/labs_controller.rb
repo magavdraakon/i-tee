@@ -261,6 +261,36 @@ class LabsController < ApplicationController
       redirect_to(my_labs_path)
   end
 
+  # method to end lab by username and lab id
+  def end_lab_by_values
+    respond_to do |format|
+      if @admin
+        user = User.where("username=?", params[:user]).first
+        if user
+          @labuser = LabUser.where('lab_id=? and user_id=?', params[:lab_id], user.id ).first
+          if @labuser
+            @labuser.end_lab
+            # back to the view the link was in
+            format.html { redirect_to(:back) }
+            format.json {render :json=>{ :success => true , :message=> 'lab ended', :lab_user => @labuser.id , :end_time => @labuser.end}}
+          else
+            format.html { redirect_to :back , :notice=> "Can't find lab user" }
+            format.json { render :json=> {:success => false , :message=>  "Can't find lab user" }}
+          end
+        else
+          format.html { redirect_to :back , :notice=> 'No such user' }
+          format.json { render :json=> {:success => false , :message=>  'No such user' }}
+        end  
+      else
+        format.html { redirect_to :back , :notice=> 'Restricted access' }
+        format.json { render :json=> {:success => false , :message=>  'No permission error' }}
+      end
+    end
+    rescue ActionController::RedirectBackError # cant redirect back? go to the lab instead
+      logger.info "\nNo :back error\n"
+      redirect_to(my_labs_path)
+  end
+
   #method for ending a lab, deletes virtual machine db rows and sets the end date for the lab
   def end_lab
     respond_to do |format|
