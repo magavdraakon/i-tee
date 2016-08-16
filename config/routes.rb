@@ -14,6 +14,7 @@ ITee::Application.routes.draw do
   match 'manage_vm/:do/:name', :to=>'virtualbox#manage_vm', via:[:get]
   match 'manage_vm', :to=>'virtualbox#manage_vm', via:[:post]
   match 'vm_details/:name', :to=>'virtualbox#vm_details'
+  match 'virtualbox_guacamole/:name', :to=>'virtualbox#open_guacamole', via:[:get]
 
   match 'jobs',:to=> 'home#jobs'
   match 'jobs/:id', :to=>'home#delete_job', via: [:delete]
