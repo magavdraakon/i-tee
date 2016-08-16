@@ -448,18 +448,10 @@ end
  end
 
 
-
 # create the password hash to be fed to the set_password method
 def self.create_password_hash(username, password)
-	info = %x(sudo -Hu vbox VBoxManage internalcommands passwordhash #{password} | cut -f 3 -d' ')
-	status= $?
-	#logger.debug info
-	if status.exitstatus===0
-		"VBoxAuthSimple/users/#{username} #{info}".strip
-	else
-		logger.debug "vboxmanage failed with errror code #{status.exitstatus}"
-		false
-	end
+	info = Digest::SHA256.hexdigest(password)
+	"VBoxAuthSimple/users/#{username} #{info}".strip
 end
 
 # set password for vms
