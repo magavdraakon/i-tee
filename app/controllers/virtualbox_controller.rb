@@ -56,6 +56,31 @@ class VirtualboxController < ApplicationController
 		end
 	end
 
+	def open_guacamole
+		respond_to do |format|
+	      	result = Virtualbox.open_guacamole(params[:name], current_user)
+	      	if result && result[:success]
+	      		format.html {
+	        		# set cookie
+	        		cookies[:GUAC_AUTH] = {
+	          			value: result[:token],
+				        #expires: 1.hour.from_now,
+				        domain: result[:domain], #%w(rangeforce.com), # %w(.example.com .example.org)
+				        path: URI(ITee::Application::config.guacamole[:url_prefix]).path,
+				        #:secure,
+				        #:httponly
+	        		}
+	        		#redirect to url https://xxx.yyy.com/#/client/zzz
+	        		redirect_to( result[:url] )
+	      		}
+	      		format.json  { render :json => result }
+		    else
+		        format.html  { redirect_to( not_found_path, :notice=> result[:message]) }
+		        format.json  { render :json => {:success=>result[:success], :message=> result[:message] } }
+		    end
+	    end
+	end
+
 private
 	def set_user
 		if params[:username] && @admin # admin may remove others passwords
