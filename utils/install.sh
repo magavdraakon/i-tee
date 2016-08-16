@@ -33,7 +33,7 @@ curl http://download.virtualbox.org/virtualbox/debian/oracle_vbox_2016.asc | apt
 apt-get update
 
 
-apt-get install -y apache2 sudo ssh php-soap php-xml virtualbox-5.0 libapache2-mod-php7.0 \
+apt-get install -y sudo apache2 libapache2-mod-php5 php-soap php-xml-parser virtualbox-5.0 \
                    libyaml-0-2 libgmp-dev libmysqlclient-dev libsqlite3-dev
 
 gem install bundler
@@ -99,7 +99,7 @@ else
 		 /var/www/i-tee/config/environments/production.rb
 
 	cd /var/www/i-tee
-	
+
 	bundle install
 
 fi
