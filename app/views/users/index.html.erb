@@ -7,7 +7,6 @@
         <th><%=link_to('Name', :controller=>'users',:action=>'index', :sort_by=>'name', :dir=>@dir)%></th>
         <th>Email</th>
         <th><%=link_to('Last sign in', :controller=>'users',:action=>'index', :sort_by=>'last_sign_in_at', :dir=>@dir)%></th>
-        <th>Last IP</th>
         <th><%=link_to('LDAP user', :controller=>'users',:action=>'index', :sort_by=>'ldap', :dir=>@dir)%></th>
         <th><%=link_to('Role', :controller=>'users',:action=>'index', :sort_by=>'role', :dir=>@dir)%></th>
         <!-- <th><%#=link_to("Token", :controller=>'users',:action=>'index', :sort_by=>"authentication_token", :dir=>@dir)%></th>
@@ -22,7 +21,6 @@
         <td><%= user.name %></td>
         <td><%= user.email %></td>
         <td><span title="<%= user.last_sign_in_at %>"><%= distance_of_time_in_words(Time.now, user.last_sign_in_at.to_time )+' ago' if user.last_sign_in_at %></span></td>
-        <td><%= user.last_sign_in_ip %></td>
         <td><%= user.ldap %></td>
         <td><%= user.rolename %></td>
 
