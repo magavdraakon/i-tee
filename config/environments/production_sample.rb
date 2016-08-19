@@ -56,16 +56,27 @@ ITee::Application.configure do
   # Guacamole configuration
   if configFile.key?('guacamole')
     config.guacamole = {
+
+      # Domain name set to Guacamole authentication cookie
+      cookie_domain: configFile['guacamole'].key?('cookie_domain') ?
+                     configFile['guacamole']['cookie_domain'] : '',
+
+      # Guacamole username prefix
       user_prefix: configFile['guacamole'].key?('prefix') ?
                    configFile['guacamole']['prefix'] : 'dev',
+
+      # Full url to Guacamole API endpoints (e.g. https://localhost/guacamole)
       url_prefix: configFile['guacamole']['url_prefix'],
+
       max_connections: 5,
-      max_connections_per_user: 2,
-      cookie_domain: configFile['guacamole'].key?('cookie_domain') ?
-                     configFile['guacamole']['cookie_domain'] : ''
+      max_connections_per_user: 2
     }
+
     if configFile['guacamole'].key?('rdp_host')
+
+      # I-Tee host used by Guacamole to connect to machines via RDP (e.g. localhost)
       config.guacamole[:rdp_host] = configFile['guacamole']['rdp_host']
+
     end
   end
 
