@@ -31,7 +31,7 @@
         </td>
         <td><%= vm['VRDEActiveConnection'] if vm['VRDEActiveConnection'] %></td>
         <td>
-             <%= link_to "Open in browser", "virtualbox_guacamole/#{vm['name']}" %>
+            <%= link_to "Open in browser", "virtualbox_guacamole/#{vm['name']}", target: '_blank' %>
         	<% if vm['VMState']=='running' %>
 
                 <div class="remote_connections">

@@ -238,9 +238,9 @@ def self.open_guacamole(vm, user)
         g_user = GuacamoleUser.where("username = ?", g_username ).first
         unless g_user
           # create user
-          result = GuacamoleUser.create(username: g_username, password_hash:  g_password, timezone: 'Etc/GMT+0')
-          unless result
-            logger.debug result
+          g_user = GuacamoleUser.create(username: g_username, password_hash:  g_password, timezone: 'Etc/GMT+0')
+          unless g_user
+            logger.debug g_user
             return {success: false, message: 'unable to add user to guacamole'} 
           end
         else
@@ -249,7 +249,6 @@ def self.open_guacamole(vm, user)
         	g_user.apply_salt
         	g_user.save
         end 
-        
         # check if there is a connection
         g_conn = GuacamoleConnection.where("connection_name = ? ", g_name ).first
         unless g_conn # find by full name
