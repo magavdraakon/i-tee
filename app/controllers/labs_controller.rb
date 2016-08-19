@@ -267,7 +267,7 @@ class LabsController < ApplicationController
       if @admin
         user = User.where("username=?", params[:user_name]).first
         if user
-          @labuser = LabUser.where('lab_id=? and user_id=?', params[:lab_id], user.id ).first
+          @labuser = LabUser.where('lab_id=? and user_id=?', params[:lab_id], user.id ).last
           if @labuser
             @labuser.end_lab
             # back to the view the link was in
