@@ -316,6 +316,29 @@ end
       {os: ['MacOS'], program: '', rdpline: self.remote('mac') }
     ]
   end
+
+  def get_connection_info
+    port=self.mac ? self.mac.ip.split('.').last : ''
+    begin
+      rdp_host=ITee::Application.config.rdp_host
+    rescue
+      rdp_host=`hostname -f`.strip
+    end
+    begin
+      rdp_port_prefix = ITee::Application.config.rdp_port_prefix
+    rescue
+      rdp_port_prefix = '10'
+    end
+
+    info = { }
+    info[:username] = self.user.username
+    info[:password] = self.password
+    info[:host] = rdp_host
+    info[:port] = "#{rdp_port_prefix}#{port}"
+
+    info
+  end
+
   # connection informations
   def remote(typ, resolution='')
     if resolution!="" 

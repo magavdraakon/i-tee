@@ -27,7 +27,8 @@ class LabUser < ActiveRecord::Base
         allow_remote: vm.lab_vmt.allow_remote,
         guacamole_type: vm.lab_vmt.guacamole_type,
         position: vm.lab_vmt.position,
-        vm_rdp: vm.get_all_rdp
+        vm_rdp: vm.get_all_rdp,
+        connection: vm.get_connection_info
       }
     end
     result
