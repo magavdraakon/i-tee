@@ -2,20 +2,19 @@
 
 #
 # i-tee installation script designed for clean
-# Ubuntu 16.04 LTS (Xenial) environments.
-# Expects Ruby toolset and relevant files to
-# exist in filesystem.
+# Ubuntu 16.04 LTS (Xenial) and Debian Jessie
+# environments. Expects Ruby toolset and relevant
+# files to exist in filesystem.
 #
 # Relevant non-standard files and directories
 #   /etc/apache2/sites-available/i-tee.conf
 #   /etc/apache2/sites-available/phpvirtualbox.conf
 #   /etc/apt/sources.list.d/virtualbox.list
-#   /etc/default/virtualbox
 #   /etc/sudoers.d/i-tee
-#   /etc/vbox/auto.cfg
-#   /var/labs/isos/
 #   /var/labs/run/
 #   /var/labs/.config/
+#   /var/www/phpvirtualbox/
+#   /var/www/i-tee/
 #
 # Example directory structure is available at
 # https://github.com/keijokapp/i-tee.docker/tree/master/fs
@@ -27,14 +26,15 @@ trap "exit 1" INT
 
 apt-get update
 
-apt-get install -y curl
+apt-get install -y --no-install-recommends curl
 
 curl http://download.virtualbox.org/virtualbox/debian/oracle_vbox_2016.asc | apt-key add -
 apt-get update
 
 
-apt-get install -y sudo apache2 libapache2-mod-php5 php-soap php-xml-parser virtualbox-5.0 \
-                   libyaml-0-2 libgmp-dev libmysqlclient-dev libsqlite3-dev
+apt-get install -y --no-install-recommends sudo apache2 libapache2-mod-php5 php-soap \
+                                           php-xml-parser virtualbox-5.0  libyaml-0-2 \
+                                           libgmp-dev libmysqlclient-dev libsqlite3-dev
 
 gem install bundler
 
@@ -56,7 +56,6 @@ chmod 0440 /etc/sudoers.d/i-tee
 
 # Configure Virtualbox autostart
 
-su - vbox -c "VBoxManage setproperty autostartdbpath /etc/vbox"
 su - vbox -c "vboxmanage setproperty vrdeauthlibrary VBoxAuthSimple"
 
 # Install Virtualbox Extension Pack
@@ -86,22 +85,11 @@ a2ensite phpvirtualbox
 
 ### Install i-tee
 
-if [ -x /usr/local/bin/checkout.sh ]
-then
+cp /var/www/i-tee/config/environments/production_sample.rb \
+	 /var/www/i-tee/config/environments/production.rb
 
-	# Development mode
+cd /var/www/i-tee
 
-	apt-get install -y git
-
-else
-
-	cp /var/www/i-tee/config/environments/production_sample.rb \
-		 /var/www/i-tee/config/environments/production.rb
-
-	cd /var/www/i-tee
-
-	bundle install
-
-fi
+bundle install
 
 
