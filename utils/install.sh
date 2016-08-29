@@ -32,8 +32,8 @@ curl http://download.virtualbox.org/virtualbox/debian/oracle_vbox_2016.asc | apt
 apt-get update
 
 
-apt-get install -y --no-install-recommends sudo apache2 libapache2-mod-php5 php-soap \
-                                           php-xml-parser virtualbox-5.0  libyaml-0-2 \
+apt-get install -y --no-install-recommends sudo apache2 libapache2-mod-php5 module-init-tools \
+                                           php-soap php-xml-parser virtualbox-5.0 libyaml-0-2 \
                                            libgmp-dev libmysqlclient-dev libsqlite3-dev
 
 gem install bundler
