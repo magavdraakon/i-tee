@@ -36,29 +36,29 @@ class Vm < ActiveRecord::Base
 
 
   def del_vm
-     %x(sudo -Hu vbox #{Rails.root}/utils/delete_machine.sh #{name}  2>&1)
+     %x(sudo -Hu vbox #{Shellwords.escape("#{Rails.root}/utils/delete_machine.sh")} #{Shellwords.escape(name)}  2>&1)
   end
   
   def poweroff_vm
     #TODO script .. pooleli
-     %x(sudo -Hu vbox #{Rails.root}/utils/stop_machine.sh #{name}  2>&1)
+     %x(sudo -Hu vbox #{Shellwords.escape("#{Rails.root}/utils/stop_machine.sh")} #{Shellwords.escape(name)}  2>&1)
   end
   
   def poweron_vm
     #TODO script .. pooleli
-    %x("sudo -Hu vbox  #{Rails.root}/utils/poweron_machine.sh #{name}  2>&1".strip)
+    %x("sudo -Hu vbox  #{Shellwords.escape("#{Rails.root}/utils/poweron_machine.sh")} #{Shellwords.escape(name)}  2>&1".strip)
   end
   
   def res_vm
-    %x(sudo -Hu vbox #{Rails.root}/utils/resume_machine.sh #{name}  2>&1)
+    %x(sudo -Hu vbox #{Shellwords.escape("#{Rails.root}/utils/resume_machine.sh")} #{Shellwords.escape(name)}  2>&1)
   end
   
   def pau_vm
-    %x(sudo -Hu vbox #{Rails.root}/utils/pause_machine.sh #{name}  2>&1)
+    %x(sudo -Hu vbox #{Shellwords.escape("#{Rails.root}/utils/pause_machine.sh")} #{Shellwords.escape(name)}  2>&1)
   end
 
   def res_rdp
-    info = %x(sudo -Hu vbox #{Rails.root}/utils/reset_vbox_rdp.sh #{name}  2>&1)
+    info = %x(sudo -Hu vbox #{Shellwords.escape("#{Rails.root}/utils/reset_vbox_rdp.sh")} #{Shellwords.escape(name)}  2>&1)
     status= $?
     {status: status.exitstatus, answer: info}
   end
@@ -80,14 +80,14 @@ class Vm < ActiveRecord::Base
       rdp_host=`hostname -f`.strip
     end
     
-    runstr = "sudo -Hu vbox  #{Rails.root}/utils/start_machine.sh #{rdp_host} #{mac.ip} #{lab_vmt.vmt.image} #{name} #{password} #{ENV['ENVIRONMENT']} '#{user.name}' 2>&1"
+    runstr = "sudo -Hu vbox  #{Shellwords.escape("#{Rails.root}/utils/start_machine.sh")} #{Shellwords.escape(rdp_host)} #{Shellwords.escape(mac.ip)} #{Shellwords.escape(lab_vmt.vmt.image)} #{Shellwords.escape(name)} #{Shellwords.escape(password)} #{Shellwords.escape(ENV['ENVIRONMENT'])} #{Shellwords.escape(user.name)} 2>&1"
     Rails.logger.debug "ini_vm: #{runstr}"
     %x(#{runstr})
-    #%x("#{@exec_line}  #{Rails.root}/utils/start_machine.sh #{mac.mac} #{mac.ip} #{lab_vmt.vmt.image} #{name} #{password} 2>&1")
+    #%x("#{@exec_line}  #{Shellwords.escape("#{Rails.root}/utils/start_machine.sh")} #{Shellwords.escape(mac.mac)} #{Shellwords.escape(mac.ip)} #{Shellescape.escape(lab_vmt.vmt.image)} #{Shellwords.escape(name)} #{Shellwords.escape(password)} 2>&1")
   end
   
   def state
-    ret = %x[sudo -Hu vbox /usr/bin/VBoxManage showvminfo #{name}|grep -E '^State:']
+    ret = %x(sudo -Hu vbox /usr/bin/VBoxManage showvminfo #{Shellwords.escape(name)} | grep -E '^State:')
     r = "#{ret}".split(' ')[1]
 
     #Rails.logger.warn ret.split(' ')[1]
@@ -158,7 +158,7 @@ end
       File.open(customization_file, 'w+') { |f|
         #Writing VM data
         f.write("#Configuration file for VM: #{name}\n")
-        f.write("export NIC1='#{Rails.root}'\n")
+        f.write("export NIC1=#{Shellwords.escape(Rails.root)}\n")
         f.write("#NIC count #{self.lab_vmt.lab_vmt_networks.count}\n\n")
 
         if self.lab_vmt.lab_vmt_networks.count > 0

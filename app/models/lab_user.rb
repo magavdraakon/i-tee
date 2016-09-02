@@ -179,7 +179,7 @@ class LabUser < ActiveRecord::Base
           # check if rdp is allowed for user
           if vm.lab_vmt.allow_remote 
             
-            info = %x(VBoxManage showvminfo #{vm.name})
+            info = %x(VBoxManage showvminfo #{Shellwords.escape(vm.name)})
             status= $?
             if status.exitstatus > 0
               logger.debug "Exit with error: #{status.exitstatus}"

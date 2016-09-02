@@ -57,7 +57,7 @@ def self.get_machines(state='', where={}, sort='')
 end
 
 def self.running_machines
-	info = %x(sudo -Hu vbox VBoxManage list runningvms | cut -f1 -d' '| tr -d '"' )
+	info = %x(sudo -Hu vbox VBoxManage list runningvms | cut -f2 -d'"')
 	status= $?
 	#logger.debug info
 	if status.exitstatus===0
@@ -75,7 +75,7 @@ def self.stopped_machines
 end
 
 def self.all_machines
-	info = %x(sudo -Hu vbox VBoxManage list vms | cut -f1 -d' '| tr -d '"' )
+	info = %x(sudo -Hu vbox VBoxManage list vms | cut -f2 -d'"')
 	status = $?
 	#logger.debug info
 	if status.exitstatus===0
@@ -86,7 +86,7 @@ def self.all_machines
 end
 
 def self.template_machines
-	info = %x(sudo -Hu vbox VBoxManage list vms | grep template|cut -d' ' -f1|tr '"' ' ')
+	info = %x(sudo -Hu vbox VBoxManage list vms | grep template | cut -f2 -d'"')
 	status= $?
 	#logger.debug info
 	if status.exitstatus===0
@@ -97,7 +97,7 @@ def self.template_machines
 end
 
 def self.get_vm_info(name, static=false)
-	info = %x(sudo -Hu vbox VBoxManage showvminfo #{name} --machinereadable )
+	info = %x(sudo -Hu vbox VBoxManage showvminfo #{Shellwords.escape(name)} --machinereadable )
 	status = $?
 	#logger.debug info
 	vm = {}
@@ -355,7 +355,7 @@ end
   end
 
  def self.start_vm(vm)
- 	info = %x(sudo -Hu vbox VBoxManage startvm #{vm} --type headless  2>&1)
+	info = %x(sudo -Hu vbox VBoxManage startvm #{Shellwords.escape(vm)} --type headless  2>&1)
 	status= $?
 	logger.debug info
 	logger.debug status
@@ -371,7 +371,7 @@ end
  end
 
  def self.stop_vm(vm)
- 	info = %x(sudo -Hu vbox VBoxManage controlvm #{vm} poweroff 2>&1)
+	info = %x(sudo -Hu vbox VBoxManage controlvm #{Shellwords.escape(vm)} poweroff 2>&1)
 	status= $?
 	#logger.debug info
 	#logger.debug status
@@ -395,12 +395,12 @@ end
  end
 
  def self.reset_vm_rdp(vm)
- 	info = %x(sudo -Hu vbox VBoxManage controlvm #{vm} vrde off 2>&1)
+	info = %x(sudo -Hu vbox VBoxManage controlvm #{Shellwords.escape(vm)} vrde off 2>&1)
 	status= $?
 	#logger.debug info
 	#logger.debug status
 	if status.exitstatus===0
-		info = %x(sudo -Hu vbox VBoxManage controlvm #{vm} vrde on 2>&1)
+		info = %x(sudo -Hu vbox VBoxManage controlvm #{Shellwords.escape(vm)} vrde on 2>&1)
 		status= $?
 		#logger.debug info
 		#logger.debug status
@@ -430,7 +430,7 @@ end
 	 		nr = info['CurrentSnapshotName'] ? info['CurrentSnapshotName'].gsub("#{vmname}-",'').gsub('-template','').to_i+1 : 1
 		 	name = "#{vmname}-#{nr}-template"
 
-		 	info = %x(sudo -Hu vbox VBoxManage snapshot #{vm} take #{name} --description "#{Time.now}" )
+			info = %x(sudo -Hu vbox VBoxManage snapshot #{Shellwords.escape(vm)} take #{Shellwords.escape(name)} --description "#{Time.now}" )
 			status= $?
 			logger.debug info
 			logger.debug status
@@ -463,7 +463,7 @@ def self.set_password(hash)
 	# logger.debug info
 	info.split(/\n+/).each do |line|
 		#puts "vm is: #{line}"
-		ex = %x(sudo -Hu vbox VBoxManage setextradata #{line} #{hash})
+		ex = %x(sudo -Hu vbox VBoxManage setextradata #{Shellwords.escape(line)} #{Shellwords.escape(hash)})
 		st = $?
 		#puts line
 		#puts st
@@ -484,7 +484,7 @@ def self.unset_password(username)
 	# logger.debug info
 	info.split(/\n+/).each do |line|
 		#puts "vm is: #{line}"
-		ex = %x(sudo -Hu vbox VBoxManage setextradata #{line} VBoxAuthSimple/users/#{username} )
+		ex = %x(sudo -Hu vbox VBoxManage setextradata #{Shellwords.escape(line)} #{Shellwords.escape("VBoxAuthSimple/users/#{username}")})
 		st = $?
 		#puts line
 		#puts st

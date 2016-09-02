@@ -1,5 +1,5 @@
 <div class="marked">
-  <%= %x(cat #{Rails.root}/public/markdown/template_guide.md) %>
+  <%= %x(cat #{Shellwords.escape("#{Rails.root}/public/markdown/template_guide.md")}) %>
   <hr>
 </div>
 

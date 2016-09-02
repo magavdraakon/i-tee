@@ -9,7 +9,7 @@
 <% home="#{Rails.root}/public/markdown/home.md" -%>
 <%if File.file?(home) -%>
 <div class="marked">
-  <%= %x(cat #{home}) %>
+  <%= %x(cat #{Shellwords.escape(home)}) %>
   <hr>
 </div>
 <%else-%>
