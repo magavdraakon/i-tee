@@ -11,14 +11,6 @@ ITee::Application.configure do
 
   # Settings specified here will take precedence over those in config/environment.rb
 
-  # The production environment is meant for finished, "live" apps.
-  # Code is not reloaded between requests
-  config.cache_classes = true
-
-  # Full error reports are disabled and caching is turned on
-  config.consider_all_requests_local       = false
-  config.action_controller.perform_caching = true
-
   # Specifies the header that your server uses for sending files
   config.action_dispatch.x_sendfile_header = 'X-Sendfile'
 
@@ -27,9 +19,10 @@ ITee::Application.configure do
   config.managers = configFile.key?('managers') ? configFile['managers'] : [ ]
 
   # hostname for rdp sessions
-  config.rdp_host = configFile['rdp_host'] #'elab.itcollege.ee'
+  config.rdp_host = configFile['rdp_host']
+
   # port prefix for rdp sessions
-  config.rdp_port_prefix = configFile.key?('rdp_port_prefix') ? configFile['rdp_port_prefix'] : '10'
+  config.rdp_port_prefix = '10'
   config.rdp_password_length = 14
 
    # determine how many instances are shown per page
@@ -37,10 +30,11 @@ ITee::Application.configure do
 
   # determine what layout to use
   config.default_skin = configFile.key?('skin') ? configFile['skin'] : 'EIK'
-  config.skins = { 'host1'=> 'EIK'}
+  config.skins = { }
 
   # place for temporal files like VM customization files
   config.run_dir = '/var/labs/run'
+
   # place for lab export / import jsons
   config.export_location= '/var/labs/exports'
 
@@ -49,9 +43,6 @@ ITee::Application.configure do
 
   # Virtualbox user and command line for launching scripts
   config.cmd_perfix = 'sudo -Hu vbox'
-
-  # master domain name for setting universal cookies for the subdomains
-  config.domain = ''
 
   # Guacamole configuration
   if configFile.key?('guacamole')
@@ -81,15 +72,30 @@ ITee::Application.configure do
   end
 
 
-  # For nginx:
-  # config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect'
-
-  # If you have no front-end server that supports something like X-Sendfile,
-  # just comment this out and Rails will serve the files
-
-  # See everything in the log (default is :info)
   if configFile.key?('debug') && configFile['debug']
+
+    # Code is not reloaded between requests
+    config.cache_classes = false
+
+    # Log level (defaults to :info)
     config.log_level = :debug
+
+    # Full error reports are disabled and caching is turned on
+    config.consider_all_requests_local       = true
+    config.action_controller.perform_caching = false
+
+  else
+
+    # Code is not reloaded between requests
+    config.cache_classes = true
+
+    # Log level (defaults to :info)
+    config.log_level = :info
+
+    # Full error reports are disabled and caching is turned on
+    config.consider_all_requests_local       = false
+    config.action_controller.perform_caching = true
+
   end
 
   # Use a different logger for distributed setups
