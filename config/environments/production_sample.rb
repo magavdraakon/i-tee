@@ -72,7 +72,7 @@ ITee::Application.configure do
   end
 
 
-  if configFile.key?('debug') && configFile['debug']
+  if configFile.key?('development') && configFile['development']
 
     # Code is not reloaded between requests
     config.cache_classes = false
