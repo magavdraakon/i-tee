@@ -13,17 +13,6 @@ echo "ERROR"
 exit 1
 }
 
-id | grep vboxusers > /dev/null
-
-
-if [ $? -eq 0 ]
-then
-    echo "Using $(id) to execute virtual machines"
-else
-    echo "Script is started with user $(id)"
-    echo "Please add user to vboxusers group or use other user who able to start VirtualBox machines"
-    exit 1
-fi
 
 IT_HOSTNAME=$1
 IP_ADDR=$2
