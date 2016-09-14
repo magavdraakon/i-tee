@@ -463,7 +463,7 @@ def self.set_password(hash)
 	# logger.debug info
 	info.split(/\n+/).each do |line|
 		#puts "vm is: #{line}"
-		ex = %x(sudo -Hu vbox VBoxManage setextradata #{Shellwords.escape(line)} #{Shellwords.escape(hash)})
+		ex = %x(sudo -Hu vbox VBoxManage setextradata #{Shellwords.escape(line)} #{hash})
 		st = $?
 		#puts line
 		#puts st
