@@ -166,7 +166,13 @@ def self.get_vm_info(name, static=false)
 		end
 
 		if vm['CurrentSnapshotNode']
-			vm['CurrentSnapshotDescription']=vm[vm['CurrentSnapshotNode'].gsub('Name', 'Description')]
+			value = vm[vm['CurrentSnapshotNode'].gsub('Name', 'Description')]
+			begin
+				value.to_time
+			rescue
+				value= ''
+			end
+			vm['CurrentSnapshotDescription']=value
 		end
 
 		vm
