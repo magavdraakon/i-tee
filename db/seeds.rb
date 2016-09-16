@@ -6,7 +6,7 @@
 #   cities = City.create([{ :name => 'Chicago' }, { :name => 'Copenhagen' }])
 #   Mayor.create(:name => 'Daley', :city => cities.first)
 (0...5).each do |a|
-	(16..200).each do |b|
+	(100..200).each do |b|
 		first = (a+16).to_s(16).upcase
 		second = b.to_s(16).upcase
 		ip = b+a*199
