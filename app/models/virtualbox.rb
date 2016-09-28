@@ -269,7 +269,7 @@ def self.open_guacamole(vm, user)
             g_conn.add_parameters([
               { parameter_name: 'hostname', parameter_value: rdp_host },
               { parameter_name: 'port', parameter_value: rdp_port },
-              { parameter_name: 'username', parameter_value: g_username },
+              { parameter_name: 'username', parameter_value: user.username },
               { parameter_name: 'password', parameter_value: g_password },
 #             { parameter_name: 'color-depth', parameter_value: 255 }
             ])
@@ -293,6 +293,14 @@ def self.open_guacamole(vm, user)
             GuacamoleConnectionParameter.where("connection_id=? and parameter_name=?", g_conn.connection_id, 'password').limit(1).update_all(parameter_value: g_password)
           else # create
             GuacamoleConnectionParameter.create(connection_id: g_conn.connection_id, parameter_name: 'password', parameter_value: g_password )
+          end
+
+          # user had changed?
+          param = GuacamoleConnectionParameter.where("connection_id=? and parameter_name=?", g_conn.connection_id, 'username').first
+          if param #update
+            GuacamoleConnectionParameter.where("connection_id=? and parameter_name=?", g_conn.connection_id, 'username').limit(1).update_all(parameter_value: user.username)
+          else # create
+            GuacamoleConnectionParameter.create(connection_id: g_conn.connection_id, parameter_name: 'username', parameter_value: user.username )
           end
           
         end #EOF connection check
