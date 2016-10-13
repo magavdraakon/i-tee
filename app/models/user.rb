@@ -12,7 +12,7 @@ class User < ActiveRecord::Base
   before_destroy :del_labs # vms are deleted trough lab user
  # has_many :user_badges, :dependent => :destroy
 
-  validates_format_of :username, :with => /^[[:alnum:]]+[[:alnum:]_]+[[:alnum:]]$/ , :message => 'can only be alphanumeric with and dashes with no spaces'
+  validates_format_of :username, :with => /^([[:alnum:]]+\.?[[:alnum:]_])+[[:alnum:]]$/ , :message => 'can only be alphanumeric with underscores, contain single periods and no spaces'
   validates_uniqueness_of :username, :email, :case_sensitive => false
 
   def select_name
