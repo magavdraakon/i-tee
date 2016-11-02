@@ -374,7 +374,7 @@ end
 	logger.debug info
 	logger.debug status
 	if status.exitstatus===0
-		{'success'=>true, 'message'=> "successfully to started #{vm}"}
+		{'success'=>true, 'message'=> "successfully started #{vm}"}
 	else
 		if info.include? "is already locked by a session"
 			{'success'=>false, 'message'=> "unable to start #{vm} - it is already running"}
@@ -390,7 +390,7 @@ end
 	#logger.debug info
 	#logger.debug status
 	if status.exitstatus===0
-		{'success'=>true, 'message'=> "successfully to stopped #{vm}"}
+		{'success'=>true, 'message'=> "successfully stopped #{vm}"}
 	else
 		if info.include? "is not currently running"
 			{'success'=>false, 'message'=> "unable to stop #{vm} - it is already powered off"}
@@ -419,7 +419,7 @@ end
 		#logger.debug info
 		#logger.debug status
 		if status.exitstatus===0
-			{'success'=>true, 'message'=> "RDP successfully to reset for #{vm}"}
+			{'success'=>true, 'message'=> "RDP successfully reset for #{vm}"}
 		else
 			if info.include? "is not currently running"
 				{'success'=>false, 'message'=> "unable to reset RDP for #{vm} - it is not running"}
