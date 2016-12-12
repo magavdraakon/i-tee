@@ -168,8 +168,10 @@ class HomeController < ApplicationController
   end
   
   def catcher
-    flash[:notice] = 'Seems that the page you were looking for does not exist, so you\'ve been redirected here.'
-    redirect_to :action => 'index'
+    respond_to do |format|
+      format.html  {redirect_to root_path, :notice=>'Seems that the page you were looking for does not exist, so you\'ve been redirected here.' }
+      format.json  { render :json => {:success=>false, :message=>"missing endpoint"} }
+    end
   end
 
 end
