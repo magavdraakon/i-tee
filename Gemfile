@@ -1,12 +1,11 @@
 source 'http://rubygems.org'
 
-gem 'rails', '3.1.12'
+gem 'rails', '3.2.22'
 
 group :development, :test do
     gem 'railroady'
     gem 'test-unit'
     gem 'sqlite3', :require => 'sqlite3'
-
 end
 
 # Bundle edge Rails instead:
@@ -20,7 +19,8 @@ gem 'mysql2', '~> 0.3.11'
 gem 'paperclip', '2.7'
 
 gem 'devise'
-gem 'devise_ldap_authenticatable', '0.4.5'
+gem 'devise_ldap_authenticatable'
+gem 'devise-encryptable'
 
 gem 'marked-rails'
 

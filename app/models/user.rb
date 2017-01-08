@@ -2,7 +2,7 @@ class User < ActiveRecord::Base
   # Include default devise modules. Others available are:
   # :token_authenticatable, :confirmable, :lockable and :timeoutable
   devise :ldap_authenticatable, #:registerable,
-         :recoverable, :rememberable, :trackable, :validatable, :token_authenticatable
+         :recoverable, :rememberable, :trackable, :validatable
 
   # Setup accessible (or protected) attributes for your model
   attr_accessible :name, :username, :email, :password, :password_confirmation, :remember_me, :keypair, :token_expires, :role
@@ -50,6 +50,17 @@ class User < ActiveRecord::Base
   # find first user that has the given token
   def self.find_by_token(token)
     User.where('authentication_token=?', token).first
+  end
+
+  def reset_authentication_token!
+    loop do
+      token = Devise.friendly_token
+      # FIXME: doesn't this cause potential concurrency issues?
+      unless User.where(authentication_token: token).first
+        self.authentication_token = token
+        break
+      end
+    end
   end
 
   def has_badge(lab_badge_id)

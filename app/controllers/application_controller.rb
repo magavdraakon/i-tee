@@ -10,9 +10,9 @@ class ApplicationController < ActionController::Base
   require 'will_paginate/array'
   before_filter :check_for_cancel, :only => [:create, :update]
 
-  before_filter :check_token
   layout :set_layout
 
+  before_filter :authenticate_user_from_token!
   before_filter :authenticate_user!, :except=>[:about, :getprogress, :set_progress]
   before_filter :admin?
   before_filter :manager?
@@ -145,7 +145,7 @@ class ApplicationController < ActionController::Base
     end
   end
   
-  def check_token
+  def authenticate_user_from_token!
     if params[:auth_token]
       # get the user with the given token
       user=User.where('authentication_token=?', params[:auth_token]).first
@@ -158,7 +158,9 @@ class ApplicationController < ActionController::Base
         if expiretime.to_datetime < DateTime.now
           #the token has expired already, deny the user access
           redirect_to destroy_user_session_path
-        end  
+        else
+          sign_in user
+        end
       end
     end
   end
