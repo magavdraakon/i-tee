@@ -1,5 +1,7 @@
 ITee::Application.routes.draw do
 
+  get 'check_resources', :to=>'home#check_resources'
+
   match 'backup', :to=> 'home#backup', via: [ :get]
   match 'import/:name', :to=> 'home#import', via: [ :get]
   match 'export/:id', :to=> 'home#export', via: [ :get]

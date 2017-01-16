@@ -65,7 +65,7 @@ class LabUsersController < ApplicationController
     end
   end
   
-
+# for search view to display user machines in an attempt
   def show
     @lab_user = LabUser.find_by_id(params[:id])
     @info={:running=>[], :paused=>[], :stopped=>[]}

@@ -35,6 +35,10 @@ module ITee
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
     # config.i18n.default_locale = :de
 
+    config.action_dispatch.default_headers = {
+        'X-Frame-Options' => 'SAMEORIGIN'
+    }
+
     # JavaScript files you want as :defaults (application.js is always included).
     # config.action_view.javascript_expansions[:defaults] = %w(jquery rails)
 

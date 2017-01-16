@@ -167,6 +167,14 @@ class HomeController < ApplicationController
   def template_info
   end
   
+  def check_resources
+    result = Check.has_free_resources
+    respond_to do |format|
+      format.html  {redirect_to root_path, :notice=>'Seems that the page you were looking for does not exist, so you\'ve been redirected here.' }
+      format.json  { render :json => result }
+    end
+  end
+
   def catcher
     respond_to do |format|
       format.html  {redirect_to root_path, :notice=>'Seems that the page you were looking for does not exist, so you\'ve been redirected here.' }
