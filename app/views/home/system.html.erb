@@ -4,8 +4,8 @@
 <p><%=AppVersion::PLATFORM_INFO%></p>
 
 <p>
-  Number of virtual machines total: <%=%x(sudo -Hu vbox /usr/bin/VBoxManage list vms|wc -l)%><br/>
-  Number of running virtual machines: <%=%x(sudo -Hu vbox /usr/bin/VBoxManage list runningvms|wc -l)%></p>
+  Number of virtual machines total: <%= Virtualbox.all_machines.length %><br/>
+  Number of running virtual machines: <%= Virtualbox.running_machines.length %></p>
   Memory information [GB]<hr>
   <pre><%=%x(free -g)%></pre>
   Disk information<hr>

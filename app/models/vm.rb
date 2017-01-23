@@ -3,10 +3,10 @@ class Vm < ActiveRecord::Base
   belongs_to :user
   belongs_to :lab_vmt
   belongs_to :lab_user
-  before_destroy :del_vm
+  before_destroy :try_delete_vm
   before_destroy :rel_mac
   before_create :add_pw
-  
+
   validates_presence_of :name, :lab_vmt_id, :user_id
   validates_uniqueness_of :name
   def rel_mac
@@ -21,109 +21,91 @@ class Vm < ActiveRecord::Base
     end
   end
 
+  def try_delete_vm
+    begin
+      self.delete_vm
+    rescue
+      # ignore failure
+    end
+  end
+
   def add_pw
     chars = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'
     self.password = ''
     8.times { |i| self.password << chars[rand(chars.length)] }
   end
 
-  #TODO does not work as desired
-  if ITee::Application::config.respond_to? :cmd_perfix
-    @exec_line = ITee::Application::config.cmd_perfix.chomp
-  else
-    @exec_line = 'sudo -Hu vbox '
-  end
-
-
-  def del_vm
-     %x(sudo -Hu vbox #{Shellwords.escape("#{Rails.root}/utils/delete_machine.sh")} #{Shellwords.escape(name)}  2>&1)
-  end
-  
-  def poweroff_vm
-    #TODO script .. pooleli
-     %x(sudo -Hu vbox #{Shellwords.escape("#{Rails.root}/utils/stop_machine.sh")} #{Shellwords.escape(name)}  2>&1)
-  end
-  
-  def poweron_vm
-    #TODO script .. pooleli
-    %x("sudo -Hu vbox  #{Shellwords.escape("#{Rails.root}/utils/poweron_machine.sh")} #{Shellwords.escape(name)}  2>&1".strip)
-  end
-  
-  def res_vm
-    %x(sudo -Hu vbox #{Shellwords.escape("#{Rails.root}/utils/resume_machine.sh")} #{Shellwords.escape(name)}  2>&1)
-  end
-  
-  def pau_vm
-    %x(sudo -Hu vbox #{Shellwords.escape("#{Rails.root}/utils/pause_machine.sh")} #{Shellwords.escape(name)}  2>&1)
-  end
-
-  def res_rdp
-    info = %x(sudo -Hu vbox #{Shellwords.escape("#{Rails.root}/utils/reset_vbox_rdp.sh")} #{Shellwords.escape(name)}  2>&1)
-    status= $?
-    {status: status.exitstatus, answer: info}
-  end
-
   def reset_rdp
-    result = self.res_rdp
-    logger.debug result
-    if result[:status]==0
+    begin
+      Virtualbox.reset_vm_rdp(name)
       {success: true, message: "Vm rdp reset successful"}
-    else
+    rescue
       {success: true, message: "Vm rdp reset failed"}
     end
   end
-  
-  def ini_vm
-    begin
-      rdp_host=ITee::Application.config.rdp_host
-    rescue
-      rdp_host=`hostname -f`.strip
-    end
-    
-    runstr = "sudo -Hu vbox  #{Shellwords.escape("#{Rails.root}/utils/start_machine.sh")} #{Shellwords.escape(rdp_host)} #{Shellwords.escape(mac.ip)} #{Shellwords.escape(lab_vmt.vmt.image)} #{Shellwords.escape(name)} #{Shellwords.escape(password)} #{Shellwords.escape(ENV['ENVIRONMENT'])} #{Shellwords.escape(user.name)} 2>&1"
-    Rails.logger.debug "ini_vm: #{runstr}"
-    %x(#{runstr})
-    #%x("#{@exec_line}  #{Shellwords.escape("#{Rails.root}/utils/start_machine.sh")} #{Shellwords.escape(mac.mac)} #{Shellwords.escape(mac.ip)} #{Shellescape.escape(lab_vmt.vmt.image)} #{Shellwords.escape(name)} #{Shellwords.escape(password)} 2>&1")
-  end
-  
-  def state
-    ret = %x(sudo -Hu vbox /usr/bin/VBoxManage showvminfo #{Shellwords.escape(name)} | grep -E '^State:')
-    r = "#{ret}".split(' ')[1]
 
-    #Rails.logger.warn ret.split(' ')[1]
-    Rails.logger.warn "VM #{name} state is: #{r}"
-    case r
-    when 'running'
-      return 'running'
-    when 'paused'
-      return 'paused'
-    when 'powered'
-      return 'stopped'
-    else
-      return 'stopped'
+  def vm_info
+    unless self.instance_variable_defined?(:@vm_info)
+      logger.debug "Loading VM info of '#{name}'"
+      begin
+        @vm_info = Virtualbox.get_vm_info(name, true)
+      rescue Exception => e
+        unless e.message == 'Not found'
+          raise e
+        end
+        @vm_info = false
+      end
     end
+    @vm_info
+  end
+
+  def state
+    if self.vm_info
+      state = self.vm_info['VMState']
+      unless state == 'running' or state == 'paused'
+        state = 'stopped'
+      end
+    else
+      state = 'stopped'
+    end
+    logger.debug "State of '#{name}' is '#{state}'"
+    state
+  end
+
+  def delete_vm
+    begin
+      Virtualbox.stop_vm(name)
+    rescue
+      # ignore failure
+    end
+    Virtualbox.delete_vm(name)
   end
 
   def stop_vm
-   if self.state=='running' || self.state=='paused'
-    if self.lab_vmt.allow_restart
-      logger.info 'Running VM power off script'
-      a=self.poweroff_vm #the script is called in the model
-      logger.info a
-      self.description='Power on the virtual machine by clicking <strong>Start</strong>.'
-      self.save
-      # remove link to  mac 
-      @mac = Mac.where('vm_id=?', self.id).first
-      @mac.vm_id=nil
-      @mac.save
-      {success: true, message: 'Successful macine shutdown'}
+    state = self.state
+    if state=='running' || state=='paused'
+      if self.lab_vmt.allow_restart
+        begin
+          Virtualbox.stop_vm(name)
+        rescue
+          # ignore failure, Virtualbox model logs the message
+        end
+
+        self.description='Power on the virtual machine by clicking <strong>Start</strong>.'
+        self.save
+
+        # remove link to mac
+        @mac = Mac.where('vm_id=?', self.id).first
+        @mac.vm_id=nil
+        @mac.save
+        {success: true, message: 'Successful macine shutdown'}
+      else
+        {success: true, message: 'Machine can not be shut down'}
+      end
     else
-      {success: true, message: 'Machine can not be shut down'}
+      {success: true, message: 'Machine was already shut down'}
     end
-  else
-    {success: true, message: 'Machine was already shut down'}
   end
-end
 
   def start_vm
     #find out if there is a mac address bound with this vm already
@@ -140,99 +122,65 @@ end
       #the vm had a mac already, dont do anything
       logger.debug '\nVm already had a mac.\n'
     end # end if nil
-      
-    if self.state!='running' && self.state!='paused'
-      logger.info 'running Machine start script'
 
-      ###########################################################
-      #Create custom environment file for start_machine.sh script
-      ###########################################################
+    state = self.state
+    if state == 'running' || state == 'paused'
+      result[:alert]="Unable to start <b>#{self.lab_vmt.nickname}</b>, it is already running"
+      return result
+    end
 
-      #customization script is stored into run_dir (application config)
+    begin
+      unless Virtualbox.all_machines.include? name
 
-      # fallback name if run_dir is missing from application config
-      customization_file='/var/labs/'
-      if ITee::Application::config.respond_to? :run_dir
-        customization_file="#{ITee::Application.config.run_dir}/"
-      end
+        logger.debug "Machine '#{name}' does not exist, creating from '#{self.lab_vmt.vmt.image}'"
 
-      customization_file += "#{name}.sh"
-
-      begin
-      File.open(customization_file, 'w+') { |f|
-        #Writing VM data
-        f.write("#Configuration file for VM: #{name}\n")
-        f.write("export NIC1=#{Shellwords.escape(Rails.root)}\n")
-        f.write("#NIC count #{self.lab_vmt.lab_vmt_networks.count}\n\n")
-
-        if self.lab_vmt.lab_vmt_networks.count > 0
-          f.write("function set_networks {\n\n#function for seting NICs for VM")
-          #Writing NIC information
-          vbox_cmd = ''
-          self.lab_vmt.lab_vmt_networks.each do |nw|
-            # substituting placeholders with data
-            gen_name=nw.network.name.gsub('{year}', Time.now.year.to_s)
-            gen_name= gen_name.gsub('{user}', self.user.username)
-            gen_name= gen_name.gsub('{slot}', nw.slot.to_s)
-            gen_name= gen_name.gsub('{labVmt}', self.lab_vmt.name)
-
-            logger.debug "\nNIC#{nw.slot} #{gen_name} net type #{nw.network.net_type}\n"
-            if nw.network.net_type == 'nat'
-              vbox_cmd += "VBoxManage modifyvm \"$NAME\" --nic#{nw.slot} nat\n"
-            elsif nw.network.net_type == 'intnet'
-              vbox_cmd = "VBoxManage modifyvm \"$NAME\" --nic#{nw.slot} intnet\n"
-              vbox_cmd += "VBoxManage modifyvm \"$NAME\"  --intnet#{nw.slot} \"#{gen_name}\"\n"
-            elsif nw.network.net_type == 'bridgeadapter'
-              vbox_cmd = "VBoxManage modifyvm \"$NAME\" --nic#{nw.slot} bridged\n"
-              vbox_cmd += "VBoxManage modifyvm \"$NAME\"  --bridgeadapter#{nw.slot} \"#{gen_name}\"\n"
-            elsif nw.network.net_type == 'hostonlyadapter'
-              vbox_cmd = "VBoxManage modifyvm \"$NAME\" --nic#{nw.slot} hostonly\n"
-              vbox_cmd += "VBoxManage modifyvm \"$NAME\"  --hostonlyadapter#{nw.slot} \"#{gen_name}\"\n"
-            end
-            logger.debug vbox_cmd
-            f.write("\n#{vbox_cmd}\n")
-            vbox_cmd =''
-
-          end
-          f.write("\n"'echo "networks are now configured for $NAME"')
-          f.write("\n}\n\n")
-          #end for fuction set networks
+        # Create new instance of template
+        begin
+          current_snapshot=Virtualbox.get_vm_info(self.lab_vmt.vmt.image)['CurrentSnapshotName']
+          logger.debug "Cloning #{name} from slapshot '#{current_snapshot}'"
+          Virtualbox.clone(self.lab_vmt.vmt.image, name, current_snapshot)
+        rescue
+          Virtualbox.clone(self.lab_vmt.vmt.image, name)
         end
 
+        host = ITee::Application.config.rdp_host
+        groupname,dummy,username = name.rpartition('-')
 
-
-      }
-      rescue
-        Rails.logger.error("Can't open file #{customization_file} for writing!")
-      else
-        Rails.logger.info("Writing configuration to #{customization_file}")
+        Virtualbox.set_groups(name, [ "/#{groupname}", "/#{username}" ])
+        Virtualbox.set_rdp_port(name, '10' + mac.ip.split('.').last)
+        Virtualbox.set_extra_data(name, "VBoxAuthSimple/users/#{username}", Digest::SHA256.hexdigest(password))
+        Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiBIOSVersion", name)
+        Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiBIOSReleaseDate", username)
+        Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiSystemProduct", "System Product")
+        Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiSystemVersion", "System Version")
+        Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSKU", "System SKU")
+        Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiSystemFamily", "System Family")
+        Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiSystemVendor", "I-tee Distance Laboratory System")
+        if !self.lab_user.lab.lab_hash.blank? and !self.lab_user.user.user_key.blank?
+          Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSerial", "#{self.lab_user.lab.lab_hash}/#{self.lab_user.user.user_key}")
+        else
+          Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSerial", "System Serial")
+        end
       end
 
-
-
-
-      @ini_result=self.ini_vm #the script is called in the model
-=begin
-      port=@mac.ip.split('.').last
-      begin
-        rdp_host=ITee::Application.config.rdp_host
-      rescue
-        rdp_host=`hostname -f`.strip
+      self.lab_vmt.lab_vmt_networks.each do |nw|
+        # substituting placeholders with data
+        network_name = nw.network.name.gsub('{year}', Time.now.year.to_s)
+                      .gsub('{user}', self.user.username)
+                      .gsub('{slot}', nw.slot.to_s)
+                      .gsub('{labVmt}', self.lab_vmt.name)
+        logger.debug "Setting network: slot: #{nw.slot}; type: #{nw.network.net_type}; name: #{network_name}"
+        Virtualbox.set_network(name, nw.slot, nw.network.net_type, network_name)
       end
-      begin
-        rdp_port_prefix = ITee::Application.config.rdp_port_prefix
-      rescue
-        rdp_port_prefix = '10'
-      end
-=end
-      
+
+      logger.debug "Starting machine"
+      Virtualbox.start_vm(name)
+
       desc = 'To create a connection with this machine using linux/unix use<br/>'
-      desc += '<srong>'+self.remote('rdesktop')+'</strong>' 
+      desc += '<srong>'+self.remote('rdesktop')+'</strong>'
       desc += '<br/> or use xfreerdp as<br/>'
-      desc += '<srong>'+self.remote('xfreerdp')+'</strong>' 
-      #"<strong>rdesktop -k et -u#{self.user.username} -p#{self.password} -N -a16 #{rdp_host}:#{rdp_port_prefix}#{port}</strong></br> or use xfreerdp as</br><strong>xfreerdp  -k et --plugin cliprdr -g 90% -u #{self.user.username} -p #{self.password} #{rdp_host}:#{rdp_port_prefix}#{port}</strong></br>"
-      
-      desc +=  '<br/>To create a connection with this machine using Windows use two commands:<br/>'
+      desc += '<srong>'+self.remote('xfreerdp')+'</strong>'
+      desc += '<br/>To create a connection with this machine using Windows use two commands:<br/>'
       desc += '<srong>'+self.remote('win')+'</strong>' #"<strong>cmdkey /generic:#{rdp_host} /user:localhost\\#{self.user.username} /pass:#{self.password}</strong><br/>"
       #desc += "<strong>mstsc.exe /v:#{rdp_host}:#{rdp_port_prefix}#{port} /f</strong><br/>"
       logger.debug "\n setting #{self.id} description to \n #{desc}"
@@ -240,44 +188,25 @@ end
 
       self.save
       logger.debug "\n save successful "
-=begin
-      require 'timeout'
-      status = Timeout::timeout(60) {
-        # Something that should be interrupted if it takes too much time...
-        if @ini_result!=nil
-          until @ini_result.include?("masin #{self.name} loodud")
-          #do nothing, just wait
-            sleep(5)
-            logger.debug "\nwaiting ...\n"
-          end
-        end
-      }
-=end
-      if @ini_result.include?("VM named: #{self.name} created")
-        result[:notice] = result[:notice]+"Machine <b>#{self.lab_vmt.nickname}</b> successfully started<br/>"
-        #flash[:notice]=flash[:notice].html_safe
-        logger.debug @ini_result
 
-        # add last activity to labuser
-        labuser=LabUser.where('lab_id=? and user_id=?', self.lab_vmt.lab_id, self.user_id).last
-        if labuser
-          labuser.last_activity=Time.now
-          labuser.activity="Start vm - '#{self.name}'"
-          labuser.save 
-        end
+      result[:notice] = "Machine <b>#{self.lab_vmt.nickname}</b> successfully started<br/>"
 
-      else
-        logger.info @ini_result
-        @mac.vm_id=nil
-        @mac.save
-        result[:notice] = ''
-        result[:alert]="Machine <b>#{self.lab_vmt.nickname}</b> initialization <b>failed</b>."
+      # add last activity to labuser
+      labuser=LabUser.where('lab_id=? and user_id=?', self.lab_vmt.lab_id, self.user_id).last
+      if labuser
+        labuser.last_activity=Time.now
+        labuser.activity="Start vm - '#{self.name}'"
+        labuser.save
       end
-     # logger.debug "\n#{result}\n"
-    else
+
+    rescue Exception => e
+      logger.error "Failed to start vm: #{e.message}"
+      @mac.vm_id=nil
+      @mac.save
       result[:notice] = ''
-      result[:alert]="Unable to start <b>#{self.lab_vmt.nickname}</b>, it is already running"
+      result[:alert]="Machine <b>#{self.lab_vmt.nickname}</b> initialization <b>failed</b>."
     end
+
     result
     # removed mac address conflict rescue. Conflict management is TODO!
   end
@@ -285,12 +214,12 @@ end
 
   #pause a machine
   def pause_vm
-    if self.state=='running'
+    state = self.state
+    if state=='running'
       logger.info 'running VM pause script'
-      a = self.pau_vm #the script is called in the model
-      logger.info a
+      Virtualbox.pause_vm(name)
       {success: true, message: 'Successful vm pause.'}
-    elsif self.state=='paused'
+    elsif state=='paused'
       {success: false, message:'Unable to pause a paused machine'}
     else
       {success: false, message: 'unable to pause a shut down machine'}
@@ -299,13 +228,13 @@ end
 
   #resume machine from pause
   def resume_vm
-    if self.state=='paused'
+    state = self.state
+    if state=='paused'
       logger.info 'running VM resume script'
-      a=self.res_vm # the script is called in the model
-      logger.info a
+      Virtualbox.resume_vm(name)
       {success: true, message: 'Successful vm resume.'}
-    elsif self.state=='running'
-      return {success: false, message:'Unable to resume a running machine'}
+    elsif state=='running'
+      {success: false, message:'Unable to resume a running machine'}
     else
       {success: false, message: 'unable to resume a shut down machine'}
     end
