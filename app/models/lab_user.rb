@@ -176,42 +176,35 @@ class LabUser < ActiveRecord::Base
 
 
   def self.rdp_status(id)
-    # vms exist only for running labs 
     labuser = LabUser.find_by_id(id)
-    if labuser==nil 
-      # do nothing if there is no vm
-    else
-      # get lab
-      lab = labuser.lab
-      if lab && lab.poll_freq>0 && !labuser.end # poll until labuser ends
-        # iterate over vms for this lab
-        labuser.vms.each do |vm|
-          # check if rdp is allowed for user
-          logger.debug "\n#{vm.name} found"
-          if vm.lab_vmt.allow_remote 
-            info = Virtualbox.get_vm_info(vm.name, true)
-            if info 
-              if info['VRDEActiveConnection']
-                if info['VRDEActiveConnection']=="on"
-                  labuser.last_activity=Time.now
-                  labuser.activity = "RDP active - '#{vm.name}'"
-                  logger.debug "RDP is active - #{vm.name}"
-                end
-              end # has field about rdp connection
-            end # got vm info
+    unless labuser
+      return
+    end
 
-          else # rdp is not enabled
-            # do nothing
+    lab = labuser.lab
+    unless lab and lab.poll_freq > 0 and !labuser.end # poll until labuser ends
+      return
+    end
+
+    labuser.vms.each do |vm|
+      if vm.lab_vmt.allow_remote
+        begin
+          info = Virtualbox.get_vm_info(vm.name, true)
+          if info['VRDEActiveConnection']=="on"
+            labuser.last_activity=Time.now
+            labuser.activity = "RDP active - '#{vm.name}'"
+            logger.debug "RDP is active on '#{vm.name}'"
           end
-        end # end foreach vms
+        rescue
+          # Ignore error, callee logs the error message
+        end
+      end
+    end # end foreach vms
 
-        labuser.save
+    labuser.save
       
-        # run this again in x seconds
-        logger.debug "\nDO THIS AGAIN!\n"
-        LabUser.delay(queue: "labuser-#{labuser.id}" ,run_at: lab.poll_freq.seconds.from_now ).rdp_status(labuser.id)
-      end #lab exsist and has polling
-    end # labuser exists
+    # run this again in x seconds
+    LabUser.delay(queue: "labuser-#{labuser.id}", run_at: lab.poll_freq.seconds.from_now).rdp_status(labuser.id)
   end
 
 
