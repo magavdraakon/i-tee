@@ -2,17 +2,10 @@
 # Author: Margus Ernits margus.ernits@gmail.com
 
 if [ $# -ne 7 ]
-then 
+then
 echo "7 arguments are needed!"
 exit 1
 fi
-
-function die {
-echo "Error with $1"
-echo "ERROR"
-exit 1
-}
-
 
 IT_HOSTNAME=$1
 IP_ADDR=$2
@@ -32,127 +25,70 @@ logger -p info -t i-tee VM ${NAME} starting
 logger -p info -t i-tee "Creating VM: $NAME from Template: ${TEMPLATE}"
 
 
-FIRST_START=false
-
 if [ $(VBoxManage list vms | cut -f1 -d' '| tr -d '"'| grep "^$NAME$" ) ]
 then
-	echo "machine already exists. Starting old instance of $NAME"
+	echo "VM $NAME already exists"
 else
-    SNAPSHOT=$(vboxmanage snapshot ${TEMPLATE} list|grep '*'|grep template|awk '{print $2}')
-    echo $(vboxmanage snapshot ${TEMPLATE} list|grep '*'|grep template|awk '{print $2}')
-    if [ $SNAPSHOT ]
-    then
-        echo "Cloning $NAME using ${TEMPLATE} and snapshot $SNAPSHOT"
-        #echo "time VBoxManage clonevm  ${TEMPLATE} --snapshot $SNAPSHOT --options link --name $NAME --register"
-        time VBoxManage clonevm  ${TEMPLATE} --snapshot $SNAPSHOT --options link --name $NAME --register
-    else
-        echo "cloning $NAME using ${TEMPLATE}"
-        time VBoxManage clonevm ${TEMPLATE} --name $NAME --register
-    fi
-    FIRST_START=true
+	SNAPSHOT=$(vboxmanage snapshot "$TEMPLATE" list|grep '*'|grep template|awk '{print $2}')
+	if [ -z "$SNAPSHOT" ]
+	then
+		echo "cloning $NAME using $TEMPLATE"
+		 time VBoxManage clonevm "$TEMPLATE" --name "$NAME" --register
+	else
+	        echo "Cloning $NAME using $TEMPLATE and snapshot $SNAPSHOT"
+		time VBoxManage clonevm  "$TEMPLATE" --snapshot "$SNAPSHOT" --options link --name "$NAME" --register
+	fi
+
+
+	USERNAME=${NAME##*-}
+	GROUPNAME=${NAME:0:((${#NAME}-${#USERNAME})-1)}
+
+	if [ -r "/var/labs/run/$TEMPLATE.sh" ]
+	then
+		. "/var/labs/run/$TEMPLATE.sh"
+
+		curl -k -H 'Content-Type: application/json' -X DELETE -d '{"api_key":"'"$API_KEY_ADMIN"'", "lab":"'"$LAB_ID"'", "userName":"'"$USERNAME"'", "reset":false}' "$LAB_URI"
+		USER_KEY=$(curl -k -H 'Content-Type: application/json' -X POST -d '{"api_key":"'"$API_KEY_ADMIN"'", "lab":"'"$LAB_ID"'", "fullname":"'"$FULLNAME"'", "username":"'"$USERNAME"'", "password":"'"$USER_PWD"'", "host":"'"$IT_HOSTNAME"'", "info":{"answer":"42"}}' "$LAB_URI" | cut -d'"' -f4 -)
+
+		VBoxManage setextradata "$NAME" "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSerial" "${LAB_ID}/${USER_KEY}"
+	else
+		VBoxManage setextradata "$NAME" "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSerial" "System Serial"
+	fi
+
+	if [ "$?" -ne 0 ]
+	then
+		echo "Cloning VM $NAME failed from template $TEMPLATE failed"
+		exit 1
+	fi
+
+	VBoxManage modifyvm "$NAME" --groups "/$GROUPNAME","/$USERNAME"
+
+	PWDHASH=$(VBoxManage internalcommands passwordhash "$USER_PWD" | cut -f3 -d' ')
+	VBoxManage setextradata "$NAME" "VBoxAuthSimple/users/$USERNAME" "$PWDHASH"
+	# dmidecode -s bios-version
+	VBoxManage setextradata "$NAME" "VBoxInternal/Devices/pcbios/0/Config/DmiBIOSVersion"       "$NAME"
+	# dmidecode -s bios-release-date
+	VBoxManage setextradata "$NAME" "VBoxInternal/Devices/pcbios/0/Config/DmiBIOSReleaseDate"   "$USERNAME"
+
+	VBoxManage setextradata "$NAME" "VBoxInternal/Devices/pcbios/0/Config/DmiSystemProduct"     "System Product"
+	VBoxManage setextradata "$NAME" "VBoxInternal/Devices/pcbios/0/Config/DmiSystemVersion"     "System Version"
+	VBoxManage setextradata "$NAME" "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSKU"         "System SKU"
+	VBoxManage setextradata "$NAME" "VBoxInternal/Devices/pcbios/0/Config/DmiSystemFamily"      "System Family"
+	VBoxManage setextradata "$NAME" "VBoxInternal/Devices/pcbios/0/Config/DmiSystemVendor"      "I-tee Distance Laboratory System"
+
+	declare -f set_networks > /dev/null && set_networks
+
+	RDP_PORT=${IP_ADDR##*.}
+	VBoxManage modifyvm "$NAME" --vrdeport "10$RDP_PORT"
+
 fi
 
-if [ $? -ne 0 ]
+VBoxManage startvm "$NAME" --type headless
+
+if [ "$?" -ne 0 ]
 then
-#echo "Clone VM failed"
-echo "Virtual Machine clonig fails ${TEMPLATE} $NAME"
-#| mail $ADMIN -s $(hostname -f)
-exit 1
-fi
-#TODO to get vm's directory vboxmanage showvminfo vm_name|grep 'Config file:'
-USERNAME=${NAME##*-}
-GROUPNAME=${NAME:0:((${#NAME}-${#USERNAME})-1)}
-VBoxManage modifyvm $NAME --groups "/${GROUPNAME}","/${USERNAME}"
-
-
-PWDHASH=$(VBoxManage internalcommands passwordhash $USER_PWD|cut -f3 -d' ')
-VBoxManage setextradata ${NAME}  "VBoxAuthSimple/users/${USERNAME}" ${PWDHASH}
-
-VBoxManage setextradata ${NAME}      "VBoxInternal/Devices/pcbios/0/Config/DmiSystemProduct"     "System Product"
-VBoxManage setextradata ${NAME}      "VBoxInternal/Devices/pcbios/0/Config/DmiSystemVersion"     "System Version"
-if [[ -r /var/labs/run/${TEMPLATE}.sh ]]
-then
-source /var/labs/run/${TEMPLATE}.sh
-
-curl -k -H 'Content-Type: application/json' -X DELETE -d '{"api_key":"'"${API_KEY_ADMIN}"'", "lab":"'"${LAB_ID}"'", "userName":"'"${USERNAME}"'", "reset":false}' "${LAB_URI}"
-
-USER_KEY=$(curl -k -H 'Content-Type: application/json' -X POST -d '{"api_key":"'"${API_KEY_ADMIN}"'", "lab":"'"${LAB_ID}"'", "fullname":"'"${FULLNAME}"'", "username":"'"${USERNAME}"'", "password":"'"${USER_PWD}"'", "host":"'"${IT_HOSTNAME}"'", "info":{"answer":"42"}}' "${LAB_URI}" | cut -d'"' -f4 -)
-
-echo USER_KEY is $USER_KEY
-logger -p info -t i-tee  "USER_KEY for user ${USERNAME} is $USER_KEY for VM  ${TEMPLATE}"
-
-    VBoxManage setextradata ${NAME}      "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSerial"      "${LAB_ID}/${USER_KEY}"
-else
-    VBoxManage setextradata ${NAME}      "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSerial"      "System Serial"
-fi
-
-VBoxManage setextradata ${NAME}      "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSKU"         "System SKU"
-VBoxManage setextradata ${NAME}      "VBoxInternal/Devices/pcbios/0/Config/DmiSystemFamily"      "System Family"
-
-# if special networks are set then rewrite NIC setup
-declare -f set_networks > /dev/null && set_networks || {
-echo "No network setup"
-INTERNALNETNAME=$(date +%Y)${USERNAME}
-VBoxManage modifyvm ${NAME}  --intnet2 $INTERNALNETNAME
-}
-
-
-VBoxManage setextradata ${NAME} "VBoxInternal/Devices/pcbios/0/Config/DmiSystemVendor" "I-tee Distance Laboratory System"
-
-# dmidecode -s bios-version
-VBoxManage setextradata ${NAME} "VBoxInternal/Devices/pcbios/0/Config/DmiBIOSVersion"       "${NAME}"
-
-# dmidecode -s bios-release-date
-VBoxManage setextradata ${NAME} "VBoxInternal/Devices/pcbios/0/Config/DmiBIOSReleaseDate"   "${USERNAME}"
-
-
-
-if [ "${FIRST_START}" = "true" ]
-then
-#connect DVD iso if exists
-    if [ -f "/var/labs/ovas/${GROUPNAME}.iso" ]
-    then
-
-    VBoxManage storageattach "${NAME}" --storagectl IDE --port 1 --device 0 --type dvddrive --medium "/var/labs/ovas/${GROUPNAME}.iso"
-
-    VBoxManage startvm $NAME --type headless
-
-    sleep 2
-
-    for i in {1..60}
-    do
-
-        if [ $(VBoxManage list runningvms | cut -f1 -d' '| tr -d '"'| grep "^$NAME$" ) ]
-        then
-            sleep 1
-        else
-            echo "First configuration for ${NAME} done!"
-            break
-        fi
-
-
-    done
-    VBoxManage controlvm ${NAME} acpipowerbutton && sleep 5
-    VBoxManage controlvm ${NAME} poweroff
-
-    VBoxManage storageattach "${NAME}" --storagectl IDE --port 1 --device 0 --medium "none"
-
-    fi
-fi
-
-RDP_PORT=${IP_ADDR##*.}
-VBoxManage modifyvm ${NAME} --vrdeport 10${RDP_PORT}
-
-VBoxManage startvm ${NAME} --type headless
-
-
-
-if [ $? -ne 0 ]
-then
-#echo "Starting VM failed"
-echo "Virtual Machine start from ${TEMPLATE} with name: $NAME Failed"
-logger -p info -t i-tee "Virtual Machine start from ${TEMPLATE} with name: $NAME Failed"
-exit 1
+	echo "Starting VM $NAME failed"
+	exit 1
 fi
 
 echo "VM named: $NAME created"
