@@ -3,16 +3,6 @@
 <p><%=AppVersion::APP_VERSION.chomp + '-' + AppVersion::GIT_REVISION%></p>
 <p><%=AppVersion::PLATFORM_INFO%></p>
 
-
-<p>Passenger info:</p>
-<p>
-  <%output=%x(utils/info.sh 2>&1)
-    group=output.split(' ')[3]
-    user= output.split(' ')[2]
-    user='nobody' if user=='root'%>
-    user: <%= user%><br/>
-  group: <%= group%>
-</p>
 <p>
   Number of virtual machines total: <%=%x(sudo -Hu vbox /usr/bin/VBoxManage list vms|wc -l)%><br/>
   Number of running virtual machines: <%=%x(sudo -Hu vbox /usr/bin/VBoxManage list runningvms|wc -l)%></p>
