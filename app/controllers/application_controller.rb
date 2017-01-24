@@ -13,7 +13,7 @@ class ApplicationController < ActionController::Base
   layout :set_layout
 
   before_filter :authenticate_user_from_token!
-  before_filter :authenticate_user!, :except=>[:about, :getprogress, :set_progress]
+  before_filter :authenticate_user!, :except=>[ :about ]
   before_filter :admin?
   before_filter :manager?
   before_filter :per_page

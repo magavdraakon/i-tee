@@ -340,7 +340,7 @@ class LabsController < ApplicationController
       redirect_to(my_labs_path)
   end
 
-  #restarting a lab means deleting virtual machines, removing start/end times and progress/results
+  # Restarting a lab means deleting virtual machines and removing start/end times
   def restart_lab
     respond_to do |format|
       @lab=Lab.find(params[:id])

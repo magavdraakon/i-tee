@@ -113,15 +113,13 @@ class LabUser < ActiveRecord::Base
   end
 
   def restart_lab
-  	self.end_lab # end lab
-  	self.start = nil
-  	self.pause = nil
-  	self.end = nil
-  	self.progress = nil
-  	self.result = nil
-  	self.save
-  	self.start_lab # start lab
-	end
+    self.end_lab
+    self.start = nil
+    self.pause = nil
+    self.end = nil
+    self.save
+    self.start_lab
+  end
 
 
 	def start_all_vms

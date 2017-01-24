@@ -1,6 +1,5 @@
 class LabUsersController < ApplicationController
-  #restricted to admins 
-  before_filter :authorise_as_manager, :except=>[:progress]
+  before_filter :authorise_as_manager
   #redirect to index view when trying to see unexisting things
   before_filter :save_from_nil, :only=>[:edit, :update, :destroy]
   before_filter :manager_tab, :except=>[:search]
@@ -303,16 +302,6 @@ class LabUsersController < ApplicationController
 
   end
 
-
-
-  def progress
-    @lab_user=LabUser.find_by_id(params[:id])
-    unless @lab_user.user.id==current_user.id || @admin
-      @lab_user=LabUser.new#dummy
-    end
-    render :partial => 'shared/lab_progress' 
-  end
-  
   def user_token
     set_order_by
     @users= User.order(@order).paginate(:page=>params[:page], :per_page=>@per_page)

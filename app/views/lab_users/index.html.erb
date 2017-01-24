@@ -7,8 +7,6 @@
       <tr>
         <th><%=link_to('Lab', :controller=>'lab_users',:action=>'index', :sort_by=>'lab_id', :dir=>@dir)%></th>
         <th><%=link_to('User', :controller=>'lab_users',:action=>'index', :sort_by=>'user_id', :dir=>@dir)%></th>
-        <th>Progress</th>
-        <th>Result</th>
         <th><%=link_to('Start', :controller=>'lab_users',:action=>'index', :sort_by=>'start', :dir=>@dir)%></th>
         <th><%=link_to('End', :controller=>'lab_users',:action=>'index', :sort_by=>'end', :dir=>@dir)%></th>
         <th><%=link_to('Last activity', :controller=>'lab_users',:action=>'index', :sort_by=>'last_activity', :dir=>@dir)%></th>
@@ -21,8 +19,6 @@
       <tr>
         <td><%= lab_user.lab.blank? ? 'no lab' : link_to(lab_user.lab.name, my_labs_path+'/'+lab_user.lab.id.to_s+'/'+lab_user.user.username)  %></td>
         <td><%= lab_user.user.username %></td>
-        <td><%= lab_user.progress %></td>
-        <td><%= lab_user.result %></td>
         <td><span title="<%= lab_user.start %>"><%= distance_of_time_in_words(Time.now, lab_user.start.to_time )+' ago' if lab_user.start %></span>
         </td>
         <td><span title="<%= lab_user.end %>"><%= distance_of_time_in_words(Time.now, lab_user.end.to_time )+' ago' if lab_user.end %></span>

@@ -20,10 +20,6 @@
      <%=collection_select(:lab_user, :user_id, User.all, :id, :username,{:prompt => true})%> <span class="red" title="Required field">*</span>
   </div>
   <div class="field">
-    <%= f.label :progress %><br />
-    <%= f.text_field :progress %>
-  </div>
-  <div class="field">
     <%= f.label :result %><br />
     <%= f.text_field :result %>
   </div><!--
