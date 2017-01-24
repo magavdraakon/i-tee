@@ -19,7 +19,7 @@
 
     <% @lab_users.each do |lab_user| %>
       <tr>
-        <td><%= link_to lab_user.lab.name, my_labs_path+'/'+lab_user.lab.id.to_s+'/'+lab_user.user.username  %></td>
+        <td><%= lab_user.lab.blank? ? 'no lab' : link_to(lab_user.lab.name, my_labs_path+'/'+lab_user.lab.id.to_s+'/'+lab_user.user.username)  %></td>
         <td><%= lab_user.user.username %></td>
         <td><%= lab_user.progress %></td>
         <td><%= lab_user.result %></td>
@@ -29,9 +29,11 @@
         </td>
         <td><% if lab_user.activity && lab_user.last_activity %><%= lab_user.activity %> @ <%= lab_user.last_activity %><%end%></td>
         <td class="narrow">
+          <% unless lab_user.lab.blank? %>
           <%= link_to('Start lab',start_lab_path+'/'+lab_user.lab.id.to_s+'/'+lab_user.user.username , :class=>'submit-button button') if !lab_user.start %>
           <%= link_to('Restart lab',restart_lab_path+'/'+lab_user.lab.id.to_s+'/'+lab_user.user.username, :class=>'add-button button', :confirm => 'This will delete all saved data. Are you sure?') if lab_user.start %>
           <%= link_to('End lab', end_lab_path+'/'+lab_user.id.to_s, :class=>'delete-button button', :confirm => 'This will delete all saved data. Are you sure?' ) if lab_user.start && !lab_user.end %>
+          <% end %>
         </td>
         <td class="narrow">
           <%= link_to 'Edit', edit_lab_user_path(lab_user) ,:class=> 'edit-button button'%>

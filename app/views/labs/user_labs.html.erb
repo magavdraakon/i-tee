@@ -118,9 +118,9 @@
             <td style="text-align:right;">
               <% if @lab.vms_by_one %>
                 <div class=" loader" ><%= link_to('Start', start_vm_path+'/'+vm.id.to_s, :class=> 'button start-button') if (state!='running' && state!='paused') || vm.mac==nil%>
-                <%= link_to('Pause', pause_vm_path+'/'+vm.id.to_s, :class=>'button pause-button') if state=='running' && vm.mac!=nil %>
+                <%= link_to('Pause', pause_vm_path+'/'+vm.id.to_s, :class=>'button pause-button') if state=='running' && vm.mac!=nil && vm.lab_vmt.allow_restart %>
                 <%= link_to('Resume', resume_vm_path+'/'+vm.id.to_s, :class=>'button start-button') if state=='paused' && vm.mac!=nil%>
-                <%= link_to('Stop', stop_vm_path+'/'+vm.id.to_s, :class=> 'button stop-button') if state=='running' && vm.mac!=nil%>
+                <%= link_to('Stop', stop_vm_path+'/'+vm.id.to_s, :class=> 'button stop-button') if state=='running' && vm.mac!=nil && vm.lab_vmt.allow_restart %>
               <% end %>
               <%= link_to('Reset RDP', rdp_reset_path+'/'+vm.id.to_s, :class=>'button start-button') if state=='running' && vm.mac!=nil && vm.lab_vmt.allow_remote %>
               <%if state=='running' && vm.mac!=nil && vm.lab_vmt.vmt.shellinabox  %>

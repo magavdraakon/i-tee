@@ -487,6 +487,29 @@ function add_vmt_to_lab(){
     vmt_holder.appendChild(document.createTextNode(" "));
     vmt_holder.appendChild(allowV);
     vmt_holder.appendChild( document.createElement("br") );
+    /*ALLOW restart*/
+    var allowRL=document.createElement("label");
+    allowRL.setAttribute("for", "lab_lab_vmts_attributes_"+n+"_allow_restart");
+    allowRL.innerHTML="Allow remote";
+
+    var allowRH=document.createElement("input");
+    allowRH.setAttribute("name", "lab[lab_vmts_attributes]["+n+"][allow_restart]");
+    allowRH.setAttribute("type", "hidden");
+    allowRH.setAttribute("value", 0);
+
+    var allowRV=document.createElement("input");
+    allowRV.setAttribute("id", "lab_lab_vmts_attributes_"+n+"_allow_restart");
+    allowRV.setAttribute("name", "lab[lab_vmts_attributes]["+n+"][allow_restart]");
+    allowRV.setAttribute("type", "checkbox");
+    allowRV.setAttribute("checked", "checked");
+    allowRV.setAttribute("value", 1);
+
+    vmt_holder.appendChild(allowRL);
+    vmt_holder.appendChild(document.createTextNode(" "));
+    vmt_holder.appendChild(allowRH);
+    vmt_holder.appendChild(document.createTextNode(" "));
+    vmt_holder.appendChild(allowRV);
+    vmt_holder.appendChild( document.createElement("br") );
     /* order */
     var orderL=document.createElement("label");
     orderL.setAttribute("for", "lab_lab_vmts_attributes_"+n+"_position");

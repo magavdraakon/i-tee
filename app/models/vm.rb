@@ -106,16 +106,20 @@ class Vm < ActiveRecord::Base
 
   def stop_vm
    if self.state=='running' || self.state=='paused'
-    logger.info 'Running VM power off script'
-    a=self.poweroff_vm #the script is called in the model
-    logger.info a
-    self.description='Power on the virtual machine by clicking <strong>Start</strong>.'
-    self.save
-    # remove link to  mac 
-    @mac = Mac.where('vm_id=?', self.id).first
-    @mac.vm_id=nil
-    @mac.save
-    {success: true, message: 'Successful macine shutdown'}
+    if self.lab_vmt.allow_restart
+      logger.info 'Running VM power off script'
+      a=self.poweroff_vm #the script is called in the model
+      logger.info a
+      self.description='Power on the virtual machine by clicking <strong>Start</strong>.'
+      self.save
+      # remove link to  mac 
+      @mac = Mac.where('vm_id=?', self.id).first
+      @mac.vm_id=nil
+      @mac.save
+      {success: true, message: 'Successful macine shutdown'}
+    else
+      {success: true, message: 'Machine can not be shut down'}
+    end
   else
     {success: true, message: 'Machine was already shut down'}
   end
