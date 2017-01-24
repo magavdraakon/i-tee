@@ -67,15 +67,15 @@
         <%state=vm.state 
           desc="Initialize the virtual machine #{vm.lab_vmt.nickname} by clicking <strong>Start</strong>"
            desc="There is no remote desktop access for #{vm.lab_vmt.nickname}" if (state=='running' || state=='paused') && !vm.lab_vmt.allow_remote
-           desc=vm.description if (state=='running' || state=='paused') && vm.mac!=nil && vm.lab_vmt.allow_remote %>
+           desc=vm.description if (state=='running' || state=='paused') && vm.rdp_port && vm.lab_vmt.allow_remote %>
         <table class="vm_s">
           <tr>
 
             <td class="narrow" >
           <b><%=vm.lab_vmt.nickname ? vm.lab_vmt.nickname : vm.name %></b>
-          <span class="vm_links"><%= '('+state+')' if vm.mac!=nil && (state=='running' || state=='paused') %></span>
-          <%if vm.mac!=nil && state=='running' && vm.lab_vmt.allow_remote %><br/>
-            <b>RDP info:</b> <%= ITee::Application.config.rdp_host %>:10<%=vm.mac.ip.split('.').last if vm.mac!=nil%><br/>
+          <span class="vm_links"><%= '('+state+')' if vm.rdp_port && (state=='running' || state=='paused') %></span>
+          <%if vm.rdp_port && state=='running' && vm.lab_vmt.allow_remote %><br/>
+            <b>RDP info:</b> <%= ITee::Application.config.rdp_host %>:<%= vm.rdp_port %><br/>
             <b>user:</b> <%= @lab_user.user.username %><br/>
             <b>pwd:</b> <%= vm.password %>
           <%end%>
@@ -83,12 +83,12 @@
 
             <td style="text-align:right;">
               <% if @lab.vms_by_one %>
-                <div class=" loader" ><%= link_to('Start', start_vm_path+'/'+vm.id.to_s, :class=> 'button start-button') if (state!='running' && state!='paused') || vm.mac==nil%>
-                <%= link_to('Pause', pause_vm_path+'/'+vm.id.to_s, :class=>'button pause-button') if state=='running' && vm.mac!=nil && vm.lab_vmt.allow_restart %>
-                <%= link_to('Resume', resume_vm_path+'/'+vm.id.to_s, :class=>'button start-button') if state=='paused' && vm.mac!=nil%>
-                <%= link_to('Stop', stop_vm_path+'/'+vm.id.to_s, :class=> 'button stop-button') if state=='running' && vm.mac!=nil && vm.lab_vmt.allow_restart %>
+                <div class=" loader" ><%= link_to('Start', start_vm_path+'/'+vm.id.to_s, :class=> 'button start-button') if (state!='running' && state!='paused') || !vm.rdp_port %>
+                <%= link_to('Pause', pause_vm_path+'/'+vm.id.to_s, :class=>'button pause-button') if state == 'running' && vm.rdp_port && vm.lab_vmt.allow_restart %>
+                <%= link_to('Resume', resume_vm_path+'/'+vm.id.to_s, :class=>'button start-button') if state == 'paused' && vm.rdp_port %>
+                <%= link_to('Stop', stop_vm_path+'/'+vm.id.to_s, :class=> 'button stop-button') if state == 'running' && vm.rdp_port && vm.lab_vmt.allow_restart %>
               <% end %>
-              <%= link_to('Reset RDP', rdp_reset_path+'/'+vm.id.to_s, :class=>'button start-button') if state=='running' && vm.mac!=nil && vm.lab_vmt.allow_remote %>
+              <%= link_to('Reset RDP', rdp_reset_path+'/'+vm.id.to_s, :class=>'button start-button') if state=='running' && vm.rdp_port && vm.lab_vmt.allow_remote %>
               </div>
             <% if vm.lab_vmt.allow_remote && state=='running' %>
                 <div class="remote_connections">

@@ -1,25 +1,12 @@
 class Vm < ActiveRecord::Base
-  has_one :mac
   belongs_to :user
   belongs_to :lab_vmt
   belongs_to :lab_user
   before_destroy :try_delete_vm
-  before_destroy :rel_mac
   before_create :add_pw
 
   validates_presence_of :name, :lab_vmt_id, :user_id
   validates_uniqueness_of :name
-  def rel_mac
-    logger.debug "\n trying to release mac for #{self.id} - #{self.name} \n"
-    mac=Mac.where('vm_id=?', self.id).first
-    if mac
-      mac.vm_id=nil
-      mac.save
-      logger.debug "mac released from #{self.id} - #{self.name}\n"
-    else
-      logger.debug "\n no mac \n"
-    end
-  end
 
   def try_delete_vm
     begin
@@ -72,6 +59,19 @@ class Vm < ActiveRecord::Base
     state
   end
 
+  def rdp_port
+    if self.vm_info
+      rdp_port = self.vm_info['vrdeport'].to_i
+      if rdp_port == -1
+        rdp_port = 0
+      end
+    else
+      rdp_port = 0
+    end
+    logger.debug "RDP port of '#{name}' is #{rdp_port}"
+    rdp_port
+  end
+
   def delete_vm
     begin
       Virtualbox.stop_vm(name)
@@ -94,10 +94,6 @@ class Vm < ActiveRecord::Base
         self.description='Power on the virtual machine by clicking <strong>Start</strong>.'
         self.save
 
-        # remove link to mac
-        @mac = Mac.where('vm_id=?', self.id).first
-        @mac.vm_id=nil
-        @mac.save
         {success: true, message: 'Successful macine shutdown'}
       else
         {success: true, message: 'Machine can not be shut down'}
@@ -108,20 +104,8 @@ class Vm < ActiveRecord::Base
   end
 
   def start_vm
-    #find out if there is a mac address bound with this vm already
+
     result = {notice: '', alert: ''}
-    @mac= Mac.where('vm_id=?', self.id).first
-    # binding a unused mac address with the vm if there is no mac
-    if @mac==nil
-      @mac= Mac.where('vm_id is null').first
-      @mac.vm_id=self.id
-      if @mac.save  #save successful
-        logger.debug '\n successful mac assignement.\n'
-      end #end -if save
-    else
-      #the vm had a mac already, dont do anything
-      logger.debug '\nVm already had a mac.\n'
-    end # end if nil
 
     state = self.state
     if state == 'running' || state == 'paused'
@@ -147,7 +131,6 @@ class Vm < ActiveRecord::Base
         groupname,dummy,username = name.rpartition('-')
 
         Virtualbox.set_groups(name, [ "/#{groupname}", "/#{username}" ])
-        Virtualbox.set_rdp_port(name, '10' + mac.ip.split('.').last)
         Virtualbox.set_extra_data(name, "VBoxAuthSimple/users/#{username}", Digest::SHA256.hexdigest(password))
         Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiBIOSVersion", name)
         Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiBIOSReleaseDate", username)
@@ -201,14 +184,11 @@ class Vm < ActiveRecord::Base
 
     rescue Exception => e
       logger.error "Failed to start vm: #{e.message}"
-      @mac.vm_id=nil
-      @mac.save
       result[:notice] = ''
       result[:alert]="Machine <b>#{self.lab_vmt.nickname}</b> initialization <b>failed</b>."
     end
 
     result
-    # removed mac address conflict rescue. Conflict management is TODO!
   end
 
 
@@ -251,24 +231,11 @@ class Vm < ActiveRecord::Base
   end
 
   def get_connection_info
-    port=self.mac ? self.mac.ip.split('.').last : ''
-    begin
-      rdp_host=ITee::Application.config.rdp_host
-    rescue
-      rdp_host=`hostname -f`.strip
-    end
-    begin
-      rdp_port_prefix = ITee::Application.config.rdp_port_prefix
-    rescue
-      rdp_port_prefix = '10'
-    end
-
     info = { }
     info[:username] = self.user.username
     info[:password] = self.password
-    info[:host] = rdp_host
-    info[:port] = "#{rdp_port_prefix}#{port}"
-
+    info[:host] = ITee::Application.config.rdp_host
+    info[:port] = self.rdp_port
     info
   end
 
@@ -277,30 +244,21 @@ class Vm < ActiveRecord::Base
     if resolution!="" 
       logger.debug "\n resolution is #{resolution}"
     end
-    port=self.mac ? self.mac.ip.split('.').last : ''
-    begin
-      rdp_host=ITee::Application.config.rdp_host
-    rescue
-      rdp_host=`hostname -f`.strip
-    end
-    begin
-      rdp_port_prefix = ITee::Application.config.rdp_port_prefix
-    rescue
-      rdp_port_prefix = '10'
-    end
+
+    rdp_host=ITee::Application.config.rdp_host
 
     case typ
       when 'win'
         desc = "cmdkey /generic:#{rdp_host} /user:localhost&#92;#{self.user.username} /pass:#{self.password}&amp;&amp;"
-        desc += "mstsc.exe /v:#{rdp_host}:#{rdp_port_prefix}#{port} /f"
+        desc += "mstsc.exe /v:#{rdp_host}:#{self.rdp_port} /f"
       when 'rdesktop'
-        desc ="rdesktop  -u#{self.user.username} -p#{self.password} -N -a16 #{rdp_host}:#{rdp_port_prefix}#{port}"
+        desc ="rdesktop  -u#{self.user.username} -p#{self.password} -N -a16 #{rdp_host}:#{self.rdp_port}"
       when 'xfreerdp'
-        desc ="xfreerdp  --plugin cliprdr -g 90% -u #{self.user.username} -p #{self.password} #{rdp_host}:#{rdp_port_prefix}#{port}"
+        desc ="xfreerdp  --plugin cliprdr -g 90% -u #{self.user.username} -p #{self.password} #{rdp_host}:#{self.rdp_port}"
       when 'mac'
-        desc ="open rdp://#{self.user.username}:#{self.password}@#{rdp_host}:#{rdp_port_prefix}#{port}"
+        desc ="open rdp://#{self.user.username}:#{self.password}@#{rdp_host}:#{self.rdp_port}"
       else
-        desc ="rdesktop  -u#{self.user.username} -p#{self.password} -N -a16 #{rdp_host}:#{rdp_port_prefix}#{port}"
+        desc ="rdesktop  -u#{self.user.username} -p#{self.password} -N -a16 #{rdp_host}:#{self.rdp_port}"
     end
 
   end
@@ -310,9 +268,6 @@ class Vm < ActiveRecord::Base
     if self.state=='running'
       if self.lab_vmt.allow_remote && self.lab_vmt.guacamole_type!="none"
 
-        port = self.mac ? self.mac.ip.split('.').last : ''
-        rdp_port_prefix = ITee::Application.config.rdp_port_prefix
-        rdp_port = "#{rdp_port_prefix}#{port}".to_i
 
         user_prefix = ITee::Application.config.guacamole[:user_prefix]
         max_connections = ITee::Application::config.guacamole[:max_connections]
@@ -356,7 +311,7 @@ class Vm < ActiveRecord::Base
           if result
             result.add_parameters([
               { parameter_name: 'hostname', parameter_value: rdp_host },
-              { parameter_name: 'port', parameter_value: rdp_port },
+              { parameter_name: 'port', parameter_value: self.rdp_port },
               { parameter_name: 'username', parameter_value: self.user.username },
               { parameter_name: 'password', parameter_value: self.password },
 #             { parameter_name: 'color-depth', parameter_value: 255 }

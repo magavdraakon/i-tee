@@ -18,8 +18,6 @@ ITee::Application.configure do
 
   # hostname for rdp sessions
   config.rdp_host = '192.168.13.12'
-  # port prefix for rdp sessions
-  config.rdp_port_prefix = '10'
   config.rdp_password_length = 14
 
   #place for temporal files like VM customization files

@@ -457,15 +457,6 @@ end
 	end
  end
 
- def self.set_rdp_port(vm, port)
-	# TODO: assert that port is integer between 2048 (exclusive) and 65535 (inclusive)
-	stdout = %x(sudo -Hu vbox VBoxManage modifyvm "#{Shellwords.escape(vm)}" --vrdeport #{port} 2>&1)
-	if $?.exitstatus != 0
-		logger.error "Failed to set vm rdp port: #{stdout}"
-		raise 'Failed to set vm rdp port'
-	end
- end
-
  def self.set_network(vm, slot, type, name='')
 	cmd_prefix = "sudo -Hu vbox VBoxManage modifyvm #{Shellwords.escape(vm)}"
 	name = Shellwords.escape(name)
