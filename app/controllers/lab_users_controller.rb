@@ -70,7 +70,7 @@ class LabUsersController < ApplicationController
     @info={:running=>[], :paused=>[], :stopped=>[]}
     @lab_user.vms.each do |v|
       v['username']=@lab_user.user.username
-      v['port']='10'+v.mac.ip.split('.').last if v.mac!=nil
+      v['port'] = v.rdp_port
       logger.debug "state is #{v.state}"
       @info[:"#{v.state}"]<< v
     end

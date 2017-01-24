@@ -417,7 +417,7 @@ def stop_all
 end
 
 
-  #stop the machine, do not delete the vm row from the db (release mac, but allow reinitialization)
+  # Stop the machine, do not delete the vm row from the db
   # view is restriced to logged in users, before filter finds vm and checks if owner/admin
   def stop_vm
     respond_to do |format|
