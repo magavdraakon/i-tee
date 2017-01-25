@@ -27,6 +27,7 @@ class Check
 =end
 		# TODO: does the script respond 0/1 or some value?
 		{success: true, message: "Sufficient resources found"}
+		#{success: false, message: 'Sorry, there are currently not enough resources to start the attempt. Please try again in a while.'}
 	end
 
 end

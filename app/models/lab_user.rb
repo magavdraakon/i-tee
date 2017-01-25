@@ -66,29 +66,35 @@ class LabUser < ActiveRecord::Base
 # create needed Vm-s based on the lab templates and set start to now
   def start_lab
   	unless self.start || self.end  # can only start labs that are not started or finished
-  		self.vmts.each do |template|
-        #is there a machine like that already?
-        vm = Vm.where('lab_vmt_id=? and lab_user_id=?', template.id, self.id).first
-        if vm==nil  #no there is not
-         		vm = Vm.create(:name=>"#{template.name}-#{self.user.username}", :lab_vmt=>template, :user=>self.user, :description=> 'Initialize the virtual machine by clicking <strong>Start</strong>.', :lab_user=>self)
+      result = Check.has_free_resources
+      if result && result[:success] # has resources
+    		self.vmts.each do |template|
+          #is there a machine like that already?
+          vm = Vm.where('lab_vmt_id=? and lab_user_id=?', template.id, self.id).first
+          if vm==nil  #no there is not
+           		vm = Vm.create(:name=>"#{template.name}-#{self.user.username}", :lab_vmt=>template, :user=>self.user, :description=> 'Initialize the virtual machine by clicking <strong>Start</strong>.', :lab_user=>self)
 
-         		logger.debug "\n #{vm.lab_user.id} Machine #{vm.id} - #{template.name}-#{self.user.username} successfully generated.\n"
-        end  
+           		logger.debug "\n #{vm.lab_user.id} Machine #{vm.id} - #{template.name}-#{self.user.username} successfully generated.\n"
+          end  
 
-    	end #end of making vms based of templates
-      # start delayed jobs for keeping up with the last activity
-      LabUser.rdp_status(self.id)
-    	# set new start time
-    	self.start=Time.now
-      self.last_activity=Time.now
-      self.activity='Lab start'
-    	self.save
-      logger.debug "\n all machines\n"
-      logger.debug self.vms.as_json
-      logger.debug "\n -end- \n"
-			if self.lab.startAll
-				self.start_all_vms
-			end
+      	end #end of making vms based of templates
+        # start delayed jobs for keeping up with the last activity
+        LabUser.rdp_status(self.id)
+      	# set new start time
+      	self.start=Time.now
+        self.last_activity=Time.now
+        self.activity='Lab start'
+      	self.save
+        logger.debug "\n all machines\n"
+        logger.debug self.vms.as_json
+        logger.debug "\n -end- \n"
+  			if self.lab.startAll
+  				self.start_all_vms
+  			end
+        {success: true, message: 'Lab started'}
+      else
+        result # forward the message from resource check
+      end
 		end
   end
 
@@ -108,11 +114,11 @@ class LabUser < ActiveRecord::Base
 
   def restart_lab
   	self.end_lab # end lab
-  	self.start=nil
-  	self.pause=nil
-  	self.end=nil
-  	self.progress=nil
-  	self.result=nil
+  	self.start = nil
+  	self.pause = nil
+  	self.end = nil
+  	self.progress = nil
+  	self.result = nil
   	self.save
   	self.start_lab # start lab
 	end
