@@ -112,23 +112,19 @@ class LabUsersController < ApplicationController
         l.delete if l!=nil
       end
       redirect_to(:back, :notice => 'successful update.')
-    else
+    else #adding a single user to a lab
       respond_to do |format|
-        #adding a single user to a lab
-        if params[:lab_user]
-          @lab_user = LabUser.new(params[:lab_user])
-        elsif params[:lab_id]
+        #create lab_user params based on lab_id and user_id
+        if params[:lab_id]
+          params[:lab_user] = { lab_id: params[:lab_id] }
           get_user
           if @user
-            @lab_user = LabUser.new
-            @lab_user.lab_id= params[:lab_id]
-            @lab_user.user_id= @user.id
-          else
-            format.html { redirect_to(lab_users_path) }
-            format.json { render :json=> { :success=> false, :message=>"user can't be found"} } 
+            params[:lab_user][:user_id] = @user.id
           end
         end
-     
+        # continue to create
+        @lab_user = LabUser.new(params[:lab_user])
+
         if @lab_user.save
           format.html { redirect_to(:back, :notice => 'successful update.') }
           format.json { render :json=> {:success => true}.merge(@lab_user.as_json), :status=> :created}
