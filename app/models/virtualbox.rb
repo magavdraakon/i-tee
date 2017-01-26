@@ -319,42 +319,6 @@ def self.open_guacamole(vm, user)
     end
 end
 
-  def self.manage_vms(vms, act)
-  	result = {'success'=>true, 'message' => '', 'errors'=>[]}
-  	vms.each do |vm|
-  		case act
-        when 'start'
-          r = Virtualbox.start_vm(vm)
-        when 'stop'
-          r = Virtualbox.stop_vm(vm)
-        when 'pause'
-          r = Virtualbox.pause_vm(vm)
-        when 'resume'
-          r = Virtualbox.resume_vm(vm)
-        when 'reset_rdp'
-          r= Virtualbox.reset_vm_rdp(vm)
-      	when 'take_snapshot'
-      	  r= Virtualbox.take_snapshot(vm)
-        else
-          r = {'success'=>false, 'message' => "unknown action"}
-        end
-        if r
-        	if r['success']
-        		result['message']=result['message'] + (result['message']=='' ? '' : '<br/> ')+ r['message']
-        	else
-        		result['errors']<<r['message']
-        	end
-        else
-        	result['errors']<< "unable to #{act} vm #{vm}"
-        end
-    end
-    if result['errors'].count>0
-    	result['success'] = false
-    	result['message'] = result['message']+ "<br/><b>errors</b>:<br/> "+result['errors'].join('<br/>')
-    end
-    result
-  end
-
  def self.state(vm)
 	stdout = %x(sudo -Hu vbox VBoxManage showvminfo #{Shellwords.escape(vm)} 2>/dev/null | grep -E '^State:')
 	state = "#{stdout}".split(' ')[1]
@@ -379,17 +343,11 @@ end
  end
 
  def self.start_vm(vm)
-	info = %x(sudo -Hu vbox VBoxManage startvm #{Shellwords.escape(vm)} --type headless  2>&1)
-	status= $?
-	logger.debug info
-	logger.debug status
-	if status.exitstatus===0
-		{'success'=>true, 'message'=> "successfully started #{vm}"}
-	else
-		if info.include? "is already locked by a session"
-			{'success'=>false, 'message'=> "unable to start #{vm} - it is already running"}
-		else
-			{'success'=>false, 'message'=> "unable to start #{vm}"}
+	stdout = %x(sudo -Hu vbox VBoxManage startvm #{Shellwords.escape(vm)} --type headless  2>&1)
+	if $?.exitstatus != 0
+		unless stdout.start_with? "VBoxManage: error: The machine '#{vm}' is already locked by a session (or being locked or unlocked)\n"
+			logger.error "Failed to start vm: #{stdout}"
+			raise 'Failed to start vm'
 		end
 	end
  end
@@ -480,55 +438,43 @@ end
  end
 
  def self.reset_vm_rdp(vm)
-	info = %x(sudo -Hu vbox VBoxManage controlvm #{Shellwords.escape(vm)} vrde off 2>&1)
-	status= $?
-	#logger.debug info
-	#logger.debug status
-	if status.exitstatus===0
-		info = %x(sudo -Hu vbox VBoxManage controlvm #{Shellwords.escape(vm)} vrde on 2>&1)
-		status= $?
-		#logger.debug info
-		#logger.debug status
-		if status.exitstatus===0
-			{'success'=>true, 'message'=> "RDP successfully reset for #{vm}"}
-		else
-			if info.include? "is not currently running"
-				{'success'=>false, 'message'=> "unable to reset RDP for #{vm} - it is not running"}
-			else
-				{'success'=>false, 'message'=> "unable to reset RDP for #{vm}"}
-			end
+	stdout = %x(sudo -Hu vbox VBoxManage controlvm #{Shellwords.escape(vm)} vrde off 2>&1)
+	if $?.exitstatus != 0
+		unless stdout == "VBoxManage: error: Machine '#{vm}' is not currently running\n"
+			logger.error "Failed to stop vm: #{stdout}"
+			raise 'Failed to disable RDP'
 		end
-	else
-		if info.include? "is not currently running"
-			{'success'=>false, 'message'=> "unable to reset RDP for #{vm} - it is not running"}
-		else
-			{'success'=>false, 'message'=> "unable to reset RDP for #{vm}"}
+		return
+	end
+
+	stdout = %x(sudo -Hu vbox VBoxManage controlvm #{Shellwords.escape(vm)} vrde on 2>&1)
+	if $?.exitstatus != 0
+		unless stdout == "VBoxManage: error: Machine '#{vm}' is not currently running\n"
+			logger.error "Failed to stop vm: #{stdout}"
+			raise 'Failed to enable RDP'
 		end
 	end
  end
 
  def self.take_snapshot(vm)
  	info = Virtualbox.get_vm_info(vm, true) # get info without searching for lab and user
- 	if info
- 		if info['VMState']=='poweroff'
-	 		vmname=vm.gsub("-template",'')
-	 		nr = info['CurrentSnapshotName'] ? info['CurrentSnapshotName'].gsub("#{vmname}-",'').gsub('-template','').to_i+1 : 1
-		 	name = "#{vmname}-#{nr}-template"
 
-			info = %x(sudo -Hu vbox VBoxManage snapshot #{Shellwords.escape(vm)} take #{Shellwords.escape(name)} --description "#{Time.now}" )
-			status= $?
-			logger.debug info
-			logger.debug status
-			if status.exitstatus===0
-				{'success'=>true, 'message'=> "snapshot of #{vm} successfully created"}
-			else
-				{'success'=>false, 'message'=> "unable to take snapshot of #{vm}"}
-			end
-		else
-			{'success'=>false, 'message'=> "unable to take snapshot of #{vm} while it is running"}
-		end
-	else
-		{'success'=>false, 'message'=> "unable to find #{vm}"}
+ 	unless info
+		raise 'Failed to get VM info'
+	end
+
+	unless info['VMState'] == 'poweroff'
+		raise 'Unable to take snapshot while VM is running'
+	end
+
+	vmname = vm.gsub("-template",'')
+	nr = info['CurrentSnapshotName'] ? info['CurrentSnapshotName'].gsub("#{vmname}-",'').gsub('-template','').to_i + 1 : 1
+ 	name = "#{vmname}-#{nr}-template"
+
+	stdout = %x(sudo -Hu vbox VBoxManage snapshot #{Shellwords.escape(vm)} take #{Shellwords.escape(name)} --description "#{Time.now}" 2>&1)
+	if $?.exitstatus != 0
+		logger.error "Failed to take snapshot: #{stdout}"
+		raise 'Failed to take snapshot'
 	end
  end
 

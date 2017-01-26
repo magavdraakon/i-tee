@@ -22,20 +22,47 @@ class VirtualboxController < ApplicationController
 			vms = params[:names]
 		end
 
-		result = Virtualbox.manage_vms(vms, params[:do])
+		messages = []
+		errors = []
 
-        if result 
-          if result['success']
-            redirect_to :back, notice: result['message'].html_safe
-          else
-            redirect_to :back, alert: result['message'].html_safe
-          end 
-        else
-          redirect_to :back, :flash=>{ error: "Unable to #{params[:do]} machines #{vms}"}
-        end
-      rescue ActionController::RedirectBackError # cant redirect back? go to the list instead
-	      logger.info '\nNo :back error\n'
-	      redirect_to( virtualization_path )
+		vms.each do |vm|
+			begin
+				case params[:do]
+				when 'start'
+					Virtualbox.start_vm(vm)
+					messages << "#{vm} successfully started"
+				when 'stop'
+					Virtualbox.stop_vm(vm)
+					messages << "#{vm} successfully stopped"
+				when 'pause'
+					Virtualbox.pause_vm(vm)
+					messages << "#{vm} successfully paused"
+				when 'resume'
+					Virtualbox.resume_vm(vm)
+					messages << "#{vm} successfully resumed"
+				when 'reset_rdp'
+					Virtualbox.reset_vm_rdp(vm)
+					messages << "#{vm} RDP successfully reset"
+				when 'take_snapshot'
+					Virtualbox.take_snapshot(vm)
+					messages << "#{vm} snapshot successfully taken"
+				else
+					raise 'Unknown action'
+				end
+			rescue Exception => e
+				errors << e.message
+			end
+		end
+
+		if errors.count > 0
+			messages << "<b>Errors:</b>"
+			redirect_to :back, alert: (messages.join('</br>') + '<br/>' + errors.join('<br/>')).html_safe
+		else
+			redirect_to :back, notice: messages.join('</br>').html_safe
+		end
+
+	rescue ActionController::RedirectBackError
+		redirect_to(virtualization_path)
 	end
 
 	def rdp_password
