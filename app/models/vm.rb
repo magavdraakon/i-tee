@@ -3,7 +3,7 @@ class Vm < ActiveRecord::Base
   belongs_to :lab_vmt
   belongs_to :lab_user
   before_destroy :try_delete_vm
-  before_create :add_pw
+  before_create :create_password
 
   validates_presence_of :name, :lab_vmt_id, :user_id
   validates_uniqueness_of :name
@@ -16,10 +16,8 @@ class Vm < ActiveRecord::Base
     end
   end
 
-  def add_pw
-    chars = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'
-    self.password = ''
-    8.times { |i| self.password << chars[rand(chars.length)] }
+  def create_password
+    self.password = SecureRandom.urlsafe_base64(ITee::Application::config.rdp_password_length)
   end
 
   def reset_rdp
