@@ -197,10 +197,11 @@ class LabUsersController < ApplicationController
       #users.each do |u|
       #while u = params[:txtsbs].readline        
         u.chomp!
-        user=u.split(',')#username,realname, email, token (username compulsory for everyone, real name and email not?)
-        if user.empty? || user[0]==nil || user[0]==''
+        user=u.split(',')#username,realname, email, token (username and name compulsory for everyone, email not?)
+        if user.empty? || user[0].blank? || user[1].blank?
           notice=notice+'adding user "<b>'+u+'</b>" failed '
-          notice=notice+' - needs username' if user[0]==nil || user[0]==''
+          notice=notice+' - needs username' if user[0].blank?
+          notice=notice+' - needs name' if user[1].blank?
           notice=notice+'<br/>'
           next
         end
@@ -218,13 +219,15 @@ class LabUsersController < ApplicationController
             notice=notice+'<b>'+user[0]+'</b> adding failed - token needed for new users<br/>'
           end
         end
-        if @user # only if user exists / ws created
+        if @user # only if user exists / was created
+          if user[1]
+            @user.name = user[1]
+          end
           if user[3] # if token is given
             @user.authentication_token=user[3]
             @user.token_expires = 2.weeks.from_now # TODO! default expiry time from settings?
-            @user.save
           end
-
+          @user.save
           labuser=LabUser.where('user_id=? and lab_id=?', @user.id, @lab.id).first
           # by now we surely have a user, add it to the lab
           if labuser==nil
