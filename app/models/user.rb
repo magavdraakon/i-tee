@@ -82,36 +82,35 @@ class User < ActiveRecord::Base
     LabUser.where('user_id=? and lab_id=?', self.id, lab_id).count > 0 ? true : false
   end
 
-# RDP password for virtualbox
-
   def set_rdp_password(password='')
     if password.size < 1
       logger.debug 'Generating new password'
-      chars = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'
-      password = ''
-      begin
-        pw_length = ITee::Application::config.rdp_password_length 
-      rescue
-        pw_length = 14
-      end
-      pw_length.times { |i| password << chars[rand(chars.length)] }
-    end
-    hash = Virtualbox.create_password_hash(self.username, password)
-    if hash
-      Virtualbox.set_password(hash)
-      # set for user
-      self.rdp_password=password
-      # save
-      self.save
+      password = SecureRandom.urlsafe_base64(ITee::Application::config.rdp_password_length)
     end
 
+    hash = Digest::SHA256.hexdigest(password)
+    Virtualbox.all_machines.each do |vm|
+      begin
+        Virtualbox.set_extra_data(vm, "VBoxAuthSimple/users/#{self.username}", hash);
+      rescue Exception => e
+        logger.error "Failed to set RDP password for machine #{vm}: #{e.message}"
+      end
+    end
+
+    self.rdp_password = password
+    self.save
   end
 
   def unset_rdp_password
-    Virtualbox.unset_password(self.username)
-    # unset for user
-    self.rdp_password=''
-    # save
+    Virtualbox.all_machines.each do |vm|
+      begin
+        Virtualbox.set_extra_data(vm, "VBoxAuthSimple/users/#{self.username}");
+      rescue Exception => e
+        logger.error "Failed to unset RDP password for machine #{vm}: #{e.message}"
+      end
+    end
+
+    self.rdp_password = ''
     self.save
   end
 end
