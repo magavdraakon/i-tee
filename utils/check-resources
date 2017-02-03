@@ -1,0 +1,10 @@
+#!/bin/sh
+
+MEMORY_FREE=$(free -m | awk 'NR==2{print $4}')
+DISK_FREE=$(df -m | awk '$NF=="/var/labs/run"{print $4}')
+
+if [ "$MEMORY_FREE" -lt "10240" ] || [ "$DISK_FREE" -lt "30720" ]
+then
+	echo "Resource exhaustion warning" >&2
+	exit 1
+fi
