@@ -10,10 +10,20 @@ class User < ActiveRecord::Base
   has_many :vms#, :dependent => :destroy
   has_many :lab_users#, :dependent => :destroy 
   before_destroy :del_labs # vms are deleted trough lab user
+  before_save :nilify_email
  # has_many :user_badges, :dependent => :destroy
 
   validates_format_of :username, :with => /^[[:alnum:]]+[[:alnum:]_]+[[:alnum:]]$/ , :message => 'can only be alphanumeric with and dashes with no spaces'
-  validates_uniqueness_of :username, :email, :case_sensitive => false
+
+  def nilify_email
+    if self.email == ''
+      self.email = nil
+    end
+  end
+
+  def email_required?
+    false
+  end
 
   def select_name
     "[#{id}] #{name}"
