@@ -2,7 +2,7 @@ class LabUsersController < ApplicationController
   #restricted to admins 
   before_filter :authorise_as_manager, :except=>[:progress]
   #redirect to index view when trying to see unexisting things
-  before_filter :save_from_nil, :only=>[:edit, :update, :destroy]
+  before_filter :save_from_nil, :only=>[:edit, :update, :destroy, :set_vta]
   before_filter :manager_tab, :except=>[:search]
   before_filter :search_tab, :only=>[:search]
 
@@ -164,6 +164,14 @@ class LabUsersController < ApplicationController
     end
   end
   
+  # get vta info from outside {host: 'http://', token: 'lab-specific update token', lab_hash: 'vta lab id', user_key: 'user token'}
+  def set_vta
+    respond_to do |format|
+      format.html { redirect_to(lab_users_path) }
+      format.json { render :json=> @lab_user.set_vta(params) }
+    end
+  end
+
   #view for adding multiple users to a lab
   def add_users
     @lab_users = LabUser.all

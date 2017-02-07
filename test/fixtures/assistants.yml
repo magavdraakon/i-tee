@@ -1,0 +1,9 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  uri: MyString
+  enabled: false
+
+two:
+  uri: MyString
+  enabled: false

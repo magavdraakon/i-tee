@@ -1,0 +1,15 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Uri:</b>
+  <%= @assistant.uri %>
+</p>
+
+<p>
+  <b>Enabled:</b>
+  <%= @assistant.enabled %>
+</p>
+
+
+<%= link_to 'Edit', edit_assistant_path(@assistant) %> |
+<%= link_to 'Back', assistants_path %>

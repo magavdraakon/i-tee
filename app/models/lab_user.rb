@@ -81,9 +81,36 @@ class LabUser < ActiveRecord::Base
         # start delayed jobs for keeping up with the last activity
         LabUser.rdp_status(self.id)
       	# set new start time
-      	self.start=Time.now
-        self.last_activity=Time.now
-        self.activity='Lab start'
+      	self.start = Time.now
+        self.last_activity = Time.now
+        self.activity = 'Lab start'
+        unless self.vta_setup # do not repeat setup if set by api
+          # check if lab has assistant to be able to create the vta labuser
+          lab = self.lab
+          user = self.user
+          if !lab.assistant_id.blank?
+            assistant = lab.assistant
+            chars = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+            password = ''
+            16.times { |i| password << chars[rand(chars.length)] }
+            begin
+              rdp_host = ITee::Application.config.rdp_host
+            rescue
+              rdp_host = `hostname -f`.strip
+            end
+            # all api
+            result = assistant.create_labuser({"api_key": lab.lab_token , "lab": lab.lab_hash, "username": user.username, "fullname": user.name, "password": password,  "host": rdp_host , "info":{"somefield": "somevalue"}})
+            if result && !result['key'].blank?
+              # save to user
+              user.user_key = result['key'];
+              unless user.save
+                return {success: false, message: 'unable to remember user token in assistant'}
+              end
+            else
+              return {success: false, message: 'unable to communicate with assistant'}
+            end
+          end
+        end
       	self.save
         logger.debug "\n all machines\n"
         logger.debug self.vms.as_json
@@ -105,7 +132,7 @@ class LabUser < ActiveRecord::Base
       #self.destroy_all_vms
       #end of deleting vms for this lab
 
-    	self.end=Time.now
+    	self.end = Time.now
     	self.save 
       # remove pending delayed jobs
       Delayed::Job.where('queue=?', "labuser-#{self.id}").destroy_all
@@ -114,6 +141,7 @@ class LabUser < ActiveRecord::Base
 
   def restart_lab
   	self.end_lab # end lab
+    self.vta_setup = false # assistant labuser needs to be reset
   	self.start = nil
   	self.pause = nil
   	self.end = nil
@@ -212,5 +240,44 @@ class LabUser < ActiveRecord::Base
   end
 
 
+ # get vta info from outside {host: 'http://', token: 'lab-specific update token', lab_hash: 'vta lab id', user_key: 'user token'}
+  def set_vta(params)
+    # find lab
+    lab = self.lab
+    user = self.user
+    if lab
+      if user
+        # find assistant
+        assistant = Assistant.where( uri: params['host'] ).first
+        unless assistant # ensure existance
+          assistant = Assistant.create(uri: params['host'])
+        end
+        # set assitant info on lab by force
+        lab.assistant = assistant
+        lab.lab_hash = params['lab_hash']
+        lab.lab_token = params['token']
+        if lab.save
+          user.user_key = params['user_key']
+          if user.save
+            self.vta_setup = true # mark vta setup as done
+            if self.save
+              {success: true, message: 'Teaching assistant info set successfully'}
+            else
+              {success: true, message: 'Teaching assistant info set successfully but could not be marked as done'}
+            end
+          else
+            {success: false, message: 'Could not save user mission info'}
+          end
+        else
+          {success: false, message: 'Could not save mission info'}
+        end
+      else
+        {success: false, message: 'Could not find user in host'}
+      end
+    else
+      {success: false, message: 'Could not find mission in host'}
+    end
+
+  end
 
 end

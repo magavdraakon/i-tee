@@ -1,5 +1,8 @@
 ITee::Application.routes.draw do
 
+  resources :assistants
+
+
   get 'check_resources', :to=>'home#check_resources'
 
   match 'backup', :to=> 'home#backup', via: [ :get]
@@ -40,7 +43,7 @@ ITee::Application.routes.draw do
   resources :lab_users
   match 'lab_users', :to=>'lab_users#destroy', via: [:delete]
   match 'lab_users', :to=>'lab_users#update', via: [:put]
-
+  match 'set_vta_info', :to=>'lab_users#set_vta', via: [:post]
  
   resources :lab_vmts
 
