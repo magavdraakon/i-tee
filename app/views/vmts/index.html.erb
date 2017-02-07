@@ -4,7 +4,6 @@
     <thead>
       <tr>
         <th>Image</th>
-        <th>OS</th>
         <th>username</th>
         <th>ShellInaBox</th>
         <th>Xml script</th>
@@ -15,7 +14,6 @@
     <% @vmts.each do |vmt| %>
       <tr>
         <td><%= vmt.image %></td>
-        <td><%= vmt.operating_system.name if vmt.operating_system!=nil%></td>
         <td><%= vmt.username%></td>
         <td><%= vmt.shellinabox%></td>
         <td><%= vmt.xml_script %></td>

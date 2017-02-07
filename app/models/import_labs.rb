@@ -118,24 +118,8 @@ def self.import_from_folder(foldername)
 						puts "\ndo stuff\n"
 						lvmt.delete('id') # remove id from lab_vmt
 						lvmt['lab_id'] = lab.id # set new lab id
-						# get os
 						lvmt['vmt'].delete('id') # remove id from vmt
-						lvmt['vmt']['os'].delete('id') # remove  id from os
-						os = OperatingSystem.where('name = ? ', lvmt['vmt']['os']['name']).first
-						if os
-							unless os.update_attributes(lvmt['vmt']['os'])
-								return {success: false, message: "OS can not be updated #{lvmt['vmt']['os']['name']}"}
-							end
-						else
-							os = OperatingSystem.new(lvmt['vmt']['os'])
-							unless os.save
-								return {success: false, message: "os can not be created #{lvmt['vmt']['os']['name']}"}
-							end
-						end
-						lvmt['vmt'].delete('os') # remove os hash
-						lvmt['vmt']['operating_system_id'] = os.id # updade os id
-						
-						# get vmt 
+
 						vmt = Vmt.where('image=?', lvmt['vmt']['image']).first
 						if vmt
 							unless vmt.update_attributes(lvmt['vmt'])
@@ -246,7 +230,6 @@ def self.export_lab_separate(id)
 		lab_vmt_networks = []
 		networks = [] # will fill networks into here
 		vmts = [] # will fill vmts into here
-		os = [] # will fill os-s into here
 		l.lab_vmts.each do |lvt|
 			lab_vmts << lvt.as_json['lab_vmt']
 			lvt.lab_vmt_networks.each do |lvt_n|
@@ -255,7 +238,6 @@ def self.export_lab_separate(id)
 			end
 
 			vmts << JSON.pretty_generate(lvt.vmt.as_json['vmt'])
-			os << JSON.pretty_generate(lvt.vmt.operating_system.as_json['operating_system'])
 		end
 		# puts JSON.pretty_generate(lab_vmts)
 		File.open(dirname+"/lab_vmts.json","w") do |f|
@@ -269,9 +251,6 @@ def self.export_lab_separate(id)
 		end
 		File.open(dirname+"/vmts.json","w") do |f|
 			f.write( JSON.pretty_generate( vmts.uniq ) )
-		end
-		File.open(dirname+"/os.json","w") do |f|
-			f.write( JSON.pretty_generate( os.uniq ) )
 		end
 
 		File.open(dirname+"/timestamp.txt","w") do |f|
@@ -327,8 +306,6 @@ def self.export_lab(id)
 			end
 			temp_vmt['lab_vmt_networks'] = lab_vmt_networks
 			vmt = lvt.vmt.as_json['vmt']
-			os = lvt.vmt.operating_system.as_json['operating_system']
-			vmt['os'] = os
 			temp_vmt['vmt'] = vmt
 			lab_vmts << temp_vmt
 		end
