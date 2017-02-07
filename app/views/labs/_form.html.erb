@@ -66,6 +66,21 @@
     <%end%>
   </div>
     </fieldset>
+    <fieldset><legend>Lab assistant</legend>
+      <div class="field">
+        <%= f.label :assistant_id %><br />
+        <%= f.select( :assistant_id,  options_from_collection_for_select(Assistant.all,:id, :uri, @lab.assistant_id) , {include_blank: "select assistant"} )%>
+      </div>
+      <div class="field">
+        <%= f.label :lab_token, 'API token to be used with this lab' %><br/>
+        <%= f.text_field :lab_token %>
+      </div>
+      <div class="field">
+        <%= f.label :lab_hash, 'Lab id in assistant' %><br/>
+        <%= f.text_field :lab_hash %>
+      </div>
+
+    </fieldset>
     <h3>Virtual machines in this lab</h3>
     <div id="lab_vmts">
     <%= f.fields_for :lab_vmts do |labVmt_form| %>
