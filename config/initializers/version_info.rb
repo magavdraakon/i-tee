@@ -1,5 +1,4 @@
 module AppVersion
-  GIT_REVISION = `git log --pretty=format:'%h %cd' -n 1 || cat revision.txt || echo "(revision unavailable)"`
-  APP_VERSION = `[ -f version.txt ] && cat version.txt || echo "NO VERSION INFO"`
+  APP_VERSION = `cat version.txt 2>/dev/null || echo "(version unavailable)"`
   PLATFORM_INFO = "Ruby: #{RUBY_ENGINE}-#{RUBY_VERSION}-p#{RUBY_PATCHLEVEL}, Rails: #{Rails.version}"
 end
