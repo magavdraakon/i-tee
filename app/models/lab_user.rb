@@ -7,14 +7,6 @@ class LabUser < ActiveRecord::Base
 
 	before_destroy :end_lab
 
-# OLD: get all vms that belong to this labuser (Lab attempt)
-  def vms_manual
-    #find templates for lab
-  	vmts=LabVmt.where('lab_id = ? ', self.lab_id)
-    #find vms for user in lab
-  	Vm.where('user_id=? and lab_vmt_id in (?)', self.user_id, vmts)
-  end
-
   def vms_info
     # id, nickname, state, allow_remote, position, rdp lines
     vms = Vm.joins(:lab_vmt).where('lab_vmts.lab_id=? and vms.user_id=?', self.lab_id, self.user_id).order('position asc')
@@ -58,26 +50,18 @@ class LabUser < ActiveRecord::Base
   	info={:running=>running, :paused=>paused, :stopped=>stopped}
   end
 
-# to be displayed as vm info for labs that are not running
-  def vmts
-  	LabVmt.where('lab_id = ? ', self.lab_id)
-  end
-
 # create needed Vm-s based on the lab templates and set start to now
   def start_lab
   	unless self.start || self.end  # can only start labs that are not started or finished
       result = Check.has_free_resources
       if result && result[:success] # has resources
-    		self.vmts.each do |template|
-          #is there a machine like that already?
+        LabVmt.where('lab_id = ? ', self.lab_id).each do |template|
           vm = Vm.where('lab_vmt_id=? and lab_user_id=?', template.id, self.id).first
-          if vm==nil  #no there is not
-           		vm = Vm.create(:name=>"#{template.name}-#{self.user.username}", :lab_vmt=>template, :user=>self.user, :description=> 'Initialize the virtual machine by clicking <strong>Start</strong>.', :lab_user=>self)
-
-           		logger.debug "\n #{vm.lab_user.id} Machine #{vm.id} - #{template.name}-#{self.user.username} successfully generated.\n"
-          end  
-
-      	end #end of making vms based of templates
+          unless vm
+            vm = Vm.create(:name=>"#{template.name}-#{self.user.username}", :lab_vmt=>template, :user=>self.user, :description=> 'Initialize the virtual machine by clicking <strong>Start</strong>.', :lab_user=>self)
+            logger.debug "\n #{vm.lab_user.id} Machine #{vm.id} - #{template.name}-#{self.user.username} successfully generated.\n"
+          end
+        end
         # start delayed jobs for keeping up with the last activity
         LabUser.rdp_status(self.id)
       	# set new start time
