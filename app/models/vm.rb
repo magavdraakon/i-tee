@@ -81,34 +81,26 @@ class Vm < ActiveRecord::Base
 
   def stop_vm
     state = self.state
-    if state=='running' || state=='paused'
-      if self.lab_vmt.allow_restart
-        begin
-          Virtualbox.stop_vm(name)
-        rescue
-          # ignore failure, Virtualbox model logs the message
-        end
-
-        self.description='Power on the virtual machine by clicking <strong>Start</strong>.'
-        self.save
-
-        {success: true, message: 'Successful macine shutdown'}
-      else
-        {success: true, message: 'Machine can not be shut down'}
-      end
-    else
-      {success: true, message: 'Machine was already shut down'}
+    unless state === 'running' || state === 'paused'
+      raise 'Not running'
     end
+    unless self.lab_vmt.allow_restart
+      raise 'Not allowed'
+    end
+
+    begin
+      Virtualbox.stop_vm(name)
+    rescue
+      # ignore failure, Virtualbox model logs the message
+    end
+    self.description='Power on the virtual machine by clicking <strong>Start</strong>.'
+    self.save
   end
 
   def start_vm
-
-    result = {notice: '', alert: ''}
-
     state = self.state
     if state == 'running' || state == 'paused'
-      result[:alert]="Unable to start <b>#{self.lab_vmt.nickname}</b>, it is already running"
-      return result
+      raise "Already running"
     end
 
     begin
@@ -170,8 +162,6 @@ class Vm < ActiveRecord::Base
       self.save
       logger.debug "\n save successful "
 
-      result[:notice] = "Machine <b>#{self.lab_vmt.nickname}</b> successfully started<br/>"
-
       # add last activity to labuser
       labuser=LabUser.where('lab_id=? and user_id=?', self.lab_vmt.lab_id, self.user_id).last
       if labuser
@@ -182,11 +172,8 @@ class Vm < ActiveRecord::Base
 
     rescue Exception => e
       logger.error "Failed to start vm: #{e.message}"
-      result[:notice] = ''
-      result[:alert]="Machine <b>#{self.lab_vmt.nickname}</b> initialization <b>failed</b>."
+      raise 'Failed to start virtual machine'
     end
-
-    result
   end
 
 

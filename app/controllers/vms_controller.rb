@@ -297,21 +297,22 @@ class VmsController < ApplicationController
   # view is restriced to logged in users, before filter finds vm and checks if owner/admin
   def start_vm
     respond_to do |format|
-      logger.debug "\n start? \n "
-      result = @vm.start_vm
-        
-      is_notice= (result[:notice] && result[:notice]!='')
-      is_alert = (result[:alert] && result[:alert]!='')
-
-      flash[:notice] = result[:notice].html_safe if is_notice
-      flash[:alert] = result[:alert].html_safe if is_alert
-      
-      format.html  { redirect_to(:back) }
-      format.json  { render :json => {:success=>is_notice, :message=> is_notice ? 'Machine started' : 'Machine start failed'} }
+      begin
+        message @vm.start_vm
+        format.html  { redirect_to(:back, :notice => 'Virtual machine has been started') }
+        format.json  { render :json => {
+                         :success => true,
+                         :message => 'Virtual machine has been started'
+                       } }
+      rescue Exception => e
+        format.html  { redirect_to(:back, :notice => 'Failed to start virtual machine: ' + e.message) }
+        format.json  { render :json => {
+                         :success => false,
+                         :message => 'Failed to start virtual machine: ' + e.message
+                       } }
+      end
     end
-    
     rescue ActionController::RedirectBackError  # cant redirect back? go to the lab instead
-      logger.info "\nNo :back error\n"
       redirect_to(my_labs_path+'/'+@vm.lab_vmt.lab.id.to_s)
   end
   
@@ -421,15 +422,23 @@ end
   # view is restriced to logged in users, before filter finds vm and checks if owner/admin
   def stop_vm
     respond_to do |format|
-      logger.debug "\n resume? \n "
-      result = @vm.stop_vm
-      # TODO! check if really stopped
-      format.html  { redirect_to(:back, :notice=> result[:message].html_safe) }
-      format.json  { render :json => {:success=>result[:success], :message=> result[:message] } }
+      begin
+        message @vm.stop_vm
+        format.html  { redirect_to(:back, :notice => 'Virtual machine has been shut down') }
+        format.json  { render :json => {
+                         :success => true,
+                         :message => 'Virtual machine has been shut down'
+                       } }
+      rescue Exception => e
+        format.html  { redirect_to(:back, :notice => 'Failed to shut down virtual machine: ' + e.message) }
+        format.json  { render :json => {
+                         :success => false,
+                         :message => 'Failed to shut down virtual machine: ' + e.message
+                       } }
     end
+  end
     
     rescue ActionController::RedirectBackError  # cant redirect back? go to the lab instead
-      logger.info "\nNo :back error\n"
       redirect_to(my_labs_path+'/'+@vm.lab_vmt.lab.id.to_s)
   end
   

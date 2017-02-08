@@ -129,7 +129,10 @@ class HomeController < ApplicationController
     result = Check.has_free_resources
     respond_to do |format|
       format.html  {redirect_to root_path, :notice=>'Seems that the page you were looking for does not exist, so you\'ve been redirected here.' }
-      format.json  { render :json => result }
+      format.json  { render :json => {
+                       success: result,
+                       message: result ? 'Sufficient resources found' : 'Sorry, there are currently not enough resources to start the attempt. Please try again in a while.'
+                     } }
     end
   end
 

@@ -52,65 +52,62 @@ class LabUser < ActiveRecord::Base
 
 # create needed Vm-s based on the lab templates and set start to now
   def start_lab
-  	unless self.start || self.end  # can only start labs that are not started or finished
-      result = Check.has_free_resources
-      if result && result[:success] # has resources
-    		LabVmt.where('lab_id = ? ', self.lab_id).each do |template|
-          #is there a machine like that already?
-          vm = Vm.where('lab_vmt_id=? and lab_user_id=?', template.id, self.id).first
-          if vm==nil  #no there is not
-           		vm = Vm.create(:name=>"#{template.name}-#{self.user.username}", :lab_vmt=>template, :user=>self.user, :description=> 'Initialize the virtual machine by clicking <strong>Start</strong>.', :lab_user=>self)
+    if self.start || self.end
+      raise 'Already started'
+    end
 
-           		logger.debug "\n #{vm.lab_user.id} Machine #{vm.id} - #{template.name}-#{self.user.username} successfully generated.\n"
-          end  
+    unless Check.has_free_resources
+      raise 'Not enough resources'
+    end
 
-      	end #end of making vms based of templates
-        # start delayed jobs for keeping up with the last activity
-        LabUser.rdp_status(self.id)
-      	# set new start time
-      	self.start = Time.now
-        self.last_activity = Time.now
-        self.activity = 'Lab start'
-        unless self.vta_setup # do not repeat setup if set by api
-          # check if lab has assistant to be able to create the vta labuser
-          lab = self.lab
-          user = self.user
-          if !lab.assistant_id.blank?
-            assistant = lab.assistant
-            password = SecureRandom.urlsafe_base64(16)
-            rdp_host = ITee::Application.config.rdp_host
-            result = assistant.create_labuser({"api_key": lab.lab_token , "lab": lab.lab_hash, "username": user.username, "fullname": user.name, "password": password,  "host": rdp_host , "info":{"somefield": "somevalue"}})
-            if result && !result['key'].blank?
-              # save to user
-              user.user_key = result['key'];
-              unless user.save
-                return {success: false, message: 'unable to remember user token in assistant'}
-              end
-            else
-              return {success: false, message: 'unable to communicate with assistant'}
-            end
-          end
-        end
-      	self.save
-        logger.debug "\n all machines\n"
-        logger.debug self.vms.as_json
-        logger.debug "\n -end- \n"
-  			if self.lab.startAll
-  				self.start_all_vms
-  			end
-        {success: true, message: 'Lab started'}
-      else
-        result # forward the message from resource check
+    LabVmt.where('lab_id = ? ', self.lab_id).each do |template|
+      vm = Vm.where('lab_vmt_id=? and lab_user_id=?', template.id, self.id).first
+      if vm == nil
+        vm = Vm.create(:name => "#{template.name}-#{self.user.username}",
+                       :lab_vmt => template,
+                       :user => self.user,
+                       :description => 'Initialize the virtual machine by clicking <strong>Start</strong>.',
+                       :lab_user => self)
       end
-		end
+    end
+
+    # start delayed jobs for keeping up with the last activity
+    LabUser.rdp_status(self.id)
+
+    # initialize lab start
+    self.start = Time.now
+    self.last_activity = Time.now
+    self.activity = 'Lab start'
+    unless self.vta_setup # do not repeat setup if set by api
+      # check if lab has assistant to be able to create the vta labuser
+      lab = self.lab
+      user = self.user
+      unless lab.assistant_id.blank?
+        assistant = lab.assistant
+        password = SecureRandom.urlsafe_base64(16)
+        rdp_host = ITee::Application.config.rdp_host
+        result = assistant.create_labuser({"api_key": lab.lab_token , "lab": lab.lab_hash, "username": user.username, "fullname": user.name, "password": password,  "host": rdp_host , "info":{"somefield": "somevalue"}})
+        if result && !result['key'].blank?
+          # save to user
+          user.user_key = result['key'];
+          unless user.save
+            return {success: false, message: 'unable to remember user token in assistant'}
+          end
+        else
+          return {success: false, message: 'unable to communicate with assistant'}
+        end
+      end
+    end
+    self.save
+    if self.lab.startAll
+      self.start_all_vms
+    end
   end
 
 # remove all Vm-s and set the end to now
   def end_lab
   	if self.start && !self.end  # can only end labs that are started and not ended
   		Vm.destroy_all(lab_user_id: self)
-      #self.destroy_all_vms
-      #end of deleting vms for this lab
 
     	self.end=Time.now
     	self.save 
@@ -129,54 +126,43 @@ class LabUser < ActiveRecord::Base
     self.start_lab
   end
 
-
-	def start_all_vms
-    # olny if lab is started
-    if self.start && !self.end 
-  		feedback =''
-      success = true
-  		self.vms.each do |vm|
-  			if vm.state!='running' && vm.state!='paused'  # cant be running nor paused
-  				start = vm.start_vm
-  				logger.info "#{vm.name} (#{vm.lab_vmt.nickname}) started"
-  				add = start[:notice]!='' ? start[:notice] : (start[:alert]!='' ? start[:alert] : "<b>#{vm.lab_vmt.nickname}</b> was not started")
-  				feedback = feedback + add +'<br/>'
-          unless add.include?('successfully started')
-            success=false # one machine fails = all fails
-          end
-  			end #end if not running or paused
-  		end
-  		logger.info "\nfeedback: #{feedback}\n"
-  		{ success: success, message: feedback}
-    else
-      { success: false, message: 'unable to start machines in inactive lab'}
+  def start_all_vms
+    unless self.start && !self.end
+      raise 'Lab inactive'
     end
-	end
-
-	def stop_all_vms # TODO: should check if lab is started?
-		feedback=''
-		self.vms.each do |vm|
-			if vm.state=='running' || vm.state=='paused'  # has to be running or paused
-				stop = vm.stop_vm
-				logger.info "#{vm.name} (#{vm.lab_vmt.nickname}) stopped"
-				feedback=feedback+"<b>#{vm.lab_vmt.nickname}</b> stopped<br/>"
-			end #end if not running or paused
-		end
-    # if no feedbck then no macines were stopped
-		{success: feedback!='' , message:feedback}
-	end
-
-	def destroy_all_vms
-		self.vms.each do |vm|
-			vm.destroy
-      if vm.destroyed? 
-        logger.debug "\nMachine #{vm.id} - #{vm.name} successfully deleted.\n"
-      else
-        logger.debug "\nMachine #{vm.id} - #{vm.name} NOT deleted.\n"
+    success = true
+    self.vms.each do |vm|
+      begin
+        start = vm.start_vm
+      rescue Exception => e
+        if e.message != 'Already running'
+          success = false
+        end
       end
-		end
-	end
+    end
+    if success
+      raise 'Failed to start all virtual machines'
+    end
+  end
 
+  def stop_all_vms
+    unless self.start && !self.end
+      raise 'Lab inactive'
+    end
+    success = true
+    self.vms.each do |vm|
+      begin
+        stop = vm.stop_vm
+      rescue Exception => e
+        if e.message != 'Not running' and e.message != 'Not allowed'
+          success = false
+        end
+      end
+    end
+    if success
+      raise 'Failed to start all virtual machines'
+    end
+  end
 
   def self.rdp_status(id)
     labuser = LabUser.find_by_id(id)
