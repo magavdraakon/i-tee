@@ -24,7 +24,6 @@ COPY /config/ /var/www/i-tee/config/
 COPY /db/ /var/www/i-tee/db/
 COPY /lib/ /var/www/i-tee/lib/
 COPY /script/ /var/www/i-tee/script/
-COPY /test/ /var/www/i-tee/test/
 COPY /utils/ /var/www/i-tee/utils/
 
 COPY /docker/application.rb /var/www/i-tee/config/application.rb
