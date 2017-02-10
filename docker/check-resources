@@ -1,0 +1,10 @@
+#!/bin/sh
+
+MEMORY_FREE=$(ssh -o "ControlMaster=auto" -o "ControlPath=/tmp/ssh_vbox.socket" -o "ControlPersist=1h" vbox@host.local free -m | awk 'NR==2{print $7}')
+DISK_FREE=$(ssh -o "ControlMaster=auto" -o "ControlPath=/tmp/ssh_vbox.socket" -o "ControlPersist=1h" vbox@host.local df -m "~vbox" | awk 'NR==2{print $4}')
+
+if [ "$MEMORY_FREE" -lt "10240" ] || [ "$DISK_FREE" -lt "30720" ]
+then
+	echo "Resource exhaustion warning" >&2
+	exit 1
+fi
