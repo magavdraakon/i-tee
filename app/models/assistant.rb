@@ -1,6 +1,7 @@
 class Assistant < ActiveRecord::Base
   attr_accessible :enabled, :uri
   has_many :labs
+  validates_uniqueness_of :uri
 
   def get_lab(params={})
 		result = self.get("/api/v1/lab", params)

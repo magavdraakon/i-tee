@@ -308,6 +308,42 @@ def self.export_lab_separate(id)
 end
 
 
+def self.export_labuser(uuid, pretty)
+	lu = LabUser.where("uuid=?", uuid).first
+	if lu 
+		if lu.start && !lu.end
+			data = {success: true,
+							lab: lu.lab ? lu.lab.as_json['lab'].except('created_at', 'updated_at', 'description', 'short_description') : {}, 
+							host: lu.lab.host ? lu.lab.host.as_json['host'].except('created_at', 'updated_at') : {},
+							assistant: lu.lab.assistant ? lu.lab.assistant.as_json['assistant'].except('created_at', 'updated_at')  : {},
+							labuser: lu.as_json['lab_user'].except('created_at', 'updated_at', 'last_activity', 'activity') , 
+							user: lu.user ? lu.user.as_json['user'].slice('id', 'username', 'name', 'user_key') : {},
+							vms: lu.vms.map{ |vm| 
+								r = vm.as_json['vm'].except('created_at', 'updated_at', 'description')  
+								r['lab_vmt'] = vm.lab_vmt.as_json['lab_vmt'].except('created_at', 'updated_at') 
+								r['lab_vmt']['lab_vmt_networks'] = vm.lab_vmt.lab_vmt_networks.map{ |n| 
+									t = n.as_json['lab_vmt_network'].except('created_at', 'updated_at') 
+									t['network'] = n.network.as_json['network'].except('created_at', 'updated_at') 
+									t
+								}
+								r['lab_vmt']['vmt'] = vm.lab_vmt.vmt.as_json['vmt'].except('created_at', 'updated_at', 'xml_script', 'private') 
+								#r['lab_vmt']['vmt']['operating_system'] = vm.lab_vmt.vmt.operating_system.as_json['operating_system']
+								r
+							} 
+						}
+				if pretty
+					JSON.pretty_generate(data)
+				else
+					data
+				end
+		else
+			return {success: false, message: "Unable to find active labuser with given uid"}
+		end
+	else
+		return {success: false, message: "Unable to find labuser with given uid"}
+	end
+end
+
 def self.export_lab(id)
 	# get lab
 	l = Lab.where("id=?", id).first

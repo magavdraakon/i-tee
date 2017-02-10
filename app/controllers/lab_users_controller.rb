@@ -1,6 +1,6 @@
 class LabUsersController < ApplicationController
   #restricted to admins 
-  before_filter :authorise_as_manager, :except=>[:progress]
+  before_filter :authorise_as_manager, :except=>[:progress, :labinfo]
   #redirect to index view when trying to see unexisting things
   before_filter :save_from_nil, :only=>[:edit, :update, :destroy, :set_vta]
   before_filter :manager_tab, :except=>[:search]
@@ -169,6 +169,14 @@ class LabUsersController < ApplicationController
     respond_to do |format|
       format.html { redirect_to(lab_users_path) }
       format.json { render :json=> @lab_user.set_vta(params) }
+    end
+  end
+
+  # return labuser and it's lab info based on labuser uuid. 
+  def labinfo
+    respond_to do |format|
+      format.html { redirect_to(root_path, notice: 'Invalid request') }
+      format.json { render :json=> ImportLabs.export_labuser(params[:uuid], params[:pretty]) }
     end
   end
 
