@@ -26,6 +26,7 @@ COPY /lib/ /var/www/i-tee/lib/
 COPY /script/ /var/www/i-tee/script/
 COPY /utils/ /var/www/i-tee/utils/
 
+COPY /docker/check-resources /var/www/i-tee/utils/check-resources
 COPY /docker/application.rb /var/www/i-tee/config/application.rb
 COPY /docker/devise.rb /var/www/i-tee/config/initializers/devise.rb
 COPY /docker/production.rb /var/www/i-tee/config/environments/production.rb
