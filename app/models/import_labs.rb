@@ -71,6 +71,7 @@ def self.import_from_folder(foldername)
 	if !foldername.blank? && File.exists?(dirname)
 		puts "folder exists #{dirname}"
 		h_file = dirname+'/host.json'
+		a_file = dirname+'/assistant.json'
 		l_file = dirname+'/lab.json'
 		v_file = dirname+'/lab_vmts.json'
 		# read host 
@@ -90,11 +91,34 @@ def self.import_from_folder(foldername)
 					return {success: false, message: "host can not be created #{host['name']}"}
 				end
 			end
+			if File.exists?(a_file) && File.file?(a_file)
+				assistant_file = File.open(a_file , 'r') 
+				assistant_obj = JSON.parse(assistant_file.read)
+				assistant_obj.delete('id') # remove id field
+				if assistant_obj.blank? # no assistant
+					assistant = {id: nil}
+				else
+					assistant = Assistant.where("uri=?", assistant_obj['uri']).first
+					if assistant
+						unless assistant.update_attributes(assistant_obj)
+							return {success: false, message: "assistant can not be updated #{assistant['uri']}"}
+						end
+					else
+						assistant = Assistant.new(assistant_obj)
+						unless assistant.save
+							return {success: false, message: "assistant can not be created #{assistant['uri']}"}
+						end
+					end
+				end
+			else # no assistant exported
+				assistant = {id: nil}
+			end
 			# if no errors, continue
 			if File.exists?(l_file) && File.file?(l_file)
 				lab_file = File.open(l_file , 'r') 
 				lab_obj = JSON.parse(lab_file.read)
 				lab_obj['host_id'] = host.id # set new host id
+				lab_obj['assistant_id'] = assistant[:id] # set new assistant id
 				lab_obj.delete('id') # remove id field
 				
 				lab = Lab.where("name=?", lab_obj['name']).first # find if this lab already exists (unique name)
@@ -201,7 +225,6 @@ def self.import_from_folder(foldername)
 			else
 				{success: false, message: "lab file does not exist #{dirname}"}
 			end
-
 		else
 			{success: false, message: "host file does not exist #{dirname}"}
 		end
@@ -312,6 +335,9 @@ def self.export_lab(id)
 		end
 		File.open(dirname+"/host.json","w") do |f|
 		  f.write( JSON.pretty_generate( l.host.as_json['host'] ) )
+		end
+		File.open(dirname+"/assistant.json","w") do |f|
+		  f.write( JSON.pretty_generate( l.assistant ? l.assistant.as_json['assistant'] : {} ) )
 		end
 		# find all lab_vmts
 		
