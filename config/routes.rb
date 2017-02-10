@@ -9,6 +9,7 @@ ITee::Application.routes.draw do
   match 'import/:name', :to=> 'home#import', via: [ :get]
   match 'export/:id', :to=> 'home#export', via: [ :get]
   match 'download_export/:name', :to=> 'home#download_export', via: [:get]
+  match 'labinfo', :to=>'lab_users#labinfo', via: [:post]
 
   match 'rdp_password', :to=>'virtualbox#rdp_password', via: [:get]
   match 'rdp_password', :to=>'virtualbox#update_password', via: [:post]

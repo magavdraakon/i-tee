@@ -4,7 +4,7 @@ class LabUser < ActiveRecord::Base
   has_many :vms
   
   validates_presence_of :user_id, :lab_id
-
+  validates_uniqueness_of :uuid
 	before_destroy :end_lab
 
   def vms_info
@@ -68,6 +68,7 @@ class LabUser < ActiveRecord::Base
       	self.start = Time.now
         self.last_activity = Time.now
         self.activity = 'Lab start'
+        self.uuid = SecureRandom.uuid
         unless self.vta_setup # do not repeat setup if set by api
           # check if lab has assistant to be able to create the vta labuser
           lab = self.lab
