@@ -118,6 +118,7 @@
     <% end %>
       <%= select_tag :networks, options_from_collection_for_select(Network.all,:id, :name), {:prompt => 'Select network template', :style=>'display:none'}  %>
       <%= select_tag :vm_templates, options_from_collection_for_select(Vmt.all,:id, :image), {:prompt => 'Select VM template', :style=>'display:none'}  %>
+      <%= select_tag :g_types, options_for_select({ :none => 0, :rdp => 1, :vnc => 2, :ssh => 3}), { :style => 'display:none' }  %>
 
     </div>
     <span class="button add-button" onclick="add_vmt_to_lab();">Add more VMTs</span>
