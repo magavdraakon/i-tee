@@ -6,31 +6,29 @@ class Assistant < ActiveRecord::Base
   validates_uniqueness_of :uri
 
   def get_lab(params={})
-    result = self.get("/api/v1/lab", params)
-    #logger.debug result
+    result = self.get_request("/api/v1/lab", params)
     result
   end
 
   def create_labuser(params={})
-    result = self.post("/api/v1/labuser", params)
-    logger.debug result
+    result = self.post_request("/api/v1/labuser", params)
     result
   end
 
   ### #### API CALLS #### ###
-  def get(path, params)
+  def get_request(path, params)
     self.request_json :get, path, params
   end
 
-  def post(path, params)
+  def post_request(path, params)
     self.request_json :post, path, params
   end
 
-  def put(path, params)
+  def put_request(path, params)
     self.request_json :put, path, params
   end
 
-  def delete(path, params)
+  def delete_request(path, params)
     self.request_json :delete, path, params
   end
 
