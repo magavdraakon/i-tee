@@ -6,6 +6,7 @@ class LabUser < ActiveRecord::Base
   validates_presence_of :user_id, :lab_id
   validates_uniqueness_of :uuid
 	before_destroy :end_lab
+  before_create :create_uuid
 
   def vms_info
     # id, nickname, state, allow_remote, position, rdp lines
@@ -68,7 +69,6 @@ class LabUser < ActiveRecord::Base
       	self.start = Time.now
         self.last_activity = Time.now
         self.activity = 'Lab start'
-        self.uuid = SecureRandom.uuid
         unless self.vta_setup # do not repeat setup if set by api
           # check if lab has assistant to be able to create the vta labuser
           lab = self.lab
@@ -105,16 +105,16 @@ class LabUser < ActiveRecord::Base
 
 # remove all Vm-s and set the end to now
   def end_lab
-  	if self.start && !self.end  # can only end labs that are started and not ended
-  		Vm.destroy_all(lab_user_id: self)
+    if self.start && !self.end  # can only end labs that are started and not ended
+      Vm.destroy_all(lab_user_id: self)
       #self.destroy_all_vms
       #end of deleting vms for this lab
-
-    	self.end=Time.now
-    	self.save 
+      self.uuid = SecureRandom.uuid
+      self.end = Time.now
+      self.save
       # remove pending delayed jobs
       Delayed::Job.where('queue=?', "labuser-#{self.id}").destroy_all
-		end
+    end
   end
 
   def restart_lab
@@ -248,5 +248,10 @@ class LabUser < ActiveRecord::Base
     end
 
   end
+
+# create a temporary uuid when the labuser is created. this will be overwritten by lab end
+def create_uuid
+  self.uuid = SecureRandom.uuid
+end
 
 end

@@ -2,6 +2,7 @@
 <div id="index_t">
 <table>
   <tr>
+    <th>Name</th>
     <th>Uri</th>
     <th>Enabled</th>
     <th></th>
@@ -11,6 +12,7 @@
 
 <% @assistants.each do |assistant| %>
   <tr>
+    <td><%= assistant.name %></td>
     <td><%= assistant.uri %></td>
     <td><%= assistant.enabled %></td>
     <td><%= link_to 'Show', assistant %></td>

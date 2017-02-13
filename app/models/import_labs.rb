@@ -296,7 +296,7 @@ def self.export_labuser(uuid, pretty)
 				lab: lu.lab ? lu.lab.as_json['lab'].except('created_at', 'updated_at', 'description', 'short_description') : {},
 				host: lu.lab.host ? lu.lab.host.as_json['host'].except('created_at', 'updated_at') : {},
 				assistant: lu.lab.assistant ? lu.lab.assistant.as_json['assistant'].except('created_at', 'updated_at')  : {},
-				labuser: lu.as_json['lab_user'].except('created_at', 'updated_at', 'last_activity', 'activity'),
+				labuser: lu.as_json['lab_user'].except('created_at', 'updated_at'),
 				user: lu.user ? lu.user.as_json['user'].slice('id', 'username', 'name', 'user_key') : {},
 				vms: lu.vms.map { |vm|
 					r = vm.as_json['vm'].except('created_at', 'updated_at', 'description')
