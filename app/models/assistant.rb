@@ -1,6 +1,8 @@
 class Assistant < ActiveRecord::Base
-  attr_accessible :enabled, :uri
+  attr_accessible :enabled, :uri, :name
   has_many :labs
+
+  validates_presence_of :name, :uri
   validates_uniqueness_of :uri
 
   def get_lab(params={})
