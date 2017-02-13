@@ -299,6 +299,11 @@ function add_vmt_to_lab() {
 	innerHtml.push('<label for="lab_lab_vmts_attributes_' + n + '_vmt_id">Vmt</label> ' +
 		'<select id="lab_lab_vmts_attributes_' + n + '_vmt_id" name="lab[lab_vmts_attributes][' + n + '][vmt_id]">' + vmt_template_options + '</select><br/>');
 
+	/* expose uuid */
+	innerHtml.push('<label for="lab_lab_vmts_attributes_' + n + '_expose_uuid">Expose uuid</label> ' +
+		'<input type="hidden" name="lab[lab_vmts_attributes][' + n + '][expose_uuid]" value="0" />' +
+		'<input type="checkbox" id="lab_lab_vmts_attributes_' + n + '_expose_uuid" name="lab[lab_vmts_attributes][' + n + '][expose_uuid]" value="1" /><br/>');
+
 	/* allow remote */
 	innerHtml.push('<label for="lab_lab_vmts_attributes_' + n + '_allow_remote">Allow remote</label> ' +
 		'<input type="hidden" name="lab[lab_vmts_attributes][' + n + '][allow_remote]" value="0" />' +

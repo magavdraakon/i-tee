@@ -89,6 +89,7 @@
           <%= labVmt_form.label :name %> <%= labVmt_form.text_field :name, :placeholder=>'unique. Alphanumeric with no spaces.' %><br/>
           <%= labVmt_form.label :nickname %> <%= labVmt_form.text_field :nickname, :placeholder=>'Name shown to user.' %><br/>
           <%= labVmt_form.label :vmt_id %> <%= labVmt_form.select :vmt_id, options_from_collection_for_select(Vmt.all, :id, :image, labVmt_form.object.vmt_id ), {:prompt => 'Select VM template'}%><br/>
+          <%= labVmt_form.label :expose_uuid %>  <%= labVmt_form.check_box :expose_uuid %><br/>
           <%= labVmt_form.label :allow_remote %>  <%= labVmt_form.check_box :allow_remote %><br/>
           <%= labVmt_form.label :allow_restart %>  <%= labVmt_form.check_box :allow_restart %><br/>
           <%= labVmt_form.label :primary %>  <%= labVmt_form.check_box :primary %><br/>

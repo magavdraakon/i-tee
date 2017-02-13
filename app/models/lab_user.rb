@@ -17,6 +17,7 @@ class LabUser < ActiveRecord::Base
         vm_id: vm.id,
         nickname: vm.lab_vmt.nickname,
         state: vm.state,
+        expose_uuid: vm.lab_vmt.expose_uuid,
         allow_remote: vm.lab_vmt.allow_remote,
         allow_restart: vm.lab_vmt.allow_restart,
         guacamole_type: vm.lab_vmt.guacamole_type,
