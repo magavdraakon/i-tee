@@ -172,13 +172,9 @@ class Vm < ActiveRecord::Base
 
       result[:notice] = "Machine <b>#{self.lab_vmt.nickname}</b> successfully started<br/>"
 
-      # add last activity to labuser
-      labuser=LabUser.where('lab_id=? and user_id=?', self.lab_vmt.lab_id, self.user_id).last
-      if labuser
-        labuser.last_activity=Time.now
-        labuser.activity="Start vm - '#{self.name}'"
-        labuser.save
-      end
+      self.lab_user.last_activity = Time.now
+      self.lab_user.activity = "Start vm - '#{self.name}'"
+      self.lab_user.save
 
     rescue Exception => e
       logger.error "Failed to start vm: #{e.message}"
