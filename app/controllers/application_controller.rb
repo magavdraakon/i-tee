@@ -19,19 +19,10 @@ class ApplicationController < ActionController::Base
   before_filter :per_page
 
   def set_layout
-    logger.info('REQUEST: ' + request.host)
     begin
-      if ITee::Application.config.skins.key?(request.host)
-        return ITee::Application.config.skins[request.host]
-      end
+      return ITee::Application.config.skin
     rescue
-    end
-
-    logger.info('No skin set for this host, trying to get default skin')
-    begin
-      return ITee::Application.config.default_skin
-    rescue
-      logger.info('no default skin set in config, use EIK skin')
+      logger.info('no default skin set in config, using skin EIK')
       return 'EIK'
     end
   end
