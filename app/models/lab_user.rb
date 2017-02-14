@@ -214,39 +214,48 @@ class LabUser < ActiveRecord::Base
     # find lab
     lab = self.lab
     user = self.user
+    logger.debug "set VTA info for #{lab.as_json} #{user.as_json}"
     if lab
+      logger.debug 'found lab'
       if user
+        logger.debug 'found user'
         # find assistant
         assistant = Assistant.where( uri: params['host'] ).first
         unless assistant # ensure existance
-          assistant = Assistant.create(uri: params['host'])
+          logger.debug 'Create assistant'
+          assistant = Assistant.create(uri: params['host'], name: params['name'], enabled: true)
         end
-        # set assitant info on lab by force
-        lab.assistant = assistant
-        lab.lab_hash = params['lab_hash']
-        lab.lab_token = params['token']
-        if lab.save
-          user.user_key = params['user_key']
-          if user.save
-            self.vta_setup = true # mark vta setup as done
-            if self.save
-              {success: true, message: 'Teaching assistant info set successfully'}
+        if assistant
+          # set assitant info on lab by force
+          lab.assistant = assistant
+          lab.lab_hash = params['lab_hash']
+          lab.lab_token = params['token']
+          if lab.save
+            user.user_key = params['user_key']
+            if user.save
+              self.vta_setup = true # mark vta setup as done
+              if self.save
+                answer = {success: true, message: 'Teaching assistant info set successfully'}
+              else
+                answer = {success: true, message: 'Teaching assistant info set successfully but could not be marked as done'}
+              end
             else
-              {success: true, message: 'Teaching assistant info set successfully but could not be marked as done'}
+              answer = {success: false, message: 'Could not save user mission info'}
             end
           else
-            {success: false, message: 'Could not save user mission info'}
+            answer = {success: false, message: 'Could not save mission info'}
           end
         else
-          {success: false, message: 'Could not save mission info'}
+          answer = {success: false, message: 'Could not describe assistant in host'}
         end
       else
-        {success: false, message: 'Could not find user in host'}
+        answer = {success: false, message: 'Could not find user in host'}
       end
     else
-      {success: false, message: 'Could not find mission in host'}
+      answer = {success: false, message: 'Could not find mission in host'}
     end
-
+    logger.debug answer
+    answer
   end
 
 # create a temporary uuid when the labuser is created. this will be overwritten by lab end
