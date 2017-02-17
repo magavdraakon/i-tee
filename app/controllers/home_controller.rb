@@ -57,7 +57,7 @@ class HomeController < ApplicationController
       begin
         #This is the tricky part
         #Initialize the temp file as a zip file
-        input_filenames = ['lab.json', 'timestamp.txt', 'host.json', 'lab_vmts.json']
+        input_filenames = ['lab.json', 'timestamp.txt', 'lab_vmts.json']
         Zip::OutputStream.open(temp_file) { |zos| }
        
         #Add files to the zip file as usual

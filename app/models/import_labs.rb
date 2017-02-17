@@ -65,154 +65,129 @@ end
 # read folder contents var/labs/export/labname
 # json files for lab_vmts
 # json file for lab 
-# json file for host
 def self.import_from_folder(foldername)
 	dirname = @@dir+'/'+foldername
 	if !foldername.blank? && File.exists?(dirname)
 		puts "folder exists #{dirname}"
-		h_file = dirname+'/host.json'
 		a_file = dirname+'/assistant.json'
 		l_file = dirname+'/lab.json'
 		v_file = dirname+'/lab_vmts.json'
-		# read host 
-		if File.exists?(h_file) && File.file?(h_file)
-			host_file = File.open(h_file , 'r') 
-			host_obj = JSON.parse(host_file.read)
-			host_obj.delete('id') # remove id field
-
-			host = Host.where("name=?", host_obj['name']).first
-			if host
-				unless host.update_attributes(host_obj)
-					return {success: false, message: "host can not be updated #{host['name']}"}
-				end
+		if File.exists?(a_file) && File.file?(a_file)
+			assistant_file = File.open(a_file , 'r')
+			assistant_obj = JSON.parse(assistant_file.read)
+			assistant_obj.delete('id') # remove id field
+			if assistant_obj.blank? # no assistant
+				assistant = {id: nil}
 			else
-				host = Host.new(host_obj)
-				unless host.save
-					return {success: false, message: "host can not be created #{host['name']}"}
+				assistant = Assistant.where("uri=?", assistant_obj['uri']).first
+				if assistant
+					unless assistant.update_attributes(assistant_obj)
+						return {success: false, message: "assistant can not be updated #{assistant['uri']}"}
+					end
+				else
+					assistant = Assistant.new(assistant_obj)
+					unless assistant.save
+						return {success: false, message: "assistant can not be created #{assistant['uri']}"}
+					end
 				end
 			end
-			if File.exists?(a_file) && File.file?(a_file)
-				assistant_file = File.open(a_file , 'r')
-				assistant_obj = JSON.parse(assistant_file.read)
-				assistant_obj.delete('id') # remove id field
-				if assistant_obj.blank? # no assistant
-					assistant = {id: nil}
-				else
-					assistant = Assistant.where("uri=?", assistant_obj['uri']).first
-					if assistant
-						unless assistant.update_attributes(assistant_obj)
-							return {success: false, message: "assistant can not be updated #{assistant['uri']}"}
+		else # no assistant exported
+			assistant = {id: nil}
+		end
+		# if no errors, continue
+		if File.exists?(l_file) && File.file?(l_file)
+			lab_file = File.open(l_file , 'r')
+			lab_obj = JSON.parse(lab_file.read)
+			lab_obj['assistant_id'] = assistant[:id] # set new assistant id
+			lab_obj.delete('id') # remove id field
+
+			lab = Lab.where("name=?", lab_obj['name']).first # find if this lab already exists (unique name)
+			if lab
+				unless lab.update_attributes(lab_obj)
+					return {success: false, message: "lab can not be updated #{lab_obj['name']}"}
+				end
+			else
+				lab = Lab.new(lab_obj)
+				unless lab.save
+					return {success: false, message: "lab can not be created #{lab_obj['name']}"}
+				end
+			end
+
+			# if no errors, continue
+			if File.exists?(v_file) && File.file?(v_file)
+				vmts_file = File.open(v_file , 'r')
+				vmts_obj = JSON.parse(vmts_file.read)
+
+				vmts_obj.each do |lvmt|
+					lvmt.delete('id') # remove id from lab_vmt
+					lvmt['lab_id'] = lab.id # set new lab id
+					lvmt['vmt'].delete('id') # remove id from vmt
+
+					vmt = Vmt.where('image=?', lvmt['vmt']['image']).first
+					if vmt
+						unless vmt.update_attributes(lvmt['vmt'])
+							return {success: false, message: "vmt can not be updated #{lvmt['vmt']['image']}"}
 						end
 					else
-						assistant = Assistant.new(assistant_obj)
-						unless assistant.save
-							return {success: false, message: "assistant can not be created #{assistant['uri']}"}
+						vmt = Vmt.new(lvmt['vmt'])
+						unless vmt.save
+							return {success: false, message: "vmt can not be created #{lvmt['vmt']['image']}"}
 						end
 					end
-				end
-			else # no assistant exported
-				assistant = {id: nil}
-			end
-			# if no errors, continue
-			if File.exists?(l_file) && File.file?(l_file)
-				lab_file = File.open(l_file , 'r') 
-				lab_obj = JSON.parse(lab_file.read)
-				lab_obj['host_id'] = host.id # set new host id
-				lab_obj['assistant_id'] = assistant[:id] # set new assistant id
-				lab_obj.delete('id') # remove id field
-				
-				lab = Lab.where("name=?", lab_obj['name']).first # find if this lab already exists (unique name)
-				if lab
-					unless lab.update_attributes(lab_obj)
-						return {success: false, message: "lab can not be updated #{lab_obj['name']}"}
-					end
-				else
-					lab = Lab.new(lab_obj)
-					unless lab.save
-						return {success: false, message: "lab can not be created #{lab_obj['name']}"}
-					end
-				end
-				# if no errors, continue
-				if File.exists?(v_file) && File.file?(v_file)
-					vmts_file = File.open(v_file , 'r') 
-					vmts_obj = JSON.parse(vmts_file.read)
-					
-					vmts_obj.each do |lvmt|
-						#puts lvmt
-						puts "\ndo stuff\n"
-						lvmt.delete('id') # remove id from lab_vmt
-						lvmt['lab_id'] = lab.id # set new lab id
-						lvmt['vmt'].delete('id') # remove id from vmt
+					lvmt.delete('vmt') # remove vmt hash
+					lvmt['vmt_id'] = vmt.id # set new vmt id
 
-						vmt = Vmt.where('image=?', lvmt['vmt']['image']).first
-						if vmt
-							unless vmt.update_attributes(lvmt['vmt'])
-								return {success: false, message: "vmt can not be updated #{lvmt['vmt']['image']}"}
+					l_nets = lvmt.delete('lab_vmt_networks') # extract networks
+					# if no errors try to find the lab_vmt
+					lab_vmt = LabVmt.where('name=?', lvmt['name'] ).first
+					if lab_vmt
+						unless lab_vmt.update_attributes(lvmt)
+							return {success: false, message: "lab vmt can not be updated #{lvmt['name']}"}
+						end
+					else
+						lab_vmt = LabVmt.new(lvmt)
+						unless lab_vmt.save
+							return {success: false, message: "lab vmt can not be created #{lvmt['name']}"}
+						end
+					end
+
+					# delete all existing lab vmt networks bound to this lab vmt
+					LabVmtNetwork.where("lab_vmt_id=?", lab_vmt.id).destroy_all
+					#get l_v_n + networks
+					l_nets.each do |vnet|
+						vnet.delete('id') # remove id from lab_vmt_network
+						vnet['network'].delete('id') # remove id from network
+						vnet['lab_vmt_id']=lab_vmt.id # set new lab vmt id
+
+						network = Network.where('name=?', vnet['network']['name']).first
+						if network
+							unless network.update_attributes(vnet['network'])
+								return {success: false, message: "network can not be updated #{vnet['network']['name']}"}
 							end
 						else
-							vmt = Vmt.new(lvmt['vmt'])
-							unless vmt.save
-								return {success: false, message: "vmt can not be created #{lvmt['vmt']['image']}"}
+							network = Network.new(vnet['network'])
+							unless network.save
+								return {success: false, message: "network can not be created #{vnet['network']['name']}"}
 							end
 						end
-						lvmt.delete('vmt') # remove vmt hash
-						lvmt['vmt_id'] = vmt.id # set new vmt id
-						
-						l_nets=lvmt.delete('lab_vmt_networks') # extract networks
-						# if no errors try to find the lab_vmt
-						lab_vmt = LabVmt.where('name=?', lvmt['name'] ).first
-						if lab_vmt
-							unless lab_vmt.update_attributes(lvmt)
-								return {success: false, message: "lab vmt can not be updated #{lvmt['name']}"}
-							end
-						else
-							lab_vmt = LabVmt.new(lvmt)
-							unless lab_vmt.save
-								return {success: false, message: "lab vmt can not be created #{lvmt['name']}"}
-							end
-						end
-						# delete all existing lab vmt networks bound to this lab vmt
-						LabVmtNetwork.where("lab_vmt_id=?", lab_vmt.id).destroy_all
-						#get l_v_n + networks
-						l_nets.each do |vnet|
-							vnet.delete('id') # remove id from lab_vmt_network
-							vnet['network'].delete('id') # remove id from network
-							vnet['lab_vmt_id']=lab_vmt.id # set new lab vmt id
-
-							network = Network.where('name=?', vnet['network']['name']).first
-							if network
-								unless network.update_attributes(vnet['network'])
-									return {success: false, message: "network can not be updated #{vnet['network']['name']}"}
-								end
-							else
-								network = Network.new(vnet['network'])
-								unless network.save
-									return {success: false, message: "network can not be created #{vnet['network']['name']}"}
-								end
-							end
-							vnet['network_id']=network.id 
-							vnet.delete('network')
-							# create new network card
-							puts vnet
-							lab_vmt_network = LabVmtNetwork.new(vnet)
-							unless lab_vmt_network.save
-								return {success: false, message: "lab vmt #{lab_vmt.name} network can not be created #{vnet['slot']}"}
-							end
+						vnet['network_id'] = network.id
+						vnet.delete('network')
+						# create new network card
+						puts vnet
+						lab_vmt_network = LabVmtNetwork.new(vnet)
+						unless lab_vmt_network.save
+							return {success: false, message: "lab vmt #{lab_vmt.name} network can not be created #{vnet['slot']}"}
 						end
 					end
-					# if not returned by now, success
-					{success: true, message: "lab #{lab.id} imported from #{dirname}"}
-				else
-					{success: false, message: "vmts file does not exist #{dirname}"}
 				end
-				
+				# if not returned by now, success
+				{success: true, message: "lab #{lab.id} imported from #{dirname}"}
 			else
-				{success: false, message: "lab file does not exist #{dirname}"}
+				{success: false, message: "vmts file does not exist #{dirname}"}
 			end
 		else
-			{success: false, message: "host file does not exist #{dirname}"}
+			{success: false, message: "lab file does not exist #{dirname}"}
 		end
-		
 	else
 		{success: false, message: "folder does not exist #{dirname}"}
 	end
@@ -243,9 +218,6 @@ def self.export_lab_separate(id)
 		#puts JSON.pretty_generate(l.as_json['lab'])
 		File.open(dirname+"/lab.json","w") do |f|
 		  f.write( JSON.pretty_generate( l.as_json['lab'] ) )
-		end
-		File.open(dirname+"/host.json","w") do |f|
-		  f.write( JSON.pretty_generate( l.host.as_json['host'] ) )
 		end
 		# find all lab_vmts
 		
@@ -294,7 +266,6 @@ def self.export_labuser(uuid, pretty)
 			data = {
 				success: true,
 				lab: lu.lab ? lu.lab.as_json['lab'].except('created_at', 'updated_at', 'description', 'short_description') : {},
-				host: lu.lab.host ? lu.lab.host.as_json['host'].except('created_at', 'updated_at') : {},
 				assistant: lu.lab.assistant ? lu.lab.assistant.as_json['assistant'].except('created_at', 'updated_at')  : {},
 				labuser: lu.as_json['lab_user'].except('created_at', 'updated_at'),
 				user: lu.user ? lu.user.as_json['user'].slice('id', 'username', 'name', 'user_key') : {},
@@ -347,9 +318,6 @@ def self.export_lab(id)
 		#puts JSON.pretty_generate(l.as_json['lab'])
 		File.open(dirname+"/lab.json","w") do |f|
 		  f.write( JSON.pretty_generate( l.as_json['lab'] ) )
-		end
-		File.open(dirname+"/host.json","w") do |f|
-		  f.write( JSON.pretty_generate( l.host.as_json['host'] ) )
 		end
 		File.open(dirname+"/assistant.json","w") do |f|
 		  f.write( JSON.pretty_generate( l.assistant ? l.assistant.as_json['assistant'] : {} ) )

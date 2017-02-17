@@ -66,8 +66,6 @@ ITee::Application.routes.draw do
   match 'labs', :to=>'labs#destroy', via: [:delete]
   match 'labs', :to=>'labs#update', via: [:put]
 
-  resources :hosts
-
   resources :token_authentications, :only => [:update, :destroy]
 
   # route, :to => 'controller#action'

@@ -300,11 +300,7 @@ class LabUsersController < ApplicationController
           manage_vms(lab.vms) if params[:vm]
         end
       end # end updates
-      if params[:h]==''
-        @labs = Lab.joins('left join hosts on hosts.id=labs.host_id').order(@order).where('LOWER(labs.name) like ?', "%#{params[:l].downcase}%").all
-      else
-        @labs = Lab.joins('left join hosts on hosts.id=labs.host_id').order(@order).where('LOWER(labs.name) like ? and LOWER(hosts.name) like ?', "%#{params[:l].downcase}%", "%#{(params[:h] ? params[:h] : '').downcase}%").all
-      end
+      @labs = Lab.order(@order).where('LOWER(labs.name) like ?', "%#{params[:l].downcase}%").all
     elsif params[:t] && params[:t]=='Lab user'
       if params[:id]
         lab_users=get_lab_users_from(params[:id])

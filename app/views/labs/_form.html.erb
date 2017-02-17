@@ -21,10 +21,6 @@
     <%= f.text_area( :description,  :rows => 20) %>
   </div>
     <fieldset><legend>Lab settings</legend>
-   <div class="field">
-    <%= f.label :host_id %><br />
-    <%= f.select( :host_id,  options_from_collection_for_select(Host.all,:id, :name, @lab.host_id) ) %>
-  </div>
       <div class="field">
         <%= f.check_box( :startAll)  %> <%= f.label :startAll ,'Start all machines with lab start' %>
       </div>
