@@ -48,7 +48,7 @@ def self.get_machines(state='', where={}, sort='')
 end
 
 def self.running_machines
-	info = %x(sudo -Hu vbox VBoxManage list runningvms | cut -f2 -d'"')
+	info = %x(utils/vboxmanage list runningvms | cut -f2 -d'"')
 	status= $?
 	#logger.debug info
 	if status.exitstatus===0
@@ -66,7 +66,7 @@ def self.stopped_machines
 end
 
 def self.all_machines
-	info = %x(sudo -Hu vbox VBoxManage list vms | cut -f2 -d'"')
+	info = %x(utils/vboxmanage list vms | cut -f2 -d'"')
 	status = $?
 	#logger.debug info
 	if status.exitstatus===0
@@ -77,7 +77,7 @@ def self.all_machines
 end
 
 def self.template_machines
-	info = %x(sudo -Hu vbox VBoxManage list vms | grep template | cut -f2 -d'"')
+	info = %x(utils/vboxmanage list vms | grep template | cut -f2 -d'"')
 	status= $?
 	#logger.debug info
 	if status.exitstatus===0
@@ -88,7 +88,7 @@ def self.template_machines
 end
 
 def self.get_vm_info(name, static=false)
-	stdout = %x(sudo -Hu vbox VBoxManage showvminfo #{Shellwords.escape(name)} --machinereadable 2>&1)
+	stdout = %x(utils/vboxmanage showvminfo #{Shellwords.escape(name)} --machinereadable 2>&1)
 	unless $?.exitstatus == 0
 		if stdout.lines.first == "VBoxManage: error: Could not find a registered machine named '#{name}'\n"
 			raise 'Not found'
@@ -320,7 +320,7 @@ def self.open_guacamole(vm, user)
 end
 
  def self.state(vm)
-	stdout = %x(sudo -Hu vbox VBoxManage showvminfo #{Shellwords.escape(vm)} 2>/dev/null | grep -E '^State:')
+	stdout = %x(utils/vboxmanage showvminfo #{Shellwords.escape(vm)} 2>/dev/null | grep -E '^State:')
 	state = "#{stdout}".split(' ')[1]
 
 	if $?.exitstatus != 0
@@ -343,7 +343,7 @@ end
  end
 
  def self.start_vm(vm)
-	stdout = %x(sudo -Hu vbox VBoxManage startvm #{Shellwords.escape(vm)} --type headless  2>&1)
+	stdout = %x(utils/vboxmanage startvm #{Shellwords.escape(vm)} --type headless  2>&1)
 	if $?.exitstatus != 0
 		unless stdout.start_with? "VBoxManage: error: The machine '#{vm}' is already locked by a session (or being locked or unlocked)\n"
 			logger.error "Failed to start vm: #{stdout}"
@@ -353,7 +353,7 @@ end
  end
 
  def self.stop_vm(vm)
-	stdout = %x(sudo -Hu vbox VBoxManage controlvm #{Shellwords.escape(vm)} poweroff 2>&1)
+	stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} poweroff 2>&1)
 	if $?.exitstatus != 0
 		unless stdout == "VBoxManage: error: Machine '#{vm}' is not currently running\n"
 			logger.error "Failed to stop vm: #{stdout}"
@@ -363,7 +363,7 @@ end
  end
 
  def self.pause_vm(vm)
-	stdout = %x(sudo -Hu vbox VBoxManage controlvm #{Shellwords.escape(vm)} savestate 2>&1)
+	stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} savestate 2>&1)
 	if $?.exitstatus != 0
 		logger.error "Failed to pause vm: #{stdout}"
 		raise 'Failed to pause vm'
@@ -371,7 +371,7 @@ end
  end
 
  def self.resume_vm(vm)
-	stdout = %x(sudo -Hu vbox VBoxManage controlvm #{Shellwords.escape(vm)} resume 2>&1)
+	stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} resume 2>&1)
 	if $?.exitstatus != 0
 		logger.error "Failed to resume vm: #{stdout}"
 		raise 'Failed to resume vm'
@@ -379,7 +379,7 @@ end
  end
 
  def self.delete_vm(vm)
-	stdout = %x(sudo -Hu vbox VBoxManage unregistervm #{Shellwords.escape(vm)} --delete 2>&1)
+	stdout = %x(utils/vboxmanage unregistervm #{Shellwords.escape(vm)} --delete 2>&1)
 	if $?.exitstatus != 0
 		logger.error "Failed to delete vm: #{stdout}"
 		raise 'Failed to delete vm'
@@ -388,9 +388,9 @@ end
 
  def self.clone(vm, name, snapshot = '')
 	if snapshot
-		stdout = %x(sudo -Hu vbox VBoxManage clonevm #{Shellwords.escape(vm)} --snapshot #{Shellwords.escape(snapshot)} --options link --name #{Shellwords.escape(name)} --register 2>&1)
+		stdout = %x(utils/vboxmanage clonevm #{Shellwords.escape(vm)} --snapshot #{Shellwords.escape(snapshot)} --options link --name #{Shellwords.escape(name)} --register 2>&1)
 	else
-		stdout = %x(sudo -Hu vbox VBoxManage clonevm #{Shellwords.escape(vm)} --name #{Shellwords.escape(name)} --register 2>&1)
+		stdout = %x(utils/vboxmanage clonevm #{Shellwords.escape(vm)} --name #{Shellwords.escape(name)} --register 2>&1)
 	end
 	if $?.exitstatus != 0
 		logger.error "Failed to clone vm: #{stdout}"
@@ -399,7 +399,7 @@ end
  end
 
  def self.set_groups(vm, groups)
-	stdout = %x(sudo -Hu vbox VBoxManage modifyvm #{Shellwords.escape(vm)} --groups #{Shellwords.escape(groups.join(','))} 2>&1)
+	stdout = %x(utils/vboxmanage modifyvm #{Shellwords.escape(vm)} --groups #{Shellwords.escape(groups.join(','))} 2>&1)
 	if $?.exitstatus != 0
 		logger.error "Failed to set vm groups: #{stdout}"
 		raise 'Failed to set vm groups'
@@ -408,7 +408,7 @@ end
 
  def self.set_extra_data(vm, key, value = nil)
 	value = value == nil ? '' : Shellwords.escape(value)
-	stdout = %x(sudo -Hu vbox VBoxManage setextradata #{Shellwords.escape(vm)} #{Shellwords.escape(key)} #{value} 2>&1)
+	stdout = %x(utils/vboxmanage setextradata #{Shellwords.escape(vm)} #{Shellwords.escape(key)} #{value} 2>&1)
 	if $?.exitstatus != 0
 		logger.error "Failed to set vm extra data: #{stdout}"
 		raise 'Failed to set vm extra data'
@@ -416,7 +416,7 @@ end
  end
 
  def self.set_network(vm, slot, type, name='')
-	cmd_prefix = "sudo -Hu vbox VBoxManage modifyvm #{Shellwords.escape(vm)}"
+	cmd_prefix = "utils/vboxmanage modifyvm #{Shellwords.escape(vm)}"
 	name = Shellwords.escape(name)
 
 	if type == 'nat'
@@ -438,7 +438,7 @@ end
  end
 
  def self.reset_vm_rdp(vm)
-	stdout = %x(sudo -Hu vbox VBoxManage controlvm #{Shellwords.escape(vm)} vrde off 2>&1)
+	stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} vrde off 2>&1)
 	if $?.exitstatus != 0
 		unless stdout == "VBoxManage: error: Machine '#{vm}' is not currently running\n"
 			logger.error "Failed to stop vm: #{stdout}"
@@ -447,7 +447,7 @@ end
 		return
 	end
 
-	stdout = %x(sudo -Hu vbox VBoxManage controlvm #{Shellwords.escape(vm)} vrde on 2>&1)
+	stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} vrde on 2>&1)
 	if $?.exitstatus != 0
 		unless stdout == "VBoxManage: error: Machine '#{vm}' is not currently running\n"
 			logger.error "Failed to stop vm: #{stdout}"
@@ -471,7 +471,7 @@ end
 	nr = info['CurrentSnapshotName'] ? info['CurrentSnapshotName'].gsub("#{vmname}-",'').gsub('-template','').to_i + 1 : 1
  	name = "#{vmname}-#{nr}-template"
 
-	stdout = %x(sudo -Hu vbox VBoxManage snapshot #{Shellwords.escape(vm)} take #{Shellwords.escape(name)} --description "#{Time.now}" 2>&1)
+	stdout = %x(utils/vboxmanage snapshot #{Shellwords.escape(vm)} take #{Shellwords.escape(name)} --description "#{Time.now}" 2>&1)
 	if $?.exitstatus != 0
 		logger.error "Failed to take snapshot: #{stdout}"
 		raise 'Failed to take snapshot'

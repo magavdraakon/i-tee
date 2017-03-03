@@ -6,9 +6,6 @@ RUN apt-get update && \
     gem install bundler && \
     mkdir -p /var/run/sshd /var/labs/run
 
-COPY /docker/vboxmanage /usr/local/bin/vboxmanage
-RUN ln -s /usr/local/bin/vboxmanage /usr/bin/VBoxManage
-
 WORKDIR /var/www/i-tee
 ENV RAILS_ENV=production
 COPY /Gemfile /var/www/i-tee/Gemfile
@@ -26,12 +23,11 @@ COPY /utils/ /var/www/i-tee/utils/
 COPY /app/ /var/www/i-tee/app/
 COPY /version.txt /var/www/i-tee/version.txt
 
+COPY /docker/vboxmanage /var/www/i-tee/utils/vboxmanage
 COPY /docker/check-resources /var/www/i-tee/utils/check-resources
 COPY /docker/application.rb /var/www/i-tee/config/application.rb
 COPY /docker/devise.rb /var/www/i-tee/config/initializers/devise.rb
 COPY /docker/production.rb /var/www/i-tee/config/environments/production.rb
-
-RUN groupadd -og 0 vboxusers && useradd -Md /root -g vboxusers -ou 0 vbox
 
 EXPOSE 80
 
