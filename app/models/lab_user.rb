@@ -54,7 +54,7 @@ class LabUser < ActiveRecord::Base
 
 # create needed Vm-s based on the lab templates and set start to now
   def start_lab
-  	unless self.start || self.end  # can only start labs that are not started or finished
+  	if self.start.blank? && self.end.blank?  # can only start labs that are not started or finished
       result = Check.has_free_resources
       if result && result[:success] # has resources
         LabVmt.where('lab_id = ? ', self.lab_id).each do |template|
@@ -101,6 +101,10 @@ class LabUser < ActiveRecord::Base
       else
         result # forward the message from resource check
       end
+    elsif self.end # lab is ended
+      {success: false, message: 'Ended lab can not be started'}
+    else
+      {success: true, message: 'Lab started..'}
 		end
   end
 
