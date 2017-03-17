@@ -7,5 +7,8 @@ do
   QUOTE_ARGS="${QUOTE_ARGS} $ARG"
 done
 
-ssh -o "ControlMaster=auto" -o "ControlPath=/tmp/ssh_vbox.socket" -o "ControlPersist=1h" vbox@host.local "vboxmanage ${QUOTE_ARGS}"
+
+VBOX_PORT=${VBOX_PORT:-22}
+
+ssh -o "ControlMaster=auto" -o "ControlPath=/tmp/ssh_vbox.socket" -o "ControlPersist=1h" -l "$VBOX_USER" -p "$VBOX_PORT" "$VBOX_HOST" "vboxmanage ${QUOTE_ARGS}"
 
