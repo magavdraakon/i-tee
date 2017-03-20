@@ -48,7 +48,6 @@ class VmsController < ApplicationController
       else # but if the parameter is not set, take the first lab this user has   
          @lab=Lab.joins('labs inner join lab_users on lab_users.lab_id=labs.id').where('user_id=?', current_user.id).first
       end
-       sql= Vm.find_by_sql("select * from vms, lab_vmts where vms.lab_vmt_id=lab_vmts.id and lab_id=#{@lab.id} and user_id=#{current_user.id} #{order}") if @lab # only try to get the vms if there is a lab
       @labs=Lab.joins('labs inner join lab_users on lab_users.lab_id=labs.id').where('user_id=?', current_user.id).uniq
     end
     @vms= sql.paginate( :page => params[:page], :per_page => @per_page)
@@ -73,9 +72,9 @@ class VmsController < ApplicationController
   
     if params[:admin]!=nil && @admin
       @tab='admin'
-      vms=Vm.find_by_sql("select vms.*, lab_vmts.lab_id from vms, lab_vmts where vms.lab_vmt_id=lab_vmts.id #{order}")
+      vms=Vm.find_by_sql("SELECT vms.*, lab_vmts.lab_id FROM vms INNER JOIN lab_vmts ON vms.lab_vmt_id=lab_vmts.id #{order}")
     else
-       vms=Vm.find_by_sql("select vms.*, lab_vmts.lab_id from vms, lab_vmts where vms.lab_vmt_id=lab_vmts.id and user_id=#{current_user.id} #{order}")    
+      vms=Vm.find_by_sql("SELECT vms.*, lab_vmts.lab_id FROM vms INNER JOIN lab_vmts ON vms.lab_vmt_id=lab_vmts.id INNER JOIN lab_users ON vms.lab_user_id=lab_users.id INNER JOIN users ON lab_users.user_id=users.id WHERE lab_users.user_id=#{current_user.id} #{order}") 
     end
     @vm=[]
     vms.each do |vm|
@@ -98,10 +97,10 @@ class VmsController < ApplicationController
     order = params[:sort_by] ? " order by #{params[:sort_by]} #{dir}" : ''
 
     if params[:admin]!=nil && @admin
-      sql= "select vms.*, lab_vmts.lab_id from vms, lab_vmts where vms.lab_vmt_id=lab_vmts.id #{order}"
+      sql= "SELECT vms.*, lab_vmts.lab_id from vms INNER JOIN lab_vmts ON vms.lab_vmt_id=lab_vmts.id #{order}"
       @tab='admin'
     else  
-      sql= "select vms.*, lab_vmts.lab_id from vms, lab_vmts where vms.lab_vmt_id=lab_vmts.id and user_id=#{current_user.id} #{order}"
+      sql= "select vms.*, lab_vmts.lab_id from vms INNER JOIN lab_vmts ON vms.lab_vmt_id=lab_vmts.id INNER JOIN lab_users on vms.lab_user_id=lab_users.id WHERE lab_users.user_id=#{current_user.id} #{order}"
     end
     @vms= Vm.paginate_by_sql(sql, :page => params[:page], :per_page => @per_page)
     

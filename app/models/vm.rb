@@ -5,7 +5,7 @@ class Vm < ActiveRecord::Base
   before_destroy :try_delete_vm
   before_create :create_password
 
-  validates_presence_of :name, :lab_vmt_id, :user_id
+  validates_presence_of :name, :lab_vmt_id, :lab_user_id
   validates_uniqueness_of :name
 
   def try_delete_vm
@@ -150,7 +150,7 @@ class Vm < ActiveRecord::Base
       self.lab_vmt.lab_vmt_networks.each do |nw|
         # substituting placeholders with data
         network_name = nw.network.name.gsub('{year}', Time.now.year.to_s)
-                      .gsub('{user}', self.user.username)
+                      .gsub('{user}', self.lab_user.user.username)
                       .gsub('{slot}', nw.slot.to_s)
                       .gsub('{labVmt}', self.lab_vmt.name)
         logger.debug "Setting network: slot: #{nw.slot}; type: #{nw.network.net_type}; name: #{network_name}"
@@ -165,7 +165,7 @@ class Vm < ActiveRecord::Base
       desc += '<br/> or use xfreerdp as<br/>'
       desc += '<srong>'+self.remote('xfreerdp')+'</strong>'
       desc += '<br/>To create a connection with this machine using Windows use two commands:<br/>'
-      desc += '<srong>'+self.remote('win')+'</strong>' #"<strong>cmdkey /generic:#{rdp_host} /user:localhost\\#{self.user.username} /pass:#{self.password}</strong><br/>"
+      desc += '<srong>'+self.remote('win')+'</strong>' #"<strong>cmdkey /generic:#{rdp_host} /user:localhost\\#{self.lab_user.user.username} /pass:#{self.password}</strong><br/>"
       #desc += "<strong>mstsc.exe /v:#{rdp_host}:#{rdp_port_prefix}#{port} /f</strong><br/>"
       logger.debug "\n setting #{self.id} description to \n #{desc}"
       self.description = desc
@@ -229,7 +229,7 @@ class Vm < ActiveRecord::Base
 
   def get_connection_info
     info = { }
-    info[:username] = self.user.username
+    info[:username] = self.lab_user.user.username
     info[:password] = self.password
     info[:host] = ITee::Application.config.rdp_host
     info[:port] = self.rdp_port
@@ -246,16 +246,16 @@ class Vm < ActiveRecord::Base
 
     case typ
       when 'win'
-        desc = "cmdkey /generic:#{rdp_host} /user:localhost&#92;#{self.user.username} /pass:#{self.password}&amp;&amp;"
+        desc = "cmdkey /generic:#{rdp_host} /user:localhost&#92;#{self.lab_user.user.username} /pass:#{self.password}&amp;&amp;"
         desc += "mstsc.exe /v:#{rdp_host}:#{self.rdp_port} /f"
       when 'rdesktop'
-        desc ="rdesktop  -u#{self.user.username} -p#{self.password} -N -a16 #{rdp_host}:#{self.rdp_port}"
+        desc ="rdesktop  -u#{self.lab_user.user.username} -p#{self.password} -N -a16 #{rdp_host}:#{self.rdp_port}"
       when 'xfreerdp'
-        desc ="xfreerdp  --plugin cliprdr -g 90% -u #{self.user.username} -p #{self.password} #{rdp_host}:#{self.rdp_port}"
+        desc ="xfreerdp  --plugin cliprdr -g 90% -u #{self.lab_user.user.username} -p #{self.password} #{rdp_host}:#{self.rdp_port}"
       when 'mac'
-        desc ="open rdp://#{self.user.username}:#{self.password}@#{rdp_host}:#{self.rdp_port}"
+        desc ="open rdp://#{self.lab_user.user.username}:#{self.password}@#{rdp_host}:#{self.rdp_port}"
       else
-        desc ="rdesktop  -u#{self.user.username} -p#{self.password} -N -a16 #{rdp_host}:#{self.rdp_port}"
+        desc ="rdesktop  -u#{self.lab_user.user.username} -p#{self.psassword} -N -a16 #{rdp_host}:#{self.rdp_port}"
     end
 
   end
@@ -309,7 +309,7 @@ class Vm < ActiveRecord::Base
             result.add_parameters([
               { parameter_name: 'hostname', parameter_value: rdp_host },
               { parameter_name: 'port', parameter_value: self.rdp_port },
-              { parameter_name: 'username', parameter_value: self.user.username },
+              { parameter_name: 'username', parameter_value: self.lab_user.user.username },
               { parameter_name: 'password', parameter_value: self.password },
 #             { parameter_name: 'color-depth', parameter_value: 255 }
             ])

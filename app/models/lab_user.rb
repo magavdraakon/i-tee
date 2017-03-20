@@ -10,7 +10,7 @@ class LabUser < ActiveRecord::Base
 
   def vms_info
     # id, nickname, state, allow_remote, position, rdp lines
-    vms = Vm.joins(:lab_vmt).where('lab_vmts.lab_id=? and vms.user_id=?', self.lab_id, self.user_id).order('position asc')
+    vms = Vm.joins(:lab_vmt, :lab_user).where('lab_vmts.lab_id=? and vms.lab_user_id=lab_users.id and lab_users.user_id=?', self.lab_id, self.user_id).order('position asc')
     result= []
     vms.each do |vm|
       result << {
@@ -31,7 +31,7 @@ class LabUser < ActiveRecord::Base
   end
 
   def vms_view
-    Vm.joins(:lab_vmt).where('lab_vmts.lab_id=? and vms.user_id=?', self.lab_id, self.user_id).order('position asc')
+    Vm.joins(:lab_vmt, :lab_user).where('lab_vmts.lab_id=? and vms.lab_user_id=lab_users.id and lab_users.user_id=?', self.lab_id, self.user_id).order('position asc')
   end
 
   def vm_statistic
