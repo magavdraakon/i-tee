@@ -201,6 +201,48 @@ def self.get_all_rdp(user, port)
 
   end
 
+def self.guacamole_initializer(vm, user)
+	if user.rdp_password==""
+		raise 'Please generate a rdp password'
+	end
+
+	machine =  Virtualbox.get_vm_info(vm, true)
+	# check if vm has guacamole enabled
+	unless machine['VMState']=='running'
+		raise 'please start this virtual machine before trying to establish a connection'
+	end
+
+	begin
+		chost = ITee::Application::config.guacamole[:rdp_host]
+	rescue
+		logger.warn "RDP host for Guacamole not specified"
+		chost = ITee::Application::config.rdp_host
+	end
+	cport =  machine['vrdeport'].to_i
+	cusername = gusername = user.username
+	cpassword = user.rdp_password
+	cname = vm
+
+	cipher = OpenSSL::Cipher.new('aes-256-gcm');
+	cipher.encrypt
+	cipher.key = ITee::Application::config.guacamole[:initializer_key]
+	iv = cipher.iv = cipher.random_iv
+	encrypted = cipher.update(JSON.generate({
+		:name => cname,
+		:type => 'rdp',
+		:hostname => chost,
+		:port => cport,
+		:username => cusername,
+		:password => cpassword,
+		:"guacamole-username" => gusername
+	})) + cipher.final
+	tag = cipher.auth_tag
+
+	message = Base64.strict_encode64(iv + tag + encrypted);
+
+	return ITee::Application::config.guacamole[:initializer_url] + '/' + message;
+end
+
 def self.open_guacamole(vm, user)
 	if user.rdp_password==""
 		#TODO! no rdp password - create it? 

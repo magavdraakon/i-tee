@@ -71,6 +71,10 @@ ITee::Application.configure do
       # Full url to Guacamole API endpoints (e.g. https://localhost/guacamole)
       url_prefix: config_file['guacamole']['url_prefix'],
 
+      # Guacamole initializer
+      initializer_url: config_file['guacamole']['initializer_url'],
+      initializer_key: config_file['guacamole']['initializer_key'],
+
       max_connections: 5,
       max_connections_per_user: 2
     }

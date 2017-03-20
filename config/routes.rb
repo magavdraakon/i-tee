@@ -21,6 +21,7 @@ ITee::Application.routes.draw do
   match 'manage_vm', :to=>'virtualbox#manage_vm', via:[:post]
   match 'vm_details/:name', :to=>'virtualbox#vm_details'
   match 'virtualbox_guacamole/:name', :to=>'virtualbox#open_guacamole', via:[:get]
+  match 'virtualbox_guacamole_initializer/:name', :to=>'virtualbox#guacamole_initializer', via:[:get]
 
   match 'jobs',:to=> 'home#jobs'
   match 'jobs/:id', :to=>'home#delete_job', via: [:delete]
@@ -147,6 +148,7 @@ ITee::Application.routes.draw do
 
   match 'open_guacamole', :to=>'vms#open_guacamole'
   match 'open_guacamole/:id', :to=>'vms#open_guacamole' 
+  match 'guacamole_initializer/:id', :to=>'vms#guacamole_initializer'
 
   match 'user_labs/:username', :to=>'labs#user_labs'
   match 'user_labs/:username/:id', :to => 'labs#user_labs'

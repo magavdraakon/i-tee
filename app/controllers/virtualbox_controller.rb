@@ -83,6 +83,19 @@ class VirtualboxController < ApplicationController
 		end
 	end
 
+	def guacamole_initializer
+		initializerUrl = Virtualbox.guacamole_initializer(params[:name], current_user)
+		respond_to do |format|
+			format.html { redirect_to(initializerUrl); }
+			format.json { render :json => { :success => true, :url => initializerUrl } }
+		end
+	rescue Exception => e
+		respond_to do |format|
+			format.html { redirect_to(not_found_path, :notice => e.message); }
+			format.json { render :json => { :success => false, :message => e.message } }
+		end
+	end
+
 	def open_guacamole
 		respond_to do |format|
 	      	result = Virtualbox.open_guacamole(params[:name], current_user)

@@ -23,6 +23,8 @@ guacamole:
  url_prefix: "https://localhost/guacamole"
  cookie_domain: "localhost"
  rdp_host: "localhost"
+ initializer_url: "https://localhost/guacamole/initializer"
+ initializer_key: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 ldap:
  host: "ldap.local"

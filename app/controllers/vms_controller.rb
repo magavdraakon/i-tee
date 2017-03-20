@@ -446,6 +446,19 @@ end
       redirect_to(my_labs_path+'/'+@vm.lab_vmt.lab.id.to_s)
   end
 
+	def guacamole_initializer
+		initializerUrl = @vm.guacamole_initializer
+		respond_to do |format|
+			format.html { redirect_to(initializerUrl); }
+			format.json { render :json => { :success => true, :url => initializerUrl } }
+		end
+	rescue Exception => e
+		respond_to do |format|
+			format.html { redirect_to(not_found_path, :notice => e.message); }
+			format.json { render :json => { :success => false, :message => e.message } }
+		end
+	end
+
   # guacamole related method that gives needed info for a guacamole connection as json
   def open_guacamole
     # vm by id in params

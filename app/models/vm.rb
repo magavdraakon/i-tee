@@ -260,6 +260,38 @@ class Vm < ActiveRecord::Base
 
   end
 
+	def self.guacamole_initializer(vm, user)
+		unless self.lab_vmt.allow_remote && self.lab_vmt.guacamole_type != 'none'
+		  raise 'Not allowed'
+		end
+
+		begin
+			chost = ITee::Application::config.guacamole[:rdp_host]
+		rescue
+			logger.warn "RDP host for Guacamole not specified"
+			chost = ITee::Application::config.rdp_host
+		end
+
+		cipher = OpenSSL::Cipher.new('aes-256-gcm');
+		cipher.encrypt
+		cipher.key = ITee::Application::config.guacamole[:initializer_key]
+		iv = cipher.iv = cipher.random_iv
+		encrypted = cipher.update(JSON.generate({
+			:name => self.name,
+			:type => self.lab_vmt.guacamole_type,
+			:hostname => chost,
+			:port => self.rdp_port,
+			:username => self.user.username,
+			:password => self.password,
+			:"guacamole-username" => "lu#{self.lab_user.id}"
+		})) + cipher.final
+		tag = cipher.auth_tag
+
+		message = Base64.strict_encode64(iv + tag + encrypted);
+
+		return ITee::Application::config.guacamole[:initializer_url] + '/' + message;
+	end
+
   def open_guacamole
     # check if vm has guacamole enabled
     if self.state=='running'
