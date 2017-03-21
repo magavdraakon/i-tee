@@ -277,7 +277,7 @@ def self.export_labuser(uuid, pretty)
 						t['network'] = n.network.as_json['network'].except('created_at', 'updated_at')
 						t
 					}
-					r['lab_vmt']['vmt'] = vm.lab_vmt.vmt.as_json['vmt'].except('created_at', 'updated_at', 'xml_script', 'private')
+					r['lab_vmt']['vmt'] = vm.lab_vmt.vmt.as_json['vmt'].except('created_at', 'updated_at')
 					r
 				}
 			}
