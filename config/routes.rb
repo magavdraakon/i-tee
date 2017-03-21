@@ -103,8 +103,6 @@ ITee::Application.routes.draw do
   match 'rdp_of', :to=> 'vms#get_rdp'
   match 'rdp_reset', :to=> 'vms#rdp_reset'
   
-  match 'set_progress', :to=> 'vms#set_progress'
-  match 'vms/get_progress/:id', :to=> 'vms#get_progress'
     #no id
   match 'start_all', :to=> 'vms#start_all'
   match 'stop_all', :to=> 'vms#stop_all'
@@ -137,7 +135,6 @@ ITee::Application.routes.draw do
 
   match 'add_users/:id', :to=> 'lab_users#add_users'
   match 'add_users', :to=> 'lab_users#add_users'
-  match 'lab_users/progress/:id', :to=> 'lab_users#progress'
   
   match 'vms_by_lab', :to=>'vms#vms_by_lab'
   match 'vms_by_lab/:id', :to=>'vms#vms_by_lab'
