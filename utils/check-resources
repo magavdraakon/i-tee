@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# Sorry...
+
 MEMORY_FREE=$(grep MemAvailable /proc/meminfo | awk '{ print $2 }')
 DISK_FREE=$(df -m ~vbox | awk 'NR==2{print $4}')
 
