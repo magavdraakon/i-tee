@@ -446,43 +446,16 @@ end
       redirect_to(my_labs_path+'/'+@vm.lab_vmt.lab.id.to_s)
   end
 
-	def guacamole_initializer
-		initializerUrl = @vm.guacamole_initializer
-		respond_to do |format|
-			format.html { redirect_to(initializerUrl); }
-			format.json { render :json => { :success => true, :url => initializerUrl } }
-		end
-	rescue Exception => e
-		respond_to do |format|
-			format.html { redirect_to(not_found_path, :notice => e.message); }
-			format.json { render :json => { :success => false, :message => e.message } }
-		end
-	end
-
-  # guacamole related method that gives needed info for a guacamole connection as json
   def open_guacamole
-    # vm by id in params
+      initializerUrl = @vm.open_guacamole
+      respond_to do |format|
+      format.html { redirect_to(initializerUrl); }
+      format.json { render :json => { :success => true, :message => initializerUrl } }
+    end
+  rescue Exception => e
     respond_to do |format|
-      result = @vm.open_guacamole
-      if result && result[:success]
-      format.html {
-        # set cookie
-        cookies[:GUAC_AUTH] = {
-          value: result[:token],
-          #expires: 1.hour.from_now,
-          domain: result[:domain], #%w(rangeforce.com), # %w(.example.com .example.org)
-          path: URI(ITee::Application::config.guacamole[:url_prefix]).path,
-          #:secure,
-          #:httponly
-        }
-        #redirect to url https://xxx.yyy.com/#/client/zzz
-        redirect_to( result[:url] )
-      }
-      format.json  { render :json => result }
-      else
-        format.html  { redirect_to( not_found_path, :notice=> result[:message]) }
-        format.json  { render :json => {:success=>result[:success], :message=> result[:message] } }
-      end
+      format.html { redirect_to(not_found_path, :notice => e.message); }
+      format.json { render :json => { :success => false, :message => e.message } }
     end
   end
 

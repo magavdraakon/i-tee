@@ -12,19 +12,13 @@ database:
  password: "some_password"
  database: "itee"
 
-guacamole_database:
- adapter: mysql2
- host: "mysql.local"
- username: "guacamole"
- password: "some_password"
- database: "guacamole"
-
 guacamole:
- url_prefix: "https://localhost/guacamole"
- cookie_domain: "localhost"
+ # Path to Guacamole initializer application
+ initializer_url: "https://www.example.com/guacamole/initializer",
+ # 256-bit AES key to encrypt data passed to initializer via user's browser
+ initializer_key": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+ # Hostname used by Guacamole to connect to virtual machines
  rdp_host: "localhost"
- initializer_url: "https://localhost/guacamole/initializer"
- initializer_key: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 ldap:
  host: "ldap.local"

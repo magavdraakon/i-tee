@@ -201,7 +201,7 @@ def self.get_all_rdp(user, port)
 
   end
 
-def self.guacamole_initializer(vm, user)
+ def self.open_guacamole(vm, user)
 	if user.rdp_password==""
 		raise 'Please generate a rdp password'
 	end
@@ -241,125 +241,7 @@ def self.guacamole_initializer(vm, user)
 	message = Base64.strict_encode64(iv + tag + encrypted);
 
 	return ITee::Application::config.guacamole[:initializer_url] + '/' + message;
-end
-
-def self.open_guacamole(vm, user)
-	if user.rdp_password==""
-		#TODO! no rdp password - create it? 
-		return {success: false, message: 'Please generate a rdp password'} 
-	end
-	machine =  Virtualbox.get_vm_info(vm, true)
-	# check if vm has guacamole enabled
-    if machine['VMState']=='running'
-
-        rdp_port =  machine['vrdeport'].to_i
-
-        user_prefix = ITee::Application.config.guacamole[:user_prefix]
-        max_connections = ITee::Application::config.guacamole[:max_connections]
-        max_user_connections = ITee::Application::config.guacamole[:max_connections_per_user]
-        url_prefix = ITee::Application::config.guacamole[:url_prefix]
-        begin
-          rdp_host = ITee::Application::config.guacamole[:rdp_host]
-        rescue
-          logger.warn "RDP host for Guacamole not specified"
-          rdp_host = ITee::Application::config.rdp_host
-        end
-        cookie_domain = ITee::Application::config.guacamole[:cookie_domain]
-
-        g_username = user_prefix+user.username
-        g_password = user.rdp_password
-        g_name = user_prefix+vm
-        # check if the user has a guacamole user
-        g_user = GuacamoleUser.where("username = ?", g_username ).first
-        unless g_user
-          # create user
-          g_user = GuacamoleUser.create(username: g_username, password_hash:  g_password, timezone: 'Etc/GMT+0')
-          unless g_user
-            logger.debug g_user
-            return {success: false, message: 'unable to add user to guacamole'} 
-          end
-        else
-        	# update password just in case
-        	g_user.password_hash = user.rdp_password
-        	g_user.apply_salt
-        	g_user.save
-        end 
-        # check if there is a connection
-        g_conn = GuacamoleConnection.where("connection_name = ? ", g_name ).first
-        unless g_conn # find by full name
-          # create connection
-          # data format {connection_name, protocol, max_connections, max_connections_per_user, params {hostname, port, username, password, color-depth}
-          g_conn = GuacamoleConnection.create( connection_name: g_name, 
-            protocol: 'rdp' , 
-            max_connections: max_connections, 
-            max_connections_per_user: max_user_connections )
-         
-          if g_conn
-            g_conn.add_parameters([
-              { parameter_name: 'hostname', parameter_value: rdp_host },
-              { parameter_name: 'port', parameter_value: rdp_port },
-              { parameter_name: 'username', parameter_value: user.username },
-              { parameter_name: 'password', parameter_value: g_password },
-#             { parameter_name: 'color-depth', parameter_value: 255 }
-            ])
-          else
-            logger.debug g_conn
-            return {success: false, message: 'unable to create connection in guacamole'} 
-          end
-        else # connection existed
-          #the port had changed?- change row where connection id is x and parameter is 'port'
-          # find parameter 
-          param = GuacamoleConnectionParameter.where("connection_id=? and parameter_name=?", g_conn.connection_id, 'port').first
-          if param #update
-            GuacamoleConnectionParameter.where("connection_id=? and parameter_name=?", g_conn.connection_id, 'port').limit(1).update_all(parameter_value: rdp_port)
-          else # create
-            GuacamoleConnectionParameter.create(connection_id: g_conn.connection_id, parameter_name: 'port', parameter_value: rdp_port )
-          end
-
-          # password had changed?
-          param = GuacamoleConnectionParameter.where("connection_id=? and parameter_name=?", g_conn.connection_id, 'password').first
-          if param #update
-            GuacamoleConnectionParameter.where("connection_id=? and parameter_name=?", g_conn.connection_id, 'password').limit(1).update_all(parameter_value: g_password)
-          else # create
-            GuacamoleConnectionParameter.create(connection_id: g_conn.connection_id, parameter_name: 'password', parameter_value: g_password )
-          end
-
-          # user had changed?
-          param = GuacamoleConnectionParameter.where("connection_id=? and parameter_name=?", g_conn.connection_id, 'username').first
-          if param #update
-            GuacamoleConnectionParameter.where("connection_id=? and parameter_name=?", g_conn.connection_id, 'username').limit(1).update_all(parameter_value: user.username)
-          else # create
-            GuacamoleConnectionParameter.create(connection_id: g_conn.connection_id, parameter_name: 'username', parameter_value: user.username )
-          end
-          
-        end #EOF connection check
-        # check if the connection persist/has been created
-        if g_conn
-          # allow connection if none exists
-          permission = GuacamoleConnectionPermission.where("user_id=? and connection_id=? and permission=?", g_user.user_id, g_conn.connection_id , 'READ').first
-          unless permission # if no permission, create one
-            result = GuacamoleConnectionPermission.create(user_id: g_user.user_id, connection_id: g_conn.connection_id, permission: 'READ')
-            unless result
-              return {success: false, message: 'unable to allow connection in guacamole'} 
-            end
-          end
-          # log in 
-          post = Http.post(url_prefix + "/api/tokens", {username: g_username, password: g_password})
-          if post.body && post.body['authToken']
-            # get machine url
-            uri = GuacamoleConnection.get_url(g_conn.connection_id)
-            path = url_prefix + "/#/client/#{uri}"
-            { success: true, url: path, token: post.body, domain: cookie_domain}
-          else
-            {success: false, message: 'unable to log in'}
-          end
-        else
-          { success: false, message: 'unable to get machine connection'}
-        end
-    else
-      {success: false, message: 'please start this virtual machine before trying to establish a connection'}
-    end
-end
+ end
 
  def self.state(vm)
 	stdout = %x(utils/vboxmanage showvminfo #{Shellwords.escape(vm)} 2>/dev/null | grep -E '^State:')
