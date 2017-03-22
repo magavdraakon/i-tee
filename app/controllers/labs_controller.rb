@@ -391,7 +391,7 @@ class LabsController < ApplicationController
     @complete=[]
     @not_started=[]
     #categorize the labs, order: running, not started, ended
-    labusers=LabUser.order('end ASC, start DESC').where('user_id=?', user.id)
+    labusers=LabUser.order("#{LabUser.connection.quote_column_name 'end'} desc, #{LabUser.connection.quote_column_name 'start'} desc").where('user_id=?', user.id)
     labusers.each do |u|
       @labs<<u.lab        
       @started<<u.lab  if u.start && !u.end 
