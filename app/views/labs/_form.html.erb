@@ -100,7 +100,7 @@
                 <%= labVmtNet_form.label :network_id %>
                 <%= labVmtNet_form.select :network_id, options_from_collection_for_select(Network.all,:id, :name, labVmtNet_form.object.network_id), {:prompt => 'Select network template'}  %>
                 <br />
-                <%= labVmtNet_form.label :slot %> <%= labVmtNet_form.number_field :slot %><br/>
+                <%= labVmtNet_form.label :slot %> <%= labVmtNet_form.number_field :slot, min: 1 %><br/>
 
                 <%= labVmtNet_form.check_box :promiscuous %> <%= labVmtNet_form.label :promiscuous %><br />
 

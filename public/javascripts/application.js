@@ -253,7 +253,7 @@ function add_network_to_vmt(el) {
 
 	/* slot */
 	innerHtml.push('<label for="lab_lab_vmts_attributes_' + p + '_lab_vmt_networks_attributes_' + n + '_slot">Slot</label> ' +
-		'<input type="number" id="lab_lab_vmts_attributes_' + p + '_lab_vmt_networks_attributes_' + n + '_slot" name="lab[lab_vmts_attributes][' + p + '][lab_vmt_networks_attributes][' + n + '][slot]" size="30" /><br/>');
+		'<input type="number" id="lab_lab_vmts_attributes_' + p + '_lab_vmt_networks_attributes_' + n + '_slot" name="lab[lab_vmts_attributes][' + p + '][lab_vmt_networks_attributes][' + n + '][slot]" size="30" min="1" /><br/>');
 
 	/* promiscuous */
 	innerHtml.push('<input type="hidden" name="lab[lab_vmts_attributes][' + p + '][lab_vmt_networks_attributes][' + n + '][promiscuous]" value="0" />' +
