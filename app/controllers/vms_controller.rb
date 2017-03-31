@@ -475,10 +475,8 @@ end
 
    #redirect user if they are not admin or the machine owner but try to modify a machine
   def auth_as_owner
-    #is this vm this users?
-    unless current_user==@vm.user || @admin
+    unless current_user == @vm.lab_user.user or @admin
       respond_to do |format|
-        logger.debug 'not owner'
         #You don't belong here. Go away.
         format.html { redirect_to root_path , :notice=> 'Sorry, this machine doesnt belong to you!' }
         format.json { render :json=> {:success => false , :message=>  'Sorry, this machine does not belong to you!'} }
