@@ -92,7 +92,7 @@ class Vm < ActiveRecord::Base
         self.description='Power on the virtual machine by clicking <strong>Start</strong>.'
         self.save
 
-        {success: true, message: 'Successful macine shutdown'}
+        {success: true, message: 'Successful machine shutdown'}
       else
         {success: true, message: 'Machine can not be shut down'}
       end
