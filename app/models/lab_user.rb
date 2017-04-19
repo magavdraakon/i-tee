@@ -4,8 +4,8 @@ class LabUser < ActiveRecord::Base
   has_many :vms
   
   validates_presence_of :user_id, :lab_id
-  validates_uniqueness_of :uuid
-	before_destroy :end_lab
+  validates :uuid, :allow_nil => false, :allow_blank => false, :uniqueness => { :case_sensitive => false }
+  before_destroy :end_lab
   before_create :create_uuid
 
   def vms_info
