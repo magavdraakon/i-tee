@@ -263,7 +263,7 @@ class Vm < ActiveRecord::Base
   def open_guacamole
     # check if vm has guacamole enabled
     if self.state=='running'
-      if self.lab_vmt.allow_remote && self.lab_vmt.guacamole_type!="none"
+      if self.lab_vmt.allow_remote and self.lab_vmt.g_type != ''
 
 
         user_prefix = ITee::Application.config.guacamole[:user_prefix]
@@ -301,7 +301,7 @@ class Vm < ActiveRecord::Base
           # data format {connection_name, protocol, max_connections, max_connections_per_user, params {hostname, port, username, password, color-depth}}
           
           result = GuacamoleConnection.create( connection_name: user_prefix+self.name, 
-            protocol: self.lab_vmt.guacamole_type , 
+            protocol: self.lab_vmt.g_type,
             max_connections: max_connections, 
             max_connections_per_user: max_user_connections )
           

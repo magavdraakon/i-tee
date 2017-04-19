@@ -97,9 +97,9 @@
                     <span class="button mac-button MacOS" onclick="show_remote(this, '<strong><%=vm.remote('mac',cookies['resolution'])%></strong>')">Mac</span>
                     <span class="button rdesktop-button Linux UNIX" onclick="show_remote(this, '<strong><%=vm.remote('rdesktop',cookies['resolution'])%></strong>')">Linux (rdesktop)</span>
                     <span class="button xfreerdp-button Linux UNIX" onclick="show_remote(this, '<strong><%=vm.remote('xfreerdp',cookies['resolution'])%></strong>')">Linux (xfreerdp)</span>
-                    <%unless vm.lab_vmt.guacamole_type=='none'%>
-                      <%=link_to 'open in browser', open_guacamole_path+"/#{vm.id}", target: '_blank', class: 'button Linux UNIX MacOS Windows' %>
-                    <%end # guacamole allowed%>
+                    <% unless vm.lab_vmt.g_type == '' %>
+                      <%= link_to 'open in browser', open_guacamole_path+"/#{vm.id}", target: '_blank', class: 'button Linux UNIX MacOS Windows' %>
+                    <% end %>
                   <div escape="false" class="remote copyMe">
                     <div class="parentheight hidden"><div class="helptext ">Click to copy</div></div>
                     <div class="commands copy">Choose a remote connection type from above</div>

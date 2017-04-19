@@ -91,7 +91,7 @@
           <%= labVmt_form.label :primary %>  <%= labVmt_form.check_box :primary %><br/>
           <div class="field">
             <%= labVmt_form.label :g_type, 'Guacamole connection' %>
-            <%= labVmt_form.select :g_type, options_for_select({ :none=> 0, :rdp=>1, :vnc=>2, :ssh=>3}, labVmt_form.object.g_type ) %>
+            <%= labVmt_form.select :g_type, options_for_select([ '', 'rdp', 'vnc', 'ssh' ], labVmt_form.object.g_type) %>
           </div>
           <%= labVmt_form.label :position %> <%= labVmt_form.number_field :position %>
           <div class="networks">
@@ -115,7 +115,7 @@
     <% end %>
       <%= select_tag :networks, options_from_collection_for_select(Network.all,:id, :name), {:prompt => 'Select network template', :style=>'display:none'}  %>
       <%= select_tag :vm_templates, options_from_collection_for_select(Vmt.all,:id, :image), {:prompt => 'Select VM template', :style=>'display:none'}  %>
-      <%= select_tag :g_types, options_for_select({ :none => 0, :rdp => 1, :vnc => 2, :ssh => 3}), { :style => 'display:none' }  %>
+      <%= select_tag :g_types, options_for_select([ '', 'rdp', 'vnc', 'ssh' ]), { :style => 'display:none' }  %>
 
     </div>
     <span class="button add-button" onclick="add_vmt_to_lab();">Add more VMTs</span>

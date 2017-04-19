@@ -20,7 +20,7 @@ class LabUser < ActiveRecord::Base
         expose_uuid: vm.lab_vmt.expose_uuid,
         allow_remote: vm.lab_vmt.allow_remote,
         allow_restart: vm.lab_vmt.allow_restart,
-        guacamole_type: vm.lab_vmt.guacamole_type,
+        guacamole_type: vm.lab_vmt.g_type,
         position: vm.lab_vmt.position,
         primary: vm.lab_vmt.primary,
         vm_rdp: vm.get_all_rdp,
