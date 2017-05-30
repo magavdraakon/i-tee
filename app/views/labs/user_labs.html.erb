@@ -54,7 +54,7 @@
 
   <% if @labs!=[] %>
         <div class="manage_lab loader">
-            <%= link_to('Start lab', start_lab_path+'/'+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : '' ), :class=>'button submit-button sl-button') unless @lab_user.start %>
+            <%= link_to('Start lab', start_lab_path(@lab, :username => @admin ? params[:username] : nil), :class=>'button submit-button sl-button') unless @lab_user.start %>
         </div>
     <% if @lab_user.start %>
       <!-- started at: <%#=@lab_user.start%><br/>
@@ -83,22 +83,22 @@
 
             <td style="text-align:right;">
               <% if @lab.vms_by_one %>
-                <div class=" loader" ><%= link_to('Start', start_vm_path+'/'+vm.id.to_s, :class=> 'button start-button') if (state!='running' && state!='paused') || !vm.rdp_port %>
-                <%= link_to('Pause', pause_vm_path+'/'+vm.id.to_s, :class=>'button pause-button') if state == 'running' && vm.rdp_port && vm.lab_vmt.allow_restart %>
-                <%= link_to('Resume', resume_vm_path+'/'+vm.id.to_s, :class=>'button start-button') if state == 'paused' && vm.rdp_port %>
-                <%= link_to('Stop', stop_vm_path+'/'+vm.id.to_s, :class=> 'button stop-button') if state == 'running' && vm.rdp_port && vm.lab_vmt.allow_restart %>
+                <div class="loader"><%= link_to('Start', start_vm_path(vm), :class => 'button start-button') if (state!='running' && state!='paused') || !vm.rdp_port %>
+                <%= link_to('Pause', pause_vm_path(vm), :class => 'button pause-button') if state == 'running' && vm.rdp_port && vm.lab_vmt.allow_restart %>
+                <%= link_to('Resume', resume_vm_path(vm), :class => 'button start-button') if state == 'paused' && vm.rdp_port %>
+                <%= link_to('Stop', stop_vm_path(vm), :class => 'button stop-button') if state == 'running' && vm.rdp_port && vm.lab_vmt.allow_restart %>
               <% end %>
-              <%= link_to('Reset RDP', rdp_reset_path+'/'+vm.id.to_s, :class=>'button start-button') if state=='running' && vm.rdp_port && vm.lab_vmt.allow_remote %>
+              <%= link_to('Reset RDP', rdp_reset_path(vm), :class => 'button start-button') if state == 'running' && vm.rdp_port && vm.lab_vmt.allow_remote %>
               </div>
             <% if vm.lab_vmt.allow_remote && state=='running' %>
                 <div class="remote_connections">
                     <span onclick="toggleOtherOsButtons(this)" class="showtoggle">&lt; more</span>
-                    <span class="button win-button Windows" onclick="show_remote(this, '<strong><%=vm.remote('win', cookies['resolution'])%></strong>')">Windows</span>
-                    <span class="button mac-button MacOS" onclick="show_remote(this, '<strong><%=vm.remote('mac',cookies['resolution'])%></strong>')">Mac</span>
-                    <span class="button rdesktop-button Linux UNIX" onclick="show_remote(this, '<strong><%=vm.remote('rdesktop',cookies['resolution'])%></strong>')">Linux (rdesktop)</span>
-                    <span class="button xfreerdp-button Linux UNIX" onclick="show_remote(this, '<strong><%=vm.remote('xfreerdp',cookies['resolution'])%></strong>')">Linux (xfreerdp)</span>
-                    <% unless vm.lab_vmt.g_type == '' %>
-                      <%= link_to 'open in browser', open_guacamole_path+"/#{vm.id}", target: '_blank', class: 'button Linux UNIX MacOS Windows' %>
+                    <span class="button win-button Windows" onclick="show_remote(this, '<strong><%=vm.remote('win')%></strong>')">Windows</span>
+                    <span class="button mac-button MacOS" onclick="show_remote(this, '<strong><%=vm.remote('mac')%></strong>')">Mac</span>
+                    <span class="button rdesktop-button Linux UNIX" onclick="show_remote(this, '<strong><%=vm.remote('rdesktop')%></strong>')">Linux (rdesktop)</span>
+                    <span class="button xfreerdp-button Linux UNIX" onclick="show_remote(this, '<strong><%=vm.remote('xfreerdp')%></strong>')">Linux (xfreerdp)</span>
+                    <% unless vm.lab_vmt.g_type == ''%>
+                      <%= link_to 'open in browser', open_guacamole_path(vm), target: '_blank', class: 'button Linux UNIX MacOS Windows' %>
                     <% end %>
                   <div escape="false" class="remote copyMe">
                     <div class="parentheight hidden"><div class="helptext ">Click to copy</div></div>
@@ -116,26 +116,20 @@
 <div class="manage_lab">
     <% if !@lab_user.end && @lab_user.vms.count>0 %>
         <span class="loader">
-          <%= link_to('Start all',start_all_path+'/'+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : ''),
-                      :class=> 'button start-button sl-button')  %>
+          <%= link_to('Start all', start_all_path(@lab, :username => @admin ? params[:username] : nil), :class=> 'button start-button sl-button')  %>
         </span>
          <span class="loader">
-          <%= link_to('Stop all',stop_all_path+'/'+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : ''),
-                      :class=> 'button stop-button sl-button')  %>
+          <%= link_to('Stop all',stop_all_path(@lab, :username => @admin ? params[:username] : nil), :class=> 'button stop-button sl-button')  %>
         </span>
     <% end %>
     <% if @lab_user.start && @lab.restartable %>
         <span class="loader">
-          <%= link_to('Restart lab',restart_lab_path+'/'+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : ''),
-                      :class=>'add-button button rl-button',
-                      :confirm => 'This will delete all saved data. Are you sure?') %>
+          <%= link_to('Restart lab',restart_lab_path(@lab, :username => @admin ? params[:username] : nil), :class=>'add-button button rl-button', :confirm => 'This will delete all saved data. Are you sure?') %>
         </span>
     <%end%>
     <% unless  @lab_user.end  || !@lab.endable %>
         <span class="loader">
-          <%= link_to('End lab', end_lab_path+'/'+@lab_user.id.to_s,
-                      :class=>'delete-button button el-button',
-                      :confirm => 'This will delete all saved data. Are you sure?')   %>
+          <%= link_to('End lab', end_lab_path(@lab, :username => @admin ? params[:username] : nil), :class=>'delete-button button el-button', :confirm => 'This will delete all saved data. Are you sure?')  %>
         </span>
     <%end%>
 </div>

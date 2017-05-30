@@ -21,12 +21,7 @@ class Vm < ActiveRecord::Base
   end
 
   def reset_rdp
-    begin
-      Virtualbox.reset_vm_rdp(name)
-      {success: true, message: "Vm rdp reset successful"}
-    rescue
-      {success: true, message: "Vm rdp reset failed"}
-    end
+    Virtualbox.reset_vm_rdp(name)
   end
 
   def vm_info
@@ -80,35 +75,28 @@ class Vm < ActiveRecord::Base
   end
 
   def stop_vm
-    state = self.state
-    if state=='running' || state=='paused'
-      if self.lab_vmt.allow_restart
-        begin
-          Virtualbox.stop_vm(name)
-        rescue
-          # ignore failure, Virtualbox model logs the message
-        end
-
-        self.description='Power on the virtual machine by clicking <strong>Start</strong>.'
-        self.save
-
-        {success: true, message: 'Successful machine shutdown'}
-      else
-        {success: true, message: 'Machine can not be shut down'}
-      end
-    else
-      {success: true, message: 'Machine was already shut down'}
+    unless [ 'running', 'paused' ].include?(self.state)
+      return
     end
+
+    unless self.lab_vmt.allow_restart
+      return
+    end
+
+    begin
+      Virtualbox.stop_vm(name)
+    rescue
+      # ignore failure, Virtualbox model logs the message
+    end
+
+    self.description='Power on the virtual machine by clicking <strong>Start</strong>.'
+    self.save
   end
 
   def start_vm
 
-    result = {notice: '', alert: ''}
-
-    state = self.state
-    if state == 'running' || state == 'paused'
-      result[:alert]="Unable to start <b>#{self.lab_vmt.nickname}</b>, it is already running"
-      return result
+    if ['running', 'paused'].include?(self.state)
+      raise 'Already running'
     end
 
     begin
@@ -137,7 +125,7 @@ class Vm < ActiveRecord::Base
         Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiSystemVendor", "I-tee Distance Laboratory System")
         if self.lab_vmt.expose_uuid
           Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiSystemVersion", self.lab_user.uuid)
-	else
+        else
           Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiSystemVersion", "System Version")
         end
         if !self.lab_user.lab.lab_hash.blank? and !self.lab_user.user.user_key.blank?
@@ -171,9 +159,6 @@ class Vm < ActiveRecord::Base
       self.description = desc
 
       self.save
-      logger.debug "\n save successful "
-
-      result[:notice] = "Machine <b>#{self.lab_vmt.nickname}</b> successfully started<br/>"
 
       self.lab_user.last_activity = Time.now
       self.lab_user.activity = "Start vm - '#{self.name}'"
@@ -181,39 +166,31 @@ class Vm < ActiveRecord::Base
 
     rescue Exception => e
       logger.error "Failed to start vm: #{e.message}"
-      result[:notice] = ''
-      result[:alert]="Machine <b>#{self.lab_vmt.nickname}</b> initialization <b>failed</b>."
+      raise 'Failed to start vm'
     end
-
-    result
   end
-
 
   #pause a machine
   def pause_vm
     state = self.state
-    if state=='running'
-      logger.info 'running VM pause script'
+    if state == 'running'
       Virtualbox.pause_vm(name)
-      {success: true, message: 'Successful vm pause.'}
-    elsif state=='paused'
-      {success: false, message:'Unable to pause a paused machine'}
+    elsif state == 'paused'
+      raise 'Already paused'
     else
-      {success: false, message: 'unable to pause a shut down machine'}
+      raise 'Bad machine state: ' + state
     end
   end
 
   #resume machine from pause
   def resume_vm
     state = self.state
-    if state=='paused'
-      logger.info 'running VM resume script'
+    if state == 'paused'
       Virtualbox.resume_vm(name)
-      {success: true, message: 'Successful vm resume.'}
-    elsif state=='running'
-      {success: false, message:'Unable to resume a running machine'}
+    elsif state == 'running'
+      raise 'Already running'
     else
-      {success: false, message: 'unable to resume a shut down machine'}
+      raise 'Bad machine state: ' + state
     end
   end
 
@@ -236,15 +213,9 @@ class Vm < ActiveRecord::Base
     info
   end
 
-  # connection informations
-  def remote(typ, resolution='')
-    if resolution!="" 
-      logger.debug "\n resolution is #{resolution}"
-    end
-
-    rdp_host=ITee::Application.config.rdp_host
-
-    case typ
+  def remote(type)
+    rdp_host = ITee::Application.config.rdp_host
+    case type
       when 'win'
         desc = "cmdkey /generic:#{rdp_host} /user:localhost&#92;#{self.lab_user.user.username} /pass:#{self.password}&amp;&amp;"
         desc += "mstsc.exe /v:#{rdp_host}:#{self.rdp_port} /f"
@@ -257,7 +228,6 @@ class Vm < ActiveRecord::Base
       else
         desc ="rdesktop  -u#{self.lab_user.user.username} -p#{self.psassword} -N -a16 #{rdp_host}:#{self.rdp_port}"
     end
-
   end
 
   def open_guacamole

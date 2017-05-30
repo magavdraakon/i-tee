@@ -58,7 +58,8 @@ ITee::Application.routes.draw do
   match 'users', :to=>'users#destroy', via: [:delete]
   match 'users', :to=>'users#update', via: [:put]
 
-  resources :vms
+  get '/vms', :to => 'vms#index'
+  get '/vms/:id', :to => 'vms#show'
 
   resources :materials
   
@@ -85,53 +86,24 @@ ITee::Application.routes.draw do
   match 'template', :to => 'home#template'
   match 'system', :to => 'home#system'
   match 'about', :to=> 'home#about'
-  #with user
-  match 'start_all/:id/:username', :to=> 'vms#start_all'
-  match 'stop_all/:id/:username', :to=> 'vms#stop_all'
-  #with id
-  match 'start_all/:id', :to=> 'vms#start_all'
-  match 'stop_all/:id', :to=> 'vms#stop_all'
+  match 'start_all/:id/:username', :to=> 'vms#start_all', :as => :start_all
+  match 'stop_all/:id/:username', :to=> 'vms#stop_all', :as => :stop_all
+  match 'start_all/:id', :to=> 'vms#start_all', :as => :start_all
+  match 'stop_all/:id', :to=> 'vms#stop_all', :as => :stop_all
 
-  match 'start_vm/:id', :to=> 'vms#start_vm'
-  match 'init_vm/:id', :to=> 'vms#init_vm'
-  match 'pause_vm/:id', :to=> 'vms#pause_vm'
-  match 'resume_vm/:id', :to=> 'vms#resume_vm'
-  match 'stop_vm/:id', :to=> 'vms#stop_vm'
-  match 'rdp_reset/:id', :to=> 'vms#rdp_reset'
+  match 'start_vm/:id', :to => 'vms#start_vm', :as => :start_vm
+  match 'pause_vm/:id', :to => 'vms#pause_vm', :as => :pause_vm
+  match 'resume_vm/:id', :to => 'vms#resume_vm', :as => :resume_vm
+  match 'stop_vm/:id', :to => 'vms#stop_vm', :as => :stop_vm
+  match 'rdp_reset/:id', :to => 'vms#rdp_reset', :as => :rdp_reset
 
-  match 'state_of', :to=> 'vms#get_state'
-  match 'rdp_of', :to=> 'vms#get_rdp'
-  match 'rdp_reset', :to=> 'vms#rdp_reset'
-  
-    #no id
-  match 'start_all', :to=> 'vms#start_all'
-  match 'stop_all', :to=> 'vms#stop_all'
-  match 'start_all_by_id', :to=> 'vms#start_all_by_id'
-  match 'stop_all_by_id', :to=> 'vms#stop_all_by_id'
-  match 'labuser_vms', :to=> 'vms#labuser_vms'
-
-  match 'start_vm', :to=> 'vms#start_vm'
-  match 'init_vm', :to=> 'vms#init_vm'
-  match 'pause_vm', :to=> 'vms#pause_vm'
-  match 'resume_vm', :to=> 'vms#resume_vm'
-  match 'stop_vm', :to=> 'vms#stop_vm'
-  
-  match 'end_lab/:id', :to=>'labs#end_lab'
-  match 'end_lab', :to=>'labs#end_lab'
-
-  match 'start_lab/:id/:username', :to=>'labs#start_lab'
-  match 'start_lab/:id', :to=>'labs#start_lab'
-  match 'start_lab', :to=>'labs#start_lab'
+  match 'end_lab/:id', :to=>'labs#end_lab', :as => :end_lab
+  match 'start_lab/:id', :to=>'labs#start_lab', :as => :start_lab
+  match 'restart_lab/:id', :to=>'labs#restart_lab', :as => :restart_lab
 
   match 'start_lab_by_id', :to=> 'labs#start_lab_by_id', via: [:post]
   match 'end_lab_by_id', :to=> 'labs#end_lab_by_id', via: [:post]
   match 'restart_lab_by_id', :to=> 'labs#restart_lab_by_id', via: [:post]
-
-  match 'end_lab_by_values', :to=> 'labs#end_lab_by_values', via: [:post]
-
-  match 'restart_lab/:id/:username', :to=> 'labs#restart_lab'
-  match 'restart_lab/:id', :to=> 'labs#restart_lab'
-  match 'restart_lab', :to=> 'labs#restart_lab'
 
   match 'add_users/:id', :to=> 'lab_users#add_users'
   match 'add_users', :to=> 'lab_users#add_users'
@@ -140,13 +112,13 @@ ITee::Application.routes.draw do
   match 'vms_by_lab/:id', :to=>'vms#vms_by_lab'
   match 'vms_by_state', :to=>'vms#vms_by_state'
   match 'vms_by_state/:state', :to=>'vms#vms_by_state'
-  
+  match 'labuser_vms', :to=> 'vms#labuser_vms'
+
   match 'my_labs/:id/:username', :to => 'labs#user_labs'
   match 'my_labs/:id', :to => 'labs#user_labs'
   match 'my_labs', :to =>'labs#user_labs'
 
-  match 'open_guacamole', :to=>'vms#open_guacamole'
-  match 'open_guacamole/:id', :to=>'vms#open_guacamole' 
+  match 'open_guacamole/:id', :to=>'vms#open_guacamole' , :as => :open_guacamole
 
   match 'user_labs/:username', :to=>'labs#user_labs'
   match 'user_labs/:username/:id', :to => 'labs#user_labs'
