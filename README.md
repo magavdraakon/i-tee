@@ -1,3 +1,11 @@
+**Current maintainer's note:** What first started as a college project, has over time become a total mess - no comprehensive documentation, automated tests, flexible logging and monitoring support, ..., not to mention countless edge-case & security bugs, shitty architecture and horrible code quality.
+It's hard to fix any of these problems without complete rewrite, so I leave you with this minimal README. We are [slowly] developing new microservice-based system, while still trying to maintain this beast.
+
+If you need any operational and/or development support, feel free to create an issue or contact with maintainer(s) via email:
+
+ * [sl2mmin](https://github.com/sl2mmin) ([roland.kaur@itcollege.ee](mailto:roland.kaur@itcollege.ee)) - project lead
+ * [keijokapp](https://github.com/keijokapp) ([keijo.kapp@itcollege.ee](mailto:keijo.kapp@itcollege.ee)) - Ruby-unfriendly maintainer/developer/architect, happy to solve any technical problem as long as it doesn't involve integrating "small" random feature into already hard-to-maintain system
+
 # About i-tee
 i-tee is a distance laboratory system, that is based on ruby on rails and uses VirtualBox headless virtualization.
 
@@ -15,13 +23,13 @@ http://conferences.sigcomm.org/sigcomm/2015/pdf/papers/p113.pdf
 
 i-tee contains three layers such as: Virtualisation, Web frontend (access control, lab control), Learningspace layer.
 
-# Installation
-
 This section describes sample installation of I-Tee on Ubuntu Server 16.04 LTS.
+
+# Running
 
 ## Virtualization environment
 
-I-Tee currently uses VirtualBox headless for virtualization and SSH to run `vboxmanage` commands on virtualization host.
+I-Tee currently uses VirtualBox headless for virtualization and OpenSSH to run `vboxmanage` commands on virtualization host.
 
  1. Create dedicated user `vbox` for VirtualBox, preferably with separate Btrfs partition as home directory (e.g. `/var/labs`).
  2. Install VirtualBox 5.1 and VirtualBox Extension Packs.
@@ -40,158 +48,42 @@ vboxmanage extpack install --replace "/tmp/Oracle_VM_VirtualBox_Extension_Pack-$
 su vbox -c "vboxmanage extpack install --replace '/tmp/Oracle_VM_VirtualBox_Extension_Pack-$SUBVERSION.vbox-extpack'" || true
 ```
 
-## Install and set up database
+## Guacamole
 
- 1. Install MySQL.
- 2. Create MySQL users and databases for I-Tee and Guacamole (e.g. `itee` and `guacamole`)
+I-Tee has some hacky support for Guacamole web client. Read [Guacamole User's Guide Chapter 3 - Installing Guacamole with Docker](https://guacamole.incubator.apache.org/doc/gug/guacamole-docker.html) for instruction about running Guacamole.
+If you get it working, put database credentials and other Guacamole-related settings to I-Tee configuration file and it *might* be enough.
 
-## Installing reverse proxy server
+**Important:** The Guacamole support is so hacky that it does not work with newer Guacamole images, so you need to use older one referred by `keijokapp/guacamole`.
 
-It's recommended to run application behind TLS-terminating reverse proxy and make then direclty inaccessible.
+## I-Tee web application
 
- 1. Install Nginx.
- 3. Add TLS key/certificate to `/etc/ssl/private/i-tee.key`/`/etc/ssl/certs/i-tee.crt`.
- 2. Configure site (e.g. `/etc/nginx/sites-available/default`):
+I-Tee has been designed and tested to run inside Docker container, although it should also (in some way) be capable of running in normal Linux environment.
+Refer [`Dockerfile`](Dockerfile) for installation instructions without Docker. The container does not need to be in the same physical machine with hypervisor
+but there might be some problems if connection is not stable enough.
+
+Docker command to run I-Tee would be something like this:
+```sh
+docker create -t \
+        --name i-tee \
+        --publish "8080:80" \
+        --env "ITEE_SECRET_TOKEN=6ddd9b0760edb09b4cade3892628fad4d182c6675ee7c1e151ced0cb8c952cb75e17b5654342746ba5640b63844f6f162246201aff936a8da154104f29b1959d" \
+        --env "VBOX_HOST=172.17.0.1" \
+        --env "VBOX_PORT=22" \
+        --env "VBOX_USER=vbox" \
+        --volume /etc/i-tee/config.yaml:/etc/i-tee/config.yaml:ro \
+        --volume /etc/i-tee/id_rsa:/root/.ssh/id_rsa:ro \
+        --volume /etc/i-tee/known_hosts:/root/.ssh/known_hosts:ro \
+        --volume /var/labs/exports:/var/labs/exports \
+        keijokapp/i-tee:latest
 ```
-server {
-	listen 80;
-	return         301 https://$host$request_uri;
-}
-
-server {
-	listen 443;
-
-	ssl on;
-	ssl_certificate /etc/ssl/certs/i-tee.crt;
-	ssl_certificate_key /etc/ssl/private/i-tee.key;
-
-	location / {
-		proxy_pass http://172.17.0.1:8080/;
-
-		# I-Tee might need some time to respond
-		proxy_connect_timeout       3600;
-		proxy_send_timeout          3600;
-		proxy_read_timeout          3600;
-		send_timeout                3600;
-	}
-
-	location /guacamole/ {
-		proxy_pass http://172.17.0.1:8081/guacamole/;
-		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-		proxy_set_header Upgrade $http_upgrade;
-		proxy_set_header Connection $http_connection;
-	}
-
-	location /virtualbox/ {
-		proxy_pass http://172.17.0.1:4433/;
-	}
-}
-```
-
-## Installing I-Tee web application
-
-I-Tee has been designed and tested to run inside Docker container, although it should also be capable of running in normal Linux environment.
-Refer [`Dockerfile`](Dockerfile) for installation instructions.
-
- 1. Install Docker.
- 2. Create configuration file `/etc/i-tee/config.yaml`. (use [`docker/config_sample.yaml`](docker/config_sample.yaml) as an example)
- 3. Create SSH keypair to access virtualization host. Add public key to `authorized_keys` file of VirtualBox user (i.e `/var/labs/.ssh/authorized_keys` for `vbox`) on virtualization host.
- 4. Create SSH `/etc/i-tee/known_hosts` file to let I-Tee verify virtualization host. It's syntax is `server-host-name key-type server-public-key`.
- 5. Create systemd unit file (e.g. `/usr/local/lib/systemd/system/i-tee.service`)
-```
-[Unit]
-Requires=docker.service
-After=docker.service
-
-[Install]
-WantedBy=multi-user.target
-
-[Service]
-EnvironmentFile=/etc/i-tee/environment
-ExecStartPre=-/usr/bin/env docker rm -f i-tee
-ExecStartPre=/usr/bin/env docker create -t \
-	--name i-tee \
-	--publish "172.17.0.1:8080:80" \
-	--env "ITEE_SECRET_TOKEN=6ddd9b0760edb09b4cade3892628fad4d182c6675ee7c1e151ced0cb8c952cb75e17b5654342746ba5640b63844f6f162246201aff936a8da154104f29b1959d" \
-	--env "VBOX_HOST=172.17.0.1" \
-	--env "VBOX_PORT=22" \
-	--env "VBOX_USER=vbox" \
-	--volume /etc/i-tee/config.yaml:/etc/i-tee/config.yaml:ro \
-	--volume /etc/i-tee/id_rsa:/root/.ssh/id_rsa:ro \
-	--volume /etc/i-tee/known_hosts:/root/.ssh/known_hosts:ro \
-	--volume /var/labs/exports:/var/labs/exports \
-	keijokapp/i-tee:latest
-ExecStart=/usr/bin/env docker start -a i-tee
-ExecStop=/usr/bin/env docker stop i-tee
-SuccessExitStatus=143
-Restart=always
-RestartSec=3
-```
- 4. Enable and start systemd unit.
-
-## Installing Guacamole
-
-I-Tee can be used with Guacamole to enable access to RDP via web browser. We recommend Docker-based installation.
-Two applications are needed for Guacamole - `guacd` which acts as configuration- and stateless Guacamole protocol proxy
-and `guacamole` which serves the application.
-
- 1. Install Docker. (TODO: reference to instructions)
- 2. Run `docker run --rm guacamole/guacamole /opt/guacamole/bin/initdb.sh --mysql` to get get database initialization script and run it in your Guacamole database.
- 3. Create systemd unit files for `guacd` and `guacamole`.
-
-
- `guacd` (e.g. `/usr/local/lib/systemd/system/guacd.service`):
-```
-[Unit]
-Requires=docker.service
-After=docker.service
-
-[Install]
-WantedBy=multi-user.target
-
-[Service]
-ExecStartPre=-/usr/bin/env docker rm -f guacd
-ExecStartPre=/usr/bin/env docker create -t \
-	--name guacd \
-	--publish "172.170.1:4822:4822" \
-	glyptodon/guacd
-ExecStart=/usr/bin/env docker start -a guacd
-ExecStop=/usr/bin/env docker stop guacd
-SuccessExitStatus=143
-Restart=always
-```
-
- `guacamole` (e.g. `/usr/local/lib/systemd/system/guacamole.service`)
-```
-[Unit]
-Requires=guacd.service
-Requires=docker.service
-After=docker.service
-
-[Install]
-WantedBy=multi-user.target
-
-[Service]
-ExecStartPre=-/usr/bin/env docker rm -f guacamole
-ExecStartPre=/usr/bin/env docker create -t \
-	--env GUACD_PORT_4822_TCP_ADDR=172.17.0.1 \
-	--env GUACD_PORT_4822_TCP_PORT=4822 \
-	--env MYSQL_HOSTNAME=172.17.0.1 \
-	--env MYSQL_PORT=3306 \
-	--env MYSQL_DATABASE=guacamole \
-	--env MYSQL_USER=guacamole \
-	--env MYSQL_PASSWORD=mysql_guacamole_password \
-	--name guacamole \
-	--publish "172.17.0.1:8081:8080" \
-	glyptodon/guacamole
-ExecStart=/usr/bin/env docker start -a guacamole
-ExecStop=/usr/bin/env docker stop guacamole
-SuccessExitStatus=143
-Restart=always
-RestartSec=3
-```
-
- 4. Enable and start created unit files.
+ * `ITEE_SECRET_TOKEN` - 64-byte hex-encoded token used to sign cookies (replace it with your random token)
+ * `VBOX_HOST` - address of hypervisor host to be connected to via SSH.
+ * `VBOX_PORT` - hypervisor SSH server port (defaults to 22)
+ * `VBOX_USER` - user used to run virtual machines
+ * `/etc/i-tee/config.yaml` - I-Tee configuration file (see [`docker/config_sample.yaml`](docker/config_sample.yaml))
+ * `/root/.ssh/id_rsa` - SSH private key used to connect to hypervisor
+ * `/root/.ssh/known_hosts` - SSH known_hosts file containing record for public key of specified hypervisor host
+ * `/root/.ssh/exports` - directory used to export/import/backup lab data as directories of JSON files
 
 # Authors
 Tiia Tänav
