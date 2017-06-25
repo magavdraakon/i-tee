@@ -1,3 +1,5 @@
+require "base64"
+
 class GuacamoleConnection < ActiveRecord::Base
 	establish_connection "#{Rails.env}_guacamole"
 	self.table_name = "guacamole_connection" 
@@ -16,8 +18,14 @@ The characters after "/guacamole/client/" are not encrypted data. They are a bas
 Each of these components separated from the other by a single NULL character (U+0000), with the resulting string encoded with base64.
 =end
 		type = 'c' # connection type
-		db = 'mysql' # db server type
-		require "base64"
+		case connection.adapter_name
+			when 'MySQL', 'MySQL2'
+				db = 'mysql'
+			when 'PostgreSQL'
+				db = 'postgresql'
+			else
+				raise 'Unknown database type'
+		end
  		Base64.encode64("#{id}\0#{type}\0#{db}").strip
 	end
 
