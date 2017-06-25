@@ -260,12 +260,10 @@ class Vm < ActiveRecord::Base
 
   end
 
+  # TODO: remove race conditions
   def open_guacamole
-    # check if vm has guacamole enabled
     if self.state=='running'
       if self.lab_vmt.allow_remote and self.lab_vmt.g_type != ''
-
-
         user_prefix = ITee::Application.config.guacamole[:user_prefix]
         max_connections = ITee::Application::config.guacamole[:max_connections]
         max_user_connections = ITee::Application::config.guacamole[:max_connections_per_user]
@@ -278,81 +276,58 @@ class Vm < ActiveRecord::Base
         end
         cookie_domain = ITee::Application::config.guacamole[:cookie_domain]
 
-
-
-        # check if the labuser has a guacamole user
-        unless self.lab_user.g_user && GuacamoleUser.find(self.lab_user.g_user)
-          # create user
+	begin
+          guacamole_user = GuacamoleUser.find(self.lab_user.g_user)
+	rescue ActiveRecord::RecordNotFound => e
           self.lab_user.g_username = user_prefix+"#{self.lab_user.id}"
           self.lab_user.g_password = SecureRandom.base64
-          result = GuacamoleUser.create(username: self.lab_user.g_username, password_hash: self.lab_user.g_password, timezone: 'Etc/GMT+0')
-          if result
-            # save to labuser
-            self.lab_user.g_user = result.user_id
-            self.lab_user.save
-          else 
-            logger.debug result
-            return {success: false, message: 'unable to add user to guacamole'} 
+          guacamole_user = GuacamoleUser.create!(username: self.lab_user.g_username, password_hash: self.lab_user.g_password, timezone: 'Etc/GMT+0')
+          self.lab_user.g_user = guacamole_user.user_id
+          self.lab_user.save!
+	end
+
+        begin
+          guacamole_connection = GuacamoleConnection.find(self.g_connection)
+          begin
+            port_parameter = GuacamoleConnectionParameter.find([ guacamole_connection, 'port' ])
+            port_parameter.parameter_value = rdp_port
+            port_parameter.save!
+          rescue ActiveRecord::RecordNotFound => e
+            GuacamoleConnectionParameter.create!(connection_id: guacamole_connection.connection_id, parameter_name: 'port', parameter_value: rdp_port)
           end
-        end # has no user
-        # check if there is a connection
-        unless self.g_connection && GuacamoleConnection.find(self.g_connection)
-          # create connection
-          # data format {connection_name, protocol, max_connections, max_connections_per_user, params {hostname, port, username, password, color-depth}}
-          
-          result = GuacamoleConnection.create( connection_name: user_prefix+self.name, 
+        rescue ActiveRecord::RecordNotFound => e
+          guacamole_connection = GuacamoleConnection.create!( connection_name: user_prefix+self.name,
             protocol: self.lab_vmt.g_type,
             max_connections: max_connections, 
             max_connections_per_user: max_user_connections )
           
-          if result
-            result.add_parameters([
-              { parameter_name: 'hostname', parameter_value: rdp_host },
-              { parameter_name: 'port', parameter_value: self.rdp_port },
-              { parameter_name: 'username', parameter_value: self.lab_user.user.username },
-              { parameter_name: 'password', parameter_value: self.password },
-#             { parameter_name: 'color-depth', parameter_value: 255 }
-            ])
-            self.g_connection = result.connection_id
-            self.save
-          else
-            logger.debug result
-            return {success: false, message: 'unable to create connection in guacamole'} 
-          end
-        else # connection existed
-          #the port had changed?- change row where connection id is x and parameter is 'port'
-          # find parameter 
-          param = GuacamoleConnectionParameter.where("connection_id=? and parameter_name=?", self.g_connection, 'port').first
-          if param #update
-            GuacamoleConnectionParameter.where("connection_id=? and parameter_name=?", self.g_connection, 'port').limit(1).update_all(parameter_value: rdp_port)
-          else # create
-            GuacamoleConnectionParameter.create(connection_id: self.g_connection, parameter_name: 'port', parameter_value: rdp_port )
-          end
-          
-        end #EOF connection check
-        # check if the connection persist/has been created
-        if self.g_connection
-          # allow connection if none exists
-          permission = GuacamoleConnectionPermission.where("user_id=? and connection_id=? and permission=?", self.lab_user.g_user, self.g_connection, 'READ').first
-          unless permission # if no permission, create one
-            result = GuacamoleConnectionPermission.create(user_id: self.lab_user.g_user, connection_id: self.g_connection, permission: 'READ')
-            unless result
-              return {success: false, message: 'unable to allow connection in guacamole'} 
-            end
-          end
-          # log in 
-          post = Http.post(url_prefix + "/api/tokens", {username: self.lab_user.g_username, password:self.lab_user.g_password})
-          if post.body && post.body['authToken']
-            # get machine url
-            uri = GuacamoleConnection.get_url(self.g_connection)
-            path = url_prefix + "/#/client/#{uri}"
-            { success: true, url: path, token: post.body, domain: cookie_domain}
-          else
-            {success: false, message: 'unable to log in'}
-          end
-        else
-          { success: false, message: 'unable to get machine connection'}
+          guacamole_connection.add_parameters([
+            { parameter_name: 'hostname', parameter_value: rdp_host },
+            { parameter_name: 'port', parameter_value: self.rdp_port },
+            { parameter_name: 'username', parameter_value: self.lab_user.user.username },
+            { parameter_name: 'password', parameter_value: self.password },
+#           { parameter_name: 'color-depth', parameter_value: 255 }
+          ])
+
+          self.g_connection = guacamole_connection.connection_id
+          self.save!
         end
+
+        begin
+          GuacamoleConnectionPermission.create!(user_id: guacamole_user.user_id, connection_id: guacamole_connection.connection_id, permission: 'READ')
+        rescue ActiveRecord::RecordNotUnique => e
+          # Ignored intentionally
+        end
+
+        post = Http.post(url_prefix + "/api/tokens", {username: self.lab_user.g_username, password: self.lab_user.g_password})
+        if post.body && post.body['authToken']
+          uri = GuacamoleConnection.get_url(self.g_connection)
+          path = url_prefix + "/#/client/#{uri}"
+          { success: true, url: path, token: post.body, domain: cookie_domain }
+        else
+          {success: false, message: 'unable to log in'}
+        end
+
       else
         {success: false, message: 'this virtual machine does not allow this connection'}
       end
