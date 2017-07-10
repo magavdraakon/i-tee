@@ -86,6 +86,7 @@ class LabUser < ActiveRecord::Base
                 return {success: false, message: 'unable to remember user token in assistant'}
               end
             else
+              logger.warn result
               return {success: false, message: 'unable to communicate with assistant'}
             end
           end
