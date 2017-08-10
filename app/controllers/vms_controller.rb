@@ -10,6 +10,8 @@ class VmsController < ApplicationController
   before_filter :admin_tab, :except=>[:show,:index, :vms_by_lab, :vms_by_state]
   before_filter :vm_tab, :only=>[:show,:index, :vms_by_lab, :vms_by_state]
 
+  skip_before_filter :authenticate_user!, :only => [:network]
+
   def save_from_nil
     logger.debug 'finding vm'
 
@@ -54,7 +56,7 @@ class VmsController < ApplicationController
     render :action=>'index'
   end
   
-   def vms_by_state
+  def vms_by_state
     @b_by='state'
 
     @state=params[:state] ? params[:state] : 'running'
@@ -473,19 +475,42 @@ end
     end
   end
 
+  def network
+    # identify labuser by uuid. get machine and perform action
+    # params: uuid, name, network : {slot, type, name}
+    respond_to do |format|
+      @labuser = LabUser.where(:uuid=>  params[:uuid]).first
+      if @labuser
+        vm = @labuser.vms.where(:name=> params[:name]).first
+        if vm 
+          params[:network] = '' if params[:network].blank?          
+          result = vm.manage_network(request.method, params[:network])
+          format.html { redirect_to root_path, :notice=> 'Sorry, this machine does not belong to you!' }
+          format.json { render json: result }
+        else
+          format.html { redirect_to root_path , :notice=> 'Sorry, this machine does not belong to you!' }
+          format.json { render :json=> {:success => false , :message=>  'Sorry, this machine does not belong to you!'} }
+        end
+      else
+        format.html { redirect_to root_path , :notice=> 'Restricted access' }
+        format.json { render :json=> {:success => false , :message=>  'Unable to find lab attempt'} }
+      end
+    end
+  end
+
    #redirect user if they are not admin or the machine owner but try to modify a machine
   def auth_as_owner
     unless current_user == @vm.lab_user.user or @admin
       respond_to do |format|
         #You don't belong here. Go away.
-        format.html { redirect_to root_path , :notice=> 'Sorry, this machine doesnt belong to you!' }
+        format.html { redirect_to root_path , :notice=> 'Sorry, this machine does not belong to you!' }
         format.json { render :json=> {:success => false , :message=>  'Sorry, this machine does not belong to you!'} }
       end
     end
   end
 private #----------------------------------------------------------------------------------
  
-   def get_user
+  def get_user
     @user=current_user # by default get the current user
     if  @admin  #  admins can use this to view users labs
       if params[:username]  # if there is a username in the url

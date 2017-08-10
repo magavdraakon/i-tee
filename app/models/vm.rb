@@ -336,4 +336,51 @@ class Vm < ActiveRecord::Base
     end
   end
 
+  def manage_network(action, nw)
+    data = Virtualbox.get_vm_info(self.name)
+    data.each do |key, value|
+      unless ['nic','macaddress','cableconnected', 'intnet', 'natnet', 'hostonlyadapter', 'bridgeadapter'].any? { |word| key.include?(word) }
+        data.delete(key) 
+      end
+    end
+    case action.downcase 
+    when 'get'
+      return  JSON.pretty_generate(data)
+    when 'post'
+      if nw.blank? || nw[:slot].blank? || nw[:type].blank? || nw[:name].blank?
+        return {success: false, message: "not enough info to add a network : slot, type, name"}
+      end
+      allowed = ['null', 'nat','intnet', 'bridgeadapter', 'hostonlyadapter']
+      unless allowed.include?(nw[:type])
+        return {success: false, message: "network type not supported", allowed: allowed}
+      end
+      Virtualbox.set_running_network(self.name, nw[:slot], nw[:type], nw[:name])
+      return {success: true, message: "added network to #{self.name}", network: nw}
+    when 'delete'
+      if nw.blank?
+        return {success: false, message: "not enough info to remove a network : slot or name"}
+      end
+      if nw[:slot].blank?
+        if nw[:name].blank?
+          return {success: false, message: "not enough info to remove a network : slot or name"}
+        else
+          field = ''
+          data.each do |key, value|
+            if value==nw[:name]
+              field = key
+            end
+          end
+          if field.blank?
+            return {success: false, message: "the machine #{self.name} does not have a network with the name: #{nw[:name]}"}
+          else
+            nw[:slot] = field.gsub(/[^0-9]/, '')
+          end
+        end
+      end
+
+      Virtualbox.set_running_network(self.name, nw[:slot], 'null', '')
+      return {success: true, message: "removed network from #{self.name}", network: nw}
+    end
+  end
+
 end

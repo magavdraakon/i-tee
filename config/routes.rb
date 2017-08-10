@@ -59,6 +59,7 @@ ITee::Application.routes.draw do
   match 'users', :to=>'users#update', via: [:put]
 
   resources :vms
+  match 'vm_network', :to=>"vms#network", via: [:get, :post, :delete]
 
   resources :materials
   

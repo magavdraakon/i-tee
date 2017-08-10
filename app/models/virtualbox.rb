@@ -437,6 +437,26 @@ end
 	end
  end
 
+ def self.set_running_network(vm, slot, type, name='')
+ 	cmd_prefix = "utils/vboxmanage controlvm #{Shellwords.escape(vm)}"
+	name = Shellwords.escape(name)
+	if type == 'null'
+		stdout = %x(#{cmd_prefix} nic#{slot} null 2>&1)	
+	elsif type == 'nat'
+		stdout = %x(#{cmd_prefix} nic#{slot} nat 2>&1)
+	elsif type == 'intnet'
+		stdout = %x(#{cmd_prefix} nic#{slot} intnet #{name} 2>&1)
+	elsif type == 'bridgeadapter'
+		stdout = %x(#{cmd_prefix} nic#{slot} bridged #{name} 2>&1)
+	elsif type == 'hostonlyadapter'
+		stdout = %x(#{cmd_prefix} nic#{slot} hostonly #{name} 2>&1)
+	end
+	if $?.exitstatus != 0
+		logger.error "Failed to set vm network: #{stdout}"
+		raise 'Failed to set vm network'
+	end
+ end
+
  def self.reset_vm_rdp(vm)
 	stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} vrde off 2>&1)
 	if $?.exitstatus != 0
