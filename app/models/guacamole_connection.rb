@@ -24,7 +24,7 @@ Each of these components separated from the other by a single NULL character (U+
 			when 'postgresql'
 				db = 'postgresql'
 			else
-				raise 'Unknown database type'
+				raise 'Unknown database type: ' + connection.adapter_name.downcase
 		end
  		Base64.encode64("#{id}\0#{type}\0#{db}").strip
 	end
