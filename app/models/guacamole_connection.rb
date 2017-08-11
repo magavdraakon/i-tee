@@ -18,10 +18,10 @@ The characters after "/guacamole/client/" are not encrypted data. They are a bas
 Each of these components separated from the other by a single NULL character (U+0000), with the resulting string encoded with base64.
 =end
 		type = 'c' # connection type
-		case connection.adapter_name
-			when 'MySQL', 'MySQL2'
+		case connection.adapter_name.downcase
+			when 'mysql', 'mysql2'
 				db = 'mysql'
-			when 'PostgreSQL'
+			when 'postgresql'
 				db = 'postgresql'
 			else
 				raise 'Unknown database type'
