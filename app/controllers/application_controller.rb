@@ -13,7 +13,7 @@ class ApplicationController < ActionController::Base
   layout :set_layout
 
   before_filter :authenticate_user_from_token!
-  before_filter :authenticate_user!, :except=>[ :about, :labinfo ]
+  before_filter :authenticate_user!, :except=>[ :about, :labinfo, :ping ]
   before_filter :admin?
   before_filter :manager?
   before_filter :per_page

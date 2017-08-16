@@ -88,6 +88,13 @@ class HomeController < ApplicationController
     end
   end
 
+  def ping
+    respond_to do |format|
+      format.html  { render :layout => false }
+      format.json  { render :json => {ping: 'pong'} }
+    end
+  end
+
   def index
   end
 
