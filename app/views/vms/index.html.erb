@@ -42,12 +42,12 @@
                    uninit
                 <%end%> 
                 lab<%= vm.lab_vmt.lab.id%>">
-        <td><%= vm.lab_vmt.nickname %> </td>
+        <td><%= vm.lab_vmt.nickname if vm.lab_vmt %> </td>
         <%if @admin && @tab=='admin' %><td><%= vm.name%> </td><%end%>
-        <%if @admin && @tab=='admin' %><td><%= vm.lab_vmt.name%> </td><%end%>
-        <td><%= vm.lab_vmt.lab.name%> </td>
-        <%if @admin && @tab=='admin' %><td><%= vm.lab_user.user.username %></td><%end%>
-        <td class="narrow"><% if vm.lab_vmt.allow_remote %><%=vm.password%><%end%></td>
+        <%if @admin && @tab=='admin' %><td><%= vm.lab_vmt.name if vm.lab_vmt%> </td><%end%>
+        <td><%= vm.lab_vmt.lab.name if vm.lab_vmt && vm.lab_vmt.lab %> </td>
+        <%if @admin && @tab=='admin' %><td><%= vm.lab_user.user.username if vm.lab_user && vm.lab_user.user%></td><%end%>
+        <td class="narrow"><% if vm.lab_vmt && vm.lab_vmt.allow_remote %><%=vm.password%><%end%></td>
         <td class="narrow">
           <%='('+state+')' if vm.rdp_port && state != 'error' %>
           <span class="loader">
