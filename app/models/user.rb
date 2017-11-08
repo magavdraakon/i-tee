@@ -15,6 +15,11 @@ class User < ActiveRecord::Base
 
   validates_format_of :username, :with => /^[[:alnum:]]+[[:alnum:]_]+[[:alnum:]]$/ , :message => 'can only be alphanumeric with and dashes with no spaces'
 
+  # Populate user model with name attribute
+  def ldap_before_save
+    self.name = Devise::LDAP::Adapter.get_ldap_param(self.username,"name").first
+  end
+  
   def nilify_email
     if self.email == ''
       self.email = nil
