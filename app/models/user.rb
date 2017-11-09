@@ -17,11 +17,11 @@ class User < ActiveRecord::Base
 
   # Populate user model with name attribute
   def ldap_before_save
-  	begin
-    self.name = Devise::LDAP::Adapter.get_ldap_param(self.username,"name").first
-	rescue NoMethodError
-		#ignored intentionally
-	end 
+    begin
+      self.name = Devise::LDAP::Adapter.get_ldap_param(self.username,"name").first
+    rescue NoMethodError
+      #ignored intentionally
+    end 
   end
   
   def nilify_email
