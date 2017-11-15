@@ -23,6 +23,10 @@
     <%= f.label :enabled %><br />
     <%= f.check_box :enabled %>
   </div>
+  <div class="field">
+    <%= f.label :version %><br />
+    <%= f.select :version, options_for_select([["VTA 2015", "v1"], ["VTA 2017", "v2"]], f.object.version),{include_blank: "choose version"},{} %>
+  </div>
   <div class="actions">
     <%= f.submit %>
   </div>

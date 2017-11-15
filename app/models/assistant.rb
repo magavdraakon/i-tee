@@ -1,17 +1,57 @@
 class Assistant < ActiveRecord::Base
-  attr_accessible :enabled, :uri, :name
+  attr_accessible :enabled, :uri, :name, :version
   has_many :labs
 
   validates_presence_of :name, :uri
   validates_uniqueness_of :uri
 
+  # not used?
   def get_lab(params={})
     result = self.get_request("/api/v1/lab", params)
     result
   end
 
+# used in start_lab
+# {"api_key": lab.lab_token , "lab": lab.lab_hash, "username": user.username, "fullname": user.name, "password": password,  "host": rdp_host , "info":{"somefield": "somevalue"}}
+# expects key field
   def create_labuser(params={})
-    result = self.post_request("/api/v1/labuser", params)
+    result = false
+    case self.version
+    when 'v1'
+      result = self.post_request("/api/v1/labuser", params)
+      if result && result.key?('labuser') # updated vta
+        # do nothing
+      elsif result && result.key?('key') # old vta, ask for labuser
+        data = {
+          api_key: params['api_key'],
+          lab: params['lab'],
+          user: result['key']
+        }
+        lu = self.get_labuser(labuser, data)
+        if !lu.blank? && lu.is_a?(Hash) && lu.key?('_id')
+          result['labuser'] = lu
+        end
+      end
+    when 'v2'
+      params.delete('info') # vta v2 does not use info fields
+      lu = self.post_request("/api/v2/labusers", params)
+      if !lu.blank? && lu.key?('_id')
+        result = { labuser: lu }
+      end
+      # get user key
+      data = {
+        username: params['username']
+      }
+      users = self.get_request("/api/v2/users", data)
+      unless users.is_a?(Hash) && users.key?('error')
+        user = users.first
+        if user.key?('token')
+          result['key']=user['token']
+        end
+      end
+    end
+    
+    #logger.debug "#{params} create labuser result #{result.as_json}"
     result
   end
 
