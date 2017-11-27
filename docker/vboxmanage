@@ -1,0 +1,14 @@
+#!/bin/bash
+
+QUOTE_ARGS=''
+for ARG in "$@"
+do
+  ARG=$(printf "%q" "$ARG")
+  QUOTE_ARGS="${QUOTE_ARGS} $ARG"
+done
+
+
+VBOX_PORT=${VBOX_PORT:-22}
+
+ssh -o "ControlMaster=auto" -o "ControlPath=/tmp/ssh_vbox.socket" -o "ControlPersist=1h" -l "$VBOX_USER" -p "$VBOX_PORT" "$VBOX_HOST" "vboxmanage ${QUOTE_ARGS}"
+

@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# Sorry...
+
+MEMORY_FREE=$(grep MemAvailable /proc/meminfo | awk '{ print $2 }')
+DISK_FREE=$(df -m ~vbox | awk 'NR==2{print $4}')
+
+if [ "$MEMORY_FREE" -lt "8388608" ] || [ "$DISK_FREE" -lt "30720" ]
+then
+	echo "Resource exhaustion warning" >&2
+	exit 1
+fi

@@ -1,9 +1,0 @@
-# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
-
-one:
-  icon: MyString
-  placeholder: MyString
-
-two:
-  icon: MyString
-  placeholder: MyString

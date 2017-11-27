@@ -1,0 +1,36 @@
+debug: true
+
+rdp_host: "localhost"
+application_url: "https://localhost/i-tee"
+
+skin: "EIK"
+
+database:
+ adapter: mysql2
+ host: "mysql.local"
+ username: "itee"
+ password: "some_password"
+ database: "itee"
+
+guacamole_database:
+ adapter: mysql2
+ host: "mysql.local"
+ username: "guacamole"
+ password: "some_password"
+ database: "guacamole"
+
+guacamole:
+ url_prefix: "https://localhost/guacamole"
+ cookie_domain: "localhost"
+ rdp_host: "localhost"
+
+ldap:
+ host: "ldap.local"
+ port: 389
+ attribute: "uid"
+ base: "dc=local"
+ group_base: "cn=Users,dc=local"
+ ssl: false
+ user: "itee"
+ password: "some_password"
+

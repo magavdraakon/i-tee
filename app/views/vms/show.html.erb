@@ -14,16 +14,8 @@
   <%= @vm.lab_vmt.lab.name %>
 </p>
 
-<p><b>IP:</b>
-  <%= @vm.mac.ip if @vm.mac!=nil%>
-</p>
-
-<p><b>Mac:</b>
-  <%= @vm.mac.mac if @vm.mac!=nil %>
-</p>
-
 <p><b>User:</b>
-  <%= @vm.user.username %>
+  <%= @vm.lab_user.user.username %>
 </p>
 
 <p><b>Description:</b>

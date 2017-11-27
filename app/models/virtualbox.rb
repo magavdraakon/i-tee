@@ -6,58 +6,49 @@ def self.get_machines(state='', where={}, sort='')
 	unless where
 		where={}
 	end
-	logger.debug "state is '#{state}'"
 	case state
-    when 'running'
-      vms = Virtualbox.running_machines
-    when 'paused'
-      vms = Virtualbox.paused_machines
-    when 'stopped'
-      vms = Virtualbox.stopped_machines
-  	when 'template'
-  	  vms = Virtualbox.template_machines
-    else
-      vms = Virtualbox.all_machines
-    end
+		when 'running'
+			vms = Virtualbox.running_machines
+		when 'paused'
+			vms = Virtualbox.paused_machines
+		when 'stopped'
+			vms = Virtualbox.stopped_machines
+		when 'template'
+			vms = Virtualbox.template_machines
+		else
+			vms = Virtualbox.all_machines
+	end
 
-    # TODO get additional info
-    vms_info=[]
-    vms.each do |vm|
-    	add = true
-
-	    if where.key?(:name) && where[:name]!=''# check if name is similar
-    		add = vm.downcase.include? where[:name].downcase
-    	end
-
-    	if add
-	    	info = Virtualbox.get_vm_info(vm)  # get detiled info
-
-	    	if where.key?(:lab) && where[:lab]!='' # only for this lab
-		    	add = info['lab'] ? info['lab']['id'].to_i == where[:lab].to_i : false
-		    end
-		    if where.key?(:user) && where[:user]!='' # only for this user
-		    	add = info['user'] ? info['user']['id'].to_i == where[:user].to_i : false
-		    end
-	    	if add && where.key?(:group) && where[:group]!=''
-	    		add = info['groups'] ? info['groups'].any? {|group| group.downcase.include? where[:group].downcase} : false
-	    	end
-
-	    	if add && where.key?(:VRDEActiveConnection) # check if connection is active
-	    		if where[:VRDEActiveConnection]=="any"
-	    			add = true
-	    		else
-	    			add = where[:VRDEActiveConnection] == info['VRDEActiveConnection']
-	    		end
-	    	end
-
-	    	vms_info << info if add
-	    end
-    end
-    vms_info
+	vms_info=[]
+	vms.each do |vm|
+		if where.key?(:name) and where[:name] != '' and !vm.downcase.include? where[:name].downcase # check if name is similar
+			return
+		end
+		begin
+			info = Virtualbox.get_vm_info(vm)  # get detiled info
+		rescue
+			# Ignore error, callee logs the error message
+			return
+		end
+		if where.key?(:lab) and where[:lab] != '' and info['lab']['id'].to_i != where[:lab].to_i # only for this lab
+			next
+		end
+		if where.key?(:user) and where[:user] != '' and info['user']['id'].to_i != where[:user].to_i # only for this user
+			next
+		end
+		if where.key?(:group) and where[:group] != '' and  !info['groups'].any? {|group| group.downcase.include? where[:group].downcase}
+			next
+		end
+		if where.key?(:VRDEActiveConnection) and where[:VRDEActiveConnection] != 'any' and where[:VRDEActiveConnection] != info['VRDEActiveConnection']# check if connection is active
+			next
+		end
+		vms_info << info
+	end
+	vms_info
 end
 
 def self.running_machines
-	info = %x(sudo -Hu vbox VBoxManage list runningvms | cut -f2 -d'"')
+	info = %x(utils/vboxmanage list runningvms | cut -f2 -d'"')
 	status= $?
 	#logger.debug info
 	if status.exitstatus===0
@@ -75,7 +66,7 @@ def self.stopped_machines
 end
 
 def self.all_machines
-	info = %x(sudo -Hu vbox VBoxManage list vms | cut -f2 -d'"')
+	info = %x(utils/vboxmanage list vms | cut -f2 -d'"')
 	status = $?
 	#logger.debug info
 	if status.exitstatus===0
@@ -86,7 +77,7 @@ def self.all_machines
 end
 
 def self.template_machines
-	info = %x(sudo -Hu vbox VBoxManage list vms | grep template | cut -f2 -d'"')
+	info = %x(utils/vboxmanage list vms | grep template | cut -f2 -d'"')
 	status= $?
 	#logger.debug info
 	if status.exitstatus===0
@@ -97,82 +88,84 @@ def self.template_machines
 end
 
 def self.get_vm_info(name, static=false)
-	info = %x(sudo -Hu vbox VBoxManage showvminfo #{Shellwords.escape(name)} --machinereadable )
-	status = $?
-	#logger.debug info
+	stdout = %x(utils/vboxmanage showvminfo #{Shellwords.escape(name)} --machinereadable 2>&1)
+	unless $?.exitstatus == 0
+		if stdout.lines.first == "VBoxManage: error: Could not find a registered machine named '#{name}'\n"
+			raise 'Not found'
+		end
+		logger.error "Failed to get vm info: #{stdout}"
+		raise 'Failed to get vm info'
+	end
+
 	vm = {}
-	if status.exitstatus===0
-		info.split(/\n+/).each do |row|
-			if row.strip!=''
-				#puts row
-				f=row.split('=')
-				value=f.last.gsub('"', '').gsub('<not set>', '')
-				field=f.first.gsub('"', '')
+	stdout.split(/\n+/).each do |row|
+		if row.strip!=''
+			f=row.split('=')
+			value=f.last.gsub('"', '').gsub('<not set>', '')
+			field=f.first.gsub('"', '')
 				
 
-				if field.include? '['
-					subfield = field.slice(field.index('[')..field.index(']'))
-					field.gsub!(subfield,'')
-					subfield.gsub!('[','').gsub!( ']','')
+			if field.include? '['
+				subfield = field.slice(field.index('[')..field.index(']'))
+				field.gsub!(subfield,'')
+				subfield.gsub!('[','').gsub!( ']','')
 
-					if subfield.include? '/'
-						s=subfield.split('/')
-						subsub = s.last
-						subfield=s.first
-					end
+				if subfield.include? '/'
+					s=subfield.split('/')
+					subsub = s.last
+					subfield=s.first
 				end
+			end
 
-				#puts "\nfield #{field}"
-				#puts "value #{value}"
-				#puts "subfield #{subfield}" if subfield
-				#puts "subfield field #{subsub}" if subsub
-
-				if subfield
-					unless vm[field] # create empty hash to house the subfield
-						vm[field] = {}
+			if subfield
+				unless vm[field] # create empty hash to house the subfield
+					vm[field] = {}
+				end
+				if subsub
+					unless vm[field][subfield] # create empty hash to house the sub-subfield
+						vm[field][subfield]={}
 					end
-					if subsub
-						unless vm[field][subfield] # create empty hash to house the sub-subfield
-							vm[field][subfield]={}
-						end
-						vm[field][subfield][subsub] = value
-					else
-						vm[field][subfield] = value
-					end
+					vm[field][subfield][subsub] = value
 				else
-					vm[field] = value
+					vm[field][subfield] = value
 				end
+			else
+				vm[field] = value
 			end
 		end
-		# field-specific parsing
-		if vm['groups']
-			vm['groups'] = vm['groups'].split(',')
-			unless static
-				vmname = vm['groups'][0] ? vm['groups'][0].gsub('/', '').strip : '' # first group is machine name
-				if vmname!='' 
-					vmt = LabVmt.where('name=?', vmname).first
-					if vmt
-						vm.merge!(Lab.select('id, name').where("id=?", vmt.lab_id).first.as_json)
-					end
-				end
-				username = vm['groups'][1] ? vm['groups'][1].gsub('/', '').strip : '' # second group is user name
-				if username!='' 
-					user = User.select('id, username, name').where('username=?', username).first
-					if user
-						vm.merge!(user.as_json)
-					end
-				end
-			end
-		end
-
-		if vm['CurrentSnapshotNode']
-			vm['CurrentSnapshotDescription']=vm[vm['CurrentSnapshotNode'].gsub('Name', 'Description')]
-		end
-
-		vm
-	else
-		false
 	end
+	# field-specific parsing
+	if vm['groups']
+		vm['groups'] = vm['groups'].split(',')
+		unless static
+			vmname = vm['groups'][0] ? vm['groups'][0].gsub('/', '').strip : '' # first group is machine name
+			if vmname != ''
+				vmt = LabVmt.where('name=?', vmname).first
+				if vmt
+					vm.merge!(Lab.select('id, name').where("id=?", vmt.lab_id).first.as_json)
+				end
+			end
+			username = vm['groups'][1] ? vm['groups'][1].gsub('/', '').strip : '' # second group is user name
+			if username != ''
+				user = User.select('id, username, name').where('username=?', username).first
+				if user
+					vm.merge!(user.as_json)
+				end
+			end
+		end
+	end
+
+	if vm['CurrentSnapshotNode']
+		value = vm[vm['CurrentSnapshotNode'].gsub('Name', 'Description')]
+		begin
+			value.to_time
+		rescue
+			value= ''
+		end
+		vm['CurrentSnapshotDescription']=value
+	end
+
+	vm
 end
 
 def self.get_all_rdp(user, port)
@@ -263,7 +256,7 @@ def self.open_guacamole(vm, user)
             g_conn.add_parameters([
               { parameter_name: 'hostname', parameter_value: rdp_host },
               { parameter_name: 'port', parameter_value: rdp_port },
-              { parameter_name: 'username', parameter_value: g_username },
+              { parameter_name: 'username', parameter_value: user.username },
               { parameter_name: 'password', parameter_value: g_password },
 #             { parameter_name: 'color-depth', parameter_value: 255 }
             ])
@@ -287,6 +280,14 @@ def self.open_guacamole(vm, user)
             GuacamoleConnectionParameter.where("connection_id=? and parameter_name=?", g_conn.connection_id, 'password').limit(1).update_all(parameter_value: g_password)
           else # create
             GuacamoleConnectionParameter.create(connection_id: g_conn.connection_id, parameter_name: 'password', parameter_value: g_password )
+          end
+
+          # user had changed?
+          param = GuacamoleConnectionParameter.where("connection_id=? and parameter_name=?", g_conn.connection_id, 'username').first
+          if param #update
+            GuacamoleConnectionParameter.where("connection_id=? and parameter_name=?", g_conn.connection_id, 'username').limit(1).update_all(parameter_value: user.username)
+          else # create
+            GuacamoleConnectionParameter.create(connection_id: g_conn.connection_id, parameter_name: 'username', parameter_value: user.username )
           end
           
         end #EOF connection check
@@ -318,184 +319,182 @@ def self.open_guacamole(vm, user)
     end
 end
 
-  def self.manage_vms(vms, act)
-  	result = {'success'=>true, 'message' => '', 'errors'=>[]}
-  	vms.each do |vm|
-  		case act
-        when 'start'
-          r = Virtualbox.start_vm(vm)
-        when 'stop'
-          r = Virtualbox.stop_vm(vm)
-        when 'pause'
-          r = Virtualbox.pause_vm(vm)
-        when 'resume'
-          r = Virtualbox.resume_vm(vm)
-        when 'reset_rdp'
-          r= Virtualbox.reset_vm_rdp(vm)
-      	when 'take_snapshot'
-      	  r= Virtualbox.take_snapshot(vm)
-        else
-          r = {'success'=>false, 'message' => "unknown action"}
-        end
-        if r
-        	if r['success']
-        		result['message']=result['message'] + (result['message']=='' ? '' : '<br/> ')+ r['message']
-        	else
-        		result['errors']<<r['message']
-        	end
-        else
-        	result['errors']<< "unable to #{act} vm #{vm}"
-        end
-    end
-    if result['errors'].count>0
-    	result['success'] = false
-    	result['message'] = result['message']+ "<br/><b>errors</b>:<br/> "+result['errors'].join('<br/>')
-    end
-    result
-  end
+ def self.state(vm)
+	stdout = %x(utils/vboxmanage showvminfo #{Shellwords.escape(vm)} 2>/dev/null | grep -E '^State:')
+	state = "#{stdout}".split(' ')[1]
+
+	if $?.exitstatus != 0
+		# Macine probably simply does not exist
+		# TODO: check existence of machine
+		return 'stopped'
+	end
+
+	case state
+	when 'running'
+		return 'running'
+	when 'paused'
+		return 'paused'
+	when 'powered'
+		return 'stopped'
+	else
+		logger.error "Invalid state: #{state}"
+		raise "Invalid state"
+	end
+ end
 
  def self.start_vm(vm)
-	info = %x(sudo -Hu vbox VBoxManage startvm #{Shellwords.escape(vm)} --type headless  2>&1)
-	status= $?
-	logger.debug info
-	logger.debug status
-	if status.exitstatus===0
-		{'success'=>true, 'message'=> "successfully to started #{vm}"}
-	else
-		if info.include? "is already locked by a session"
-			{'success'=>false, 'message'=> "unable to start #{vm} - it is already running"}
-		else
-			{'success'=>false, 'message'=> "unable to start #{vm}"}
+	stdout = %x(utils/vboxmanage startvm #{Shellwords.escape(vm)} --type headless  2>&1)
+	if $?.exitstatus != 0
+		unless stdout.start_with? "VBoxManage: error: The machine '#{vm}' is already locked by a session (or being locked or unlocked)\n"
+			logger.error "Failed to start vm: #{stdout}"
+			raise 'Failed to start vm'
 		end
 	end
  end
 
  def self.stop_vm(vm)
-	info = %x(sudo -Hu vbox VBoxManage controlvm #{Shellwords.escape(vm)} poweroff 2>&1)
-	status= $?
-	#logger.debug info
-	#logger.debug status
-	if status.exitstatus===0
-		{'success'=>true, 'message'=> "successfully to stopped #{vm}"}
-	else
-		if info.include? "is not currently running"
-			{'success'=>false, 'message'=> "unable to stop #{vm} - it is already powered off"}
-		else
-			{'success'=>false, 'message'=> "unable to stop #{vm}"}
+	stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} poweroff 2>&1)
+	if $?.exitstatus != 0
+		unless stdout == "VBoxManage: error: Machine '#{vm}' is not currently running\n"
+			logger.error "Failed to stop vm: #{stdout}"
+			raise 'Failed to stop vm'
 		end
 	end
  end
 
  def self.pause_vm(vm)
-
+	stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} savestate 2>&1)
+	if $?.exitstatus != 0
+		logger.error "Failed to pause vm: #{stdout}"
+		raise 'Failed to pause vm'
+	end
  end
 
  def self.resume_vm(vm)
+	stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} resume 2>&1)
+	if $?.exitstatus != 0
+		logger.error "Failed to resume vm: #{stdout}"
+		raise 'Failed to resume vm'
+	end
+ end
 
+ def self.delete_vm(vm)
+	stdout = %x(utils/vboxmanage unregistervm #{Shellwords.escape(vm)} --delete 2>&1)
+	if $?.exitstatus != 0
+		logger.error "Failed to delete vm: #{stdout}"
+		raise 'Failed to delete vm'
+	end
+ end
+
+ def self.clone(vm, name, snapshot = '')
+	if snapshot
+		stdout = %x(utils/vboxmanage clonevm #{Shellwords.escape(vm)} --snapshot #{Shellwords.escape(snapshot)} --options link --name #{Shellwords.escape(name)} --register 2>&1)
+	else
+		stdout = %x(utils/vboxmanage clonevm #{Shellwords.escape(vm)} --name #{Shellwords.escape(name)} --register 2>&1)
+	end
+	if $?.exitstatus != 0
+		logger.error "Failed to clone vm: #{stdout}"
+		raise 'Failed to clone vm'
+	end
+ end
+
+ def self.set_groups(vm, groups)
+	stdout = %x(utils/vboxmanage modifyvm #{Shellwords.escape(vm)} --groups #{Shellwords.escape(groups.join(','))} 2>&1)
+	if $?.exitstatus != 0
+		logger.error "Failed to set vm groups: #{stdout}"
+		raise 'Failed to set vm groups'
+	end
+ end
+
+ def self.set_extra_data(vm, key, value = nil)
+	value = value == nil ? '' : Shellwords.escape(value)
+	stdout = %x(utils/vboxmanage setextradata #{Shellwords.escape(vm)} #{Shellwords.escape(key)} #{value} 2>&1)
+	if $?.exitstatus != 0
+		logger.error "Failed to set vm extra data: #{stdout}"
+		raise 'Failed to set vm extra data'
+	end
+ end
+
+ def self.set_network(vm, slot, type, name='')
+	cmd_prefix = "utils/vboxmanage modifyvm #{Shellwords.escape(vm)}"
+	name = Shellwords.escape(name)
+
+	if type == 'nat'
+		stdout = %x(#{cmd_prefix} --nic#{slot} nat 2>&1)
+	elsif type == 'intnet'
+		stdout = %x(#{cmd_prefix} --nic#{slot} intnet 2>&1 &&
+		            #{cmd_prefix} --intnet#{slot} #{name} 2>&1)
+	elsif type == 'bridgeadapter'
+		stdout = %x(#{cmd_prefix} --nic#{slot} bridged 2>&1 &&
+		            #{cmd_prefix} --bridgeadapter#{slot} #{name} 2>&1)
+	elsif type == 'hostonlyadapter'
+		stdout = %x(#{cmd_prefix} --nic#{slot} hostonly 2>&1 &&
+		            #{cmd_prefix} --hostonlyadapter#{slot} #{name} 2>&1)
+	end
+	if $?.exitstatus != 0
+		logger.error "Failed to set vm network: #{stdout}"
+		raise 'Failed to set vm network'
+	end
+ end
+
+ def self.set_running_network(vm, slot, type, name='')
+ 	cmd_prefix = "utils/vboxmanage controlvm #{Shellwords.escape(vm)}"
+	name = Shellwords.escape(name)
+	if type == 'null'
+		stdout = %x(#{cmd_prefix} nic#{slot} null 2>&1)	
+	elsif type == 'nat'
+		stdout = %x(#{cmd_prefix} nic#{slot} nat 2>&1)
+	elsif type == 'intnet'
+		stdout = %x(#{cmd_prefix} nic#{slot} intnet #{name} 2>&1)
+	elsif type == 'bridgeadapter'
+		stdout = %x(#{cmd_prefix} nic#{slot} bridged #{name} 2>&1)
+	elsif type == 'hostonlyadapter'
+		stdout = %x(#{cmd_prefix} nic#{slot} hostonly #{name} 2>&1)
+	end
+	if $?.exitstatus != 0
+		logger.error "Failed to set vm network: #{stdout}"
+		raise 'Failed to set vm network'
+	end
  end
 
  def self.reset_vm_rdp(vm)
-	info = %x(sudo -Hu vbox VBoxManage controlvm #{Shellwords.escape(vm)} vrde off 2>&1)
-	status= $?
-	#logger.debug info
-	#logger.debug status
-	if status.exitstatus===0
-		info = %x(sudo -Hu vbox VBoxManage controlvm #{Shellwords.escape(vm)} vrde on 2>&1)
-		status= $?
-		#logger.debug info
-		#logger.debug status
-		if status.exitstatus===0
-			{'success'=>true, 'message'=> "RDP successfully to reset for #{vm}"}
-		else
-			if info.include? "is not currently running"
-				{'success'=>false, 'message'=> "unable to reset RDP for #{vm} - it is not running"}
-			else
-				{'success'=>false, 'message'=> "unable to reset RDP for #{vm}"}
-			end
+	stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} vrde off 2>&1)
+	if $?.exitstatus != 0
+		unless stdout == "VBoxManage: error: Machine '#{vm}' is not currently running\n"
+			logger.error "Failed to stop vm: #{stdout}"
+			raise 'Failed to disable RDP'
 		end
-	else
-		if info.include? "is not currently running"
-			{'success'=>false, 'message'=> "unable to reset RDP for #{vm} - it is not running"}
-		else
-			{'success'=>false, 'message'=> "unable to reset RDP for #{vm}"}
+		return
+	end
+
+	stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} vrde on 2>&1)
+	if $?.exitstatus != 0
+		unless stdout == "VBoxManage: error: Machine '#{vm}' is not currently running\n"
+			logger.error "Failed to stop vm: #{stdout}"
+			raise 'Failed to enable RDP'
 		end
 	end
  end
 
  def self.take_snapshot(vm)
  	info = Virtualbox.get_vm_info(vm, true) # get info without searching for lab and user
- 	if info
- 		if info['VMState']=='poweroff'
-	 		vmname=vm.gsub("-template",'')
-	 		nr = info['CurrentSnapshotName'] ? info['CurrentSnapshotName'].gsub("#{vmname}-",'').gsub('-template','').to_i+1 : 1
-		 	name = "#{vmname}-#{nr}-template"
 
-			info = %x(sudo -Hu vbox VBoxManage snapshot #{Shellwords.escape(vm)} take #{Shellwords.escape(name)} --description "#{Time.now}" )
-			status= $?
-			logger.debug info
-			logger.debug status
-			if status.exitstatus===0
-				{'success'=>true, 'message'=> "snapshot of #{vm} successfully created"}
-			else
-				{'success'=>false, 'message'=> "unable to take snapshot of #{vm}"}
-			end
-		else
-			{'success'=>false, 'message'=> "unable to take snapshot of #{vm} while it is running"}
-		end
-	else
-		{'success'=>false, 'message'=> "unable to find #{vm}"}
+ 	unless info
+		raise 'Failed to get VM info'
+	end
+
+	unless info['VMState'] == 'poweroff'
+		raise 'Unable to take snapshot while VM is running'
+	end
+
+	vmname = vm.gsub("-template",'')
+	nr = info['CurrentSnapshotName'] ? info['CurrentSnapshotName'].gsub("#{vmname}-",'').gsub('-template','').to_i + 1 : 1
+ 	name = "#{vmname}-#{nr}-template"
+
+	stdout = %x(utils/vboxmanage snapshot #{Shellwords.escape(vm)} take #{Shellwords.escape(name)} --description "#{Time.now}" 2>&1)
+	if $?.exitstatus != 0
+		logger.error "Failed to take snapshot: #{stdout}"
+		raise 'Failed to take snapshot'
 	end
  end
-
-
-# create the password hash to be fed to the set_password method
-def self.create_password_hash(username, password)
-	info = Digest::SHA256.hexdigest(password)
-	"VBoxAuthSimple/users/#{username} #{info}".strip
-end
-
-# set password for vms
-# TODO: allow sending a list of vm-s instead of applying to all machines
-def self.set_password(hash)
-	info = %x(sudo -Hu vbox VBoxManage list vms| cut -f1 -d' '| tr -d '"' )
-	status = $?
-	error=false
-	# logger.debug info
-	info.split(/\n+/).each do |line|
-		#puts "vm is: #{line}"
-		ex = %x(sudo -Hu vbox VBoxManage setextradata #{Shellwords.escape(line)} #{Shellwords.escape(hash)})
-		st = $?
-		#puts line
-		#puts st
-		#puts ex
-		unless st.exitstatus===0
-			error=true
-			logger.debug "setting new RDP password for #{line} failed \n"
-		end
-	end
-	logger.debug "set new password for "+info.split(/\n+/).count.to_s+" machines"
-	!error
-end
-
-def self.unset_password(username)
-	info = %x(sudo -Hu vbox VBoxManage list vms| cut -f1 -d' '| tr -d '"' )
-	status = $?
-	error=false
-	# logger.debug info
-	info.split(/\n+/).each do |line|
-		#puts "vm is: #{line}"
-		ex = %x(sudo -Hu vbox VBoxManage setextradata #{Shellwords.escape(line)} #{Shellwords.escape("VBoxAuthSimple/users/#{username}")})
-		st = $?
-		#puts line
-		#puts st
-		#puts ex
-		unless st.exitstatus===0
-			error=true
-			logger.debug "unsetting new RDP password for #{line} failed \n"
-		end
-	end
-	logger.debug "unset password for "+info.split(/\n+/).count.to_s+" machines"
-	!error
-end
-
 end

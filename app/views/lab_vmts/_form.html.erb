@@ -27,12 +27,16 @@
     <%=collection_select(:lab_vmt, :vmt_id, Vmt.all, :id, :image,{:prompt => true})%> <span class="red" title="Required field">*</span>
   </div>
     <div class="field">
+      <%= f.label :expose_uuid %>
+      <%= f.check_box :expose_uuid %>
+    </div>
+    <div class="field">
       <%= f.label :allow_remote %>
       <%= f.check_box :allow_remote %>
     </div>
     <div class="field">
       <%= f.label :g_type, 'Guacamole connection' %>
-      <%= f.select :g_type, options_for_select({ :none=> 0, :rdp=>1, :vnc=>2, :ssh=>3}, f.object.g_type ) %>
+      <%= f.select :g_type, options_for_select([ '', 'rdp', 'vnc', 'ssh' ], f.object.g_type) %>
     </div>
     <div class="field">
       <%= f.label :position %> 

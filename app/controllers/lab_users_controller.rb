@@ -1,8 +1,9 @@
 class LabUsersController < ApplicationController
-  #restricted to admins 
-  before_filter :authorise_as_manager, :except=>[:progress]
+  before_filter :authorise_as_manager
+  #restricted to admins
+  before_filter :authorise_as_manager, :except=>[ :labinfo ]
   #redirect to index view when trying to see unexisting things
-  before_filter :save_from_nil, :only=>[:edit, :update, :destroy]
+  before_filter :save_from_nil, :only=>[:edit, :update, :destroy, :set_vta]
   before_filter :manager_tab, :except=>[:search]
   before_filter :search_tab, :only=>[:search]
 
@@ -65,13 +66,13 @@ class LabUsersController < ApplicationController
     end
   end
   
-
+# for search view to display user machines in an attempt
   def show
     @lab_user = LabUser.find_by_id(params[:id])
     @info={:running=>[], :paused=>[], :stopped=>[]}
     @lab_user.vms.each do |v|
       v['username']=@lab_user.user.username
-      v['port']='10'+v.mac.ip.split('.').last if v.mac!=nil
+      v['port'] = v.rdp_port
       logger.debug "state is #{v.state}"
       @info[:"#{v.state}"]<< v
     end
@@ -112,23 +113,19 @@ class LabUsersController < ApplicationController
         l.delete if l!=nil
       end
       redirect_to(:back, :notice => 'successful update.')
-    else
+    else #adding a single user to a lab
       respond_to do |format|
-        #adding a single user to a lab
-        if params[:lab_user]
-          @lab_user = LabUser.new(params[:lab_user])
-        elsif params[:lab_id]
+        #create lab_user params based on lab_id and user_id
+        if params[:lab_id]
+          params[:lab_user] = { lab_id: params[:lab_id] }
           get_user
           if @user
-            @lab_user = LabUser.new
-            @lab_user.lab_id= params[:lab_id]
-            @lab_user.user_id= @user.id
-          else
-            format.html { redirect_to(lab_users_path) }
-            format.json { render :json=> { :success=> false, :message=>"user can't be found"} } 
+            params[:lab_user][:user_id] = @user.id
           end
         end
-     
+        # continue to create
+        @lab_user = LabUser.new(params[:lab_user])
+
         if @lab_user.save
           format.html { redirect_to(:back, :notice => 'successful update.') }
           format.json { render :json=> {:success => true}.merge(@lab_user.as_json), :status=> :created}
@@ -167,7 +164,23 @@ class LabUsersController < ApplicationController
       format.json { render :json=> { :success=>true, :message=>'lab user removed'} }
     end
   end
-  
+
+  # get vta info from outside {host: 'http://', token: 'lab-specific update token', lab_hash: 'vta lab id', user_key: 'user token'}
+  def set_vta
+    respond_to do |format|
+      format.html { redirect_to(lab_users_path) }
+      format.json { render :json=> @lab_user.set_vta(params) }
+    end
+  end
+
+  # return labuser and it's lab info based on labuser uuid
+  def labinfo
+    respond_to do |format|
+      format.html { redirect_to(root_path, notice: 'Invalid request') }
+      format.json { render :json=> ImportLabs.export_labuser(params[:uuid], params[:pretty]) }
+    end
+  end
+
   #view for adding multiple users to a lab
   def add_users
     @lab_users = LabUser.all
@@ -201,10 +214,11 @@ class LabUsersController < ApplicationController
       #users.each do |u|
       #while u = params[:txtsbs].readline        
         u.chomp!
-        user=u.split(',')#username,realname, email, token (username compulsory for everyone, real name and email not?)
-        if user.empty? || user[0]==nil || user[0]==''
+        user=u.split(',')#username,realname, email, token (username and name compulsory for everyone, email not?)
+        if user.empty? || user[0].blank? || user[1].blank?
           notice=notice+'adding user "<b>'+u+'</b>" failed '
-          notice=notice+' - needs username' if user[0]==nil || user[0]==''
+          notice=notice+' - needs username' if user[0].blank?
+          notice=notice+' - needs name' if user[1].blank?
           notice=notice+'<br/>'
           next
         end
@@ -222,13 +236,15 @@ class LabUsersController < ApplicationController
             notice=notice+'<b>'+user[0]+'</b> adding failed - token needed for new users<br/>'
           end
         end
-        if @user # only if user exists / ws created
+        if @user # only if user exists / was created
+          if user[1]
+            @user.name = user[1]
+          end
           if user[3] # if token is given
             @user.authentication_token=user[3]
             @user.token_expires = 2.weeks.from_now # TODO! default expiry time from settings?
-            @user.save
           end
-
+          @user.save
           labuser=LabUser.where('user_id=? and lab_id=?', @user.id, @lab.id).first
           # by now we surely have a user, add it to the lab
           if labuser==nil
@@ -284,11 +300,7 @@ class LabUsersController < ApplicationController
           manage_vms(lab.vms) if params[:vm]
         end
       end # end updates
-      if params[:h]==''
-        @labs = Lab.joins('left join hosts on hosts.id=labs.host_id').order(@order).where('LOWER(labs.name) like ?', "%#{params[:l].downcase}%").all
-      else
-        @labs = Lab.joins('left join hosts on hosts.id=labs.host_id').order(@order).where('LOWER(labs.name) like ? and LOWER(hosts.name) like ?', "%#{params[:l].downcase}%", "%#{(params[:h] ? params[:h] : '').downcase}%").all
-      end
+      @labs = Lab.order(@order).where('LOWER(labs.name) like ?', "%#{params[:l].downcase}%").all
     elsif params[:t] && params[:t]=='Lab user'
       if params[:id]
         lab_users=get_lab_users_from(params[:id])
@@ -304,16 +316,6 @@ class LabUsersController < ApplicationController
 
   end
 
-
-
-  def progress
-    @lab_user=LabUser.find_by_id(params[:id])
-    unless @lab_user.user.id==current_user.id || @admin
-      @lab_user=LabUser.new#dummy
-    end
-    render :partial => 'shared/lab_progress' 
-  end
-  
   def user_token
     set_order_by
     @users= User.order(@order).paginate(:page=>params[:page], :per_page=>@per_page)

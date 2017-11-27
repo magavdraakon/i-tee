@@ -21,10 +21,6 @@
     <%= f.text_area( :description,  :rows => 20) %>
   </div>
     <fieldset><legend>Lab settings</legend>
-   <div class="field">
-    <%= f.label :host_id %><br />
-    <%= f.select( :host_id,  options_from_collection_for_select(Host.all,:id, :name, @lab.host_id) ) %>
-  </div>
       <div class="field">
         <%= f.check_box( :startAll)  %> <%= f.label :startAll ,'Start all machines with lab start' %>
       </div>
@@ -66,6 +62,21 @@
     <%end%>
   </div>
     </fieldset>
+    <fieldset><legend>Lab assistant</legend>
+      <div class="field">
+        <%= f.label :assistant_id %><br />
+        <%= f.select( :assistant_id,  options_from_collection_for_select(Assistant.all,:id, :uri, @lab.assistant_id) , {include_blank: "select assistant"} )%>
+      </div>
+      <div class="field">
+        <%= f.label :lab_token, 'API token to be used with this lab' %><br/>
+        <%= f.text_field :lab_token %>
+      </div>
+      <div class="field">
+        <%= f.label :lab_hash, 'Lab id in assistant' %><br/>
+        <%= f.text_field :lab_hash %>
+      </div>
+
+    </fieldset>
     <h3>Virtual machines in this lab</h3>
     <div id="lab_vmts">
     <%= f.fields_for :lab_vmts do |labVmt_form| %>
@@ -74,11 +85,13 @@
           <%= labVmt_form.label :name %> <%= labVmt_form.text_field :name, :placeholder=>'unique. Alphanumeric with no spaces.' %><br/>
           <%= labVmt_form.label :nickname %> <%= labVmt_form.text_field :nickname, :placeholder=>'Name shown to user.' %><br/>
           <%= labVmt_form.label :vmt_id %> <%= labVmt_form.select :vmt_id, options_from_collection_for_select(Vmt.all, :id, :image, labVmt_form.object.vmt_id ), {:prompt => 'Select VM template'}%><br/>
+          <%= labVmt_form.label :expose_uuid %>  <%= labVmt_form.check_box :expose_uuid %><br/>
           <%= labVmt_form.label :allow_remote %>  <%= labVmt_form.check_box :allow_remote %><br/>
+          <%= labVmt_form.label :allow_restart %>  <%= labVmt_form.check_box :allow_restart %><br/>
           <%= labVmt_form.label :primary %>  <%= labVmt_form.check_box :primary %><br/>
           <div class="field">
             <%= labVmt_form.label :g_type, 'Guacamole connection' %>
-            <%= labVmt_form.select :g_type, options_for_select({ :none=> 0, :rdp=>1, :vnc=>2, :ssh=>3}, labVmt_form.object.g_type ) %>
+            <%= labVmt_form.select :g_type, options_for_select([ '', 'rdp', 'vnc', 'ssh' ], labVmt_form.object.g_type) %>
           </div>
           <%= labVmt_form.label :position %> <%= labVmt_form.number_field :position %>
           <div class="networks">
@@ -87,7 +100,7 @@
                 <%= labVmtNet_form.label :network_id %>
                 <%= labVmtNet_form.select :network_id, options_from_collection_for_select(Network.all,:id, :name, labVmtNet_form.object.network_id), {:prompt => 'Select network template'}  %>
                 <br />
-                <%= labVmtNet_form.label :slot %> <%= labVmtNet_form.number_field :slot %><br/>
+                <%= labVmtNet_form.label :slot %> <%= labVmtNet_form.number_field :slot, min: 1 %><br/>
 
                 <%= labVmtNet_form.check_box :promiscuous %> <%= labVmtNet_form.label :promiscuous %><br />
 
@@ -102,6 +115,7 @@
     <% end %>
       <%= select_tag :networks, options_from_collection_for_select(Network.all,:id, :name), {:prompt => 'Select network template', :style=>'display:none'}  %>
       <%= select_tag :vm_templates, options_from_collection_for_select(Vmt.all,:id, :image), {:prompt => 'Select VM template', :style=>'display:none'}  %>
+      <%= select_tag :g_types, options_for_select([ '', 'rdp', 'vnc', 'ssh' ]), { :style => 'display:none' }  %>
 
     </div>
     <span class="button add-button" onclick="add_vmt_to_lab();">Add more VMTs</span>

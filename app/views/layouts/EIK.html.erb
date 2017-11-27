@@ -102,8 +102,7 @@
                     <%= link_to_unless_current 'VMTs networks in labs', lab_vmt_networks_path %>
                   </td>
                   <td>
-                    <%= link_to_unless_current('Hosts', hosts_path) %><br/>
-                    <%= link_to_unless_current('Operating systems', operating_systems_path) %>
+                    <%= link_to_unless_current('Assistants', assistants_path) %><br/>
                   </td>
                    <td>
                     <%= link_to_unless_current('Badges', badges_path) %><br/>
@@ -160,7 +159,7 @@
 
             </div>
         
-            <div id="content" >
+            <div id="content" class="side_visible">
               <div id="menu-show"></div>
               <div id="messages">
               <%= content_tag(:div, flash[:error], :id => 'flash_error', :escape=>false) if flash[:error] %>

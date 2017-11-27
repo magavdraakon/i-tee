@@ -5,7 +5,12 @@ body  {
 background: -moz-linear-gradient(100% 100% 90deg, #f2e9e1, #cbe86b) #f2e9e1 no-repeat;
 background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#cbe86b), to(#f2e9e1)) #f2e9e1 no-repeat;
  font-family: 'Ubuntu', serif;
-
+}
+body, html{
+    width: 100%;
+    height:100%;
+    margin:0;
+    min-width:1000px;
 }
 /* overall text */
 
@@ -35,12 +40,17 @@ h1 a, h2 a, h3 a{
     font-weight :normal;
 }
 #contain  {
-max-width:1200px;
-min-width:900px;
-margin-left:auto;
-margin-right:auto;
-
+margin: 0 5%;
 }
+
+/* on smaller screens*/
+@media all and (max-width: 1000px) {
+    #contain  {
+        margin:0 10px;
+    }
+ 
+}
+
 #c_wrap{
 background:#fff;
 overflow: auto; /*contains floating elements*/
@@ -212,7 +222,7 @@ ul.no-bullet {list-style-type:none; margin-left: 0;}
     background:#fff;
     border-right:1px solid #c0c0c0;
     border-bottom: 1px solid #C2C2C2;
-    display:none;
+    display:block;
 }
 #sidemenu ul {margin-left: 0;}
 #menu-head {
@@ -294,7 +304,7 @@ padding:5px;
 
 }
 #menu-show {
-    display: block;
+    display: none;
     height: 30px;
     width: 15px;
     position: relative;

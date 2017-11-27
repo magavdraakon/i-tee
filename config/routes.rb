@@ -1,9 +1,15 @@
 ITee::Application.routes.draw do
 
+  resources :assistants
+  get 'ping', :to=>'home#ping'
+
+  get 'check_resources', :to=>'home#check_resources'
+
   match 'backup', :to=> 'home#backup', via: [ :get]
   match 'import/:name', :to=> 'home#import', via: [ :get]
   match 'export/:id', :to=> 'home#export', via: [ :get]
   match 'download_export/:name', :to=> 'home#download_export', via: [:get]
+  match 'labinfo', :to=>'lab_users#labinfo', via: [:get, :post]
 
   match 'rdp_password', :to=>'virtualbox#rdp_password', via: [:get]
   match 'rdp_password', :to=>'virtualbox#update_password', via: [:post]
@@ -31,15 +37,14 @@ ITee::Application.routes.draw do
 
   resources :badges
 
-  resources :operating_systems
-
   match 'users/sign_up', :to=>'home#catcher'
   
   resources :lab_users
   match 'lab_users', :to=>'lab_users#destroy', via: [:delete]
   match 'lab_users', :to=>'lab_users#update', via: [:put]
 
- 
+  match 'set_vta_info', :to=>'lab_users#set_vta', via: [:post]
+
   resources :lab_vmts
 
   resources :vmts
@@ -54,14 +59,13 @@ ITee::Application.routes.draw do
   match 'users', :to=>'users#update', via: [:put]
 
   resources :vms
+  match 'vm_network', :to=>"vms#network", via: [:get, :post, :delete]
 
   resources :materials
   
   resources :labs
   match 'labs', :to=>'labs#destroy', via: [:delete]
   match 'labs', :to=>'labs#update', via: [:put]
-
-  resources :hosts
 
   resources :token_authentications, :only => [:update, :destroy]
 
@@ -82,7 +86,6 @@ ITee::Application.routes.draw do
   match 'template', :to => 'home#template'
   match 'system', :to => 'home#system'
   match 'about', :to=> 'home#about'
-  match 'getprogress', :to=> 'home#getprogress'
   #with user
   match 'start_all/:id/:username', :to=> 'vms#start_all'
   match 'stop_all/:id/:username', :to=> 'vms#stop_all'
@@ -101,8 +104,6 @@ ITee::Application.routes.draw do
   match 'rdp_of', :to=> 'vms#get_rdp'
   match 'rdp_reset', :to=> 'vms#rdp_reset'
   
-  match 'set_progress', :to=> 'vms#set_progress'
-  match 'vms/get_progress/:id', :to=> 'vms#get_progress'
     #no id
   match 'start_all', :to=> 'vms#start_all'
   match 'stop_all', :to=> 'vms#stop_all'
@@ -135,7 +136,6 @@ ITee::Application.routes.draw do
 
   match 'add_users/:id', :to=> 'lab_users#add_users'
   match 'add_users', :to=> 'lab_users#add_users'
-  match 'lab_users/progress/:id', :to=> 'lab_users#progress'
   
   match 'vms_by_lab', :to=>'vms#vms_by_lab'
   match 'vms_by_lab/:id', :to=>'vms#vms_by_lab'

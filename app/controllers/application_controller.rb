@@ -10,28 +10,19 @@ class ApplicationController < ActionController::Base
   require 'will_paginate/array'
   before_filter :check_for_cancel, :only => [:create, :update]
 
-  before_filter :check_token
   layout :set_layout
 
-  before_filter :authenticate_user!, :except=>[:about, :getprogress, :set_progress]
+  before_filter :authenticate_user_from_token!
+  before_filter :authenticate_user!, :except=>[ :about, :labinfo, :ping ]
   before_filter :admin?
   before_filter :manager?
   before_filter :per_page
 
   def set_layout
-    logger.info('REQUEST: ' + request.host)
     begin
-      if ITee::Application.config.skins.key?(request.host)
-        return ITee::Application.config.skins[request.host]
-      end
+      return ITee::Application.config.skin
     rescue
-    end
-
-    logger.info('No skin set for this host, trying to get default skin')
-    begin
-      return ITee::Application.config.default_skin
-    rescue
-      logger.info('no default skin set in config, use EIK skin')
+      logger.info('no default skin set in config, using skin EIK')
       return 'EIK'
     end
   end
@@ -145,7 +136,7 @@ class ApplicationController < ActionController::Base
     end
   end
   
-  def check_token
+  def authenticate_user_from_token!
     if params[:auth_token]
       # get the user with the given token
       user=User.where('authentication_token=?', params[:auth_token]).first
@@ -158,7 +149,9 @@ class ApplicationController < ActionController::Base
         if expiretime.to_datetime < DateTime.now
           #the token has expired already, deny the user access
           redirect_to destroy_user_session_path
-        end  
+        else
+          sign_in user
+        end
       end
     end
   end

@@ -18,25 +18,7 @@
     <%= f.text_field :username %> 
     <span class="red" title="Required field">*</span>
   </div>
-  <div class="field">
-    <%= f.label :operating_system_id %>
-    <%=collection_select(:vmt, :operating_system_id, OperatingSystem.all, :id, :name, {:prompt => true})%>
-   <span class="red" title="Required field">*</span>
-  </div>
-  
-  <div class="field">
-    <%= f.check_box :shellinabox %><%= f.label :shellinabox, 'ShellInaBox' %>
-  </div>
-
-  <div class="field">
-    <%= f.label :xml_script %><br />
-    <%= f.text_field :xml_script %>
-  </div>
-  <div class="field">
-    <%= f.label :private %><br />
-    <%= f.text_area :private %>
-  </div>
   <div class="actions">
-     <%= submit_tag 'Cancel', :class=> 'cancel' %> <%= f.submit %>
+    <%= submit_tag 'Cancel', :class=> 'cancel' %> <%= f.submit %>
   </div>
 <% end %>

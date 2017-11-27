@@ -57,7 +57,7 @@ class HomeController < ApplicationController
       begin
         #This is the tricky part
         #Initialize the temp file as a zip file
-        input_filenames = ['lab.json', 'timestamp.txt', 'host.json', 'lab_vmts.json']
+        input_filenames = ['lab.json', 'timestamp.txt', 'lab_vmts.json']
         Zip::OutputStream.open(temp_file) { |zos| }
        
         #Add files to the zip file as usual
@@ -85,6 +85,13 @@ class HomeController < ApplicationController
       end
     else 
       redirect_to backup_path, alert: 'No folder specified'
+    end
+  end
+
+  def ping
+    respond_to do |format|
+      format.html  { render :layout => false }
+      format.json  { render :json => {ping: 'pong'} }
     end
   end
 
@@ -122,54 +129,22 @@ class HomeController < ApplicationController
     redirect_to :back
   end
 
-  #this is a method that updates a lab_users progress
-  #input parameters: ip (the machine, the report is about)
-  #                  progress (the progress for the machine)
-  def getprogress
-    #render :layout => false
-    #who sent the info? 
-    @client_ip = request.remote_ip
-    @remote_ip = request.env['HTTP_X_FORWARDED_FOR']
-    
-    #get the lab_user based on the ip aadress- get the vm with the given ip, get the vm-s lab_user
-    # update the labuser.progress based on the input
-    @target_ip=params[:target]
-    if @target_ip==nil
-      @target_ip='error'
-    else
-      if @target_ip==@client_ip #TODO- once the allowed ip range is known, update
-        @progress=params[:progress]
-        if @progress!=nil
-          @progress.gsub!(/_/) do
-            '<br/>'
-          end
-        end
-        @mac=Mac.find_by_ip(@target_ip).first #find(:first, :conditions=>['ip=?', @target_ip])
-        if @mac.vm!=nil
-          #the mac exists and has a vm
-          user=@mac.vm.user.id
-          lab=@mac.vm.lab_vmt.lab.id
-          @lab_user=LabUser.where('user_id=? and lab_id=?', user, lab).first
-          if @lab_user!=nil
-            #the vm helped find its lab_user
-            @lab_user.progress=@progress
-            @lab_user.save
-            
-          end#end labuser exists
-        end#end vm exists
-      else
-      end#end the target sent the progress
-    end
-  end
-  
-  
-  
   def template_info
   end
   
+  def check_resources
+    result = Check.has_free_resources
+    respond_to do |format|
+      format.html  {redirect_to root_path, :notice=>'Seems that the page you were looking for does not exist, so you\'ve been redirected here.' }
+      format.json  { render :json => result }
+    end
+  end
+
   def catcher
-    flash[:notice] = 'Seems that the page you were looking for does not exist, so you\'ve been redirected here.'
-    redirect_to :action => 'index'
+    respond_to do |format|
+      format.html  {redirect_to root_path, :notice=>'Seems that the page you were looking for does not exist, so you\'ve been redirected here.' }
+      format.json  { render :json => {:success=>false, :message=>"missing endpoint"} }
+    end
   end
 
 end

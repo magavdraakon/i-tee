@@ -10,6 +10,8 @@ class VmsController < ApplicationController
   before_filter :admin_tab, :except=>[:show,:index, :vms_by_lab, :vms_by_state]
   before_filter :vm_tab, :only=>[:show,:index, :vms_by_lab, :vms_by_state]
 
+  skip_before_filter :authenticate_user!, :only => [:network]
+
   def save_from_nil
     logger.debug 'finding vm'
 
@@ -48,14 +50,13 @@ class VmsController < ApplicationController
       else # but if the parameter is not set, take the first lab this user has   
          @lab=Lab.joins('labs inner join lab_users on lab_users.lab_id=labs.id').where('user_id=?', current_user.id).first
       end
-       sql= Vm.find_by_sql("select * from vms, lab_vmts where vms.lab_vmt_id=lab_vmts.id and lab_id=#{@lab.id} and user_id=#{current_user.id} #{order}") if @lab # only try to get the vms if there is a lab
       @labs=Lab.joins('labs inner join lab_users on lab_users.lab_id=labs.id').where('user_id=?', current_user.id).uniq
     end
     @vms= sql.paginate( :page => params[:page], :per_page => @per_page)
     render :action=>'index'
   end
   
-   def vms_by_state
+  def vms_by_state
     @b_by='state'
 
     @state=params[:state] ? params[:state] : 'running'
@@ -73,9 +74,9 @@ class VmsController < ApplicationController
   
     if params[:admin]!=nil && @admin
       @tab='admin'
-      vms=Vm.find_by_sql("select vms.*, lab_vmts.lab_id from vms, lab_vmts where vms.lab_vmt_id=lab_vmts.id #{order}")
+      vms=Vm.find_by_sql("SELECT vms.*, lab_vmts.lab_id FROM vms INNER JOIN lab_vmts ON vms.lab_vmt_id=lab_vmts.id #{order}")
     else
-       vms=Vm.find_by_sql("select vms.*, lab_vmts.lab_id from vms, lab_vmts where vms.lab_vmt_id=lab_vmts.id and user_id=#{current_user.id} #{order}")    
+      vms=Vm.find_by_sql("SELECT vms.*, lab_vmts.lab_id FROM vms INNER JOIN lab_vmts ON vms.lab_vmt_id=lab_vmts.id INNER JOIN lab_users ON vms.lab_user_id=lab_users.id INNER JOIN users ON lab_users.user_id=users.id WHERE lab_users.user_id=#{current_user.id} #{order}") 
     end
     @vm=[]
     vms.each do |vm|
@@ -98,10 +99,10 @@ class VmsController < ApplicationController
     order = params[:sort_by] ? " order by #{params[:sort_by]} #{dir}" : ''
 
     if params[:admin]!=nil && @admin
-      sql= "select vms.*, lab_vmts.lab_id from vms, lab_vmts where vms.lab_vmt_id=lab_vmts.id #{order}"
+      sql= "SELECT vms.*, lab_vmts.lab_id from vms INNER JOIN lab_vmts ON vms.lab_vmt_id=lab_vmts.id #{order}"
       @tab='admin'
     else  
-      sql= "select vms.*, lab_vmts.lab_id from vms, lab_vmts where vms.lab_vmt_id=lab_vmts.id and user_id=#{current_user.id} #{order}"
+      sql= "select vms.*, lab_vmts.lab_id from vms INNER JOIN lab_vmts ON vms.lab_vmt_id=lab_vmts.id INNER JOIN lab_users on vms.lab_user_id=lab_users.id WHERE lab_users.user_id=#{current_user.id} #{order}"
     end
     @vms= Vm.paginate_by_sql(sql, :page => params[:page], :per_page => @per_page)
     
@@ -417,7 +418,7 @@ def stop_all
 end
 
 
-  #stop the machine, do not delete the vm row from the db (release mac, but allow reinitialization)
+  # Stop the machine, do not delete the vm row from the db
   # view is restriced to logged in users, before filter finds vm and checks if owner/admin
   def stop_vm
     respond_to do |format|
@@ -474,64 +475,42 @@ end
     end
   end
 
-  #this is a method that updates a vms progress
-  #input parameters: ip (the machine, the report is about)
-  #           progress (the progress for the machine)
-  def set_progress
-    #who sent the info? 
-    @client_ip = request.remote_ip
-    @remote_ip = request.env['HTTP_X_FORWARDED_FOR']
-    
-    #get the vms based on the ip aadress and update the vm.progress based on the input
-    @target_ip=params[:ip]
-    if @target_ip==nil
-      @target_ip='error'
-    else
-      #check if the param was actually in a form of a ip
-      @check=@target_ip.split('.')
-      if @target_ip==@client_ip && ((Integer(@check[0]) rescue nil) && (Integer(@check[1]) rescue nil) && (Integer(@check[2]) rescue nil) && (Integer(@check[3]) rescue nil))
-        #TODO- once the allowed ip range is known, update
-        @progress=params[:progress]
-        if @progress!=nil
-          @progress.gsub!(/_/) do
-            '<br/>'
-          end
+  def network
+    # identify labuser by uuid. get machine and perform action
+    # params: uuid, name, network : {slot, type, name}
+    respond_to do |format|
+      @labuser = LabUser.where(:uuid=>  params[:uuid]).first
+      if @labuser
+        vm = @labuser.vms.where(:name=> params[:name]).first
+        if vm 
+          params[:network] = '' if params[:network].blank?          
+          result = vm.manage_network(request.method, params[:network])
+          format.html { redirect_to root_path, :notice=> 'Sorry, this machine does not belong to you!' }
+          format.json { render json: result }
+        else
+          format.html { redirect_to root_path , :notice=> 'Sorry, this machine does not belong to you!' }
+          format.json { render :json=> {:success => false , :message=>  'Sorry, this machine does not belong to you!'} }
         end
-        @mac=Mac.where('ip=?', @target_ip).first
-        @vm=@mac.vm
-        if @vm!=nil
-          #the mac exists and has a vm
-          @vm.progress=@progress
-          @vm.save
-        end#end vm exists        
-      end#end the target sent the progress
-    end#end the ip parameter is set
-  end
-   
-  def get_progress
-    
-    @vm=Vm.find_by_id(params[:id])
-    unless @vm || @vm.user.id==current_user.id || @admin
-      @vm=Vm.new #dummy
+      else
+        format.html { redirect_to root_path , :notice=> 'Restricted access' }
+        format.json { render :json=> {:success => false , :message=>  'Unable to find lab attempt'} }
+      end
     end
-    render :partial => 'shared/vm_progress' 
   end
-  
+
    #redirect user if they are not admin or the machine owner but try to modify a machine
   def auth_as_owner
-    #is this vm this users?
-    unless current_user==@vm.user || @admin
+    unless current_user == @vm.lab_user.user or @admin
       respond_to do |format|
-        logger.debug 'not owner'
         #You don't belong here. Go away.
-        format.html { redirect_to root_path , :notice=> 'Sorry, this machine doesnt belong to you!' }
+        format.html { redirect_to root_path , :notice=> 'Sorry, this machine does not belong to you!' }
         format.json { render :json=> {:success => false , :message=>  'Sorry, this machine does not belong to you!'} }
       end
     end
   end
 private #----------------------------------------------------------------------------------
  
-   def get_user
+  def get_user
     @user=current_user # by default get the current user
     if  @admin  #  admins can use this to view users labs
       if params[:username]  # if there is a username in the url
