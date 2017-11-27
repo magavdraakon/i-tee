@@ -19,6 +19,7 @@ docker build -t i-tee .
 git checkout version.txt
 
 
-echo docker login rangeforce.azurecr.io
-echo docker tag i-tee rangeforce.azurecr.io/i-tee:latest
-echo docker push rangeforce.azurecr.io/i-tee
+echo "Enter following commands to push docker image"
+echo docker tag i-tee magavdraakon/i-tee:latest
+echo docker login
+echo docker push magavdraakon/i-tee
