@@ -14,3 +14,4 @@ doc/*
 *~
 .idea/*
 .ruby-version
+output.html
