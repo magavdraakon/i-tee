@@ -18,7 +18,7 @@ docker build -t i-tee .
 
 git checkout version.txt
 
-echo docker tag i-tee magavdraakon/i-tee:latest
-echo docker login
-echo docker push magavdraakon/i-tee
 
+echo docker login rangeforce.azurecr.io
+echo docker tag i-tee rangeforce.azurecr.io/i-tee:latest
+echo docker push rangeforce.azurecr.io/i-tee
