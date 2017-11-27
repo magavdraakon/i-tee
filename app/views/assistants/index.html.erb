@@ -5,6 +5,7 @@
     <th>Name</th>
     <th>Uri</th>
     <th>Enabled</th>
+    <th>Version</th>
     <th></th>
     <th></th>
     <th></th>
@@ -14,7 +15,8 @@
   <tr>
     <td><%= assistant.name %></td>
     <td><%= assistant.uri %></td>
-    <td><%= assistant.enabled %></td>
+    <td><%= assistant.enabled %></td>    
+    <td><%= assistant.version %></td>
     <td><%= link_to 'Show', assistant %></td>
     <td><%= link_to 'Edit', edit_assistant_path(assistant) %></td>
     <td><%= link_to 'Destroy', assistant, method: :delete, data: { confirm: 'Are you sure?' } %></td>
