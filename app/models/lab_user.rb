@@ -82,10 +82,6 @@ class LabUser < ActiveRecord::Base
             if result && !result['key'].blank?
               # save to user
               user.user_key = result['key'];
-              # remember the vta attemptid
-              if result.key?('labuser') && result['labuser'].key?('_id')
-                self.vta_id = result['labuser']['_id']
-              end
               unless user.save
                 return {success: false, message: 'unable to remember user token in assistant'}
               end
@@ -219,7 +215,7 @@ class LabUser < ActiveRecord::Base
   end
 
 
- # get vta info from outside {host: 'http://', name:"", version:"" token: 'lab-specific update token', lab_hash: 'vta lab id', user_key: 'user token', vta_id: 'vta attempt id'}
+ # get vta info from outside {host: 'http://', name:"", version:"" token: 'lab-specific update token', lab_hash: 'vta lab id', user_key: 'user token'}
   def set_vta(params)
     # find lab
     lab = self.lab
@@ -231,12 +227,12 @@ class LabUser < ActiveRecord::Base
         logger.debug 'found user'
         # find assistant
         assistant = Assistant.where( uri: params['host'] ).first
-        unless assistant # ensure existance
+        unless assistant # ensure existence
           logger.debug 'Create assistant'
-          assistant = Assistant.create(uri: params['host'], name: params['name'], enabled: true, version: (params['version'] ? params['version'] : 'v1')
+          assistant = Assistant.create(uri: params['host'], name: params['name'], enabled: true, version: (params['version'] ? params['version'] : 'v1'))
         end
         if assistant
-          # set assitant info on lab by force
+          # set assistant info on lab by force
           lab.assistant = assistant
           lab.lab_hash = params['lab_hash']
           lab.lab_token = params['token']
@@ -244,7 +240,6 @@ class LabUser < ActiveRecord::Base
             user.user_key = params['user_key']
             if user.save
               self.vta_setup = true # mark vta setup as done
-              self.vta_id = (params['vta_id'] ? params['vta_id'] : '')
               if self.save
                 answer = {success: true, message: 'Teaching assistant info set successfully'}
               else

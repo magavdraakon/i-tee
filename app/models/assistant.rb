@@ -19,39 +19,29 @@ class Assistant < ActiveRecord::Base
     case self.version
     when 'v1'
       result = self.post_request("/api/v1/labuser", params)
-      if result && result.key?('labuser') # updated vta
-        # do nothing
-      elsif result && result.key?('key') # old vta, ask for labuser
-        data = {
-          api_key: params['api_key'],
-          lab: params['lab'],
-          user: result['key']
-        }
-        lu = self.get_labuser(labuser, data)
-        if !lu.blank? && lu.is_a?(Hash) && lu.key?('_id')
-          result['labuser'] = lu
-        end
-      end
     when 'v2'
-      params.delete('info') # vta v2 does not use info fields
-      lu = self.post_request("/api/v2/labusers", params)
-      if !lu.blank? && lu.key?('_id')
-        result = { labuser: lu }
-      end
-      # get user key
       data = {
-        username: params['username']
+        labID: params[:lab],
+        api_key: params[:api_key],
+        username: params[:username],
+        fullname: params[:fullname],
+        password: params[:password],
+        host: params[:host]
       }
-      users = self.get_request("/api/v2/users", data)
-      unless users.is_a?(Hash) && users.key?('error')
-        user = users.first
-        if user.key?('token')
-          result['key']=user['token']
+      lu = self.post_request("/api/v2/labusers", data)
+      if !lu.blank? && lu.key?('userKey')
+        result = {'key' => lu['userKey']}
+      else # get user key manually
+        data = { username: params[:username] }
+        users = self.get_request("/api/v2/users", data)
+        unless users.is_a?(Hash) && users.key?('error')
+          user = users.first
+          if user.key?('url_token')
+            result = {'key' => user['url_token'] }
+          end
         end
       end
     end
-    
-    #logger.debug "#{params} create labuser result #{result.as_json}"
     result
   end
 
