@@ -157,6 +157,18 @@ class Vm < ActiveRecord::Base
         Virtualbox.set_network(name, nw.slot, nw.network.net_type, network_name)
       end
 
+      # set all admin user passwords
+      users = User.where(role: 2) # admin
+      users.each do |user|
+        logger.debug "ADMIN: setting #{user.username} password for #{name}"
+        hash = Digest::SHA256.hexdigest(user.rdp_password)
+        begin
+          Virtualbox.set_extra_data(name, "VBoxAuthSimple/users/#{user.username}", hash);
+        rescue Exception => e
+          logger.error "Failed to set RDP password for machine #{name}: #{e.message}"
+        end
+      end
+
       logger.debug "Starting machine"
       Virtualbox.start_vm(name)
 
