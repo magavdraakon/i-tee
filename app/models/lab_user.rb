@@ -215,7 +215,7 @@ class LabUser < ActiveRecord::Base
   end
 
 
- # get vta info from outside {host: 'http://', token: 'lab-specific update token', lab_hash: 'vta lab id', user_key: 'user token'}
+ # get vta info from outside {host: 'http://', name:"", version:"" token: 'lab-specific update token', lab_hash: 'vta lab id', user_key: 'user token'}
   def set_vta(params)
     # find lab
     lab = self.lab
@@ -227,12 +227,12 @@ class LabUser < ActiveRecord::Base
         logger.debug 'found user'
         # find assistant
         assistant = Assistant.where( uri: params['host'] ).first
-        unless assistant # ensure existance
+        unless assistant # ensure existence
           logger.debug 'Create assistant'
-          assistant = Assistant.create(uri: params['host'], name: params['name'], enabled: true)
+          assistant = Assistant.create(uri: params['host'], name: params['name'], enabled: true, version: (params['version'] ? params['version'] : 'v1'))
         end
         if assistant
-          # set assitant info on lab by force
+          # set assistant info on lab by force
           lab.assistant = assistant
           lab.lab_hash = params['lab_hash']
           lab.lab_token = params['token']
