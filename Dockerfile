@@ -28,8 +28,7 @@ COPY /docker/check-resources /var/www/i-tee/utils/check-resources
 COPY /docker/application.rb /var/www/i-tee/config/application.rb
 COPY /docker/devise.rb /var/www/i-tee/config/initializers/devise.rb
 COPY /docker/production.rb /var/www/i-tee/config/environments/production.rb
-COPY /docker/passenger-env.conf /etc/nginx/main.d/passenger-env.conf
 
 EXPOSE 80
 
-ENTRYPOINT [ "/usr/local/bundle/bin/passenger", "start", "-p", "80", "-e", "production", "--log-file", "/dev/stderr" ]
+ENTRYPOINT [ "/usr/local/bundle/bin/passenger", "start", "-p", "80", "-e", "production", "--log-file", "/dev/stderr", "--min-instances", "10", "--max-pool-size", "30"]
