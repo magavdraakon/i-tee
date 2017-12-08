@@ -80,6 +80,9 @@ def self.import_from_folder(foldername)
 				assistant = {id: nil}
 			else
 				assistant = Assistant.where("uri=?", assistant_obj['uri']).first
+				# filter out fields not in model
+				diff = assistant_obj.keys - Assistant.column_names
+				diff.each { |k| assistant_obj.delete k }
 				if assistant
 					unless assistant.update_attributes(assistant_obj)
 						return {success: false, message: "assistant can not be updated #{assistant['uri']}"}
@@ -102,6 +105,9 @@ def self.import_from_folder(foldername)
 			lab_obj.delete('id') # remove id field
 
 			lab = Lab.where("name=?", lab_obj['name']).first # find if this lab already exists (unique name)
+			# filter out fields not in model
+			diff = lab_obj.keys - Lab.column_names
+			diff.each { |k| lab_obj.delete k }
 			if lab
 				unless lab.update_attributes(lab_obj)
 					return {success: false, message: "lab can not be updated #{lab_obj['name']}"}
@@ -117,13 +123,17 @@ def self.import_from_folder(foldername)
 			if File.exists?(v_file) && File.file?(v_file)
 				vmts_file = File.open(v_file , 'r')
 				vmts_obj = JSON.parse(vmts_file.read)
-
+				names = []
 				vmts_obj.each do |lvmt|
+					names << lvmt['name']
 					lvmt.delete('id') # remove id from lab_vmt
 					lvmt['lab_id'] = lab.id # set new lab id
 					lvmt['vmt'].delete('id') # remove id from vmt
 
 					vmt = Vmt.where('image=?', lvmt['vmt']['image']).first
+					# filter out fields not in model
+					diff = lvmt['vmt'].keys - Vmt.column_names
+					diff.each { |k| lvmt['vmt'].delete k }
 					if vmt
 						unless vmt.update_attributes(lvmt['vmt'])
 							return {success: false, message: "vmt can not be updated #{lvmt['vmt']['image']}"}
@@ -140,6 +150,9 @@ def self.import_from_folder(foldername)
 					l_nets = lvmt.delete('lab_vmt_networks') # extract networks
 					# if no errors try to find the lab_vmt
 					lab_vmt = LabVmt.where('name=?', lvmt['name'] ).first
+					# filter out fields not in model
+					diff = lvmt.keys - LabVmt.column_names
+					diff.each { |k| lvmt.delete k }
 					if lab_vmt
 						unless lab_vmt.update_attributes(lvmt)
 							return {success: false, message: "lab vmt can not be updated #{lvmt['name']}"}
@@ -160,6 +173,9 @@ def self.import_from_folder(foldername)
 						vnet['lab_vmt_id']=lab_vmt.id # set new lab vmt id
 
 						network = Network.where('name=?', vnet['network']['name']).first
+						# filter out fields not in model
+						diff = vnet['network'].keys - Network.column_names
+						diff.each { |k| vnet['network'].delete k }
 						if network
 							unless network.update_attributes(vnet['network'])
 								return {success: false, message: "network can not be updated #{vnet['network']['name']}"}
@@ -174,12 +190,26 @@ def self.import_from_folder(foldername)
 						vnet.delete('network')
 						# create new network card
 						puts vnet
+						# filter out fields not in model
+						diff = vnet.keys - LabVmtNetwork.column_names
+						diff.each { |k| vnet.delete k }
 						lab_vmt_network = LabVmtNetwork.new(vnet)
 						unless lab_vmt_network.save
 							return {success: false, message: "lab vmt #{lab_vmt.name} network can not be created #{vnet['slot']}"}
 						end
-					end
+					end # eof create networking
+				end # eof vmts
+				# check for vmts with names not included in vmts_obj
+				gotnames = lab.lab_vmts.pluck(:name)
+				logger.debug "machines: should be #{names} vs found #{gotnames}"
+				diff = gotnames - names
+				# remove lab_vmts and their networks
+				diff.each do |n|
+					lab_vmt = LabVmt.where('name=?', n ).first
+					LabVmtNetwork.where("lab_vmt_id=?", lab_vmt.id).destroy_all
+					LabVmt.where('name=?', n ).destroy_all
 				end
+
 				# if not returned by now, success
 				{success: true, message: "lab #{lab.id} imported from #{dirname}"}
 			else
