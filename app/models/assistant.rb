@@ -1,3 +1,7 @@
+require "net/http"
+require "uri"
+require "json"
+
 class Assistant < ActiveRecord::Base
   attr_accessible :enabled, :uri, :name, :version
   has_many :labs

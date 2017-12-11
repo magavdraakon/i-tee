@@ -2,7 +2,7 @@ require "net/http"
 require "uri"
 require "json"
 
-class Http
+class HttpRequest
 
 @cookies=''
  ###   #### API CALLS ####  ### 

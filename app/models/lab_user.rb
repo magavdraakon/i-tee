@@ -54,6 +54,7 @@ class LabUser < ActiveRecord::Base
 
 # create needed Vm-s based on the lab templates and set start to now
   def start_lab
+    logger.debug "Lab start called for #{self.id}"
   	if self.start.blank? && self.end.blank?  # can only start labs that are not started or finished
       result = Check.has_free_resources
       if result && result[:success] # has resources
@@ -103,27 +104,48 @@ class LabUser < ActiveRecord::Base
         result # forward the message from resource check
       end
     elsif self.end # lab is ended
-      {success: false, message: 'Ended lab can not be started'}
+      {success: false, message: 'Ended mission can not be started'}
     else
       {success: true, message: 'Lab started..'}
 		end
   end
 
 # remove all Vm-s and set the end to now
+# called 2x in labuser_controller when removing lab from user
+# called 3x in labs controller when ending lab (by id, by value, default)
+# called during restart_lab
   def end_lab
-    if self.start && !self.end  # can only end labs that are started and not ended
-      Vm.destroy_all(lab_user_id: self)
+    logger.debug "Lab end called for #{self.id}"
+    if !self.start.blank? && self.end.blank?  # can only end labs that are started and not ended
+      begin
+        Vm.where(lab_user_id: self.id).destroy_all
+        logger.debug "vms deleted for #{self.id}"
+      rescue Exception => e
+        logger.error e
+        return {success: false, message: "Mission end failed" }
+      end
       #self.destroy_all_vms
       #end of deleting vms for this lab
       self.uuid = SecureRandom.uuid
       self.end = Time.now
-      self.save
-      # remove pending delayed jobs
-      Delayed::Job.where('queue=?', "labuser-#{self.id}").destroy_all
+      if self.save
+        logger.debug "mission #{self.id} ended, removing delayed jobs"
+        # remove pending delayed jobs
+        Delayed::Job.where('queue=?', "labuser-#{self.id}").destroy_all
+        return {success: true, message: "Mission ended" }
+      else
+        logger.error "unable to end mission #{self.id}"
+        return {success: false, message: "Unable to end this mission" }
+      end
+    elsif self.start.blank?
+      return {success: false, message: "This mission has not been started" }
+    else
+      return {success: true, message: "This mission has already been ended" }
     end
   end
 
   def restart_lab
+    logger.debug "Lab restart called for #{self.id}"
     self.end_lab
     self.vta_setup = false # assistant labuser needs to be reset
     self.start = nil
@@ -153,7 +175,7 @@ class LabUser < ActiveRecord::Base
   		logger.info "\nfeedback: #{feedback}\n"
   		{ success: success, message: feedback}
     else
-      { success: false, message: 'unable to start machines in inactive lab'}
+      { success: false, message: 'unable to start machines in inactive mission'}
     end
 	end
 
@@ -162,8 +184,13 @@ class LabUser < ActiveRecord::Base
 		self.vms.each do |vm|
 			if vm.state=='running' || vm.state=='paused'  # has to be running or paused
 				stop = vm.stop_vm
-				logger.info "#{vm.name} (#{vm.lab_vmt.nickname}) stopped"
-				feedback=feedback+"<b>#{vm.lab_vmt.nickname}</b> stopped<br/>"
+        if stop[:success]
+  				logger.info "#{vm.name} (#{vm.lab_vmt.nickname}) stopped"
+  				feedback = feedback+"<b>#{vm.lab_vmt.nickname}</b> stopped<br/>"
+        else
+          logger.info "#{vm.name} (#{vm.lab_vmt.nickname}) not stopped"
+          feedback = feedback+"<b>#{vm.lab_vmt.nickname}</b> not stopped<br/>"
+        end
 			end #end if not running or paused
 		end
     # if no feedbck then no macines were stopped

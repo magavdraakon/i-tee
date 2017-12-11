@@ -8,11 +8,12 @@ class Vm < ActiveRecord::Base
   validates_presence_of :name, :lab_vmt_id, :lab_user_id
   validates_uniqueness_of :name
 
-  def try_delete_vm
+  def try_delete_vm   
     begin
       self.delete_vm
-    rescue
-      # ignore failure
+      logger.debug "#{self.name} stopped and deleted"
+    rescue Exception => e 
+      raise e
     end
   end
 
@@ -73,10 +74,11 @@ class Vm < ActiveRecord::Base
   def delete_vm
     begin
       Virtualbox.stop_vm(name)
-    rescue
-      # ignore failure
+      Virtualbox.delete_vm(name)
+    rescue Exception => e
+      # specific failure is logged by virtualbox class
+      raise "Deleting #{self.name} failed"
     end
-    Virtualbox.delete_vm(name)
   end
 
   def stop_vm
@@ -85,19 +87,18 @@ class Vm < ActiveRecord::Base
       if self.lab_vmt.allow_restart
         begin
           Virtualbox.stop_vm(name)
+          self.description = 'Power on the virtual machine by clicking <strong>Start</strong>.'
+          self.save
+          {success: true, message: "#{self.nickname} successfully shut down"}
         rescue
           # ignore failure, Virtualbox model logs the message
-        end
-
-        self.description='Power on the virtual machine by clicking <strong>Start</strong>.'
-        self.save
-
-        {success: true, message: 'Successful machine shutdown'}
+          {success: false, message: "Failed to stop machine #{self.nickname}"}
+        end       
       else
-        {success: true, message: 'Machine can not be shut down'}
+        {success: true, message: "Machine #{self.nickname} can not be shut down"}
       end
     else
-      {success: true, message: 'Machine was already shut down'}
+      {success: true, message: "Machine #{self.nickname} was already shut down"}
     end
   end
 
@@ -319,7 +320,7 @@ class Vm < ActiveRecord::Base
           # Ignored intentionally
         end
 
-        post = Http.post(url_prefix + "/api/tokens", {username: self.lab_user.g_username, password: self.lab_user.g_password})
+        post = HttpRequest.post(url_prefix + "/api/tokens", {username: self.lab_user.g_username, password: self.lab_user.g_password})
         if post.body && post.body['authToken']
           uri = GuacamoleConnection.get_url(self.g_connection)
           path = url_prefix + "/#/client/#{uri}"

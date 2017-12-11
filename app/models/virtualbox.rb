@@ -302,7 +302,7 @@ def self.open_guacamole(vm, user)
             end
           end
           # log in 
-          post = Http.post(url_prefix + "/api/tokens", {username: g_username, password: g_password})
+          post = HttpRequest.post(url_prefix + "/api/tokens", {username: g_username, password: g_password})
           if post.body && post.body['authToken']
             # get machine url
             uri = GuacamoleConnection.get_url(g_conn.connection_id)

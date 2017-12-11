@@ -242,10 +242,11 @@ class LabsController < ApplicationController
       if @admin && params[:labuser_id]
         @labuser= LabUser.where('id=?', params[:labuser_id]).first
         if @labuser
-          @labuser.end_lab
+          result = @labuser.end_lab
+          logger.debug "mission #{@labuser.id} end result: #{result.as_json}"
           # back to the view the link was in
-          format.html { redirect_to(:back) }
-          format.json {render :json=>{ :success => true , :message=> 'lab ended', :lab_user => @labuser.id , :end_time => @labuser.end}}
+          format.html { redirect_to(:back, notice: result[:message]) }
+          format.json {render :json=>{ :success => result[:success] , :message=> result[:message], :lab_user => @labuser.id , :end_time => @labuser.end}}
         else
           format.html { redirect_to :back , :notice=> "Can't find lab user" }
           format.json { render :json=> {:success => false , :message=>  "Can't find lab user" }}
@@ -268,10 +269,11 @@ class LabsController < ApplicationController
         if user
           @labuser = LabUser.where('lab_id=? and user_id=?', params[:lab_id], user.id ).last
           if @labuser
-            @labuser.end_lab
+            result = @labuser.end_lab
+            logger.debug "mission #{@labuser.id} end result: #{result.as_json}"
             # back to the view the link was in
-            format.html { redirect_to(:back) }
-            format.json {render :json=>{ :success => true , :message=> 'lab ended', :lab_user => @labuser.id , :end_time => @labuser.end}}
+            format.html { redirect_to(:back, notice: result[:message]) }
+            format.json {render :json=>{ :success => result[:success] , :message=> result[:message], :lab_user => @labuser.id , :end_time => @labuser.end}}
           else
             format.html { redirect_to :back , :notice=> "Can't find lab user" }
             format.json { render :json=> {:success => false , :message=>  "Can't find lab user" }}
@@ -297,10 +299,11 @@ class LabsController < ApplicationController
       if current_user==@lab_user.user || @admin #check if this is this users lab (to not allow url hacking) or if the user is admin
         logger.debug "\nEnding '#{@lab_user.user.username}' lab '#{@lab_user.lab.name}' as admin\n" if @admin
         # remove the vms for this lab_user
-        @lab_user.end_lab
+        result = @lab_user.end_lab
+        logger.debug "mission #{@lab_user.id} end result: #{result.as_json}"
         # back to the view the link was in
-        format.html { redirect_to(:back) }
-        format.json {render :json=>{ :success => true , :message=> 'lab ended', :lab_user => @lab_user.id , :end_time => @lab_user.end}}
+        format.html { redirect_to(:back, notice: result[:message]) }
+        format.json {render :json=>{ :success => result[:success] , :message=> result[:message], :lab_user => @lab_user.id , :end_time => @lab_user.end}}
       else #this lab doesnt belong to this user, permission error
         format.html { redirect_to error_401_path , :notice=> 'Restricted access!' }
         format.json {render :json=>{ :success => false , :message=> 'No permission error' }}
