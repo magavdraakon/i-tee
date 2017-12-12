@@ -20,6 +20,6 @@ git checkout version.txt
 
 
 echo "Enter following commands to push docker image"
-echo docker tag i-tee magavdraakon/i-tee:latest
+echo docker tag i-tee rangeforce/i-tee:latest
 echo docker login
-echo docker push magavdraakon/i-tee
+echo docker push rangeforce/i-tee
