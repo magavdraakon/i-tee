@@ -3,6 +3,16 @@
 <p><%=AppVersion::APP_VERSION.chomp%></p>
 <p><%=AppVersion::PLATFORM_INFO%></p>
 
+<%= form_tag(system_path, method: "post", role:'form') do %>
+	<p>Current log level is <%= @levels[@level][0] %>
+	<div class="col-xs-2">
+		<b>Change log level to: </b> 
+		<%= select_tag :loglevel, options_for_select(@levels, params[:loglevel] || @level ), include_blank: false %>
+		<%= submit_tag "Apply", class: 'btn btn-success' %> 
+	</div>
+	
+<% end %>
+
 <p>
   Number of virtual machines total: <%= Virtualbox.all_machines.length %><br/>
   Number of running virtual machines: <%= Virtualbox.running_machines.length %></p>

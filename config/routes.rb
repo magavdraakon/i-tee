@@ -84,7 +84,7 @@ ITee::Application.routes.draw do
 
   match 'error_401', :to => 'home#error_401'
   match 'template', :to => 'home#template'
-  match 'system', :to => 'home#system'
+  match 'system', :to => 'home#system_info', via: [:get, :post]
   match 'about', :to=> 'home#about'
   #with user
   match 'start_all/:id/:username', :to=> 'vms#start_all'
