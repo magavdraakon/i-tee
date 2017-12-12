@@ -44,23 +44,21 @@ class Vm < ActiveRecord::Base
   end
 
   def vm_info
-    unless self.instance_variable_defined?(:@vm_info)
-      logger.debug "Loading VM info of '#{name}'"
-      begin
-        @vm_info = Virtualbox.get_vm_info(name, true)
-      rescue Exception => e
-        unless e.message == 'Not found'
-          raise e
-        end
-        @vm_info = false
+    logger.debug "Loading VM info of '#{name}'"
+    begin
+      return Virtualbox.get_vm_info(name, true)
+    rescue Exception => e
+      unless e.message == 'Not found'
+        raise e
       end
+      return false
     end
-    @vm_info
   end
 
   def state
-    if self.vm_info
-      state = self.vm_info['VMState']
+    info = self.vm_info
+    if info
+      state = info['VMState']
       unless state == 'running' or state == 'paused'
         state = 'stopped'
       end
@@ -72,8 +70,9 @@ class Vm < ActiveRecord::Base
   end
 
   def rdp_port
-    if self.vm_info
-      rdp_port = self.vm_info['vrdeport'].to_i
+    info = self.vm_info
+    if info
+      rdp_port = info['vrdeport'].to_i
       if rdp_port == -1
         rdp_port = 0
       end
@@ -84,15 +83,25 @@ class Vm < ActiveRecord::Base
     rdp_port
   end
 
+# check if vbox knows this vm, stop if needed, but always delete
   def delete_vm
     begin
-      Virtualbox.stop_vm(name)
-      logger.debug "#{self.name} VM stopped"
+      info = Virtualbox.get_vm_info(self.name, true)
+      state = info['VMState']
+      if state=='running' || state=='paused'
+        Virtualbox.stop_vm(name)
+        logger.debug "#{self.name} VM stopped"
+      end
       Virtualbox.delete_vm(name)
       logger.debug "#{self.name} VM deleted"
     rescue Exception => e
-      # specific failure is logged by virtualbox class
-      raise "Deleting #{self.name} failed"
+      if e.message == 'Not found'
+        logger.debug "VM #{self.name} not found"
+        return true # if machine does not exist, it is deleted
+      else
+        logger.error e
+        raise "Deleting VM #{self.name} failed"
+      end
     end
   end
 
