@@ -115,10 +115,22 @@ class LabUser < ActiveRecord::Base
 # called 3x in labs controller when ending lab (by id, by value, default)
 # called during restart_lab
   def end_lab
-    logger.debug "Lab end called for #{self.id}"
+    logger.info "Lab end called for #{self.id}"
     if !self.start.blank? && self.end.blank?  # can only end labs that are started and not ended
       begin
-        Vm.where(lab_user_id: self.id).destroy_all
+        machines = Vm.where(lab_user_id: self.id) 
+        # to make sure vms are being removed, do it one by one
+        machines.each do |vm|
+          begin
+            vm.delete_vm
+            logger.info "#{vm.name} stopped and deleted @ lab end"
+          rescue Exception => e 
+            logger.error e
+            return {success: false, message: "Mission end failed" }
+          end
+        end
+        # remove the db entries, the before destroy filter should realize there is no vm to destroy and will be 'skipped'
+        machines.destroy_all
         logger.debug "vms deleted for #{self.id}"
       rescue Exception => e
         logger.error e
@@ -129,7 +141,7 @@ class LabUser < ActiveRecord::Base
       self.uuid = SecureRandom.uuid
       self.end = Time.now
       if self.save
-        logger.debug "mission #{self.id} ended, removing delayed jobs"
+        logger.info "mission #{self.id} ended, removing delayed jobs"
         # remove pending delayed jobs
         Delayed::Job.where('queue=?', "labuser-#{self.id}").destroy_all
         return {success: true, message: "Mission ended" }

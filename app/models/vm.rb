@@ -8,12 +8,25 @@ class Vm < ActiveRecord::Base
   validates_presence_of :name, :lab_vmt_id, :lab_user_id
   validates_uniqueness_of :name
 
-  def try_delete_vm   
+  def try_delete_vm
+    do_delete = true
     begin
-      self.delete_vm
-      logger.debug "#{self.name} stopped and deleted"
-    rescue Exception => e 
-      raise e
+      info = Virtualbox.get_vm_info(self.name, true)
+    rescue Exception => e
+      unless e.message == 'Not found'
+        raise e
+      end
+      do_delete = false
+    end
+    # only if vbox has the machine description
+    if do_delete
+      logger.debug "before destroy for #{self.name} will try to stop & delete the vm"
+      begin
+        self.delete_vm
+        logger.info "#{self.name} stopped and deleted"
+      rescue Exception => e 
+        raise e
+      end
     end
   end
 
@@ -74,7 +87,9 @@ class Vm < ActiveRecord::Base
   def delete_vm
     begin
       Virtualbox.stop_vm(name)
+      logger.debug "#{self.name} VM stopped"
       Virtualbox.delete_vm(name)
+      logger.debug "#{self.name} VM deleted"
     rescue Exception => e
       # specific failure is logged by virtualbox class
       raise "Deleting #{self.name} failed"
