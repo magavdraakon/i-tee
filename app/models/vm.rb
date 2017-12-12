@@ -104,16 +104,16 @@ class Vm < ActiveRecord::Base
           Virtualbox.stop_vm(name)
           self.description = 'Power on the virtual machine by clicking <strong>Start</strong>.'
           self.save
-          {success: true, message: "#{self.nickname} successfully shut down"}
+          {success: true, message: "#{self.lab_vmt.nickname} successfully shut down"}
         rescue
           # ignore failure, Virtualbox model logs the message
-          {success: false, message: "Failed to stop machine #{self.nickname}"}
+          {success: false, message: "Failed to stop machine #{self.lab_vmt.nickname}"}
         end       
       else
-        {success: true, message: "Machine #{self.nickname} can not be shut down"}
+        {success: true, message: "Machine #{self.lab_vmt.nickname} can not be shut down"}
       end
     else
-      {success: true, message: "Machine #{self.nickname} was already shut down"}
+      {success: true, message: "Machine #{self.lab_vmt.nickname} was already shut down"}
     end
   end
 
