@@ -78,9 +78,6 @@ class Assistant < ActiveRecord::Base
   end
 
   def request(method, path, params = {})
-    if params[:api_key].blank? # always add master admin token if none specified in params
-      params.merge!({ :api_key => self.token })
-    end
     uri = URI.parse(self.uri)
     http = Net::HTTP.new(uri.host, uri.port)
     http.read_timeout = 500 # seconds
@@ -114,7 +111,7 @@ class Assistant < ActiveRecord::Base
       end
     end
     path = "/"
-    params={ :auth_token => self.token } # always add admin token
+    params = { }
 
     full_path = encode_path_params(path, params)
     request = Net::HTTP::Get.new(full_path) # try and load the front page
