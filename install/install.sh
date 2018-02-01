@@ -10,6 +10,7 @@ if [ $UID -ne 0 ]
 then
 	echo "Not root! Exiting..."
 	echo "Start ${BASH_SOURCE[0]} as a root!"
+	exit 1
 fi
 
 cd "$( dirname "${BASH_SOURCE[0]}" )"
@@ -34,7 +35,12 @@ set +e
 cp ./etc/apt/sources.list.d/virtualbox.list /etc/apt/sources.list.d/virtualbox.list
 cp ./etc/default/virtualbox /etc/default/virtualbox
 cp ./etc/default/ferm /etc/default/ferm
-cp ./etc/ferm/firewall.conf /etc/ferm/firewall.conf
+
+cat > /etc/ferm/firewall.conf<<END
+# Default default firewall customization file
+@def $OUTER_IF=($(ip route ls |grep default | awk '{print $5}'));
+END
+
 cp ./etc/ferm/ferm.conf /etc/ferm/ferm.conf
 cp ./usr/local/share/guacamole/initdb.mysql.sql /usr/local/share/guacamole/initdb.mysql.sql
 cp ./usr/local/lib/systemd/system/*.service /usr/local/lib/systemd/system/
@@ -63,7 +69,7 @@ chown vbox:vbox /var/labs -R
 chmod u+s,g+s /var/labs -R
 
 # Password is needed for phpVirtualbox
-VBOX_PASSWORD=$(< /dev/urandom tr -dc _A-Za-z0-9 | head -c12)
+VBOX_PASSWORD=$(< /dev/urandom tr -dc _A-Za-z0-9 | head -c20)
 echo "vbox:$VBOX_PASSWORD" | chpasswd
 
 ### Install packages
@@ -148,8 +154,8 @@ set -e
 
 itee_magic() {
 
-	ITEE_PASSWORD=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c12)
-	GUACAMOLE_PASSWORD=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c12)
+	ITEE_PASSWORD=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c20)
+	GUACAMOLE_PASSWORD=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c20)
 
 	SQL=
 	SQL="$SQL CREATE DATABASE IF NOT EXISTS itee;\n"
