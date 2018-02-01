@@ -1,0 +1,25 @@
+[Unit]
+Requires=docker.service
+After=docker.service
+
+
+[Install]
+WantedBy=multi-user.target
+
+
+[Service]
+ExecStartPre=-/usr/bin/env docker rm -f netdata
+ExecStartPre=/usr/bin/env docker create \
+	--name netdata \
+	--net host \
+	--cap-add SYS_PTRACE \
+	--env NETDATA_PORT=20000 \
+	-v /proc:/host/proc:ro \
+	-v /sys:/host/sys:ro \
+	-t \
+	titpetric/netdata
+ExecStart=/usr/bin/env docker start -a netdata
+ExecStop=/usr/bin/env docker stop netdata
+SuccessExitStatus=143
+Restart=always
+RestartSec=3

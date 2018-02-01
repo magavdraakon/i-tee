@@ -1,0 +1,32 @@
+
+[Unit]
+Requires=docker.service
+After=docker.service
+
+
+[Install]
+WantedBy=multi-user.target
+
+
+[Service]
+ExecStartPre=-/usr/bin/env docker rm -f i-tee
+ExecStartPre=/bin/sh -c "docker create \
+	--add-host \"host.local:172.17.0.1\" \
+	--name i-tee \
+	--publish "172.17.0.1:8080:80" \
+	--env "VBOX_USER=vbox" \
+	--env "VBOX_HOST=172.17.0.1" \
+	--env "VBOX_PORT=22" \
+	--env "ITEE_SECRET_TOKEN=06a8ef723831449b0d984cd0b798c06a98a56449aff19d3172f55aa1e8b325250f228884cf3d0e540ca5db3146be0f8e2a172193960a75be8c61f1d6fc25acc0" \
+	--volume /etc/i-tee/config.yaml:/etc/i-tee/config.yaml:ro \
+	--volume /etc/i-tee/id_rsa:/root/.ssh/id_rsa:ro \
+	--volume /etc/i-tee/known_hosts:/root/.ssh/known_hosts:ro \
+	--volume /var/labs/exports:/var/labs/exports \
+	--volume /var/labs/run:/var/labs/run \
+	-t \
+	keijokapp/i-tee:latest"
+ExecStart=/usr/bin/env docker start -a i-tee
+ExecStop=/usr/bin/env docker stop i-tee
+SuccessExitStatus=143
+Restart=always
+RestartSec=3

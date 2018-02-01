@@ -1,0 +1,32 @@
+upstream lab-proxy {
+        server 172.18.128.2:8443;
+}
+
+
+server {
+
+	listen 443;
+
+	server_name *.lab.rangeforce.com;
+
+	ssl on;
+        ssl_certificate /etc/ssl/private/lab-proxy.crt;
+        ssl_certificate_key /etc/ssl/private/lab-proxy.key;
+        ssl_ciphers 'EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH';
+        ssl_prefer_server_ciphers on;
+        ssl_session_cache shared:SSL:10m;
+	
+
+	location / {
+		proxy_pass http://lab-proxy/;
+
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection $http_connection;
+		proxy_set_header Host            $host;
+		proxy_set_header X-Forwarded-For $remote_addr;
+	}
+
+	location ~ ^/brackets/(main.js|config.json|dependencies.js|index.html|LiveDevelopment|extensions|nls|samples|styles|thirdparty|xorigin.js|dependencies.js.gz|main.js.gz|xorigin.js.gz) {
+		return 301 https://files.rangeforce.com$uri;
+	}
+}

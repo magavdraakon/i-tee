@@ -1,0 +1,30 @@
+[Unit]
+Requires=guacd.service
+Requires=docker.service
+After=docker.service
+
+
+[Install]
+WantedBy=multi-user.target
+
+
+[Service]
+ExecStartPre=-/usr/bin/env docker rm -f guacamole
+ExecStartPre=/bin/sh -c 'docker create \
+	--add-host "host.local:172.17.0.1" \
+	--env GUACD_PORT_4822_TCP_ADDR="host.local" \
+	--env GUACD_PORT_4822_TCP_PORT=4822 \
+	--env MYSQL_HOSTNAME="host.local" \
+	--env MYSQL_PORT=3306 \
+	--env MYSQL_DATABASE=guacamole \
+	--env MYSQL_USER=guacamole \
+	--env MYSQL_PASSWORD=$(json-util get guacamole_database.password < /etc/i-tee/config.yaml | json-util decode-string) \
+	--name guacamole \
+	--publish "172.17.0.1:8081:8080" \
+	-t \
+	keijokapp/guacamole'
+ExecStart=/usr/bin/env docker start -a guacamole
+ExecStop=/usr/bin/env docker stop guacamole
+SuccessExitStatus=143
+Restart=always
+RestartSec=3

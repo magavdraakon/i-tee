@@ -1,0 +1,26 @@
+[Unit]
+Requires=docker.service
+After=docker.service
+
+
+[Install]
+WantedBy=multi-user.target
+
+
+[Service]
+EnvironmentFile=/etc/phpvirtualbox/environment
+ExecStartPre=-/usr/bin/env docker rm -f phpvirtualbox
+ExecStartPre=/usr/bin/env docker create \
+	--add-host "host.local:172.17.0.1" \
+	-e "VBOX_USERNAME=vbox" \
+	-e "VBOX_PASSWORD=${VBOX_PASSWORD}" \
+	-e "VBOX_LOCATION=http://host.local:18083/" \
+	--name phpvirtualbox \
+	--publish "172.17.0.1:4433:80" \
+	-t \
+	keijokapp/phpvirtualbox
+ExecStart=/usr/bin/env docker start -a phpvirtualbox
+ExecStop=/usr/bin/env docker stop phpvirtualbox
+SuccessExitStatus=143
+Restart=always
+RestartSec=3

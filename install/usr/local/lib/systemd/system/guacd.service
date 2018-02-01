@@ -1,0 +1,22 @@
+[Unit]
+Requires=docker.service
+After=docker.service
+
+
+[Install]
+WantedBy=multi-user.target
+
+
+[Service]
+ExecStartPre=-/usr/bin/env docker rm -f guacd
+ExecStartPre=/usr/bin/env docker create \
+	--add-host "host.local:172.17.0.1" \
+	--name guacd \
+	--publish "172.17.0.1:4822:4822" \
+	-t \
+	guacamole/guacd
+ExecStart=/usr/bin/env docker start -a guacd
+ExecStop=/usr/bin/env docker stop guacd
+SuccessExitStatus=143
+Restart=always
+RestartSec=3

@@ -1,0 +1,12 @@
+[Unit]
+
+
+[Install]
+WantedBy=multi-user.target
+
+
+[Service]
+ExecStart=/usr/bin/ssh ldap-tunnel@ldap.rangeforce.com -NL "172.17.0.1:389:192.168.56.10:389"
+Restart=always
+RestartSec=3
+SuccessExitStatus=143
