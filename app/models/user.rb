@@ -8,12 +8,12 @@ class User < ActiveRecord::Base
   attr_accessible :name, :username, :email, :password, :password_confirmation, :remember_me, :token_expires, :role
 
   has_many :vms#, :dependent => :destroy
-  has_many :lab_users#, :dependent => :destroy 
+  has_many :lab_users#, :dependent => :destroy
   before_destroy :del_labs # vms are deleted trough lab user
   before_save :nilify_email
  # has_many :user_badges, :dependent => :destroy
 
-  validates_format_of :username, :with => /^[[:alnum:]]+[[:alnum:]_]+[[:alnum:]]$/ , :message => 'can only be alphanumeric with and dashes with no spaces'
+  validates_format_of :username, :with => /^([[:alnum:]]+\.?[[:alnum:]_])+[[:alnum:]]$/ , :message => 'can only be alphanumeric with underscores, contain single periods and no spaces'
 
   # Populate user model with name attribute
   def ldap_before_save
@@ -21,9 +21,9 @@ class User < ActiveRecord::Base
       self.name = Devise::LDAP::Adapter.get_ldap_param(self.username,"name").first
     rescue NoMethodError
       #ignored intentionally
-    end 
+    end
   end
-  
+
   def nilify_email
     if self.email == ''
       self.email = nil
