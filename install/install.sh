@@ -42,13 +42,15 @@ cat > /etc/ferm/firewall.conf<<END
 END
 
 cp ./etc/ferm/ferm.conf /etc/ferm/ferm.conf
+mkdir -p /usr/local/share/guacamole/
 cp ./usr/local/share/guacamole/initdb.mysql.sql /usr/local/share/guacamole/initdb.mysql.sql
+mkdir -p /usr/local/lib/systemd/system/
 cp ./usr/local/lib/systemd/system/*.service /usr/local/lib/systemd/system/
 mkdir -p /etc/vbox
 cp ./etc/vbox/autostart.conf /etc/vbox/autostart.conf
 mkdir -p /etc/nginx
 cp ./etc/nginx/htpasswd /etc/nginx/htpasswd
-cp ./etc/nginx/sites-available /etc/nginx/sites-available
+mkdir -p /etc/nginx/sites-available
 cp ./etc/nginx/sites-available/lab-proxy /etc/nginx/sites-available/lab-proxy
 cp ./etc/nginx/sites-available/default /etc/nginx/sites-available/default
 mkdir -p /etc/i-tee
@@ -75,14 +77,14 @@ echo "vbox:$VBOX_PASSWORD" | chpasswd
 ### Install packages
 
 install_docker() {
-
+	apt-get remove docker docker-engine docker.io
 
 	apt-get install --no-install-recommends \
 		apt-transport-https \
     		curl \
     		software-properties-common
-
 	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+	
 	add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 
 	apt-get install -y --no-install-recommends \
@@ -98,7 +100,8 @@ install_docker() {
 install_virtualbox() {
 	echo "Installing packages"
 
-	echo "$(curl http://download.virtualbox.org/virtualbox/debian/oracle_vbox_2016.asc)" | apt-key add -
+	wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add -
+	wget -q https://www.virtualbox.org/download/oracle_vbox.asc -O- | sudo apt-key add -
 
 	apt update
 	apt install --no-install-recommends -y virtualbox-5.1 gcc make
