@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e
 
@@ -114,6 +114,8 @@ install_virtualbox() {
 	vboxmanage extpack install --replace "/tmp/Oracle_VM_VirtualBox_Extension_Pack-$SUBVERSION.vbox-extpack"
 	su - vbox -c "vboxmanage extpack install --replace '/tmp/Oracle_VM_VirtualBox_Extension_Pack-$SUBVERSION.vbox-extpack'" || true
 	su - vbox -c "vboxmanage setproperty vrdeauthlibrary VBoxAuthSimple"
+
+	apt-mark hold virtualbox-5.1
 }
 
 install_docker
