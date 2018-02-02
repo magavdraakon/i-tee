@@ -50,10 +50,6 @@ mkdir -p /etc/vbox
 cp ./etc/vbox/autostart.conf /etc/vbox/autostart.conf
 mkdir -p /etc/nginx
 
-PHPVIRTUALBOX_ADMIN_PASSWORD=$(pwgen 20 1)
-echo "$PHPVIRTUALBOX_ADMIN_PASSWORD" > /root/i-tee-passwords.txt
-echo "$PHPVIRTUALBOX_ADMIN_PASSWORD" | htpasswd -ci /etc/nginx/htpasswd htaccess  admin
-
 mkdir -p /etc/nginx/sites-available
 cp ./etc/nginx/sites-available/lab-proxy /etc/nginx/sites-available/lab-proxy
 cp ./etc/nginx/sites-available/default /etc/nginx/sites-available/default
@@ -295,6 +291,18 @@ systemctl daemon-reload
 systemctl enable ferm phpvirtualbox ldap-tunnel mysql nginx guacamole i-tee netdata vboxweb-service
 systemctl restart ferm
 systemctl restart phpvirtualbox ldap-tunnel mysql nginx guacamole i-tee netdata vboxweb-service
+
+if [ ! -f /etc/nginx/htpasswd ]
+then
+	echo "Generating new password for phpvirtualbox"
+PHPVIRTUALBOX_ADMIN_PASSWORD=$(pwgen 20 1)
+echo "phpvirtualbox username: admin, password: $PHPVIRTUALBOX_ADMIN_PASSWORD" > /root/i-tee-passwords.txt
+echo "$PHPVIRTUALBOX_ADMIN_PASSWORD" | htpasswd -ci /etc/nginx/htpasswd  admin
+
+PHPVIRTUALBOX_ADMIN_HASH=$(echo -n $PHPVIRTUALBOX_ADMIN_PASSWORD|sha512sum|cut -f1 -d' ')
+su - vbox -c"vboxmanage setextradata global phpvb/users/admin/pass $PHPVIRTUALBOX_ADMIN_HASH"
+fi
+
 
 # Filling I-Tee database
 
