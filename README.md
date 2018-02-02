@@ -16,6 +16,13 @@ http://conferences.sigcomm.org/sigcomm/2015/pdf/papers/p113.pdf
 i-tee contains three layers such as: Virtualisation, Web frontend (access control, lab control), Learningspace layer.
 
 
+
+    Ernits M., Kikkas K. (2016) A Live Virtual Simulator for Teaching Cybersecurity to Information Technology Students. In: Zaphiris P., Ioannou A. (eds) Learning and Collaboration Technologies. LCT 2016. Lecture Notes in Computer Science, vol 9753. Springer, Cham
+    DOI=https://doi.org/10.1007/978-3-319-39483-1_43
+    Publisher Name Springer, Cham
+    Print ISBN 978-3-319-39482-4
+    Online ISBN 978-3-319-39483-1
+
 # Prerequirements
 
 * Bare metal host for virtualization
@@ -26,11 +33,11 @@ i-tee contains three layers such as: Virtualisation, Web frontend (access contro
 
 
 * Create I-Tee base configuration file `/etc/i-tee/config.yaml`
-  ```json
+```json
   {
 	"ldap" : {
 		"host" : "LDAP_SERVER",
-		"port" : LDAP_PORT,
+		"port" : 1234,
 		"attribute" : "sAMAccountName",
 		"base" : "dc=yoursearch,dc=base",
 		"group_base" : "cn=Users,dc=zentyal-domain,dc=lan",
@@ -42,6 +49,7 @@ i-tee contains three layers such as: Virtualisation, Web frontend (access contro
 	"admins": [ "list","of","your","admins"]
 }
 ```
+
 
 * Ensure that your server name can be resolved Using
 ```bash
