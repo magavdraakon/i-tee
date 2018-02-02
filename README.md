@@ -44,17 +44,18 @@ i-tee contains three layers such as: Virtualisation, Web frontend (access contro
 ```
 
 * Ensure that your server name can be resolved Using
-'''bash
+```bash
 hostname -f
-'''
+```
 
 * Clone repo and start installation on ubuntu 16.04 64bit
-'''bash
+```bash
 git clone https://github.com/magavdraakon/i-tee.git
 
 cd i-tee
 ./install/install.sh
-'''
+```
+
 # Authors
 Tiia Tänav
 
