@@ -27,7 +27,7 @@ curl -L https://github.com/keijokapp/json-util/releases/download/1.0/json-util -
 chmod +x /usr/local/bin/json-util
 
 apt-get update > /dev/null
-apt-get install --no-install-recommends -y rsync curl ssh hostname ferm ssl-cert nginx
+apt-get install --no-install-recommends -y rsync curl ssh hostname ferm ssl-cert nginx apache2-utils pwgen
 
 
 ### Install static files
@@ -49,7 +49,11 @@ cp ./usr/local/lib/systemd/system/*.service /usr/local/lib/systemd/system/
 mkdir -p /etc/vbox
 cp ./etc/vbox/autostart.conf /etc/vbox/autostart.conf
 mkdir -p /etc/nginx
-cp ./etc/nginx/htpasswd /etc/nginx/htpasswd
+
+PHPVIRTUALBOX_ADMIN_PASSWORD=$(pwgen 20 1)
+echo "$PHPVIRTUALBOX_ADMIN_PASSWORD" > /root/i-tee-passwords.txt
+echo "$PHPVIRTUALBOX_ADMIN_PASSWORD" | htpasswd -ci /etc/nginx/htpasswd htaccess  admin
+
 mkdir -p /etc/nginx/sites-available
 cp ./etc/nginx/sites-available/lab-proxy /etc/nginx/sites-available/lab-proxy
 cp ./etc/nginx/sites-available/default /etc/nginx/sites-available/default
