@@ -4,6 +4,7 @@ rdp_host: "localhost"
 application_url: "https://localhost/i-tee"
 
 skin: "EIK"
+per_page: 15
 
 database:
  adapter: mysql2
