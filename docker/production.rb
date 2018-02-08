@@ -7,8 +7,7 @@ ITee::Application.configure do
   config.action_dispatch.x_sendfile_header = 'X-Sendfile'
   config.active_support.deprecation = :notify
   config.logger = Logger.new(STDOUT)
-  config.per_page=15
-
+  
   config_file = { }
 
   # .yaml is recommended extensions, so let's use that
@@ -30,6 +29,8 @@ ITee::Application.configure do
 
   # Layout to use
   config.skin = config_file.key?('skin') ? config_file['skin'] : 'EIK'
+  # pagination limits
+  config.per_page = config_file.key?('per_page') ? config_file['per_page'] :15
 
   # place for lab export / import jsons
   config.export_location = '/var/labs/exports'
