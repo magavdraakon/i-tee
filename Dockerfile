@@ -1,16 +1,19 @@
 FROM ruby:2.2.5
-MAINTAINER keijo.kapp@rangeforce.com
+MAINTAINER margus.ernits@rangeforce.com
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends sudo openssh-client libyaml-0-2 libgmp-dev libmysqlclient-dev libsqlite3-dev && \
-    gem install bundler && \
-    mkdir -p /var/run/sshd /var/labs/run
+    apt-get install -y --no-install-recommends sudo openssh-client libyaml-0-2 libgmp-dev libmysqlclient-dev libsqlite3-dev bundler nodejs && \
+    && apt-get clean autoclean \
+    && apt-get autoremove -y \
+    && rm -rf  /var/lib/apt  /var/lib/dpkg  /var/lib/cache /var/lib/log \
+    && mkdir -p /var/run/sshd /var/labs/run
+
 
 WORKDIR /var/www/i-tee
 ENV RAILS_ENV=production
 COPY /Gemfile /var/www/i-tee/Gemfile
 COPY /Gemfile.lock /var/www/i-tee/Gemfile.lock
-RUN bundle install
+RUN gem install bundler && bundle install --jobs 20 --retry 5
 
 COPY /Rakefile /var/www/i-tee/Rakefile
 COPY /config.ru /var/www/i-tee/config.ru
