@@ -2,7 +2,7 @@ FROM ruby:2.2.5
 MAINTAINER margus.ernits@rangeforce.com
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends sudo openssh-client libyaml-0-2 libgmp-dev libmysqlclient-dev libsqlite3-dev bundler nodejs && \
+    apt-get install -y --no-install-recommends sudo openssh-client libyaml-0-2 libgmp-dev libmysqlclient-dev libsqlite3-dev bundler nodejs \
     && apt-get clean autoclean \
     && apt-get autoremove -y \
     && rm -rf  /var/lib/apt  /var/lib/dpkg  /var/lib/cache /var/lib/log \
