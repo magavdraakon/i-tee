@@ -64,6 +64,12 @@ cd i-tee
 ./install/install.sh
 ```
 
+
+
+* Download and install lab infra
+OpenSense VM ()
+lab-proxy VM ()
+
 # Authors
 Tiia Tänav
 
