@@ -24,7 +24,7 @@ ExecStartPre=/bin/sh -c "docker create \
 	--volume /var/labs/exports:/var/labs/exports \
 	--volume /var/labs/run:/var/labs/run \
 	-t \
-	keijokapp/i-tee:latest"
+	rangeforce/i-tee:latest"
 ExecStart=/usr/bin/env docker start -a i-tee
 ExecStop=/usr/bin/env docker stop i-tee
 SuccessExitStatus=143
