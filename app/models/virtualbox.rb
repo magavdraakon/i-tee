@@ -319,6 +319,18 @@ def self.open_guacamole(vm, user)
     end
 end
 
+	def self.set_port_range(vm, range='9000-11000')
+		logger.info "utils/vboxmanage modifyvm #{Shellwords.escape(vm)} --vrdeport #{Shellwords.escape(range)} "
+		stdout = %x(utils/vboxmanage modifyvm #{Shellwords.escape(vm)} --vrdeport #{Shellwords.escape(range)}  2>&1)
+		if $?.exitstatus != 0
+			unless stdout.start_with? "VBoxManage: error: The machine '#{vm}' is already locked by a session (or being locked or unlocked)\n"
+				logger.error "Failed to set vm port range: #{stdout}"
+				raise 'Failed to set vm port range'
+			end
+		end
+
+	end
+
  def self.state(vm)
 	stdout = %x(utils/vboxmanage showvminfo #{Shellwords.escape(vm)} 2>/dev/null | grep -E '^State:')
 	state = "#{stdout}".split(' ')[1]
@@ -343,6 +355,7 @@ end
  end
 
  def self.start_vm(vm)
+ 	Virtualbox.set_port_range(vm) # set default port range of 9000-11000 
 	stdout = %x(utils/vboxmanage startvm #{Shellwords.escape(vm)} --type headless  2>&1)
 	if $?.exitstatus != 0
 		unless stdout.start_with? "VBoxManage: error: The machine '#{vm}' is already locked by a session (or being locked or unlocked)\n"

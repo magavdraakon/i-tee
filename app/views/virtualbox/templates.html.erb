@@ -31,9 +31,8 @@
         </td>
         <td><%= vm['VRDEActiveConnection'] if vm['VRDEActiveConnection'] %></td>
         <td>
-            <%= link_to "Open in browser", "virtualbox_guacamole/#{vm['name']}", target: '_blank' %>
         	<% if vm['VMState']=='running' %>
-
+                <%= link_to "Open in browser", "virtualbox_guacamole/#{vm['name']}", target: '_blank' %>
                 <div class="remote_connections">
                     <span onclick="toggleOtherOsButtons(this)" class="showtoggle">&lt; more</span>
                     <span class="button win-button Windows" onclick="show_remote(this, '<strong><%=Virtualbox.remote('win', vm['vrdeport'], current_user)%></strong>')">Windows</span>
