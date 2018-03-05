@@ -89,7 +89,7 @@ class VirtualboxController < ApplicationController
 	      	if result && result[:success]
 	      		format.html {
 	        		# set cookie
-	        		cookies[:GUAC_AUTH] = {
+	        		data = {
 	          			value: result[:token],
 				        #expires: 1.hour.from_now,
 				        domain: result[:domain], #%w(rangeforce.com), # %w(.example.com .example.org)
@@ -97,6 +97,8 @@ class VirtualboxController < ApplicationController
 				        #:secure,
 				        #:httponly
 	        		}
+	        		Rails.logger.debug "setting guacamole cookie #{data.to_json}"
+	        		cookies[:GUAC_AUTH] = data
 	        		#redirect to url https://xxx.yyy.com/#/client/zzz
 	        		redirect_to( result[:url] )
 	      		}

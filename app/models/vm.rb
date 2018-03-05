@@ -351,7 +351,16 @@ class Vm < ActiveRecord::Base
         end
 
         begin
-          GuacamoleConnectionPermission.create!(user_id: guacamole_user.user_id, connection_id: guacamole_connection.connection_id, permission: 'READ')
+          # allow connection if none exists
+          permission = GuacamoleConnectionPermission.where("user_id=? and connection_id=? and permission=?", guacamole_user.user_id, guacamole_connection.connection_id , 'READ').first
+          unless permission # if no permission, create one
+            result = GuacamoleConnectionPermission.create(user_id: guacamole_user.user_id, connection_id: guacamole_connection.connection_id, permission: 'READ')
+            unless result
+              return {success: false, message: 'unable to allow connection in guacamole'} 
+            end
+          end
+
+          # GuacamoleConnectionPermission.create!(user_id: guacamole_user.user_id, connection_id: guacamole_connection.connection_id, permission: 'READ')
         rescue ActiveRecord::RecordNotUnique => e
           # Ignored intentionally
         end

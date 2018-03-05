@@ -242,6 +242,13 @@ def self.open_guacamole(vm, user)
         	g_user.apply_salt
         	g_user.save
         end 
+        params = [
+          { parameter_name: 'hostname', parameter_value: rdp_host },
+          { parameter_name: 'port', parameter_value: rdp_port },
+          { parameter_name: 'username', parameter_value: user.username },
+          { parameter_name: 'password', parameter_value: g_password },
+#             { parameter_name: 'color-depth', parameter_value: 255 }
+        ]
         # check if there is a connection
         g_conn = GuacamoleConnection.where("connection_name = ? ", g_name ).first
         unless g_conn # find by full name
@@ -253,43 +260,22 @@ def self.open_guacamole(vm, user)
             max_connections_per_user: max_user_connections )
          
           if g_conn
-            g_conn.add_parameters([
-              { parameter_name: 'hostname', parameter_value: rdp_host },
-              { parameter_name: 'port', parameter_value: rdp_port },
-              { parameter_name: 'username', parameter_value: user.username },
-              { parameter_name: 'password', parameter_value: g_password },
-#             { parameter_name: 'color-depth', parameter_value: 255 }
-            ])
+            g_conn.add_parameters(params)
           else
             logger.debug g_conn
             return {success: false, message: 'unable to create connection in guacamole'} 
           end
         else # connection existed
-          #the port had changed?- change row where connection id is x and parameter is 'port'
-          # find parameter 
-          param = GuacamoleConnectionParameter.where("connection_id=? and parameter_name=?", g_conn.connection_id, 'port').first
-          if param #update
-            GuacamoleConnectionParameter.where("connection_id=? and parameter_name=?", g_conn.connection_id, 'port').limit(1).update_all(parameter_value: rdp_port)
-          else # create
-            GuacamoleConnectionParameter.create(connection_id: g_conn.connection_id, parameter_name: 'port', parameter_value: rdp_port )
-          end
-
-          # password had changed?
-          param = GuacamoleConnectionParameter.where("connection_id=? and parameter_name=?", g_conn.connection_id, 'password').first
-          if param #update
-            GuacamoleConnectionParameter.where("connection_id=? and parameter_name=?", g_conn.connection_id, 'password').limit(1).update_all(parameter_value: g_password)
-          else # create
-            GuacamoleConnectionParameter.create(connection_id: g_conn.connection_id, parameter_name: 'password', parameter_value: g_password )
-          end
-
-          # user had changed?
-          param = GuacamoleConnectionParameter.where("connection_id=? and parameter_name=?", g_conn.connection_id, 'username').first
-          if param #update
-            GuacamoleConnectionParameter.where("connection_id=? and parameter_name=?", g_conn.connection_id, 'username').limit(1).update_all(parameter_value: user.username)
-          else # create
-            GuacamoleConnectionParameter.create(connection_id: g_conn.connection_id, parameter_name: 'username', parameter_value: user.username )
-          end
-          
+          # update/create all parameters
+          params.each do |p|
+	          # find parameter 
+	          param = GuacamoleConnectionParameter.where("connection_id=? and parameter_name=?", g_conn.connection_id, p[:parameter_name]).first
+	          if param #update
+	            GuacamoleConnectionParameter.where("connection_id=? and parameter_name=?", g_conn.connection_id, p[:parameter_name]).limit(1).update_all(parameter_value: p[:parameter_value])
+	          else # create
+	            GuacamoleConnectionParameter.create(connection_id: g_conn.connection_id, parameter_name: p[:parameter_name], parameter_value: p[:parameter_value] )
+	          end
+	        end          
         end #EOF connection check
         # check if the connection persist/has been created
         if g_conn

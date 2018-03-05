@@ -67,6 +67,7 @@ end
   end
 
   def self.request( method, path, params = {})
+
     #params.merge!({:auth_token=> self.token }) # always add admin token
     unless path.starts_with?('https://') || path.starts_with?('http://')
       path = "http://"+path
@@ -97,7 +98,7 @@ end
     request.set_form_data(params)
     #request.body = params.to_json
     # end
-
+    Rails.logger.info "#{method}, #{path}, #{params.to_json}" 
     http.request(request)
   end
 
@@ -114,17 +115,17 @@ end
     request.body = params.to_json
     res = http.request(request)
     if res && res.kind_of?(Net::HTTPRedirection)
-      logger.debug "\n host redirected"
+      Rails.logger.debug "\n host redirected"
       host_exists?(res['location']) # Go after any redirect and make sure you can access the redirected URL 
     else
-      logger.debug "\n return code #{res.code}" 
+      Rails.logger.debug "\n return code #{res.code}" 
       ! %W(4 5).include?(res.code[0]) # Not from 4xx or 5xx families
     end
   rescue Errno::ENOENT
-    logger.debug "\nENOENT: error"
+    Rails.logger.debug "\nENOENT: error"
     false #false if can't find the server
   rescue Errno::ECONNREFUSED
-    logger.debug "\nECONNREFUSED: error"
+    Rails.logger.debug "\nECONNREFUSED: error"
     false # connection refused
   end
 
