@@ -109,8 +109,8 @@ class LabUsersController < ApplicationController
       end
       removed_users.each do |d|
         #look for the unchecked users and remove them from db if they were there
-        l=LabUser.where('lab_id=? and user_id=?', lab, d.id).first
-        l.delete if l!=nil
+        l = LabUser.where('lab_id=? and user_id=?', lab, d.id).first
+        l.destroy if l
       end
       redirect_to(:back, :notice => 'successful update.')
     else #adding a single user to a lab
