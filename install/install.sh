@@ -46,6 +46,43 @@ mkdir -p /usr/local/share/guacamole/
 cp ./usr/local/share/guacamole/initdb.mysql.sql /usr/local/share/guacamole/initdb.mysql.sql
 mkdir -p /usr/local/lib/systemd/system/
 cp ./usr/local/lib/systemd/system/*.service /usr/local/lib/systemd/system/
+
+cat > /usr/local/lib/systemd/system/i-tee.service <<EOL
+
+
+[Unit]
+Requires=docker.service
+After=docker.service
+
+
+[Install]
+WantedBy=multi-user.target
+
+
+[Service]
+ExecStartPre=-/usr/bin/env docker rm -f i-tee
+ExecStartPre=/bin/sh -c "docker create \\
+	--add-host \"host.local:172.17.0.1\" \\
+	--name i-tee \\
+	--publish "172.17.0.1:8080:80" \\
+	--env "VBOX_USER=vbox" \\
+	--env "VBOX_HOST=172.17.0.1" \\
+	--env "VBOX_PORT=22" \\
+	--env "ITEE_SECRET_TOKEN=$(pwgen 128 1)" \\
+	--volume /etc/i-tee/config.yaml:/etc/i-tee/config.yaml:ro \\
+	--volume /etc/i-tee/id_rsa:/root/.ssh/id_rsa:ro \\
+	--volume /etc/i-tee/known_hosts:/root/.ssh/known_hosts:ro \\
+	--volume /var/labs/exports:/var/labs/exports \\
+	--volume /var/labs/run:/var/labs/run \\
+	-t \\
+	rangeforce/i-tee:latest"
+ExecStart=/usr/bin/env docker start -a i-tee
+ExecStop=/usr/bin/env docker stop i-tee
+SuccessExitStatus=143
+Restart=always
+RestartSec=3
+EOL
+
 mkdir -p /etc/vbox
 cp ./etc/vbox/autostart.conf /etc/vbox/autostart.conf
 mkdir -p /etc/nginx
@@ -305,6 +342,8 @@ fi
 
 vboxmanage hostonlyif create
 vboxmanage hostonlyif ipconfig vboxnet0 --ip 172.18.0.1
+
+
 
 
 # Filling I-Tee database
