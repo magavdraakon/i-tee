@@ -566,7 +566,7 @@ end
  	codes['down']=['e0 50','d0']
  	codes['ralt']=['e0 38','b8']
  	codes['rctrl']=['e0 1d','9d']
- 	
+ 	codes['windows']=['e0 5b', 'e0 db']
  	
  	codes
  end
