@@ -206,34 +206,39 @@ class LabUsersController < ApplicationController
     @lab=Lab.find_by_id(params[:lab_id])
     if params[:txtsbs].present? && @lab!=nil
       @upload_text = params[:txtsbs].read
-      users=@upload_text.split('\n')
       
-      notice=''
-      @upload_text.each_line do |u| 
-        
-      #users.each do |u|
-      #while u = params[:txtsbs].readline        
+      u_missing = []
+      n_missing = []
+      t_missing = []
+      failed = []
+      @upload_text.each_line.with_index do |u, index|        
         u.chomp!
-        user=u.split(',')#username,realname, email, token (username and name compulsory for everyone, email not?)
-        if user.empty? || user[0].blank? || user[1].blank?
-          notice=notice+'adding user "<b>'+u+'</b>" failed '
-          notice=notice+' - needs username' if user[0].blank?
-          notice=notice+' - needs name' if user[1].blank?
-          notice=notice+'<br/>'
+        user = u.split(',')#username,realname, email, token (username and name compulsory for everyone, email not?)
+        if user.empty?
+          failed << (index+1)
           next
         end
+        if user[0].blank? 
+          u_missing << (index+1)
+          next
+        end
+        if user[1].blank?
+          user[1] = user[0].gsub(' ', '') unless user[0].blank? # use username as fullname
+          n_missing << (index+1) if user[1].blank?
+          next
+        end
+        
         @user=User.where('username=?', user[0]).first
         if @user==nil #user doesnt exist
-          email=user[2]
+          email = user[2].gsub(' ','')
           if email == nil || email == ''
            email="#{user[0]}@itcollege.ee"
           end
-
           #TODO: email is username@itcollege when email is set??? take address (@something.end) from config?
           if user[3]
             @user=User.create!(:email=>email ,:username=>user[0], :name=>user[1] ,:password=>user[3])
           else
-            notice=notice+'<b>'+user[0]+'</b> adding failed - token needed for new users<br/>'
+            t_missing << (index+1)
           end
         end
         if @user # only if user exists / was created
@@ -252,16 +257,22 @@ class LabUsersController < ApplicationController
             labuser.lab=@lab
             labuser.user=@user
             if labuser.save
-              notice=notice+'<b>'+user[0]+'</b> added successfully<br/>'
+             # do nothing when success
             else
-              notice=notice+'<b>'+user[0]+'</b> adding failed<br/>'
+              failed << (index+1)
             end
           else
-            notice=notice+'<b>'+user[0]+'</b> was already in the lab<br/>'
+            # do nothing when existed
           end
         end
       end
-
+      #TODO: flash notice too long if more then 50 users?
+      notice = ''
+      notice += "#{failed.join(', ')} failed<br/>" unless failed.empty?
+      notice += "#{u_missing.join(', ')} username missing<br/>" unless u_missing.empty?
+      notice += "#{n_missing.join(', ')} name missing<br/>" unless n_missing.empty?
+      notice += "#{t_missing.join(', ')} token missing" unless t_missing.empty?
+      
       redirect_to(:back, :notice=>notice.html_safe)
     else
       redirect_to(:back, :alert=>'No import file specified.')
