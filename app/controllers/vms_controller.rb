@@ -4,8 +4,8 @@ class VmsController < ApplicationController
   
   #before_filter :authorise_as_admin, :except => [:show, :index, :init_vm, :stop_vm, :pause_vm, :resume_vm, :start_vm, :start_all]
   #redirect to index view when trying to see unexisting things
-  before_filter :save_from_nil, :only=>[:show, :edit, :start_vm, :stop_vm, :pause_vm, :resume_vm, :get_state, :get_rdp, :rdp_reset,:open_guacamole ]
-  before_filter :auth_as_owner, :only=>[:show, :start_vm, :stop_vm, :pause_vm, :resume_vm, :get_state, :get_rdp, :rdp_reset ,:open_guacamole]       
+  before_filter :save_from_nil, :only=>[:show, :edit, :start_vm, :stop_vm, :pause_vm, :resume_vm, :get_state, :get_rdp, :rdp_reset,:open_guacamole, :send_text, :send_keys ]
+  before_filter :auth_as_owner, :only=>[:show, :start_vm, :stop_vm, :pause_vm, :resume_vm, :get_state, :get_rdp, :rdp_reset ,:open_guacamole, :send_text, :send_keys]       
   
   before_filter :admin_tab, :except=>[:show,:index, :vms_by_lab, :vms_by_state]
   before_filter :vm_tab, :only=>[:show,:index, :vms_by_lab, :vms_by_state]
@@ -471,6 +471,44 @@ end
       else
         format.html  { redirect_to( not_found_path, :notice=> result[:message]) }
         format.json  { render :json => {:success=>result[:success], :message=> result[:message] } }
+      end
+    end
+  end
+
+  def send_text
+    respond_to do |format|
+      begin        
+        format.html  { redirect_to( not_found_path, :notice=> "format not supported") }
+        format.json  { 
+          unless @vm.lab_vmt.allow_remote
+            render :json => {success: false, message: "You are not allowed to send text to this machine"}
+          else
+            result = Virtualbox.send_text(@vm.name, params[:text])
+            render :json => result 
+          end
+        }
+      rescue Exception => e 
+        format.html  { redirect_to( not_found_path, :notice=> "format not supported" ) }
+        format.json  { render :json => {:success=>false, :message=> e.to_s } }
+      end
+    end
+  end
+
+  def send_keys
+    respond_to do |format|
+      begin        
+        format.html  { redirect_to( not_found_path, :notice=> "format not supported") }
+        format.json  { 
+          unless @vm.lab_vmt.allow_remote
+            render :json => {success: false, message: "You are not allowed to send keys to this machine"}
+          else
+            result = Virtualbox.send_keys(@vm.name, params[:text])
+            render :json => result 
+          end
+        }
+      rescue Exception => e 
+        format.html  { redirect_to( not_found_path, :notice=> "format not supported" ) }
+        format.json  { render :json => {:success=>false, :message=> e.to_s } }
       end
     end
   end

@@ -496,4 +496,151 @@ end
 		raise 'Failed to take snapshot'
 	end
  end
+
+ def self.scancodes
+ 	codes = {}
+ 	range = ('a'..'f').to_a
+ 	codes['esc']=['1', '81']
+ 	# 1 - 8
+ 	(1...9).each do |i|
+ 		codes["#{i}"]=["0#{i+1}", "8#{i+1}"]
+ 	end
+ 	['!','@','pound','$','%','^', '&', '*'].each_with_index do |v, i|
+ 		codes["#{v}"] = ["2a 0#{i+2}", "8#{i+2} aa"]
+ 	end
+ 	['9', '0', '-', '=', 'bksp', 'tab'].each_with_index do |v, i|
+ 		codes["#{v}"] = ["0#{range[i]}", "8#{range[i]}"]
+ 	end
+ 	['(', ')', '_', '+'].each_with_index do |v, i|
+ 		codes["#{v}"] = ["2a 0#{range[i]}", "8#{range[i]} aa"]
+ 	end
+ 	['q','w','e','r','t','y','u','i','o','p'].each_with_index do |v, i|
+ 		codes["#{v}"] = ["1#{i}", "9#{i}"]
+ 		codes["#{v}".upcase] = ["2a 1#{i}", "9#{i} aa"] # shift down before pushing letter and releasing after letter is released
+ 	end
+ 	['[', ']', 'enter', 'ctrl', 'a', 's'].each_with_index do |v, i|
+ 		codes["#{v}"] = ["1#{range[i]}", "9#{range[i]}"]
+ 	end
+ 	codes['{']=['2a 1a', '9a aa']
+ 	codes['}']=['2a 1b', '9b aa']
+ 	codes['A']=['2a 1e', '9e aa']
+ 	codes['S']=['2a 1f', '9f aa']
+ 	['d','f','g','h','j','k','l',';',"apostrophe",'tick'].each_with_index do |v, i|
+ 		codes["#{v}"] = ["2#{i}", "a#{i}"]
+ 		codes["#{v.upcase}"] = ["2a 2#{i}", "a#{i} aa"] unless [';',"'",'`'].include?(v)
+ 	end
+ 	codes[':']=['2a 27', 'a7 aa']
+ 	codes['quote']=['2a 28', 'a8 aa']
+ 	codes['~']=['2a 29', 'a9 aa']
+ 	# TODO \ is special 
+ 	['shift','backspace','z','x','c','v'].each_with_index do |v, i|
+ 		codes["#{v}"] = ["2#{range[i]}", "a#{range[i]}"]
+ 		codes["#{v.upcase}"] = ["2a 2#{range[i]}", "a#{range[i]} aa"] unless ['lshift','\\'].include?(v)
+ 	end
+ 	codes['|']=['2a 2b', 'ab aa']
+ 	# TODO  prtsc is special. 
+ 	['b','n','m',',','.','/','rshift','prtsc',"alt",'space'].each_with_index do |v, i|
+ 		codes["#{v}"] = ["3#{i}", "b#{i}"]
+ 		codes["#{v.upcase}"] = ["2a 3#{i}", "b#{i} aa"] if ['b','n','m'].include?(v)
+ 	end
+ 	codes['<']=['2a 33', 'b3 aa']
+ 	codes['>']=['2a 34', 'b4 aa']
+ 	codes['?']=['2a 35', 'b5 aa']
+ 	['caps','f1','f2','f3','f4','f5'].each_with_index do |v, i|
+ 		codes["#{v}"] = ["3#{range[i]}", "b#{range[i]}"]
+ 	end
+ 	['f6','f7','f8','f9','f10','num','scrl'].each_with_index do |v, i|
+ 		codes["#{v}"] = ["4#{i}", "c#{i}"]
+ 	end
+ 	codes['f11']=['57','d7']
+ 	codes['f12']=['58','d8']
+ 	codes['ins']=['e0 52','d2']
+ 	codes['del']=['e0 53','d3']
+ 	codes['home']=['e0 47','c7']
+ 	codes['end']=['e0 4f','cf']
+ 	codes['pgup']=['e0 49','c9']
+ 	codes['pgdn']=['e0 51','d1']
+ 	codes['left']=['e0 4b','cb']
+ 	codes['right']=['e0 4d','cd']
+ 	codes['up']=['e0 48','c8']
+ 	codes['down']=['e0 50','d0']
+ 	codes['ralt']=['e0 38','b8']
+ 	codes['rctrl']=['e0 1d','9d']
+ 	
+ 	
+ 	codes
+ end
+
+ # convert text to scancode sequence and send to machine
+ def self.send_text(vm, text)
+ 	begin
+		codes = Virtualbox.scancodes
+		# split rows
+		lines = text.lines
+		lines << '' if text.end_with?("\n") # make sure to keep the enter when it is supplied
+		logger.debug "sent #{lines.count} lines"
+		lines.each_with_index do |row, index|
+			row.scan(/.{1,4}/).each do |chunk| # max 4 characters at a time
+				result = []
+				keys = chunk.split('')
+				keys.each do |l|
+					l = 'space' if l==' '
+					l = 'quote' if l=='"'
+					l = 'apostrophe' if l=="'"
+					l = 'tick' if l=='`'
+					l = 'backspace' if l=='\\' || l.ord == 92
+					l = 'pound' if l=='#'
+					raise "unknown key #{l}" unless codes[l]
+					result << codes[l].join(' ')
+				end
+			 	stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} keyboardputscancode #{result.join(' ')} 2>&1)
+				if $?.exitstatus != 0
+					raise 'Failed to send text to vm'
+				end
+				sleep 0.2
+			end
+			# put line return if there are more rows after this one
+			if lines[index+1]
+			 	stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} keyboardputscancode #{codes['enter'].join(' ')} 2>&1)
+				if $?.exitstatus != 0
+					raise 'Failed to send enter to vm'
+				end
+				sleep 0.2
+			end
+		end
+		{success: true, message: "Text successfully sent"}
+	rescue Exception => e 
+		logger.error e.to_s
+		return {success: false, message: e.message || 'unexpected error while sending text' }
+	end
+ end
+
+ # send key combo where keys are held down and released together "ctrl+alt+del"
+ def self.send_keys(vm, pattern)
+ 	begin
+	 	codes = Virtualbox.scancodes
+	 	keys = pattern.split('+').map { |v| v.strip.downcase }
+	 	result = []
+	 	# press down
+	 	keys.each do |l|
+	 		raise "unknown key #{l}" unless codes[l]
+	 		result << codes[l][0]
+	 	end
+	 	#release
+	 	keys.each do |l|
+	 		raise "unknown key #{l}" unless codes[l]
+	 		result << codes[l][1]
+	 	end
+	 	stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} keyboardputscancode #{result.join(' ')} 2>&1)
+		if $?.exitstatus != 0
+			raise 'Failed to send keys to vm'
+		end
+		{success: true, message: "Keys successfully sent"}
+	rescue Exception => e 
+		logger.error e.to_s
+		return {success: false, message: e.message || 'unexpected error while sending keys' }
+	end
+ end
+
+
 end

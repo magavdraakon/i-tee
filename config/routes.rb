@@ -149,6 +149,9 @@ ITee::Application.routes.draw do
   match 'open_guacamole', :to=>'vms#open_guacamole'
   match 'open_guacamole/:id', :to=>'vms#open_guacamole' 
 
+  match 'send_keys', :to=>'vms#send_keys', via: [:post]
+  match 'send_text', :to=>'vms#send_text', via: [:post]
+
   match 'user_labs/:username', :to=>'labs#user_labs'
   match 'user_labs/:username/:id', :to => 'labs#user_labs'
 

@@ -635,8 +635,7 @@ textarea {
 }
 /*add_users view */
 .user_li {
-  float:left;
-  width:150px;
+  
   display:none;
 }
 .letter_a {
