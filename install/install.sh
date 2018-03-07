@@ -96,6 +96,14 @@ cp ./etc/systemd/system/docker.service.d/noiptables.conf /etc/systemd/system/doc
 cp ./etc/sysctl.d/80-labs.conf /etc/sysctl.d/80-labs.conf
 set -e
 
+
+#rise sshd limits
+
+echo "MaxSessions 250" >> /etc/ssh/sshd_config
+echo "MaxStartups 250" >> /etc/ssh/sshd_config
+
+
+
 ### Create users, groups and respective directories
 
 set +e
