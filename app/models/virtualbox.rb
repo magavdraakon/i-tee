@@ -554,18 +554,18 @@ end
  	end
  	codes['f11']=['57','d7']
  	codes['f12']=['58','d8']
- 	codes['ins']=['e0 52','d2']
- 	codes['del']=['e0 53','d3']
- 	codes['home']=['e0 47','c7']
- 	codes['end']=['e0 4f','cf']
- 	codes['pgup']=['e0 49','c9']
- 	codes['pgdn']=['e0 51','d1']
- 	codes['left']=['e0 4b','cb']
- 	codes['right']=['e0 4d','cd']
- 	codes['up']=['e0 48','c8']
- 	codes['down']=['e0 50','d0']
- 	codes['ralt']=['e0 38','b8']
- 	codes['rctrl']=['e0 1d','9d']
+ 	codes['ins']=['e0 52','e0 d2']
+ 	codes['del']=['e0 53','e0 d3']
+ 	codes['home']=['e0 47','e0 c7']
+ 	codes['end']=['e0 4f','e0 cf']
+ 	codes['pgup']=['e0 49','e0 c9']
+ 	codes['pgdn']=['e0 51','e0 d1']
+ 	codes['left']=['e0 4b','e0 cb']
+ 	codes['right']=['e0 4d','e0 cd']
+ 	codes['up']=['e0 48','e0 c8']
+ 	codes['down']=['e0 50','e0 d0']
+ 	codes['ralt']=['e0 38','e0 b8']
+ 	codes['rctrl']=['e0 1d','e0 9d']
  	codes['windows']=['e0 5b', 'e0 db']
  	
  	codes
@@ -626,11 +626,19 @@ end
 	 		raise "unknown key #{l}" unless codes[l]
 	 		result << codes[l][0]
 	 	end
+	 	logger.info "keyboardputscancode #{result.join(' ')}"
+	 	stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} keyboardputscancode #{result.join(' ')} 2>&1)
+		if $?.exitstatus != 0
+			raise 'Failed to send keys to vm'
+		end
+		sleep 0.2
+		result = []
 	 	#release
 	 	keys.each do |l|
 	 		raise "unknown key #{l}" unless codes[l]
 	 		result << codes[l][1]
 	 	end
+	 	logger.info "keyboardputscancode #{result.join(' ')}"
 	 	stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} keyboardputscancode #{result.join(' ')} 2>&1)
 		if $?.exitstatus != 0
 			raise 'Failed to send keys to vm'
