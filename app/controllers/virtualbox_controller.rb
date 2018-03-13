@@ -83,9 +83,11 @@ class VirtualboxController < ApplicationController
 		end
 	end
 
+	# used in virtualbox tab
+
 	def open_guacamole
 		respond_to do |format|
-	      	result = Virtualbox.open_guacamole(params[:name], current_user)
+	      	result = Virtualbox.open_guacamole(params[:name], current_user, true)
 	      	if result && result[:success]
 	      		format.html {
 	        		# set cookie

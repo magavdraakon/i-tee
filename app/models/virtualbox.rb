@@ -177,8 +177,8 @@ def self.get_all_rdp(user, port)
     ]
   end
   # connection informations
-  def self.remote(typ, port, user)
-    
+  def self.remote(typ, port, user, admin=false)
+    add = ( admin ? '-admin' : '')
     begin
       rdp_host=ITee::Application.config.rdp_host
     rescue
@@ -187,21 +187,22 @@ def self.get_all_rdp(user, port)
 
     case typ
       when 'win'
-        desc = "cmdkey /generic:#{rdp_host} /user:localhost&#92;#{user.username} /pass:#{user.rdp_password}&amp;&amp;"
+        desc = "cmdkey /generic:#{rdp_host} /user:localhost&#92;#{user.username}#{add} /pass:#{user.rdp_password}&amp;&amp;"
         desc += "mstsc.exe /v:#{rdp_host}:#{port} /f"
       when 'rdesktop'
-        desc ="rdesktop  -u#{user.username} -p#{user.rdp_password} -N -a16 #{rdp_host}:#{port}"
+        desc ="rdesktop  -u#{user.username}#{add} -p#{user.rdp_password} -N -a16 #{rdp_host}:#{port}"
       when 'xfreerdp'
-        desc ="xfreerdp  --plugin cliprdr -g 90% -u #{user.username} -p #{user.rdp_password} #{rdp_host}:#{port}"
+        desc ="xfreerdp  --plugin cliprdr -g 90% -u #{user.username}#{add} -p #{user.rdp_password} #{rdp_host}:#{port}"
       when 'mac'
-        desc ="open rdp://#{user.username}:#{user.rdp_password}@#{rdp_host}:#{port}"
+        desc ="open rdp://#{user.username}#{add}:#{user.rdp_password}@#{rdp_host}:#{port}"
       else
-        desc ="rdesktop  -u#{user.username} -p#{user.rdp_password} -N -a16 #{rdp_host}:#{port}"
+        desc ="rdesktop  -u#{user.username}#{add} -p#{user.rdp_password} -N -a16 #{rdp_host}:#{port}"
     end
 
   end
 
-def self.open_guacamole(vm, user)
+def self.open_guacamole(vm, user, admin=false)
+	add = ( admin ? '-admin' : '')
 	if user.rdp_password==""
 		#TODO! no rdp password - create it? 
 		return {success: false, message: 'Please generate a rdp password'} 
@@ -224,7 +225,7 @@ def self.open_guacamole(vm, user)
         end
         cookie_domain = ITee::Application::config.guacamole[:cookie_domain]
 
-        g_username = user_prefix+user.username
+        g_username = user_prefix+user.username+add
         g_password = user.rdp_password
         g_name = user_prefix+vm
         # check if the user has a guacamole user
@@ -245,7 +246,7 @@ def self.open_guacamole(vm, user)
         params = [
           { parameter_name: 'hostname', parameter_value: rdp_host },
           { parameter_name: 'port', parameter_value: rdp_port },
-          { parameter_name: 'username', parameter_value: user.username },
+          { parameter_name: 'username', parameter_value: user.username+add },
           { parameter_name: 'password', parameter_value: g_password },
 #             { parameter_name: 'color-depth', parameter_value: 255 }
         ]

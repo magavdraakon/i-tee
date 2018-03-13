@@ -100,7 +100,7 @@ class User < ActiveRecord::Base
     hash = Digest::SHA256.hexdigest(password)
     Virtualbox.all_machines.each do |vm|
       begin
-        Virtualbox.set_extra_data(vm, "VBoxAuthSimple/users/#{self.username}", hash);
+        Virtualbox.set_extra_data(vm, "VBoxAuthSimple/users/#{self.username}-admin", hash);
       rescue Exception => e
         logger.error "Failed to set RDP password for machine #{vm}: #{e.message}"
       end
@@ -113,7 +113,7 @@ class User < ActiveRecord::Base
   def unset_rdp_password
     Virtualbox.all_machines.each do |vm|
       begin
-        Virtualbox.set_extra_data(vm, "VBoxAuthSimple/users/#{self.username}");
+        Virtualbox.set_extra_data(vm, "VBoxAuthSimple/users/#{self.username}-admin");
       rescue Exception => e
         logger.error "Failed to unset RDP password for machine #{vm}: #{e.message}"
       end
