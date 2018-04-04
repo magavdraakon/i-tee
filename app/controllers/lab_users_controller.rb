@@ -227,7 +227,6 @@ class LabUsersController < ApplicationController
           n_missing << (index+1) if user[1].blank?
           next
         end
-        
         @user=User.where('username=?', user[0]).first
         if @user==nil #user doesnt exist
           email = user[2].gsub(' ','')
@@ -236,7 +235,9 @@ class LabUsersController < ApplicationController
           end
           #TODO: email is username@itcollege when email is set??? take address (@something.end) from config?
           if user[3]
-            @user=User.create!(:email=>email ,:username=>user[0], :name=>user[1] ,:password=>user[3])
+            password = SecureRandom.urlsafe_base64(16)
+            data = {:email=>email ,:username=>user[0], :name=>user[1] ,:password=>password}
+            @user = User.create!(data)
           else
             t_missing << (index+1)
           end

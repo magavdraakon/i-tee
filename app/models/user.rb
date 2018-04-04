@@ -13,7 +13,7 @@ class User < ActiveRecord::Base
   before_save :nilify_email
  # has_many :user_badges, :dependent => :destroy
 
-  validates_format_of :username, :with => /^([[:alnum:]]+\.?[[:alnum:]_])+[[:alnum:]]$/ , :message => 'can only be alphanumeric with underscores, contain single periods and no spaces'
+  validates_format_of :username, :with => /^[[:alnum:]]+\.?[[:alnum:]_]+[[:alnum:]]?$/ , :message => 'can only be alphanumeric with underscores, contain single periods and no spaces'
 
   # Populate user model with name attribute
   def ldap_before_save
