@@ -162,7 +162,7 @@ class Vm < ActiveRecord::Base
         Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiSystemVendor", "I-tee Distance Laboratory System")
         if self.lab_vmt.expose_uuid
           Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiSystemVersion", self.lab_user.uuid)
-	else
+	      else
           Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiSystemVersion", "System Version")
         end
         if !self.lab_user.lab.lab_hash.blank? and !self.lab_user.user.user_key.blank?

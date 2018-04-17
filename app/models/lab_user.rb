@@ -2,9 +2,11 @@ class LabUser < ActiveRecord::Base
   belongs_to :user
   belongs_to :lab
   has_many :vms
+  has_many :labuser_connections
   
   validates_presence_of :user_id, :lab_id
   validates :uuid, :allow_nil => false, :allow_blank => false, :uniqueness => { :case_sensitive => false }
+  validates :token, :allow_nil => false, :allow_blank => false, :uniqueness => { :case_sensitive => false }
   before_destroy :end_lab
   before_create :create_uuid
 
@@ -139,6 +141,7 @@ class LabUser < ActiveRecord::Base
       #self.destroy_all_vms
       #end of deleting vms for this lab
       self.uuid = SecureRandom.uuid
+      self.token = SecureRandom.uuid # used by client
       self.end = Time.now
       if self.save
         logger.info "mission #{self.id} ended, removing delayed jobs"
@@ -306,6 +309,7 @@ class LabUser < ActiveRecord::Base
 # create a temporary uuid when the labuser is created. this will be overwritten by lab end
 def create_uuid
   self.uuid = SecureRandom.uuid
+  self.token = SecureRandom.uuid # used by client
 end
 
 end
