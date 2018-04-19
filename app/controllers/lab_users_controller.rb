@@ -55,9 +55,9 @@ class LabUsersController < ApplicationController
           params[:conditions][:start]=nil
         end
         logger.debug "\n query params #{params[:conditions]}\n"
-        labusers = LabUser.where(params[:conditions])
+        labusers = LabUser.where(params[:conditions]).map{|l| l.with_ping}
       else
-        labusers = LabUser.all
+        labusers = LabUser.all.map{|l| l.with_ping}
       end
     end
     respond_to do |format|
@@ -128,7 +128,7 @@ class LabUsersController < ApplicationController
 
         if @lab_user.save
           format.html { redirect_to(:back, :notice => 'successful update.') }
-          format.json { render :json=> {:success => true}.merge(@lab_user.as_json), :status=> :created}
+          format.json { render :json=> {:success => true}.merge(@lab_user.with_ping), :status=> :created}
         else
           format.html { render :action => 'index' }
           format.json { render :json=> {:success => false, :errors => @lab_user.errors}, :status=> :unprocessable_entity}

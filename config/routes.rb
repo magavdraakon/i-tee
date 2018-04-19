@@ -1,7 +1,7 @@
 ITee::Application.routes.draw do
 
   resources :assistants
-  get 'ping', :to=>'home#ping'
+  match 'ping', :to=>'home#ping', via:[:get, :post]
 
   get 'check_resources', :to=>'home#check_resources'
 

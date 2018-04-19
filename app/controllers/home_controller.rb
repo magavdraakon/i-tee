@@ -88,10 +88,33 @@ class HomeController < ApplicationController
     end
   end
 
-  def ping
+
+  def ping 
+    history = (params[:ph].blank? ? [] : params[:ph].values )
+    if !params[:start].blank? && !params[:end].blank?
+      history << {start_at: params[:start], end_at: params[:end]}
+    end
+    # save to DB
+    if history.count >= 10
+      if params[:token].blank?
+        logger.error "unable to save ping statistics without a token"
+      else
+        labuser = LabUser.where(token: params[:token]).first
+        if labuser
+          if labuser.labuser_connections.create(history)
+            history = [] # empty after save
+            labuser.last_activity = Time.now
+            labuser.activity = "ping"
+            labuser.save
+          end
+        else
+          logger.error "unable to find labuser with token #{params[:token]}"
+        end
+      end
+    end
     respond_to do |format|
       format.html  { render :layout => false }
-      format.json  { render :json => {ping: 'pong'} }
+      format.json  { render :json => {ping: 'pong', ph: history, start: params[:time] } }
     end
   end
 

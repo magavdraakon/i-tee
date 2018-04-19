@@ -7,7 +7,7 @@ class AddTokenToLabUser < ActiveRecord::Migration
     LabUser.reset_column_information
     # add token to old labusers
     LabUser.all.each do |lu|
-    	lu.token = SecureRandom.uuid
+    	lu.token = SecureRandom.uuid if lu.token.blank?
     	lu.save
     end
   end

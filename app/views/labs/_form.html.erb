@@ -34,18 +34,35 @@
         <%= f.check_box( :endable)  %><%= f.label :endable %>
       </div>
       <hr/>
+      <h4>Timing settings</h4>
+      <p>These values (sec) specify how timed events in the lab are executed</p>
     <div class="field">
-      <%= f.label :poll_freq, 'Seconds to wait before checking vm RDP connection status again (0=no polling): ' %><br/>
+      <%= f.label :poll_freq, 'frequency of checking vm RDP connection status (0=no polling): ' %>
       <%= f.text_field :poll_freq %>
     </div>
     <div class="field">
-      <%= f.label :power_timeout, 'Seconds to wait before powering off all vms due to RDP inactivity (0=no stopping): ' %><br/>
+      <%= f.label :power_timeout, 'Time to power off all vms due to RDP inactivity (0=no stopping): ' %>
       <%= f.text_field :power_timeout %>
     </div>
     <div class="field">
-      <%= f.label :end_timeout, 'Seconds to wait before ending lab due to RDP inactivity (0=no ending): ' %><br/>
+      <%= f.label :end_timeout, 'Time to end lab due to RDP inactivity (0=no ending): ' %>
       <%= f.text_field :end_timeout %>
     </div>
+    <h4>Connection settings</h4>
+    <p>These values (ms) specify how ping duration is evaluated</p>
+    <div class="field">
+      <%= f.label :ping_low, 'if ping is below this, the connection is good: ' %>
+      <%= f.number_field :ping_low %>
+    </div>
+    <div class="field">
+      <%= f.label :ping_mid, 'if ping is below this, the connection is usable: ' %>
+      <%= f.number_field :ping_mid %>
+    </div>
+     <div class="field">
+      <%= f.label :ping_high, 'if ping is below this, the connection is bad, if over then unusable: ' %>
+      <%= f.number_field :ping_high %>
+    </div>
+
     </fieldset>
     <fieldset><legend>User management</legend>
       <div class="field">

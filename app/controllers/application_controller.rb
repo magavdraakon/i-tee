@@ -17,6 +17,7 @@ class ApplicationController < ActionController::Base
   before_filter :admin?
   before_filter :manager?
   before_filter :per_page
+  before_filter :set_headers
 
   def set_layout
     begin
@@ -79,6 +80,18 @@ class ApplicationController < ActionController::Base
    end
   
   private#-------------------------------------------------------------------
+
+  def set_headers
+    origin = request.headers['origin']
+    allowed = ITee::Application.config.allowed_origins
+    if allowed.include?(origin) || allowed.include?('*')
+      headers['Access-Control-Allow-Origin'] = origin
+      headers['Access-Control-Expose-Headers'] = 'ETag'
+      headers['Access-Control-Allow-Methods'] = 'GET, POST, PATCH, PUT, DELETE, OPTIONS, HEAD'
+      headers['Access-Control-Allow-Headers'] = '*,x-requested-with,Content-Type,If-Modified-Since,If-None-Match'
+      headers['Access-Control-Max-Age'] = '86400'
+    end
+  end
 
   def set_order_by
     if params[:dir]=='desc'
