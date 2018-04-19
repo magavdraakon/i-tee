@@ -15,7 +15,7 @@ ITee::Application.configure do
     config_file = YAML.load_file("/etc/i-tee/config.yaml")
   end
 
-  config.allowed_origins = configFile.key?('allowed_origins') ? configFile['allowed_origins'] : [ 'https://'+configFile['rdp_host'] ]
+  config.allowed_origins = config_file.key?('allowed_origins') ? config_file['allowed_origins'] : [ 'https://'+config_file['rdp_host'] ]
 
   # Administrator and manager usernames
   config.admins = config_file.key?('admins') ? config_file['admins'] : [ ]
