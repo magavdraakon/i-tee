@@ -94,6 +94,7 @@ class HomeController < ApplicationController
     if !params[:start].blank? && !params[:end].blank?
       history << {start_at: params[:start], end_at: params[:end]}
     end
+    endping = false
     # save to DB
     if history.count >= 10
       if params[:token].blank?
@@ -108,13 +109,15 @@ class HomeController < ApplicationController
             labuser.save
           end
         else
+          history = [] # no use remembering info for token that does not match any labuser (lab ended?)
+          endping = true
           logger.error "unable to find labuser with token #{params[:token]}"
         end
       end
     end
     respond_to do |format|
       format.html  { render :layout => false }
-      format.json  { render :json => {ping: 'pong', ph: history, start: params[:time] } }
+      format.json  { render :json => {ping: 'pong', ph: history, start: params[:time], end: endping } }
     end
   end
 
