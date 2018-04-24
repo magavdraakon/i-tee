@@ -73,13 +73,18 @@
               <%=link_to_unless_current('Backup', backup_path) %>  
             <%end%>
           </div>
-          <div class="course s_menu <% if @tab == 'courses' %>current_tab<% end%>"></div>
+          <div class="course s_menu <% if @tab == 'courses' %>current_tab<% end%>">
+            <!-- <%= link_to_unless_current 'My labs', my_labs_path %> -->
+            <%= link_to_unless_current 'Got an access coupon?', redeem_coupon_path %>
+          </div>
           <div class="vms s_menu <% if @tab== 'vms' %>current_tab<% end%>">
             <%= link_to_unless_current 'All virtual machines', vms_path %>
             <%= link_to_unless_current('Virtual machines by state', vms_by_state_path) %>
             <%= link_to_unless_current('Virtual machines by lab', vms_by_lab_path) %>
           </div>
-          <div class="course s_menu <% if @tab == 'user' %>current_tab<% end%>"> </div>
+          <div class="course s_menu <% if @tab == 'user' %>current_tab<% end%>">
+          	hello
+          </div>
           <%if  @admin   %>
             <div class="admin s_menu <% if @tab=='admin' %>current_tab<% end%>">
               <table>
@@ -103,6 +108,7 @@
                   </td>
                   <td>
                     <%= link_to_unless_current('Assistants', assistants_path) %><br/>
+                    <%= link_to_unless_current('Redeem codes', coupons_path) %><br/>
                   </td>
                    <td>
                     <%= link_to_unless_current('Badges', badges_path) %><br/>
