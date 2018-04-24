@@ -1,8 +1,8 @@
 class CouponsController < ApplicationController
   #restricted to admins 
-  before_filter :authorise_as_admin
+  before_filter :authorise_as_manager
   #redirect to index view when trying to see unexisting things
-  before_filter :admin_tab
+  before_filter :manager_tab
   
   # GET /coupons
   # GET /coupons.xml
