@@ -51,12 +51,13 @@ class Vm < ActiveRecord::Base
       unless e.message == 'Not found'
         raise e
       end
+      logger.debug "VM '#{name}' not registered in Virtualbox"
       return false
     end
   end
 
-  def state
-    info = self.vm_info
+  def state(info=nil)
+    info = self.vm_info if info.blank?
     if info
       state = info['VMState']
       unless state == 'running' or state == 'paused'
@@ -69,8 +70,8 @@ class Vm < ActiveRecord::Base
     state
   end
 
-  def rdp_port
-    info = self.vm_info
+  def rdp_port(info=nil)
+    info = self.vm_info if info.blank?
     if info
       rdp_port = info['vrdeport'].to_i
       if rdp_port == -1
@@ -267,10 +268,11 @@ class Vm < ActiveRecord::Base
   end
 
 
-  def get_all_rdp
+  def get_all_rdp(info=nil)
+    info = self.vm_info if info.blank?
     username = self.lab_user.user.username
     password = self.password 
-    rdp_port = self.rdp_port 
+    rdp_port = self.rdp_port(info)
     [
       {os: ['Windows'], program: '', rdpline: self.remote('win','', username, password, rdp_port) },
       {os: ['Linux', 'UNIX'], program: 'xfreerdp', rdpline: self.remote('xfreerdp','', username, password, rdp_port) },
@@ -279,13 +281,14 @@ class Vm < ActiveRecord::Base
     ]
   end
 
-  def get_connection_info
-    info = { }
-    info[:username] = self.lab_user.user.username
-    info[:password] = self.password
-    info[:host] = ITee::Application.config.rdp_host
-    info[:port] = self.rdp_port
-    info
+  def get_connection_info(info=nil)
+    info = self.vm_info if info.blank?
+    data = { }
+    data[:username] = self.lab_user.user.username
+    data[:password] = self.password
+    data[:host] = ITee::Application.config.rdp_host
+    data[:port] = self.rdp_port(info)
+    data
   end
 
   # connection informations
@@ -318,7 +321,10 @@ class Vm < ActiveRecord::Base
 
   # TODO: remove race conditions
   def open_guacamole
-    if self.state=='running'
+    info = self.vm_info || {'VMState': 'stopped', 'vrdeport': 0}
+    rdpPort = self.rdp_port(info)
+
+    if self.state(info)=='running'
       if self.lab_vmt.allow_remote and self.lab_vmt.g_type != ''
         user_prefix = ITee::Application.config.guacamole[:user_prefix]
         max_connections = ITee::Application::config.guacamole[:max_connections]
@@ -346,10 +352,10 @@ class Vm < ActiveRecord::Base
           guacamole_connection = GuacamoleConnection.find(self.g_connection)
           begin
             port_parameter = GuacamoleConnectionParameter.find([ guacamole_connection, 'port' ])
-            port_parameter.parameter_value = rdp_port
+            port_parameter.parameter_value = rdpPort
             port_parameter.save!
           rescue ActiveRecord::RecordNotFound => e
-            GuacamoleConnectionParameter.create!(connection_id: guacamole_connection.connection_id, parameter_name: 'port', parameter_value: rdp_port)
+            GuacamoleConnectionParameter.create!(connection_id: guacamole_connection.connection_id, parameter_name: 'port', parameter_value: rdpPort)
           end
         rescue ActiveRecord::RecordNotFound => e
           guacamole_connection = GuacamoleConnection.create!( connection_name: user_prefix+self.name,
@@ -359,7 +365,7 @@ class Vm < ActiveRecord::Base
           
           guacamole_connection.add_parameters([
             { parameter_name: 'hostname', parameter_value: rdp_host },
-            { parameter_name: 'port', parameter_value: self.rdp_port },
+            { parameter_name: 'port', parameter_value: rdpPort },
             { parameter_name: 'username', parameter_value: self.lab_user.user.username },
             { parameter_name: 'password', parameter_value: self.password },
 #           { parameter_name: 'color-depth', parameter_value: 255 }

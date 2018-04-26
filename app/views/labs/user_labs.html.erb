@@ -65,10 +65,11 @@
       <%= 'There are no machines allocated for this lab' if @lab_user.vms.count==0 %>
       <% @lab_user.vms_view.each do |vm| %>
         <%
-          state = vm.state 
+          vminfo = vm.vm_info
+          state = vm.state(vminfo) 
           allow_remote = vm.lab_vmt.allow_remote
           allow_restart = vm.lab_vmt.allow_restart
-          rdp_port = vm.rdp_port
+          rdp_port = vm.rdp_port(vminfo)
           nickname = (vm.lab_vmt.nickname ? vm.lab_vmt.nickname : vm.name)
           username = @lab_user.user.username
           password = vm.password

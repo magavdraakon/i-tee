@@ -88,6 +88,7 @@ def self.template_machines
 end
 
 def self.get_vm_info(name, static=false)
+	logger.debug "VIRTUALBOX. get vm info '#{name}'"
 	stdout = %x(utils/vboxmanage showvminfo #{Shellwords.escape(name)} --machinereadable 2>&1)
 	unless $?.exitstatus == 0
 		if stdout.lines.first == "VBoxManage: error: Could not find a registered machine named '#{name}'\n"

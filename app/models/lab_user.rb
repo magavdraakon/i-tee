@@ -32,18 +32,19 @@ class LabUser < ActiveRecord::Base
     vms = Vm.joins(:lab_vmt, :lab_user).where('lab_vmts.lab_id=? and vms.lab_user_id=lab_users.id and lab_users.user_id=?', self.lab_id, self.user_id).order('position asc')
     result= []
     vms.each do |vm|
+      info = vm.vm_info || {'VMState': 'stopped', 'vrdeport': 0}
       result << {
         vm_id: vm.id,
         nickname: vm.lab_vmt.nickname,
-        state: vm.state,
+        state: vm.state(info),
         expose_uuid: vm.lab_vmt.expose_uuid,
         allow_remote: vm.lab_vmt.allow_remote,
         allow_restart: vm.lab_vmt.allow_restart,
         guacamole_type: vm.lab_vmt.g_type,
         position: vm.lab_vmt.position,
         primary: vm.lab_vmt.primary,
-        vm_rdp: vm.get_all_rdp,
-        connection: vm.get_connection_info
+        vm_rdp: vm.get_all_rdp(info),
+        connection: vm.get_connection_info(info)
       }
     end
     result
