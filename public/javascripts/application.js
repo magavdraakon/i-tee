@@ -255,6 +255,10 @@ function add_network_to_vmt(el) {
 	innerHtml.push('<label for="lab_lab_vmts_attributes_' + p + '_lab_vmt_networks_attributes_' + n + '_slot">Slot</label> ' +
 		'<input type="number" id="lab_lab_vmts_attributes_' + p + '_lab_vmt_networks_attributes_' + n + '_slot" name="lab[lab_vmts_attributes][' + p + '][lab_vmt_networks_attributes][' + n + '][slot]" size="30" min="1" /><br/>');
 
+	/* IP */
+	innerHtml.push('<label for="lab_lab_vmts_attributes_' + p + '_lab_vmt_networks_attributes_' + n + '_ip">IP</label> ' +
+		'<input type="text" id="lab_lab_vmts_attributes_' + p + '_lab_vmt_networks_attributes_' + n + '_ip" name="lab[lab_vmts_attributes][' + p + '][lab_vmt_networks_attributes][' + n + '][ip]"/><br/>');
+
 	/* promiscuous */
 	innerHtml.push('<input type="hidden" name="lab[lab_vmts_attributes][' + p + '][lab_vmt_networks_attributes][' + n + '][promiscuous]" value="0" />' +
 		'<input type="checkbox" id="lab_lab_vmts_attributes_' + p + '_lab_vmt_networks_attributes_' + n + '_promiscuous" name="lab[lab_vmts_attributes][' + p + '][lab_vmt_networks_attributes][' + n + '][promiscuous]" value="1" />' +

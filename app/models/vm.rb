@@ -157,7 +157,6 @@ class Vm < ActiveRecord::Base
         Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiBIOSVersion", name)
         Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiBIOSReleaseDate", username)
         Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiSystemProduct", Rails.configuration.application_url)
-        Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSKU", "System SKU")
         Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiSystemFamily", "System Family")
         Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiSystemVendor", "I-tee Distance Laboratory System")
         if self.lab_vmt.expose_uuid
@@ -171,7 +170,7 @@ class Vm < ActiveRecord::Base
           Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSerial", "System Serial")
         end
       end
-
+      ips = []
       self.lab_vmt.lab_vmt_networks.each do |nw|
         # substituting placeholders with data
         network_name = nw.network.name.gsub('{year}', Time.now.year.to_s)
@@ -180,6 +179,15 @@ class Vm < ActiveRecord::Base
                       .gsub('{labVmt}', self.lab_vmt.name)
         logger.debug "Setting network: slot: #{nw.slot}; type: #{nw.network.net_type}; name: #{network_name}"
         Virtualbox.set_network(name, nw.slot, nw.network.net_type, network_name)
+        # add to a list of network-ip pairs if ip is set
+        ips << "#{network_name}:#{nw.ip}" unless nw.ip.blank?
+      end
+      # add list of pre-determined ips if there are any
+      unless ips.blank?
+        logger.debug "Setting ip addresses: #{ips.join(';')}"
+        Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSKU", ips.join(';'))
+      else
+        Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSKU", "System SKU")
       end
 
       # set all admin user passwords
@@ -197,12 +205,16 @@ class Vm < ActiveRecord::Base
       logger.debug "Starting machine"
       Virtualbox.start_vm(name)
 
+      username = self.lab_user.user.username
+      password = self.password 
+      rdp_port = self.rdp_port 
+
       desc = 'To create a connection with this machine using linux/unix use<br/>'
-      desc += '<srong>'+self.remote('rdesktop')+'</strong>'
+      desc += '<srong>'+self.remote('rdesktop','', username, password, rdp_port)+'</strong>'
       desc += '<br/> or use xfreerdp as<br/>'
-      desc += '<srong>'+self.remote('xfreerdp')+'</strong>'
+      desc += '<srong>'+self.remote('xfreerdp','', username, password, rdp_port)+'</strong>'
       desc += '<br/>To create a connection with this machine using Windows use two commands:<br/>'
-      desc += '<srong>'+self.remote('win')+'</strong>' #"<strong>cmdkey /generic:#{rdp_host} /user:localhost\\#{self.lab_user.user.username} /pass:#{self.password}</strong><br/>"
+      desc += '<srong>'+self.remote('win','', username, password, rdp_port)+'</strong>' #"<strong>cmdkey /generic:#{rdp_host} /user:localhost\\#{self.lab_user.user.username} /pass:#{self.password}</strong><br/>"
       #desc += "<strong>mstsc.exe /v:#{rdp_host}:#{rdp_port_prefix}#{port} /f</strong><br/>"
       logger.debug "\n setting #{self.id} description to \n #{desc}"
       self.description = desc
@@ -256,11 +268,14 @@ class Vm < ActiveRecord::Base
 
 
   def get_all_rdp
+    username = self.lab_user.user.username
+    password = self.password 
+    rdp_port = self.rdp_port 
     [
-      {os: ['Windows'], program: '', rdpline: self.remote('win') },
-      {os: ['Linux', 'UNIX'], program: 'xfreerdp', rdpline: self.remote('xfreerdp') },
-      {os: ['Linux', 'UNIX'], program: 'rdesktop', rdpline: self.remote('rdesktop') },
-      {os: ['MacOS'], program: '', rdpline: self.remote('mac') }
+      {os: ['Windows'], program: '', rdpline: self.remote('win','', username, password, rdp_port) },
+      {os: ['Linux', 'UNIX'], program: 'xfreerdp', rdpline: self.remote('xfreerdp','', username, password, rdp_port) },
+      {os: ['Linux', 'UNIX'], program: 'rdesktop', rdpline: self.remote('rdesktop','', username, password, rdp_port) },
+      {os: ['MacOS'], program: '', rdpline: self.remote('mac','', username, password, rdp_port) }
     ]
   end
 
@@ -274,25 +289,29 @@ class Vm < ActiveRecord::Base
   end
 
   # connection informations
-  def remote(typ, resolution='')
-    if resolution!="" 
-      logger.debug "\n resolution is #{resolution}"
+  def remote(typ, resolution='', username=nil, password=nil, rdp_port=nil)
+=begin
+    unless resolution.blank?
+      logger.debug "resolution is #{resolution}"
     end
-
-    rdp_host=ITee::Application.config.rdp_host
+=end
+    rdp_host = ITee::Application.config.rdp_host
+    username = self.lab_user.user.username if username.blank?
+    password = self.password if password.blank?
+    rdp_port = self.rdp_port if rdp_port.blank?
 
     case typ
       when 'win'
-        desc = "cmdkey /generic:#{rdp_host} /user:localhost&#92;#{self.lab_user.user.username} /pass:#{self.password}&amp;&amp;"
-        desc += "mstsc.exe /v:#{rdp_host}:#{self.rdp_port} /f"
+        desc = "cmdkey /generic:#{rdp_host} /user:localhost&#92;#{username} /pass:#{password}&amp;&amp;"
+        desc += "mstsc.exe /v:#{rdp_host}:#{rdp_port} /f"
       when 'rdesktop'
-        desc ="rdesktop  -u#{self.lab_user.user.username} -p#{self.password} -N -a16 #{rdp_host}:#{self.rdp_port}"
+        desc ="rdesktop  -u#{username} -p#{password} -N -a16 #{rdp_host}:#{rdp_port}"
       when 'xfreerdp'
-        desc ="xfreerdp  --plugin cliprdr -g 90% -u #{self.lab_user.user.username} -p #{self.password} #{rdp_host}:#{self.rdp_port}"
+        desc ="xfreerdp  --plugin cliprdr -g 90% -u #{username} -p #{password} #{rdp_host}:#{rdp_port}"
       when 'mac'
-        desc ="open rdp://#{self.lab_user.user.username}:#{self.password}@#{rdp_host}:#{self.rdp_port}"
+        desc ="open rdp://#{username}:#{password}@#{rdp_host}:#{rdp_port}"
       else
-        desc ="rdesktop  -u#{self.lab_user.user.username} -p#{self.psassword} -N -a16 #{rdp_host}:#{self.rdp_port}"
+        desc ="rdesktop  -u#{username} -p#{password} -N -a16 #{rdp_host}:#{rdp_port}"
     end
 
   end
