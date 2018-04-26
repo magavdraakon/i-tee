@@ -394,11 +394,14 @@ class LabsController < ApplicationController
     @complete=[]
     @not_started=[]
     #categorize the labs, order: running, not started, ended
-    labusers=LabUser.order("#{LabUser.connection.quote_column_name 'end'} desc, #{LabUser.connection.quote_column_name 'start'} desc").where('user_id=?', user.id)
+    labusers = LabUser.order("#{LabUser.connection.quote_column_name 'end'} desc, #{LabUser.connection.quote_column_name 'start'} desc").where('user_id=?', user.id).map{|u|u}
+    lab_ids = labusers.map {|lu| lu[:lab_id]}.flatten.uniq
+    labs = Lab.find_all_by_id(lab_ids).map{|l|l}
     labusers.each do |u|
-      @labs<<u.lab        
-      @started<<u.lab  if u.start && !u.end 
-      @complete<<u.lab  if u.start && u.end 
+      ll = labs.select {|l| l.id == u.lab_id}.first 
+      @labs << ll       
+      @started << ll  if u.start && !u.end 
+      @complete << ll  if u.start && u.end 
     end 
     @not_started=@labs-@started-@complete
   end

@@ -65,7 +65,7 @@
       <%= 'There are no machines allocated for this lab' if @lab_user.vms.count==0 %>
       <% @lab_user.vms_view.each do |vm| %>
         <%
-          vminfo = vm.vm_info
+          vminfo = vm.vm_info || {'VMState': 'stopped', 'vrdeport': 0}
           state = vm.state(vminfo) 
           allow_remote = vm.lab_vmt.allow_remote
           allow_restart = vm.lab_vmt.allow_restart
