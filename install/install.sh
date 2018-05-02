@@ -346,13 +346,11 @@ echo "$PHPVIRTUALBOX_ADMIN_PASSWORD" | htpasswd -ci /etc/nginx/htpasswd  admin
 
 PHPVIRTUALBOX_ADMIN_HASH=$(echo -n $PHPVIRTUALBOX_ADMIN_PASSWORD|sha512sum|cut -f1 -d' ')
 su - vbox -c"vboxmanage setextradata global phpvb/users/admin/pass $PHPVIRTUALBOX_ADMIN_HASH"
+su - vbox -c"vboxmanage setextradata global phpvb/users/admin/admin 1"
 fi
 
 vboxmanage hostonlyif create
 vboxmanage hostonlyif ipconfig vboxnet0 --ip 172.18.0.1
-
-
-
 
 # Filling I-Tee database
 
