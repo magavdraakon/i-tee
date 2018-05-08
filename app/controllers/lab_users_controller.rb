@@ -194,12 +194,16 @@ class LabUsersController < ApplicationController
       @lab=Lab.first
       redirect_to(add_users_path) if params[:id]!=nil
     end
-    session[:lab_id]=@lab.id # remember for next time
-    #users already in the particular lab
-    @users_in=[]
-    @lab.lab_users.each do |u|
-      @users_in<<u.user
-    end
+    begin
+      session[:lab_id]=@lab.id # remember for next time
+      #users already in the particular lab
+      @users_in=[]
+      @lab.lab_users.each do |u|
+        @users_in<<u.user
+      end
+    rescue StandardError
+      redirect_to users_path, notice: "No labs are added to I-Tee, therefore this action is not available."
+    end 
   end
   
   def import
