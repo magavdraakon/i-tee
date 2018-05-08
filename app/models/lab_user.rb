@@ -3,7 +3,9 @@ class LabUser < ActiveRecord::Base
   belongs_to :lab
   has_many :vms
   has_many :labuser_connections, :dependent => :destroy
-  
+
+  belongs_to :coupon
+  attr_protected :retention_time
   validates_presence_of :user_id, :lab_id
   validates :uuid, :allow_nil => false, :allow_blank => false, :uniqueness => { :case_sensitive => false }
   validates :token, :allow_nil => false, :allow_blank => false, :uniqueness => { :case_sensitive => false }

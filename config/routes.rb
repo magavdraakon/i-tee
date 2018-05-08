@@ -155,6 +155,10 @@ ITee::Application.routes.draw do
   match 'user_labs/:username', :to=>'labs#user_labs'
   match 'user_labs/:username/:id', :to => 'labs#user_labs'
 
+  # Covers redeem code functionality
+  resources :redeems, only: [:new, :create]
+  match 'redeem', :to => 'redeems#new', via: [:get], as: "redeem_coupon"
+  resources :coupons
   
   match 'not_found', :to=>"home#error_404"
 

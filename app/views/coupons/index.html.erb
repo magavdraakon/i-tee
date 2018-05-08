@@ -1,0 +1,67 @@
+<h3>Redeem codes created by you | <%= link_to "Add new coupon", new_coupon_path %></h3>
+<div id="index_t">
+  <% if @own_coupons.any? %>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Redeem code</th>
+        <th>Lab access</th>
+        <th>Valid from</th>
+        <th>Valid until</th>
+        <th>Retention time (days)</th>
+        <th></th>
+      </tr>
+    </thead>
+    <% @own_coupons.each do |coupon| %>
+      <tr>
+        <td><%= coupon.name %></td>
+        <td><%= coupon.redeemcode %></td>
+        <td><%= coupon.lab.name %></td>
+        <td><%= coupon.valid_from.to_formatted_s(:long) %></td>
+        <td><%= coupon.valid_through.to_formatted_s(:long) %></td>
+        <td><%= coupon.retention %></td>
+        <td class="narrow">
+          <%= link_to 'Edit', edit_coupon_path(coupon),:class=> 'edit-button button' %>
+          <%= link_to 'Destroy', coupon, :confirm => 'Are you sure?', :method => :delete ,:class=> 'delete-button button'%></td>
+      </tr>
+    <% end %>
+  </table>
+   <%= will_paginate @own_coupons %><div class="page_info"><%= page_entries_info @own_coupons %></div>
+   <% else %>
+   <p>No coupons created by you. You might want to create your first one!</p>
+   <% end %>
+   <h3>All redeem codes</h3>
+  <% if @coupons.any? %>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Redeem code</th>
+        <th>Lab access</th>
+        <th>Valid from</th>
+        <th>Valid until</th>
+        <th>Retention time (days)</th>
+        <th></th>
+      </tr>
+    </thead>
+    <% @coupons.each do |coupon| %>
+      <tr>
+        <td><%= coupon.name %></td>
+        <td><%= coupon.redeemcode %></td>
+        <td><%= coupon.lab.name %></td>
+        <td><%= coupon.valid_from.to_formatted_s(:long) %></td>
+        <td><%= coupon.valid_through.to_formatted_s(:long) %></td>
+        <td><%= coupon.retention %></td>
+        <td class="narrow">
+          <%= link_to 'Edit', edit_coupon_path(coupon),:class=> 'edit-button button' %>
+          <%= link_to 'Destroy', coupon, :confirm => 'Are you sure?', :method => :delete ,:class=> 'delete-button button'%></td>
+      </tr>
+    <% end %>
+  </table>
+   <%= will_paginate @coupons %><div class="page_info"><%= page_entries_info @coupons %></div>
+   <% else %>
+   <p>No coupons added to system. You might want to create your first one!</p>
+   <% end %>
+</div>
+<br/>
