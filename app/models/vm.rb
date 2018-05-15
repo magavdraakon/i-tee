@@ -181,12 +181,13 @@ class Vm < ActiveRecord::Base
         logger.debug "Setting network: slot: #{nw.slot}; type: #{nw.network.net_type}; name: #{network_name}"
         Virtualbox.set_network(name, nw.slot, nw.network.net_type, network_name)
         # add to a list of network-ip pairs if ip is set
-        ips << "#{network_name}:#{nw.ip}" unless nw.ip.blank?
+        ips << "#{nw.slot}=#{nw.ip}" unless nw.ip.blank?
       end
       # add list of pre-determined ips if there are any
       unless ips.blank?
-        logger.debug "Setting ip addresses: #{ips.join(';')}"
-        Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSKU", ips.join(';'))
+        joined = ips.join('|')
+        logger.debug "Setting ip addresses: #{joined}"
+        Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSKU", joined)
       else
         Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSKU", "System SKU")
       end
