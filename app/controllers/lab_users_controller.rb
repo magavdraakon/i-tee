@@ -185,20 +185,24 @@ class LabUsersController < ApplicationController
   def add_users
     @lab_users = LabUser.all
     @lab_user = LabUser.new 
-    # find lab by url id
-    @lab=Lab.find_by_id(params[:id]) if params[:id]
-    # if there is no url id, but a session lab_id exists, use that to find the lab
-    @lab=Lab.find_by_id(session[:lab_id]) if session[:lab_id] and !params[:id]
-    #if no lab is found, take the first
-    if @lab==nil
-      @lab=Lab.first
-      redirect_to(add_users_path) if params[:id]!=nil
+    @lab = false
+    if params[:id] # find lab by url id
+      @lab = Lab.where(id: params[:id]).first
+    elsif session[:lab_id] # if there is no url id, but a session lab_id exists, use that to find the lab
+      @lab = Lab.where(id: session[:lab_id]).first 
     end
-    session[:lab_id]=@lab.id # remember for next time
-    #users already in the particular lab
-    @users_in=[]
-    @lab.lab_users.each do |u|
-      @users_in<<u.user
+    #if no lab is found, take the first
+    @lab = Lab.first unless @lab
+    # if there are no labs - redirect away
+    if @lab.blank?
+      redirect_to users_path, notice: "No labs are added to I-Tee, therefore this action is not available." 
+    else
+      session[:lab_id]=@lab.id # remember for next time
+      #users already in the particular lab
+      @users_in=[]
+      @lab.lab_users.each do |u|
+        @users_in<<u.user
+      end
     end
   end
   
