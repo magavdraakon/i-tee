@@ -1,0 +1,9 @@
+* * * * * cd /var/www/i-tee/ && /usr/local/bundle/bin/rake RAILS_ENV=production expired_labs:search_and_destroy > /var/www/i-tee/cron.log 2>&1
+
+crontab -l | { cat; echo "* * * * * source /root/env; bash -c 'env >> /root/env.log && cd /var/www/i-tee/ && rake RAILS_ENV=production expired_labs:search_and_destroy > /var/www/i-tee/cron.log 2>&1'"; } | crontab -
+
+
+su - root -c 'cd /var/www/i-tee/ && /usr/local/bundle/bin/rake RAILS_ENV=production expired_labs:search_and_destroy > /var/www/i-tee/cron.log 2>&1'
+
+
+bash -c 'source ~/.bash_profile; source ~/.bashrc; ./myscript.sh'

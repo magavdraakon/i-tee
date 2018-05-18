@@ -58,7 +58,11 @@
             </table>
           </div>
       <% end %>
-      <div class="course s_menu <% if @tab == 'courses' %>current_tab<% end %>"></div>
+      <div class="course s_menu <% if @tab == 'courses' %>current_tab<% end %>">
+        <!-- looks ugly, commenting out -->
+        <!-- <%= link_to_unless_current 'My labs', my_labs_path %> -->
+        <%= link_to_unless_current 'Got an access coupon?', redeem_coupon_path %>
+      </div>
       <div class="vms s_menu <% if @tab == 'vms' %>current_tab<% end %>">
         <table>
           <tr><td>
@@ -91,6 +95,7 @@
                 </td>
                 <td>
                   <%= link_to_unless_current('Assistants', assistants_path) %><br/>
+                  <%= link_to_unless_current('Redeem codes', coupons_path) %><br/>
                 </td>
                 <td>
                   <%= link_to_unless_current('Badges', badges_path) %><br/>

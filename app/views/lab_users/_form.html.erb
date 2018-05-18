@@ -22,7 +22,14 @@
   <div class="field">
     <%= f.label :result %><br />
     <%= f.text_field :result %>
-  </div><!--
+  </div>
+  <% unless @lab_user.retention_time.blank? %>
+  <div class="field">
+    <%= f.label :retention_time, "Retention time" %><br />
+    <%= f.datetime_select :retention_time, :start_year => Date.current.year, order: [:day, :month, :year], :end_year => 2050 %>
+  </div>
+  <% end %>
+  <!--
   <div class="field">
     <%# f.label :start %><br />
     <%# f.datetime_select :start %>
