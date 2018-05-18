@@ -110,5 +110,24 @@ ITee::Application.configure do
     config.consider_all_requests_local       = false
     config.action_controller.perform_caching = true
 
+
+
+     
+  config.serve_static_assets = true
+  #config.public_file_server.enabled = true
+
+
+  # Compress JavaScripts and CSS
+  config.assets.compress = true
+  
+  # Choose the compressors to use
+  # config.assets.js_compressor  = :uglifier
+  # config.assets.css_compressor = :yui
+  
+  config.assets.compile = true
+  
+  # Generate digests for assets URLs.
+  config.assets.digest = true
+
   end
 end

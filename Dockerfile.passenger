@@ -1,24 +1,19 @@
 FROM ruby:2.2.5
 MAINTAINER margus.ernits@rangeforce.com
 
-RUN apt-get update -qq && \
-    apt-get install -y --no-install-recommends build-essential sudo openssh-client libyaml-0-2 libgmp-dev libmysqlclient-dev libsqlite3-dev bundler nodejs \
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends sudo openssh-client libyaml-0-2 libgmp-dev libmysqlclient-dev libsqlite3-dev bundler nodejs \
     && apt-get clean autoclean \
     && apt-get autoremove -y \
     && rm -rf  /var/lib/apt  /var/lib/dpkg  /var/lib/cache /var/lib/log \
     && mkdir -p /var/run/sshd /var/labs/run
 
-WORKDIR /var/www/i-tee
 
-# Setting env up
-ENV RAILS_ENV='production'
-ENV RAKE_ENV='production' 
-# Adding gems
+WORKDIR /var/www/i-tee
+ENV RAILS_ENV=production
 COPY /Gemfile /var/www/i-tee/Gemfile
 COPY /Gemfile.lock /var/www/i-tee/Gemfile.lock
-
-RUN bundle install --jobs 20 --retry 5 --without development test 
-# Adding project files
+RUN gem install bundler && bundle install --jobs 20 --retry 5
 
 COPY /Rakefile /var/www/i-tee/Rakefile
 COPY /config.ru /var/www/i-tee/config.ru
@@ -37,7 +32,6 @@ COPY /docker/application.rb /var/www/i-tee/config/application.rb
 COPY /docker/devise.rb /var/www/i-tee/config/initializers/devise.rb
 COPY /docker/production.rb /var/www/i-tee/config/environments/production.rb
 
-#RUN bundle exec rake assets:precompile
 EXPOSE 80
-CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]
 
+ENTRYPOINT [ "/usr/local/bundle/bin/passenger", "start", "-p", "80", "-e", "production", "--log-file", "/dev/stderr", "--min-instances", "10", "--max-pool-size", "30"]
