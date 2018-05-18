@@ -3,7 +3,10 @@ class LabUser < ActiveRecord::Base
   belongs_to :lab
   has_many :vms
   has_many :labuser_connections, :dependent => :destroy
-  
+  # Keep track whether lab was granted by coupon or not
+  belongs_to :coupon
+  #attr :retention_time
+
   validates_presence_of :user_id, :lab_id
   validates :uuid, :allow_nil => false, :allow_blank => false, :uniqueness => { :case_sensitive => false }
   validates :token, :allow_nil => false, :allow_blank => false, :uniqueness => { :case_sensitive => false }
@@ -73,7 +76,8 @@ class LabUser < ActiveRecord::Base
   end
 
 # create needed Vm-s based on the lab templates and set start to now
-  def start_lab
+  def start_lab(set_retention = true)
+    logger.debug "Update retention is set to #{set_retention}"
     logger.debug "Lab start called for #{self.id}"
   	if self.start.blank? && self.end.blank?  # can only start labs that are not started or finished
       result = Check.has_free_resources
@@ -112,10 +116,30 @@ class LabUser < ActiveRecord::Base
             end
           end
         end
+
+        # If redeem code was used to assign lab, we need to set retention timestamp
+        if set_retention && self.coupon.present?
+          begin
+          	if self.coupon.still_valid?
+          		retention = self.coupon.retention
+          		self.retention_time = Time.now + (retention.to_int).minutes
+          	else
+          		# Remove lab the next minute
+          		# TODO: New rails job
+          		self.retention_time = Time.now
+          		return {success: false, message: "This lab is no longer available. Coupon usage timeframe is over."}
+          	end
+          rescue Exception => e
+            logger.error "Error when assigning retention time to Labuser #{self.id}: #{e}"
+            return {success: false, message: "Unable to set retention time for lab."}
+          end
+        end
+
       	self.save
         logger.debug "\n all machines\n"
         logger.debug self.vms.as_json
         logger.debug "\n -end- \n"
+
   			if self.lab.startAll
   				self.start_all_vms
   			end
@@ -187,7 +211,7 @@ class LabUser < ActiveRecord::Base
     # destroy old ping info
     self.labuser_connections.destroy_all
     self.save
-    self.start_lab
+    self.start_lab(false) # TODO: Reset retention for practice labs?
   end
 
 

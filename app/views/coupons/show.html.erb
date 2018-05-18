@@ -1,0 +1,19 @@
+<p><b>Name:</b>
+  <%= @coupon.name %>
+</p>
+<p><b>Coupon code:</b>
+  <%= @coupon.redeemcode %>
+</p>
+<p><b>Assigned lab:</b>
+  <%= @coupon.lab.name %>
+</p>
+<p><b>Retention time:</b>
+  <%= @coupon.retention %> days
+</p>
+<p><b>Valid from:</b>
+  <%= @coupon.valid_from.to_formatted_s(:long) %>
+</p>
+<p><b>Valid until:</b>
+  <%= @coupon.valid_through.to_formatted_s(:long) %>
+</p>
+<%= link_to 'Edit redeem code preferences', edit_coupon_path(@coupon), :class=>'button edit-button' if @admin%>

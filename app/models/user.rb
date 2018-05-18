@@ -11,6 +11,7 @@ class User < ActiveRecord::Base
   has_many :lab_users#, :dependent => :destroy
   before_destroy :del_labs # vms are deleted trough lab user
   before_save :nilify_email
+  has_many :redeems
  # has_many :user_badges, :dependent => :destroy
 
   validates_format_of :username, :with => /^[[:alnum:]]+\.?[[:alnum:]_]+[[:alnum:]]?$/ , :message => 'can only be alphanumeric with underscores, contain single periods and no spaces'

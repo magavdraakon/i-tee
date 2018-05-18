@@ -1,0 +1,62 @@
+<script>
+  function generateCoupon() {
+    var randomString = function(length) {
+      var text = "";
+      var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+      
+      for(var i = 0; i < length; i++) {
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+      }
+      
+      return text;
+    }
+
+    // random string length
+    var random = randomString(6);
+    
+    // insert random string to the field
+    var elem = document.getElementById("coupon_redeemcode").value = random;
+    
+  };
+</script>
+<%= form_for(@coupon) do |f| %>
+  <% if @coupon.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@coupon.errors.count, 'error') %> prohibited this coupon from being saved:</h2>
+      <% @coupon.errors.full_messages.each do |msg| %>
+        <%= msg %><br/>
+      <% end %>
+    </div>
+  <% end %>
+
+<div class="field">
+    <%= f.label :name, "Name for Redeem code" %><br />
+    <%= f.text_field :name %>
+  </div>
+  <div class="field">
+    <%= f.label :redeemcode, "Redeem code" %><br />
+    <%= f.text_field :redeemcode %> <a href="#" onclick='javascript:generateCoupon();'>Generate random</a>
+  </div>
+  <div class="field">
+    <%= f.label :retention, "Retention time in minutes" %><br />
+    <%= f.number_field :retention %>
+  </div>
+
+  <div class="field">
+    <%= f.label :valid_from, "Redeemable from date" %><br />
+    <%= f.datetime_select :valid_from, :start_year => Date.current.year, order: [:day, :month, :year], :end_year => 2050 %>
+  </div>
+
+  <div class="field">
+    <%= f.label :valid_through, "Redeemable until date" %><br />
+    <%= f.datetime_select :valid_through, :start_year => Date.current.year, order: [:day, :month, :year], :end_year => 2050 %>
+  </div>
+  <div class="field">
+    <%= f.label :lab_id, "Lab to give access to" %><br />
+    <%= f.select(:lab_id,  options_from_collection_for_select(Lab.all, 'id', 'name', @coupon.lab_id), {include_blank: "select lab"}) %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>
+
