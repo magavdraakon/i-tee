@@ -19,7 +19,7 @@ class User < ActiveRecord::Base
   # Populate user model with name attribute
   def ldap_before_save
     begin
-      self.name = Devise::LDAP::Adapter.get_ldap_param(self.username,"name").first
+      self.name = Devise::LDAP::Adapter.get_ldap_param(self.username,"displayname").first
     rescue NoMethodError
       #ignored intentionally
     end
