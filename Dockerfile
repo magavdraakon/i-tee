@@ -32,7 +32,8 @@ COPY /docker/check-resources /var/www/i-tee/utils/check-resources
 COPY /docker/application.rb /var/www/i-tee/config/application.rb
 COPY /docker/devise.rb /var/www/i-tee/config/initializers/devise.rb
 COPY /docker/production.rb /var/www/i-tee/config/environments/production.rb
-
+RUN cp /usr/share/zoneinfo/Europe/Tallinn /etc/localtime
+RUN echo "Europe/Tallinn" > /etc/timezone
 RUN echo "* * * * * . /etc/environment && bash -c 'cd /var/www/i-tee/ && rake RAILS_ENV=production expired_labs:search_and_destroy > /var/www/i-tee/cron.log 2>&1'" | crontab -
 
 EXPOSE 80
