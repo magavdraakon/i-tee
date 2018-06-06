@@ -3,21 +3,10 @@ class LabsController < ApplicationController
   before_filter :authorise_as_admin, :except => [:user_labs, :start_lab, :end_lab, :restart_lab]
 
   #redirect to index view when trying to see unexisting things
-  before_filter :get_lab, :only=>[:show, :edit, :update]
+  before_filter :set_lab, :only=>[:show, :edit, :update, :destroy]
   # set the menu tab to show the user
   before_filter :course_tab, :only=>[:user_labs]
   before_filter :admin_tab, :except=>[:user_labs]
-    
-  
-  def get_lab
-    @lab = Lab.where('id=?',params[:id]).first
-    unless @lab 
-      respond_to do |format|
-         format.html  {redirect_to my_labs_path, :notice=>'Invalid lab id.' }
-         format.json  { render :json => {:success=>false, :message=>"Can't find lab"} }
-      end
-    end
-  end
   
   # GET /labs
   # GET /labs.xml
@@ -77,7 +66,7 @@ class LabsController < ApplicationController
   # POST /labs
   # POST /labs.xml
   def create
-    @lab = Lab.new(params[:lab])
+    @lab = Lab.new(lab_params)
     @all_users=false
     @user_count=0
     respond_to do |format|
@@ -103,7 +92,7 @@ class LabsController < ApplicationController
       @user_count =0
       @user_count = @lab.lab_users.count  
       @all_users=true if User.all.count==@user_count
-      if @lab.update_attributes(params[:lab])
+      if @lab.update_attributes(lab_params)
        
         @lab.add_all_users  if params[:add].to_s==1.to_s    
         @lab.remove_all_users if params[:remove].to_s==1.to_s 
@@ -120,7 +109,6 @@ class LabsController < ApplicationController
   # DELETE /labs/1
   # DELETE /labs/1.xml
   def destroy
-    @lab = Lab.where('id=?',params[:id]).first
     respond_to do |format|
         if @lab
           @lab.destroy
@@ -396,7 +384,7 @@ class LabsController < ApplicationController
     #categorize the labs, order: running, not started, ended
     labusers = LabUser.order("#{LabUser.connection.quote_column_name 'end'} desc, #{LabUser.connection.quote_column_name 'start'} desc").where('user_id=?', user.id).map{|u|u}
     lab_ids = labusers.map {|lu| lu[:lab_id]}.flatten.uniq
-    labs = Lab.find_all_by_id(lab_ids).map{|l|l}
+    labs = Lab.where(id: lab_ids).map{|l|l}
     labusers.each do |u|
       ll = labs.select {|l| l.id == u.lab_id}.first 
       @labs << ll       
@@ -416,5 +404,20 @@ class LabsController < ApplicationController
         @user = User.where('id = ?',params[:user_id]).first
       end
     end
+  end
+
+
+  def set_lab
+    @lab = Lab.where(id: params[:id]).first
+    unless @lab
+      redirect_to(labs_path,:notice=>'invalid id.')
+    end
+  end
+
+  def lab_params
+    params.require(:lab).permit(:id, :name, :description, :short_description, :host_id, :restartable, :endable, :startAll, :vms_by_one, :poll_freq, :end_timeout, :power_timeout, :lab_hash, :lab_token, :assistant_id, :ping_low, :ping_mid, :ping_high, 
+      lab_vmts_attributes: [:id, :name, :lab_id, :vmt_id, :allow_remote, :nickname, :position, :g_type, :primary, :allow_restart, :expose_uuid, :enable_rdp, :_destroy, lab_vmt_networks_attributes: [:id, :network_id, :slot, :lab_vmt_id, :promiscuous, :reinit_mac,:ip, :_destroy]
+        ]
+      )
   end
 end

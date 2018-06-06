@@ -3,22 +3,14 @@ class MaterialsController < ApplicationController
   #restricted to admins, users can only view the material
   before_filter :authorise_as_admin, :except => [:show]
   #redirect to index view when trying to see unexisting things
-  before_filter :save_from_nil, :only=>[:show, :edit]
+  before_filter :set_material, :only=>[:show, :edit, :update, :destroy]
   before_filter :admin_tab, :except=>[:show]
   
-  def save_from_nil
-    @material = Material.find_by_id(params[:id])
-    if @material==nil 
-      redirect_to(materials_path,:notice=>'invalid id.')
-    end
-  end
-
   # GET /materials
   # GET /materials.xml
   def index
     set_order_by
     @materials = Material.order(@order).paginate(:page=>params[:page], :per_page=>@per_page)
-
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @materials }
@@ -28,8 +20,6 @@ class MaterialsController < ApplicationController
   # GET /materials/1
   # GET /materials/1.xml
   def show
-    #@material = Material.find(params[:id])
-
     respond_to do |format|
       format.html # show.html.erb
       format.xml  { render :xml => @material }
@@ -40,7 +30,6 @@ class MaterialsController < ApplicationController
   # GET /materials/new.xml
   def new
     @material = Material.new
-
     respond_to do |format|
       format.html # new.html.erb
       format.xml  { render :xml => @material }
@@ -49,13 +38,12 @@ class MaterialsController < ApplicationController
 
   # GET /materials/1/edit
   def edit
-    #@material = Material.find(params[:id])
   end
 
   # POST /materials
   # POST /materials.xml
   def create
-    @material = Material.new(params[:material])
+    @material = Material.new(material_params)
     respond_to do |format|
       if @material.save
         format.html { redirect_to(@material, :notice => 'Material was successfully created.') }
@@ -66,15 +54,12 @@ class MaterialsController < ApplicationController
       end
     end
   end
-
   
   # PUT /materials/1
   # PUT /materials/1.xml
   def update
-    @material = Material.find(params[:id])
-
     respond_to do |format|
-      if @material.update_attributes(params[:material])
+      if @material.update_attributes(material_params)
         format.html { redirect_to(@material, :notice => 'Material was successfully updated.') }
         format.xml  { head :ok }
       else
@@ -87,12 +72,23 @@ class MaterialsController < ApplicationController
   # DELETE /materials/1
   # DELETE /materials/1.xml
   def destroy
-    @material = Material.find(params[:id])
     @material.destroy
-
     respond_to do |format|
       format.html { redirect_to(materials_url) }
       format.xml  { head :ok }
     end
+  end
+
+
+  private # -------------------------------------------------------
+  def set_material
+    @material = Material.where(id: params[:id]).first
+    unless @material
+      redirect_to(materials_path,:notice=>'invalid id.')
+    end
+  end
+
+  def material_params
+    params.require(:material).permit(:id, :name, :source)
   end
 end

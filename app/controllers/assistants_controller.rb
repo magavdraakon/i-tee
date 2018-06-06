@@ -23,13 +23,13 @@ class AssistantsController < ApplicationController
   end
 
   def create
-    @assistant = Assistant.new(params[:assistant])
+    @assistant = Assistant.new(assistant_params)
     @assistant.save
     respond_with(@assistant)
   end
 
   def update
-    @assistant.update_attributes(params[:assistant])
+    @assistant.update_attributes(assistant_params)
     respond_with(@assistant)
   end
 
@@ -38,9 +38,16 @@ class AssistantsController < ApplicationController
     respond_with(@assistant)
   end
 
-  private
+  private # -------------------------------------------------------------
 
   def set_assistant
-    @assistant = Assistant.find(params[:id])
+    @assistant = Assistant.where(id:params[:id]).first
+    unless @assistant
+      redirect_to(assistants_path,:notice=>'invalid id.')
+    end
+  end
+
+  def assistant_params
+     params.require(:assistant).permit(:id, :uri, :enabled, :name, :version)
   end
 end

@@ -2,15 +2,9 @@ class LabVmtsController < ApplicationController
   #restricted to admins
   before_filter :authorise_as_admin
   #redirect to index view when trying to see unexisting things
-  before_filter :save_from_nil, :only=>[:edit]
+  before_filter :set_lab_vmt, :only=>[:edit, :show, :update, :destroy]
   before_filter :admin_tab
-  def save_from_nil
-    @lab_vmt = LabVmt.find_by_id(params[:id])
-    if @lab_vmt==nil 
-      redirect_to(lab_vmts_path,:notice=>'invalid id.')
-    end
-  end
-  
+   
   # GET /lab_vmts
   # GET /lab_vmts.xml
   #index and new view are merged, but there is also a separate view for new 
@@ -25,24 +19,20 @@ class LabVmtsController < ApplicationController
     end
   end
   
-
-
   # GET /lab_vmts/1/edit
   def edit
-   # @lab_vmt = LabVmt.find(params[:id])
     @lab=@lab_vmt.lab
-    
   end
 
   # POST /lab_vmts
   # POST /lab_vmts.xml
   def create
-    @lab_vmt = LabVmt.new(params[:lab_vmt])
+    @lab_vmt = LabVmt.new(lab_vmt_params)
     set_order_by
     if params[:from]=='labs/show'
       # if we go to the lab, we need lab info
       @lab = Lab.find(params[:lab_vmt][:lab_id])
-      redirect_path=lab_path(@lab.id)
+      redirect_path = lab_path(@lab.id)
     else
       # if we go to the list, we need the list items.
       @lab_vmts = LabVmt.order(@order)
@@ -64,10 +54,8 @@ class LabVmtsController < ApplicationController
   # PUT /lab_vmts/1
   # PUT /lab_vmts/1.xml
   def update
-    @lab_vmt = LabVmt.find(params[:id])
-
     respond_to do |format|
-      if @lab_vmt.update_attributes(params[:lab_vmt])
+      if @lab_vmt.update_attributes(lab_vmt_params)
         format.html { redirect_to(lab_vmts_url, :notice => 'Lab vmt was successfully updated.') }
         format.xml  { head :ok }
       else
@@ -80,12 +68,22 @@ class LabVmtsController < ApplicationController
   # DELETE /lab_vmts/1
   # DELETE /lab_vmts/1.xml
   def destroy
-    @lab_vmt = LabVmt.find(params[:id])
     @lab_vmt.destroy
-
     respond_to do |format|
       format.html { redirect_to(:back) }
       format.xml  { head :ok }
     end
+  end
+
+  private # -------------------------------------------------------
+  def set_lab_vmt
+    @lab_vmt = LabVmt.where(id: params[:id]).first
+    unless @lab_vmt
+      redirect_to(lab_vmts_path,:notice=>'invalid id.')
+    end
+  end
+
+  def lab_vmt_params
+    params.require(:lab_vmt).permit(:id, :name, :lab_id, :vmt_id, :allow_remote, :nickname, :position, :g_type, :primary, :allow_restart, :expose_uuid, :enable_rdp)
   end
 end

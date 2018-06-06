@@ -2,20 +2,17 @@ class TokenAuthenticationsController < ApplicationController
    #at the moment, only allow managers to reset the tokens
   before_filter :authorise_as_manager
   before_filter :manager_tab
+  before_filter :set_user
  
-  def edit
-    @user = User.find_by_id(params[:id])
-    
+  def edit    
   end
   
   def update
     if params[:commit]=='cancel'
       redirect_to users_path
     else
-      
-	    @user = User.find(params[:id])
       @user.reset_authentication_token! if params[:reset]
-      @user.token_expires=DateTime.new( params[:user]['token_expires(1i)'].to_i,
+      @user.token_expires = DateTime.new( params[:user]['token_expires(1i)'].to_i,
                                       params[:user]['token_expires(2i)'].to_i,
                                       params[:user]['token_expires(3i)'].to_i,
                                       params[:user]['token_expires(4i)'].to_i,
@@ -32,10 +29,19 @@ class TokenAuthenticationsController < ApplicationController
     end
 	end
 	 
-	  def destroy
-	    @user = User.find_by_id(params[:id])
-	    @user.authentication_token = nil
-	    @user.save
-	    redirect_to :back
-	  end
+  def destroy
+    @user.authentication_token = nil
+    @user.save
+    redirect_to :back
+  end
+
+
+private # -------------------------------------------------------
+  def set_user
+    @user = User.where(id: params[:id]).first
+    unless @user
+      redirect_to(users_path,:notice=>'invalid id.')
+    end
+  end
+
 end

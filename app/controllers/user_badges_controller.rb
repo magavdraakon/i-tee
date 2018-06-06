@@ -1,10 +1,12 @@
 class UserBadgesController < ApplicationController
-   before_filter :admin_tab
+  before_filter :authorise_as_admin
+  before_filter :admin_tab
+  before_filter :set_user_badge, :only=>[:show, :edit, :update, :destroy]
+
   # GET /user_badges
   # GET /user_badges.json
   def index
     @user_badges = UserBadge.all
-
     respond_to do |format|
       format.html # index.html.erb
       format.json { render :json => @user_badges }
@@ -14,8 +16,6 @@ class UserBadgesController < ApplicationController
   # GET /user_badges/1
   # GET /user_badges/1.json
   def show
-    @user_badge = UserBadge.find(params[:id])
-
     respond_to do |format|
       format.html # show.html.erb
       format.json { render :json => @user_badge }
@@ -26,7 +26,6 @@ class UserBadgesController < ApplicationController
   # GET /user_badges/new.json
   def new
     @user_badge = UserBadge.new
-
     respond_to do |format|
       format.html # new.html.erb
       format.json { render :json => @user_badge }
@@ -35,14 +34,12 @@ class UserBadgesController < ApplicationController
 
   # GET /user_badges/1/edit
   def edit
-    @user_badge = UserBadge.find(params[:id])
   end
 
   # POST /user_badges
   # POST /user_badges.json
   def create
-    @user_badge = UserBadge.new(params[:user_badge])
-
+    @user_badge = UserBadge.new(user_badge_params)
     respond_to do |format|
       if @user_badge.save
         format.html { redirect_to @user_badge, :notice => 'User badge was successfully created.' }
@@ -57,10 +54,8 @@ class UserBadgesController < ApplicationController
   # PUT /user_badges/1
   # PUT /user_badges/1.json
   def update
-    @user_badge = UserBadge.find(params[:id])
-
     respond_to do |format|
-      if @user_badge.update_attributes(params[:user_badge])
+      if @user_badge.update_attributes(user_badge_params)
         format.html { redirect_to @user_badge, :notice => 'User badge was successfully updated.' }
         format.json { head :ok }
       else
@@ -73,12 +68,23 @@ class UserBadgesController < ApplicationController
   # DELETE /user_badges/1
   # DELETE /user_badges/1.json
   def destroy
-    @user_badge = UserBadge.find(params[:id])
     @user_badge.destroy
-
     respond_to do |format|
       format.html { redirect_to user_badges_url }
       format.json { head :ok }
     end
   end
+
+private # -------------------------------------------------------
+  def set_user_badge
+    @user_badge = UserBadge.where(id: params[:id]).first
+    unless @user_badge
+      redirect_to(user_badges_path,:notice=>'invalid id.')
+    end
+  end
+
+  def user_badge_params
+    params.require(:user_badge).permit(:id, :user_id, :lab_badge_id)
+  end
+
 end

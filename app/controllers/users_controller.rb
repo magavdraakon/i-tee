@@ -2,7 +2,8 @@ class UsersController < ApplicationController
   before_filter :authorise_as_manager, :except=>['show']
   before_filter :manager_tab, :except=>['show']
   before_filter :user_tab, :only=>['show']
-  
+  before_filter :set_user, :only=>[:show, :edit, :update, :destroy]
+
   def index
     set_order_by
     #@users= User.find_by_sql("select id, username, last_sign_in_at, ldap, email, last_sign_in_ip from users")
@@ -20,12 +21,9 @@ class UsersController < ApplicationController
   end
   
   def show
-    @user=User.find(params[:id])
-
   end
 
   def edit
-    @user=User.find(params[:id])
   end
   
   def new
@@ -33,14 +31,14 @@ class UsersController < ApplicationController
   end
   
   def create
-    user = params[:user] ? params[:user] : params[:new_user]
-    @user = User.new(user)
-    @user.password='randomness' unless user[:password]
-    @user.ldap=false
-    @user.ldap=true if params[:ldap_user]=='yes'
+    params[:user] = (params[:user] ? params[:user] : params[:new_user])
+    @user = User.new(user_params)
+    @user.password = 'randomness' unless user[:password]
+    @user.ldap = false
+    @user.ldap = true if params[:ldap_user]=='yes'
     respond_to do |format|
       if @user.save
-        if user[:token_expires] # if time is sent, generate new token
+        if params[:user][:token_expires] # if time is sent, generate new token
           @user.reset_authentication_token!
         end
         if params[:token]
@@ -63,25 +61,24 @@ class UsersController < ApplicationController
   end
   
   def update
-    user = params[:user] ? params[:user] : params[:new_user]
-    @user = User.where('id=?', params[:id]).first
+    params[:user] = (params[:user] ? params[:user] : params[:new_user])
     respond_to do |format| 
       if @user
-        @user.ldap=false
-        @user.ldap=true if params[:ldap_user]=='yes'
-        if user[:token_expires] # if time is sent, generate new token
+        @user.ldap = false
+        @user.ldap = true if params[:ldap_user]=='yes'
+        if params[:user][:token_expires] # if time is sent, generate new token
           @user.reset_authentication_token!
         end
         if params[:generate_token]=='yes'
           @user.reset_authentication_token!
-          @user.token_expires=DateTime.new( params[:token]['expires(1i)'].to_i,
+          @user.token_expires = DateTime.new( params[:token]['expires(1i)'].to_i,
                                             params[:token]['expires(2i)'].to_i,
                                             params[:token]['expires(3i)'].to_i,
                                             params[:token]['expires(4i)'].to_i,
                                             params[:token]['expires(5i)'].to_i)
         end
 
-        if @user.update_attributes(user)
+        if @user.update_attributes(user_params)
           format.html { redirect_to(users_path, :notice => 'User was successfully updated.') }
           format.json  { render :json=> { :success=> true}.merge(@user.as_json)}
         else
@@ -96,7 +93,6 @@ class UsersController < ApplicationController
   end
   
   def destroy
-    @user = User.where('id=?', params[:id]).first
     respond_to do |format|
       if @user
         logger.debug "\n user removal START \n"
@@ -112,4 +108,15 @@ class UsersController < ApplicationController
     end
   end
 
+private # -------------------------------------------------------
+  def set_user
+    @user = User.where(id: params[:id]).first
+    unless @user
+      redirect_to(users_path,:notice=>'invalid id.')
+    end
+  end
+
+  def user_params
+    params.require(:user).permit(:id, :email, :password, :username, :name, :authentication_token, :token_expires, :ldap, :role)
+  end
 end

@@ -3,11 +3,11 @@
 <%alphabet=[]%>
 <%('a'..'z').each do |l|%>
   <%alphabet<<l%>
-  <a href="#" onclick="show_names('<%=l%>');"><%=l.upcase%></a>
+  <a href="#" onclick="show_names(event, '<%=l%>');"><%=l.upcase%></a>
 <%end%>
-<a href="#" onclick="show_names('')">other</a>
-<a href="#" onclick="show_names('*')">all</a>
-<a href="#" onclick="show_names('checked');">selected</a>
+<a href="#" onclick="show_names(event, '')">other</a>
+<a href="#" onclick="show_names(event, '*')">all</a>
+<a href="#" onclick="show_names(event, 'checked');">selected</a>
 <p>
 <span class="button delete-button" onclick="manage_checked(false, 'Are you sure you want to unselect all users?');">Unselect all</span>
   <span class="button add-button" onclick="manage_checked(true ,'Are you sure you want to select all users?');">Select all</span>

@@ -101,7 +101,7 @@ class ApplicationController < ActionController::Base
       dir = 'ASC'
       @dir = 'desc'
     end
-    @order = params[:sort_by]!=nil ? "#{params[:sort_by]} #{dir}" : ''
+    @order = (!params[:sort_by].blank? ? "#{params[:sort_by]} #{dir}" : '')
   end
       
   def home_tab

@@ -1,10 +1,13 @@
 class LabBadgesController < ApplicationController
-   before_filter :admin_tab
+  #restricted to admins 
+  before_filter :authorise_as_admin
+  before_filter :admin_tab
+  before_filter :set_badge, only: [:show, :edit, :update, :destroy]
+
   # GET /lab_badges
   # GET /lab_badges.json
   def index
     @lab_badges = LabBadge.all
-
     respond_to do |format|
       format.html # index.html.erb
       format.json { render :json => @lab_badges }
@@ -14,8 +17,6 @@ class LabBadgesController < ApplicationController
   # GET /lab_badges/1
   # GET /lab_badges/1.json
   def show
-    @lab_badge = LabBadge.find(params[:id])
-
     respond_to do |format|
       format.html # show.html.erb
       format.json { render :json => @lab_badge }
@@ -35,13 +36,12 @@ class LabBadgesController < ApplicationController
 
   # GET /lab_badges/1/edit
   def edit
-    @lab_badge = LabBadge.find(params[:id])
   end
 
   # POST /lab_badges
   # POST /lab_badges.json
   def create
-    @lab_badge = LabBadge.new(params[:lab_badge])
+    @lab_badge = LabBadge.new(lab_badge_params)
 
     respond_to do |format|
       if @lab_badge.save
@@ -57,10 +57,8 @@ class LabBadgesController < ApplicationController
   # PUT /lab_badges/1
   # PUT /lab_badges/1.json
   def update
-    @lab_badge = LabBadge.find(params[:id])
-
     respond_to do |format|
-      if @lab_badge.update_attributes(params[:lab_badge])
+      if @lab_badge.update_attributes(lab_badge_params)
         format.html { redirect_to @lab_badge, :notice => 'Lab badge was successfully updated.' }
         format.json { head :ok }
       else
@@ -73,12 +71,23 @@ class LabBadgesController < ApplicationController
   # DELETE /lab_badges/1
   # DELETE /lab_badges/1.json
   def destroy
-    @lab_badge = LabBadge.find(params[:id])
     @lab_badge.destroy
 
     respond_to do |format|
       format.html { redirect_to lab_badges_url }
       format.json { head :ok }
     end
+  end
+
+  private # -------------------------------------------------------
+  def set_badge
+    @lab_badge = LabBadge.where(id: params[:id]).first
+    unless @lab_badge
+      redirect_to(lab_badges_path,:notice=>'invalid id.')
+    end
+  end
+
+  def lab_badge_params
+    params.require(:lab_badge).permit(:id, :lab_id, :badge_id, :name, :description)
   end
 end

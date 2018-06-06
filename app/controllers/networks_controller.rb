@@ -1,6 +1,8 @@
 class NetworksController < ApplicationController
   before_filter :authorise_as_admin
   before_filter :admin_tab
+  before_filter :set_network, :only=>[:show, :edit, :update, :destroy]
+
   # GET /networks
   # GET /networks.json
   def index
@@ -15,8 +17,6 @@ class NetworksController < ApplicationController
   # GET /networks/1
   # GET /networks/1.json
   def show
-    @network = Network.find(params[:id])
-
     respond_to do |format|
       format.html # show.html.erb
       format.json { render json: @network }
@@ -27,7 +27,6 @@ class NetworksController < ApplicationController
   # GET /networks/new.json
   def new
     @network = Network.new
-
     respond_to do |format|
       format.html # new.html.erb
       format.json { render json: @network }
@@ -36,14 +35,12 @@ class NetworksController < ApplicationController
 
   # GET /networks/1/edit
   def edit
-    @network = Network.find(params[:id])
   end
 
   # POST /networks
   # POST /networks.json
   def create
-    @network = Network.new(params[:network])
-
+    @network = Network.new(network_params)
     respond_to do |format|
       if @network.save
         format.html { redirect_to networks_path, notice: 'Network was successfully created.' }
@@ -58,10 +55,8 @@ class NetworksController < ApplicationController
   # PUT /networks/1
   # PUT /networks/1.json
   def update
-    @network = Network.find(params[:id])
-
     respond_to do |format|
-      if @network.update_attributes(params[:network])
+      if @network.update_attributes(network_params)
         format.html { redirect_to networks_path, notice: 'Network was successfully updated.' }
         format.json { head :ok }
       else
@@ -74,12 +69,22 @@ class NetworksController < ApplicationController
   # DELETE /networks/1
   # DELETE /networks/1.json
   def destroy
-    @network = Network.find(params[:id])
     @network.destroy
-
     respond_to do |format|
       format.html { redirect_to networks_url }
       format.json { head :ok }
     end
+  end
+
+private # -------------------------------------------------------
+  def set_network
+    @network = Network.where(id: params[:id]).first
+    unless @network
+      redirect_to(networks_path,:notice=>'invalid id.')
+    end
+  end
+
+  def network_params
+    params.require(:network).permit(:id, :name, :net_type)
   end
 end

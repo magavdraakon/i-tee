@@ -332,4 +332,20 @@ def create_uuid
   self.token = SecureRandom.uuid # used by client
 end
 
+def self.add_users(params)
+  lab = Lab.where(id: params[:lab_user][:lab_id]).first
+  if lab
+    User.where(id: params[:users]).each do |c|
+      l = lab.lab_users.new
+      l.user = c
+      #if there is no db row with the set parameters then create one
+      unless lab.lab_users.where(user_id: c.id).first
+        l.save
+      end
+    end
+    # destroy all extra lab_users
+    lab.lab_users.where.not(id: params[:users]).destroy_all
+  end
+end
+
 end

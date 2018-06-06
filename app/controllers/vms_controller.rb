@@ -4,55 +4,44 @@ class VmsController < ApplicationController
   
   #before_filter :authorise_as_admin, :except => [:show, :index, :init_vm, :stop_vm, :pause_vm, :resume_vm, :start_vm, :start_all]
   #redirect to index view when trying to see unexisting things
-  before_filter :save_from_nil, :only=>[:show, :edit, :start_vm, :stop_vm, :pause_vm, :resume_vm, :get_state, :get_rdp, :rdp_reset,:open_guacamole, :send_text, :send_keys ]
+  before_filter :set_vm, :only=>[:show, :edit, :update, :destroy, :start_vm, :stop_vm, :pause_vm, :resume_vm, :get_state, :get_rdp, :rdp_reset,:open_guacamole, :send_text, :send_keys ]
   before_filter :auth_as_owner, :only=>[:show, :start_vm, :stop_vm, :pause_vm, :resume_vm, :get_state, :get_rdp, :rdp_reset ,:open_guacamole, :send_text, :send_keys]       
   
   before_filter :admin_tab, :except=>[:show,:index, :vms_by_lab, :vms_by_state]
   before_filter :vm_tab, :only=>[:show,:index, :vms_by_lab, :vms_by_state]
 
   skip_before_filter :authenticate_user!, :only => [:network]
-
-  def save_from_nil
-    logger.debug 'finding vm'
-
-    @vm = Vm.find_by_id(params[:id])
-    if @vm==nil 
-      logger.debug "no such vm\n"
-      respond_to do |format|
-        format.html  {redirect_to(vms_path,:notice=>'invalid id.')}
-        format.json  { render :json => {:success=>false, :message=>"Can't find vm"} }
-      end
-    end
-  end
   
   def vms_by_lab
     @b_by='lab'
     sql=[]
-    if params[:dir]=='asc'
-      dir = 'ASC'
-      @dir = '&dir=desc'
-    else 
-      dir = 'DESC'
-      @dir = '&dir=asc'
-    end
-    order = params[:sort_by]!=nil ? " order by #{params[:sort_by]} #{dir}" : ''
-    logger.debug "ORDER #{order}"
-    if params[:admin]!=nil && @admin
-      @lab=Lab.find(params[:id]) if params[:id]# try to get the selected lab
-      @lab=Lab.first unless params[:id] # but if the parameter is not set, take the first lab
-      #@vms=Vm.find(:all, :joins=>["vms inner join lab_vmts as l on vms.lab_vmt_id=l.id"], :order=>params[:sort_by])
-      sql= Vm.find_by_sql("select vms.*, lab_vmts.lab_id from vms, lab_vmts where vms.lab_vmt_id=lab_vmts.id and lab_id=#{@lab.id} #{order}")
+    order = order_vms
+    if !params[:admin].blank? && @admin # admin user
+      @lab = Lab.find(params[:id]) if params[:id]# try to get the selected lab
+      @lab = Lab.first unless params[:id] # but if the parameter is not set, take the first lab
+      # get the vm templates in the lab
+      vmt_ids = (@lab.blank? ? [] : @lab.lab_vmts.map{|lv| lv.id }.flatten.uniq)
+      # find all machines made from the templates
+      sql = Vm.includes(:lab_user).where( lab_vmt_id: vmt_ids ).order(order)
       @tab='admin'
       @labs=Lab.all.uniq
-    else
-      if params[:id]!=nil  # try to get the selected lab
-         @lab=Lab.joins('labs inner join lab_users on lab_users.lab_id=labs.id').where('lab_id=? and user_id=?',params[:id], current_user.id).first
-      else # but if the parameter is not set, take the first lab this user has   
-         @lab=Lab.joins('labs inner join lab_users on lab_users.lab_id=labs.id').where('user_id=?', current_user.id).first
+    else # simple user
+      # find lab via labuser
+      @labusers = []
+      if params[:id].blank?
+        labuser = current_user.lab_users.first # take the first known labuser to know wich lab to display
+        @labusers = current_user.lab_users.where(lab_id: labuser.lab_id) if labuser
+      else
+        @labusers = current_user.lab_users.where(lab_id: params[:id]) 
       end
-      @labs=Lab.joins('labs inner join lab_users on lab_users.lab_id=labs.id').where('user_id=?', current_user.id).uniq
+      labuser_ids = @labusers.map{|lu| lu.id }.flatten.uniq
+      # find all machines for all attempts in this lab
+      sql = Vm.includes(:lab_user).where( lab_user_id: labuser_ids ).order(order)
+      # get all user lab ids
+      lab_ids = current_user.lab_users.map{|lu| lu.lab_id}.flatten.uniq 
+      @labs = Lab.where(id: lab_ids)
     end
-    @vms= sql.paginate( :page => params[:page], :per_page => @per_page)
+    @vms = sql.paginate( :page => params[:page], :per_page => @per_page) 
     render :action=>'index'
   end
   
@@ -62,21 +51,14 @@ class VmsController < ApplicationController
     @state=params[:state] ? params[:state] : 'running'
     @state='stopped' if @state=='uninitialized'
 
-    # TODO! turn it into DRY
-    if params[:dir]=='asc'
-      dir = 'ASC'
-      @dir = '&dir=desc'
-    else 
-      dir = 'DESC'
-      @dir = '&dir=asc'
-    end
-    order = params[:sort_by] ? " order by #{params[:sort_by]} #{dir}" : ''
+    order = order_vms
   
-    if params[:admin]!=nil && @admin
+    if params[:admin]!=nil && @admin # admin user
       @tab='admin'
-      vms=Vm.find_by_sql("SELECT vms.*, lab_vmts.lab_id FROM vms INNER JOIN lab_vmts ON vms.lab_vmt_id=lab_vmts.id #{order}")
-    else
-      vms=Vm.find_by_sql("SELECT vms.*, lab_vmts.lab_id FROM vms INNER JOIN lab_vmts ON vms.lab_vmt_id=lab_vmts.id INNER JOIN lab_users ON vms.lab_user_id=lab_users.id INNER JOIN users ON lab_users.user_id=users.id WHERE lab_users.user_id=#{current_user.id} #{order}") 
+      vms = Vm.includes(:lab_user).order(order)
+    else # simple user
+      labuser_ids = current_user.lab_users.map{|lu| lu.id }.flatten.uniq
+      vms = Vm.includes(:lab_user).where( lab_user_id: labuser_ids ).order(order)
     end
     @vm=[]
     vms.each do |vm|
@@ -89,22 +71,15 @@ class VmsController < ApplicationController
   # GET /vms
   # GET /vms.xml
   def index
-    if params[:dir]=='asc'
-      dir = 'ASC'
-      @dir = '&dir=desc'
-    else 
-      dir = 'DESC'
-      @dir = '&dir=asc'
-    end
-    order = params[:sort_by] ? " order by #{params[:sort_by]} #{dir}" : ''
-
-    if params[:admin]!=nil && @admin
-      sql= "SELECT vms.*, lab_vmts.lab_id from vms INNER JOIN lab_vmts ON vms.lab_vmt_id=lab_vmts.id #{order}"
+    order = order_vms
+    if params[:admin]!=nil && @admin # admin user
+      sql = Vm.includes(:lab_user).order(order)
       @tab='admin'
     else  
-      sql= "select vms.*, lab_vmts.lab_id from vms INNER JOIN lab_vmts ON vms.lab_vmt_id=lab_vmts.id INNER JOIN lab_users on vms.lab_user_id=lab_users.id WHERE lab_users.user_id=#{current_user.id} #{order}"
+      labuser_ids = current_user.lab_users.map{|lu| lu.id }.flatten.uniq
+      sql = Vm.includes(:lab_user).where( lab_user_id: labuser_ids ).order(order)
     end
-    @vms= Vm.paginate_by_sql(sql, :page => params[:page], :per_page => @per_page)
+    @vms = sql.paginate( :page => params[:page], :per_page => @per_page) 
     
     respond_to do |format|
       format.html # index.html.erb
@@ -115,7 +90,6 @@ class VmsController < ApplicationController
   # GET /vms/1
   # GET /vms/1.xml
   def show
-   # @vm = Vm.find(params[:id])
     respond_to do |format|
       format.html # show.html.erb
       format.xml  { render :xml => @vm }
@@ -135,15 +109,12 @@ class VmsController < ApplicationController
 
   # GET /vms/1/edit
   def edit
-    #@vm = Vm.find(params[:id])
   end
-
   
   # POST /vms
   # POST /vms.xml
   def create
-    @vm = Vm.new(params[:vm])
-  
+    @vm = Vm.new(vm_params)
     respond_to do |format|
       if @vm.save
         format.html { redirect_to(vms_path+'?admin=1', :notice => 'Vm was successfully created.') }
@@ -158,10 +129,8 @@ class VmsController < ApplicationController
   # PUT /vms/1
   # PUT /vms/1.xml
   def update
-    @vm = Vm.find(params[:id])
-
     respond_to do |format|
-      if @vm.update_attributes(params[:vm])
+      if @vm.update_attributes(vm_params)
         format.html { redirect_to(vms_path+'?admin=1', :notice => 'Vm was successfully updated.') }
         format.xml  { head :ok }
       else
@@ -174,9 +143,7 @@ class VmsController < ApplicationController
   # DELETE /vms/1
   # DELETE /vms/1.xml
   def destroy
-    @vm = Vm.find(params[:id])
     @vm.destroy
-
     respond_to do |format|
       format.html { redirect_to(vms_path+'?admin=1') }
       format.xml  { head :ok }
@@ -536,6 +503,22 @@ end
     end
   end
 
+  
+private #----------------------------------------------------------------------------------
+  def order_vms
+    if params[:dir]=='asc'
+      dir = 'ASC'
+      @dir = '&dir=desc'
+    else 
+      dir = 'DESC'
+      @dir = '&dir=asc'
+    end
+    # if sort by is not empty and the value is a column
+    order = (!params[:sort_by].blank? && (Vm.column_names.include?(params[:sort_by]) || LabUser.column_names.include?(params[:sort_by])) ? "#{params[:sort_by]} #{dir}" : '')
+    logger.debug "ORDER #{order}"
+    return order
+  end
+
    #redirect user if they are not admin or the machine owner but try to modify a machine
   def auth_as_owner
     unless current_user == @vm.lab_user.user or @admin
@@ -546,8 +529,7 @@ end
       end
     end
   end
-private #----------------------------------------------------------------------------------
- 
+
   def get_user
     @user=current_user # by default get the current user
     if  @admin  #  admins can use this to view users labs
@@ -558,5 +540,19 @@ private #-----------------------------------------------------------------------
         @user = User.where('id = ?',params[:user_id]).first
       end
     end
+  end
+
+  def set_vm
+    @vm = Vm.where(id: params[:id]).first
+    unless @vm
+      respond_to do |format|
+        format.html  {redirect_to(vms_path,:notice=>'invalid id.')}
+        format.json  { render :json => {:success=>false, :message=>"Can't find vm"} }
+      end
+    end
+  end
+
+  def vm_params
+     params.require(:vm).permit(:id, :name, :lab_vmt_id, :description, :password, :lab_user_id, :g_connection)
   end
 end

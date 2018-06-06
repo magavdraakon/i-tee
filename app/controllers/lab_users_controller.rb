@@ -3,7 +3,7 @@ class LabUsersController < ApplicationController
   #restricted to admins
   before_filter :authorise_as_manager, :except=>[ :labinfo ]
   #redirect to index view when trying to see unexisting things
-  before_filter :save_from_nil, :only=>[:edit, :update, :destroy, :set_vta]
+  before_filter :save_from_nil, :only=>[:show, :edit, :update, :destroy, :set_vta]
   before_filter :manager_tab, :except=>[:search]
   before_filter :search_tab, :only=>[:search]
 
@@ -68,7 +68,6 @@ class LabUsersController < ApplicationController
   
 # for search view to display user machines in an attempt
   def show
-    @lab_user = LabUser.find_by_id(params[:id])
     @info={:running=>[], :paused=>[], :stopped=>[]}
     @lab_user.vms.each do |v|
       v['username']=@lab_user.user.username
@@ -93,25 +92,7 @@ class LabUsersController < ApplicationController
     @lab_users = LabUser.order(@order).paginate(:page => params[:page], :per_page => @per_page)
     # logic for when adding/removing multiple users at once to a specific lab
     if params[:lab_user] && params[:lab_user][:page]=='bulk_add'
-      all_users=User.all
-      checked_users=get_users_from(params[:users])
-      removed_users=all_users-checked_users
-      lab=params[:lab_user][:lab_id]
-      checked_users.each do |c|
-        l=LabUser.new
-        l.lab_id=lab
-        l.user_id=c.id
-        #if there is no db row with the se parameters then create one
-        # TODO: move to model
-        if LabUser.where('lab_id=? and user_id=?', lab, c.id).first==nil
-          l.save
-        end
-      end
-      removed_users.each do |d|
-        #look for the unchecked users and remove them from db if they were there
-        l = LabUser.where('lab_id=? and user_id=?', lab, d.id).first
-        l.destroy if l
-      end
+      LabUser.add_users(params)
       redirect_to(:back, :notice => 'successful update.')
     else #adding a single user to a lab
       respond_to do |format|
@@ -124,7 +105,7 @@ class LabUsersController < ApplicationController
           end
         end
         # continue to create
-        @lab_user = LabUser.new(params[:lab_user])
+        @lab_user = LabUser.new(labuser_params)
 
         if @lab_user.save
           format.html { redirect_to(:back, :notice => 'successful update.') }
@@ -141,7 +122,7 @@ class LabUsersController < ApplicationController
   # PUT /lab_users/1.xml
   def update
     respond_to do |format|
-      if @lab_user.update_attributes(params[:lab_user])
+      if @lab_user.update_attributes(labuser_params)
 
         format.html { redirect_to(:back, :notice => 'successful update.') }
         format.json  { render :json=>{:success=>true}.merge(@lab_user.as_json) }
@@ -334,11 +315,14 @@ class LabUsersController < ApplicationController
 
   def user_token
     set_order_by
-    @users= User.order(@order).paginate(:page=>params[:page], :per_page=>@per_page)
+    @users = User.order(@order).paginate(:page=>params[:page], :per_page=>@per_page)
   end
   
   private #-----------------------------------------------
 
+  def labuser_params
+    params.require(:lab_user).permit(:id, :lab_id, :user_id, :result, :start, :pause, :end, :last_activity, :activity, :g_user, :g_username, :g_password, :vta_setup, :uuid, :token)
+  end
 
   def get_user
     @user=current_user # by default get the current user
@@ -355,15 +339,15 @@ class LabUsersController < ApplicationController
   # return a array of users based on the input (list of checked checkboxes)
   def get_users_from(id_list)
     id_list=[] if id_list.blank?
-    id_list.collect{|u| User.find_by_id(u.to_i)}.compact
+    User.where(id: id_list)
   end
-   def get_lab_users_from(id_list)
+  def get_lab_users_from(id_list)
     id_list=[] if id_list.blank?
-    id_list.collect{|u| LabUser.find_by_id(u.to_i)}.compact
+    LabUser.where(id: id_list)
   end
-   def get_labs_from(id_list)
+  def get_labs_from(id_list)
     id_list=[] if id_list.blank?
-    id_list.collect{|u| Lab.find_by_id(u.to_i)}.compact
+    Lab.where(id: id_list)
   end
 
   def manage_labusers(lab_users)

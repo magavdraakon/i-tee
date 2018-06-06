@@ -75,7 +75,6 @@ function ready() {
 	}
 
 	if($.trim($('#menu-head').text()) == '') {
-		console.log('hide it')
 		$('#sidemenu').hide();
 		$('#content').css("margin-left", 0);
 		$('#menu-show').hide();
@@ -243,7 +242,8 @@ function manage_checked(status, message) {
 }
 
 // show users
-function show_names(letter) {
+function show_names(event, letter) {
+	event.preventDefault();
 	if(letter == '*') { // show all
 		$('.user_li').show();
 	} else {
