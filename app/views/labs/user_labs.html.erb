@@ -102,7 +102,7 @@
               </div>
             <% if allow_remote && state=='running' %>
                 <div class="remote_connections">
-                    <% unless vm.lab_vmt.g_type == '' %>
+                    <% unless vm.lab_vmt.g_type == 'none' %>
                       <%= link_to 'open in browser', open_guacamole_path+"/#{vm.id}", target: '_blank', class: 'button Linux UNIX MacOS Windows' %><br/>
                     <% end %>
                     <% if vm.lab_vmt.enable_rdp %>

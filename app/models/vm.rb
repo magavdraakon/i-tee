@@ -326,7 +326,7 @@ class Vm < ActiveRecord::Base
     rdpPort = self.rdp_port(info)
 
     if self.state(info)=='running'
-      if self.lab_vmt.allow_remote and self.lab_vmt.g_type != ''
+      if self.lab_vmt.allow_remote and self.lab_vmt.g_type != 'none'
         user_prefix = ITee::Application.config.guacamole[:user_prefix]
         max_connections = ITee::Application::config.guacamole[:max_connections]
         max_user_connections = ITee::Application::config.guacamole[:max_connections_per_user]

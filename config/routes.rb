@@ -1,4 +1,6 @@
-ITee::Application.routes.draw do
+Rails.application.routes.draw do
+  # The priority is based upon order of creation: first created -> highest priority.
+  # See how all your routes lay out with "rake routes".
 
   resources :assistants
   match 'ping', :to=>'home#ping', via:[:get, :post]
@@ -15,18 +17,18 @@ ITee::Application.routes.draw do
   match 'rdp_password', :to=>'virtualbox#update_password', via: [:post]
   match 'rdp_password', :to=>'virtualbox#remove_password', via: [:delete]
 
-  match 'virtualization', :to =>'virtualbox#index'
-  match 'templates', :to =>'virtualbox#templates'
+  match 'virtualization', :to =>'virtualbox#index', via: [:get, :post]
+  match 'templates', :to =>'virtualbox#templates', via: [:get, :post]
   match 'manage_vm/:do/:name', :to=>'virtualbox#manage_vm', via:[:get]
   match 'manage_vm', :to=>'virtualbox#manage_vm', via:[:post]
-  match 'vm_details/:name', :to=>'virtualbox#vm_details'
+  match 'vm_details/:name', :to=>'virtualbox#vm_details', via: [:get, :post]
   match 'virtualbox_guacamole/:name', :to=>'virtualbox#open_guacamole', via:[:get]
 
-  match 'jobs',:to=> 'home#jobs'
+  match 'jobs',:to=> 'home#jobs', via: [:get, :post]
   match 'jobs/:id', :to=>'home#delete_job', via: [:delete]
   match 'jobs/:id', :to=>'home#run_job', via: [:put]
 
-  match 'networks/:id/edit', :to => 'networks#index'
+  match 'networks/:id/edit', :to => 'networks#index', via: [:get, :post]
   resources :lab_vmt_networks
 
   resources :networks
@@ -37,7 +39,7 @@ ITee::Application.routes.draw do
 
   resources :badges
 
-  match 'users/sign_up', :to=>'home#catcher'
+  match 'users/sign_up', :to=>'home#catcher', via: [:get, :post]
   
   resources :lab_users
   match 'lab_users', :to=>'lab_users#destroy', via: [:delete]
@@ -71,58 +73,58 @@ ITee::Application.routes.draw do
 
   # route, :to => 'controller#action'
   
-  match 'search', :to=> 'lab_users#search'
+  match 'search', :to=> 'lab_users#search', via: [:get, :post]
 
 
-  match 'lab_users/import', :to=>'lab_users#import'
-  match 'manage_tokens', :to=>'lab_users#user_token'
-  match 'edit_token', :to=>'token_authentications#edit'
-  match 'edit_token/:id', :to=>'token_authentications#edit'
+  match 'lab_users/import', :to=>'lab_users#import', via: [:get, :post]
+  match 'manage_tokens', :to=>'lab_users#user_token', via: [:get, :post]
+  match 'edit_token', :to=>'token_authentications#edit', via: [:get, :post]
+  match 'edit_token/:id', :to=>'token_authentications#edit', via: [:get, :post]
   
-  match 'users/edit', :to=>'users#edit'
-  match 'users/edit/:id', :to=>'users#edit'
+  match 'users/edit', :to=>'users#edit', via: [:get, :post]
+  match 'users/edit/:id', :to=>'users#edit', via: [:get, :post]
 
-  match 'error_401', :to => 'home#error_401'
-  match 'template', :to => 'home#template'
+  get 'error_401', :to => 'home#error_401'
+  match 'template', :to => 'home#template', via: [:get, :post]
   match 'system', :to => 'home#system_info', via: [:get, :post]
-  match 'about', :to=> 'home#about'
+  get 'about', :to=> 'home#about'
   #with user
-  match 'start_all/:id/:username', :to=> 'vms#start_all'
-  match 'stop_all/:id/:username', :to=> 'vms#stop_all'
+  match 'start_all/:id/:username', :to=> 'vms#start_all', via: [:get, :post]
+  match 'stop_all/:id/:username', :to=> 'vms#stop_all', via: [:get, :post]
   #with id
-  match 'start_all/:id', :to=> 'vms#start_all'
-  match 'stop_all/:id', :to=> 'vms#stop_all'
+  match 'start_all/:id', :to=> 'vms#start_all', via: [:get, :post]
+  match 'stop_all/:id', :to=> 'vms#stop_all', via: [:get, :post]
 
-  match 'start_vm/:id', :to=> 'vms#start_vm'
-  match 'init_vm/:id', :to=> 'vms#init_vm'
-  match 'pause_vm/:id', :to=> 'vms#pause_vm'
-  match 'resume_vm/:id', :to=> 'vms#resume_vm'
-  match 'stop_vm/:id', :to=> 'vms#stop_vm'
-  match 'rdp_reset/:id', :to=> 'vms#rdp_reset'
+  match 'start_vm/:id', :to=> 'vms#start_vm', via: [:get, :post]
+  match 'init_vm/:id', :to=> 'vms#init_vm', via: [:get, :post]
+  match 'pause_vm/:id', :to=> 'vms#pause_vm', via: [:get, :post]
+  match 'resume_vm/:id', :to=> 'vms#resume_vm', via: [:get, :post]
+  match 'stop_vm/:id', :to=> 'vms#stop_vm', via: [:get, :post]
+  match 'rdp_reset/:id', :to=> 'vms#rdp_reset', via: [:get, :post]
 
-  match 'state_of', :to=> 'vms#get_state'
-  match 'rdp_of', :to=> 'vms#get_rdp'
-  match 'rdp_reset', :to=> 'vms#rdp_reset'
+  match 'state_of', :to=> 'vms#get_state', via: [:get, :post]
+  match 'rdp_of', :to=> 'vms#get_rdp', via: [:get, :post]
+  match 'rdp_reset', :to=> 'vms#rdp_reset', via: [:get, :post]
   
     #no id
-  match 'start_all', :to=> 'vms#start_all'
-  match 'stop_all', :to=> 'vms#stop_all'
-  match 'start_all_by_id', :to=> 'vms#start_all_by_id'
-  match 'stop_all_by_id', :to=> 'vms#stop_all_by_id'
-  match 'labuser_vms', :to=> 'vms#labuser_vms'
+  match 'start_all', :to=> 'vms#start_all', via: [:get, :post]
+  match 'stop_all', :to=> 'vms#stop_all', via: [:get, :post]
+  match 'start_all_by_id', :to=> 'vms#start_all_by_id', via: [:get, :post]
+  match 'stop_all_by_id', :to=> 'vms#stop_all_by_id', via: [:get, :post]
+  match 'labuser_vms', :to=> 'vms#labuser_vms', via: [:get, :post]
 
-  match 'start_vm', :to=> 'vms#start_vm'
-  match 'init_vm', :to=> 'vms#init_vm'
-  match 'pause_vm', :to=> 'vms#pause_vm'
-  match 'resume_vm', :to=> 'vms#resume_vm'
-  match 'stop_vm', :to=> 'vms#stop_vm'
+  match 'start_vm', :to=> 'vms#start_vm', via: [:get, :post]
+  match 'init_vm', :to=> 'vms#init_vm', via: [:get, :post]
+  match 'pause_vm', :to=> 'vms#pause_vm', via: [:get, :post]
+  match 'resume_vm', :to=> 'vms#resume_vm', via: [:get, :post]
+  match 'stop_vm', :to=> 'vms#stop_vm', via: [:get, :post]
   
-  match 'end_lab/:id', :to=>'labs#end_lab'
-  match 'end_lab', :to=>'labs#end_lab'
+  match 'end_lab/:id', :to=>'labs#end_lab', via: [:get, :post]
+  match 'end_lab', :to=>'labs#end_lab', via: [:get, :post]
 
-  match 'start_lab/:id/:username', :to=>'labs#start_lab'
-  match 'start_lab/:id', :to=>'labs#start_lab'
-  match 'start_lab', :to=>'labs#start_lab'
+  match 'start_lab/:id/:username', :to=>'labs#start_lab', via: [:get, :post]
+  match 'start_lab/:id', :to=>'labs#start_lab', via: [:get, :post]
+  match 'start_lab', :to=>'labs#start_lab', via: [:get, :post]
 
   match 'start_lab_by_id', :to=> 'labs#start_lab_by_id', via: [:post]
   match 'end_lab_by_id', :to=> 'labs#end_lab_by_id', via: [:post]
@@ -130,49 +132,47 @@ ITee::Application.routes.draw do
 
   match 'end_lab_by_values', :to=> 'labs#end_lab_by_values', via: [:post]
 
-  match 'restart_lab/:id/:username', :to=> 'labs#restart_lab'
-  match 'restart_lab/:id', :to=> 'labs#restart_lab'
-  match 'restart_lab', :to=> 'labs#restart_lab'
+  match 'restart_lab/:id/:username', :to=> 'labs#restart_lab', via: [:get, :post]
+  match 'restart_lab/:id', :to=> 'labs#restart_lab', via: [:get, :post]
+  match 'restart_lab', :to=> 'labs#restart_lab', via: [:get, :post]
 
-  match 'add_users/:id', :to=> 'lab_users#add_users'
-  match 'add_users', :to=> 'lab_users#add_users'
+  match 'add_users/:id', :to=> 'lab_users#add_users', via: [:get, :post]
+  match 'add_users', :to=> 'lab_users#add_users', via: [:get, :post]
   
-  match 'vms_by_lab', :to=>'vms#vms_by_lab'
-  match 'vms_by_lab/:id', :to=>'vms#vms_by_lab'
-  match 'vms_by_state', :to=>'vms#vms_by_state'
-  match 'vms_by_state/:state', :to=>'vms#vms_by_state'
+  match 'vms_by_lab', :to=>'vms#vms_by_lab', via: [:get, :post]
+  match 'vms_by_lab/:id', :to=>'vms#vms_by_lab', via: [:get, :post]
+  match 'vms_by_state', :to=>'vms#vms_by_state', via: [:get, :post]
+  match 'vms_by_state/:state', :to=>'vms#vms_by_state', via: [:get, :post]
   
-  match 'my_labs/:id/:username', :to => 'labs#user_labs'
-  match 'my_labs/:id', :to => 'labs#user_labs'
-  match 'my_labs', :to =>'labs#user_labs'
+  match 'my_labs/:id/:username', :to => 'labs#user_labs', via: [:get, :post]
+  match 'my_labs/:id', :to => 'labs#user_labs', via: [:get, :post]
+  match 'my_labs', :to =>'labs#user_labs', via: [:get, :post]
 
-  match 'open_guacamole', :to=>'vms#open_guacamole'
-  match 'open_guacamole/:id', :to=>'vms#open_guacamole' 
+  match 'open_guacamole', :to=>'vms#open_guacamole', via: [:get, :post]
+  match 'open_guacamole/:id', :to=>'vms#open_guacamole' , via: [:get, :post]
 
   match 'send_keys', :to=>'vms#send_keys', via: [:post]
   match 'send_text', :to=>'vms#send_text', via: [:post]
 
-  match 'user_labs/:username', :to=>'labs#user_labs'
-  match 'user_labs/:username/:id', :to => 'labs#user_labs'
+  match 'user_labs/:username', :to=>'labs#user_labs', via: [:get, :post]
+  match 'user_labs/:username/:id', :to => 'labs#user_labs', via: [:get, :post]
 
   
-  match 'not_found', :to=>"home#error_404"
+  match 'not_found', :to=>"home#error_404", via: [:get, :post]
 
-  # The priority is based upon order of creation:
-  # first created -> highest priority.
+  # You can have the root of your site routed with "root"
+  root 'home#index'
 
-  # Sample of regular route:
-  #   match 'products/:id' => 'catalog#view'
-  # Keep in mind you can assign values other than :controller and :action
+  # Example of regular route:
+  #   get 'products/:id' => 'catalog#view'
 
-  # Sample of named route:
-  #   match 'products/:id/purchase' => 'catalog#purchase', :as => :purchase
-  # This route can be invoked with purchase_url(:id => product.id)
+  # Example of named route that can be invoked with purchase_url(id: product.id)
+  #   get 'products/:id/purchase' => 'catalog#purchase', as: :purchase
 
-  # Sample resource route (maps HTTP verbs to controller actions automatically):
+  # Example resource route (maps HTTP verbs to controller actions automatically):
   #   resources :products
 
-  # Sample resource route with options:
+  # Example resource route with options:
   #   resources :products do
   #     member do
   #       get 'short'
@@ -184,43 +184,40 @@ ITee::Application.routes.draw do
   #     end
   #   end
 
-  # Sample resource route with sub-resources:
+  # Example resource route with sub-resources:
   #   resources :products do
   #     resources :comments, :sales
   #     resource :seller
   #   end
 
-  # Sample resource route with more complex sub-resources
+  # Example resource route with more complex sub-resources:
   #   resources :products do
   #     resources :comments
   #     resources :sales do
-  #       get 'recent', :on => :collection
+  #       get 'recent', on: :collection
   #     end
   #   end
 
-  # Sample resource route within a namespace:
+  # Example resource route with concerns:
+  #   concern :toggleable do
+  #     post 'toggle'
+  #   end
+  #   resources :posts, concerns: :toggleable
+  #   resources :photos, concerns: :toggleable
+
+  # Example resource route within a namespace:
   #   namespace :admin do
   #     # Directs /admin/products/* to Admin::ProductsController
   #     # (app/controllers/admin/products_controller.rb)
   #     resources :products
   #   end
 
-  # You can have the root of your site routed with "root"
-  # just remember to delete public/index.html.
-   root :to => 'home#index'
-
-  
   # This is a catch-all for routes that don't exist, visitor is redirected to home page.
   #ActionController::Routing::Routes.draw do |map|
-#    map.connect ':controller/:action/:id'
-#    map.connect '*path', :controller => 'home', :action => 'catcher'
-#end
-match ':controller/:action/:id',  :to=>'home#catcher' 
-match '*path',  :to=>'home#catcher'
+  #    map.connect ':controller/:action/:id'
+  #    map.connect '*path', :controller => 'home', :action => 'catcher'
+  #end
+  match ':controller/:action/:id',  :to=>'home#catcher' , via: [:get, :post, :delete]
+  match '*path',  :to=>'home#catcher', via: [:get, :post, :delete]
 
-  # See how all your routes lay out with "rake routes"
-
-  # This is a legacy wild controller route that's not recommended for RESTful applications.
-  # Note: This route will make all actions in every controller accessible via GET requests.
-  # match ':controller(/:action(/:id(.:format)))'
 end

@@ -3,7 +3,7 @@ require "uri"
 require "json"
 
 class Assistant < ActiveRecord::Base
-  attr_accessible :enabled, :uri, :name, :version
+  #attr_accessible :enabled, :uri, :name, :version
   has_many :labs
 
   validates_presence_of :name, :uri

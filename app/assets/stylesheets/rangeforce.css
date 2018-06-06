@@ -1,0 +1,660 @@
+/* stylesheet to go along with rangeforce layout */
+/*{
+
+}
+ 
+*/
+body, html {
+    font: 15px/1.7 "Open Sans",Arial,Verdana,sans-serif;
+    height:100%;
+    margin:0;
+    padding:0;
+
+}
+
+textarea {
+    width:100%;
+}
+a{ text-decoration:none; color:red;}
+p {
+    margin: 10px 0;
+}
+h1 {
+    margin:15px 0;
+    font-size:30px;
+    line-height: normal;
+}
+h2 {
+    margin:20px 0;
+    font-size:22px;
+    line-height: normal;
+}
+h3 {
+    margin: 25px 0;
+    font-size:20px;
+    line-height: normal;
+}
+#contain {position:relative;
+    background: url('../images/sisutaust.jpeg');
+    background-size: cover;
+    min-height:100%;
+    line-height:1.25em;
+}
+#c-wrap {
+    height:100%;
+}
+#content {padding:10px;
+    height:100%;
+}
+/* Topmenu */
+#top {
+    background: black;
+    width:100%;
+    overflow-y:auto;
+    text-align: center;
+}
+#top-bar {
+    width:90%;
+    margin:auto;
+}
+#top a {
+    line-height:100px;
+    font-size:1.2em;
+    background: black;
+    color:white;
+    font-weight: bold;
+    padding: 0 20px;
+}
+#top img{
+     vertical-align: middle;
+}
+#logo img{
+    height:35px;
+}
+#logo2 img{
+       height:80px;
+}
+#top .current_tab {
+    color:red;
+}
+
+/* middle */
+#middle {
+    overflow-y:auto;
+    width:90%;
+    margin:auto;
+    padding-bottom: 50px;
+}
+#m_menu  {
+    border-bottom:solid 2px black;
+    padding:40px 40px 0 40px;
+}
+.b_menu {
+    display:inline-block;
+    padding: 10px 15px;
+    color:dimgrey;
+    font-size:1em;
+    margin-bottom:-2px;
+}
+
+.b_menu.current_tab {
+    border-bottom:solid 3px red;
+
+}
+.s_menu a{
+    color:dimgrey;
+    display:inline-block;
+}
+.s_menu  {
+    display: none;
+    font-size:17px;
+}
+.s_menu td  {
+   padding: 0 10px;
+}
+.s_menu.current_tab  {
+   display: initial;
+}
+#s_menu {
+    color:red;
+    line-height:25px;
+   margin-bottom:20px;
+}
+/* footer */
+#footer {position: absolute;
+    bottom:0;
+    padding:10px 0;
+    background: black;
+    width:100%;
+    text-align: center;
+}
+#footer a {
+    line-height:30px;
+    font-size:1em;
+    background: black;
+    color:white;
+    text-decoration:none;
+    font-weight: bold;
+    padding: 0 20px;
+}
+
+
+/*sidebar*/
+.side_visible {
+    margin-left:300px;
+}
+#sidemenu{
+    float:left;
+    width: 300px;
+    font-size:1.1em;
+    display: none;
+}
+
+ul {margin-left:30px; list-style-type:circle; }
+ul.no-bullet {
+    list-style-type:none;
+    margin-left:0;
+}
+#sidemenu ul {margin-left:0;}
+#menu-head {
+    margin-top: -30px;
+    height: 30px;
+
+    color: black;
+    font-weight: 500;
+    /* font-family: Verdana, Helvetica, Arial, sans-serif;*/
+}
+#sidemenu li {
+    list-style-type:none;
+    line-height: 1.5em;
+    color: black;
+    /* font-family: "Helvetica Neue", "Lucida Grande", Helvetica, Arial, Verdana, sans-serif;*/
+}
+#sidemenu li.upper {
+    margin-top:5px;
+}
+#sidemenu li.between {
+    padding-left: 10px;
+    background: #F8F8FF;
+}
+
+#sidemenu li.started {
+    list-style-type:none;
+    height: 2em;
+    background:#e0f2dc;
+    /*font-family: "Helvetica Neue", "Lucida Grande", Helvetica, Arial, Verdana, sans-serif;*/
+}
+#sidemenu li.ended {
+    list-style-type:none;
+    height: 2em;
+    background:#F8F8FF;
+    /* font-family: "Helvetica Neue", "Lucida Grande", Helvetica, Arial, Verdana, sans-serif;*/
+}
+
+#sidemenu li a {
+    padding-left: 15px;
+    color: black;
+    display: block;
+    text-decoration: none;
+}
+
+#sidemenu a:hover {
+   color:#ff0000;
+}
+
+#sidemenu #menu-hide {
+    position: relative;
+    top: -10px;
+    left: 285px;
+    height: 30px;
+    width: 30px;
+    display: block;
+    background: transparent url("../images/Back-50.png") no-repeat; /*https://icons8.com/web-app/1806/Back*/
+    background-size:contain;
+    cursor: pointer;
+}
+#sidemenu  p {
+    padding:5px;
+
+}
+#sidemenu ul {
+
+}
+
+#menu-show {
+    display: block;
+    height: 30px;
+    width: 30px;
+    position: relative;
+    left: -10px;
+    top:-20px;
+    background: transparent url("../images/Right4-50.png") no-repeat; /*https://icons8.com/web-app/7233/Right4*/
+    background-size:contain;
+    cursor: pointer;
+}
+.current_lab a {
+    font-weight: normal!important;
+    color:#ff0000 !important;
+}
+
+/*  LOGIN   */
+#sign_in {
+    color:white;
+    text-align:center;
+    padding:40px 20px;
+    max-width:500px;
+    max-height: 200px;
+    margin:auto;
+    position:absolute;
+    top:0;
+    bottom:0;
+    left:0;
+    right:0;
+    line-height:1.5em;
+    font-size:1.2em;
+    background:rgba(0,0,0,0.5);
+}
+#sign_in p{
+    margin-top:10px;
+}
+#sign_in input{
+   width:300px;
+    font-size:1.2em;
+    border: solid black 2px;
+    background: white;
+    color:black;
+    padding:3px 5px;
+    text-align: center;
+}
+#sign_in input[type="submit"]{
+    border-color:white;
+    background: black;
+    color:white;
+    font-weight:bold;
+}
+body.sessions{
+    background: url('../images/front_student_w_net.jpg');
+    background-size: cover;
+}
+body.sessions #contain {
+    background: none;
+}
+
+body.sessions #messages {
+      display: none;
+  }
+/* tabelid */
+
+#index_t table  {
+    width:100%;
+    font-size:0.9em;
+    border:solid black 1px;
+}
+#index_t td  {
+    border:solid black 1px;
+    padding:3px;
+
+}
+ .narrow  {
+   width:1%;
+    white-space: nowrap;
+
+}
+#index_t th  {
+    background: black;
+    color:white;
+    vertical-align: middle;
+    padding:3px;
+}
+#index_t tr:hover  {
+    background: rgba(255,0,0,0.5);
+
+}
+/*buttons*/
+.win-button {
+    padding-left: 22px!important;
+    background: url("../images/Windows_Logo-32.png") 4px 3px no-repeat;
+    background-size: 16px;}/* https://icons8.com/web-app/154/Windows-Logo */
+.mac-button {
+    padding-left: 22px!important;
+    background: url("../images/Mac_OS-32.png") 4px 3px no-repeat;
+    background-size: 16px;}/* https://icons8.com/web-app/890/Mac-OS */
+.rdesktop-button, .xfreerdp-button {
+    padding-left: 22px!important;
+    background: url("../images/Ubuntu-32.png") 4px 3px no-repeat;
+    background-size: 16px;} /* https://icons8.com/web-app/11339/Ubuntu */
+/* form buttons */
+/*
+.edit-button {
+    background: url("../images/edit.png") 4px 3px no-repeat;
+    padding-left:22px!important;}
+.show-button {
+    background: url("../images/show.gif") 6px 3px no-repeat;
+    padding-left:22px!important;}
+.delete-button {
+    background: url("../images/delete.png") 4px 3px no-repeat;
+    padding-left:22px!important;}
+
+.add-button {
+    background: url("../images/add.png") 4px 3px no-repeat;
+    padding-left:22px!important;}
+.info-button {
+    background: url("../images/info.png") 4px 3px no-repeat;
+    padding-left:22px!important;}
+
+.submit-button {
+    background: url("../images/submit.png") 4px 3px no-repeat;
+    padding-left:22px!important;}
+.login-button {
+    background: url("../images/login.gif") 4px 3px no-repeat;
+    padding-left:22px!important;}
+.cancel-button {
+    background: url("../images/cancel.png") 6px 3px no-repeat;
+    padding-left:22px!important;}
+*/
+/*vm state buttons*/
+/*
+.stop-button {
+    background: url("../images/stop.png") 4px 3px no-repeat;
+    padding-left:22px!important;}
+.start-button {
+    background: url("../images/play.png") 4px 3px no-repeat;
+    padding-left:22px!important;}
+.pause-button {
+    background: url("../images/pause.png") 4px 3px no-repeat;
+    padding-left:22px!important;}
+*/
+/*lab state buttons */
+.manage_lab a {
+    background: url("../images/vequritas.svg")  no-repeat;
+    background-color: transparent!important;
+    background-size: 120px;
+    line-height: 120px!important;
+    width: 120px;
+    padding:0!important;
+    font-size:1.2em;
+    text-align:center;
+
+}
+.manage_lab span {
+    display: inline-block;
+    width:20%;
+    min-width:130px;
+}
+.rl-button { color: darkgreen !important;}
+.sl-button {color: darkblue !important;}
+.el-button { color: orangered !important; }
+
+.manage_lab {
+    margin:10px 0;
+    text-align: center;
+}
+
+.button:hover {
+    cursor:pointer;
+    color:black;
+}
+
+.button {
+    font-weight:bold;
+    text-decoration:none;
+    color:rgba(0, 0, 87, 1);
+    cursor: pointer;
+    padding:0 5px;
+    display:inline-block;
+}
+
+
+/*lab view vm-s */
+.vm_s {
+    border-top:solid 1px dimgrey;
+    padding: 10px 0;
+}
+.vm_s td {
+   padding:3px;
+}
+.vm_s:last-child {
+    border-bottom:solid 1px dimgrey;
+}
+.vm_s a{
+    font-size:1.2em
+}
+
+.copyMe {
+    position:relative;
+    padding: 2px 4px;
+    border:solid 1px #c0c0c0;
+    margin:6px 0;
+    text-align: right;
+}
+.copyMe strong {
+    margin-right:8em;
+    text-align: left;
+    display: block;
+}
+.copyMe .parentheight {
+    position:absolute;
+    top:0;
+    right:0;
+    bottom:0;
+    width: 7em;
+    text-align:center;
+    border-left:solid 1px #c0c0c0;
+    background: #DDD;
+}
+.copyMe .important {
+    color:rgba(0, 0, 87, 1);
+    font-weight: bold;
+}
+
+.copyMe .helptext {
+    position:absolute;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+    right:0;
+    left:0;
+}
+.remote_connections {
+    margin:3px 0;
+}
+.showtoggle {
+    font-weight:bold;
+    text-decoration:none;
+    color:rgba(0, 0, 87, 1);
+    cursor: pointer;
+    padding:0 5px;
+    display:inline-block;
+}
+
+/* lab edit form */
+#lab_vmts .vmt{
+    padding:3px;
+    border:solid 1px #c0c0c0;
+    margin:3px;
+    border-width: 1px 0;
+}
+#lab_vmts .network{
+    padding:3px;
+    border:solid 1px #c0c0c0;
+    display:inline-block;
+    margin:3px;
+}
+
+/* pagination classes */
+.pagination, .page_info {
+    font-size:0.8em;
+    text-align:right;
+    color: #666666;
+}
+
+.pagination a, .previous_page, .next_page, .current {
+    border-radius:10px;
+    border: 2px solid rgba(125, 159, 186, .5);
+    padding:2px;
+    padding-left:4px;
+    padding-right:4px;
+    text-decoration:none;
+    color: #666666;
+    cursor: pointer;
+    line-height:2em;
+    background-color: rgba(255, 255, 255, .7);
+}
+
+.disabled, .current {
+    cursor:default;
+    color:#c0c0c0;
+
+}
+.current {
+    color:#000;
+    font-weight:bold;
+}
+
+
+@media screen and (max-width: 1000px) {
+    #middle {
+        width:100% !important;
+        padding:0!important;
+        padding-bottom:50px !important;
+    }
+
+
+
+}
+@media screen and (max-width: 700px) {
+    #top a {
+        float:none;
+        display: block;
+        line-height: normal;
+        padding: 5px;
+        clear:both;
+    }
+    #logo, #logo2 {
+        display:inline !important;
+        line-height:70px !important;
+
+    }
+    #middle {
+        width:100%;
+        padding:10px 0 50px 0;
+    }
+    #m_menu  {
+        border-bottom:solid 2px black;
+        padding: 5px ;
+        padding-top:10px;
+    }
+    #content{
+        padding:0!important;
+    }
+}
+@media screen and (max-height: 500px) {
+    #sign_in {
+        position:static;
+        margin:auto;
+    }
+
+}
+
+
+
+/* LOADER */
+#blurred_bg{
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: url('../images/sisutaust.jpeg');
+    background-size: cover;
+    opacity:0.5;
+    z-index:5;
+}
+#tabel{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin:0 auto;
+    z-index: 10;
+    display:table;
+    width:100%;
+    height:100%;
+    color:white;
+}
+#cell{
+    display:table-cell;
+    vertical-align:middle;
+}
+#sisu {
+    display: table;
+    margin: auto;
+    height:100px;
+    width:100px;
+    opacity:0.9;
+    border-radius:50%;
+    padding: 10px;
+}
+
+#loading {
+    display:none;
+    height: 0;
+}
+
+
+
+
+/* classes */
+.red{
+    color:red;
+}
+.grey{
+    color:gray;
+}
+.bold {
+    font-weight:bold;
+}
+.hidden{
+    display:none;
+}
+.upper {
+    text-transform: uppercase;
+}
+.left {
+    float:left;
+}
+.right{
+    float:right;
+}
+.clearl{
+    clear:left;
+}
+.clearr{
+    clear:right;
+}
+.clearb {
+    clear:both;
+}
+
+/* dont show here */
+#login_info, #login_logos, #sign_in_title {
+    display:none;
+}
+
+/* prettify */
+.linenums {
+    list-style-position: inside;
+}
+
+/*vormid */
+
+fieldset {
+    border: solid 1px #C0C0C0;
+    padding: 10px;
+}
+legend {
+    font-size:1.2em;
+    font-weight:bold;
+}
