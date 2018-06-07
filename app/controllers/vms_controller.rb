@@ -22,21 +22,24 @@ class VmsController < ApplicationController
       # get the vm templates in the lab
       vmt_ids = (@lab.blank? ? [] : @lab.lab_vmts.map{|lv| lv.id }.flatten.uniq)
       # find all machines made from the templates
-      sql = Vm.includes(:lab_user).where( lab_vmt_id: vmt_ids ).order(order)
+      sql = Vm.joins(:lab_user).where( lab_vmt_id: vmt_ids ).order(order)
       @tab='admin'
       @labs=Lab.all.uniq
     else # simple user
       # find lab via labuser
       @labusers = []
+      @lab=false
       if params[:id].blank?
         labuser = current_user.lab_users.first # take the first known labuser to know wich lab to display
         @labusers = current_user.lab_users.where(lab_id: labuser.lab_id) if labuser
+        @lab = labuser.lab if labuser
       else
         @labusers = current_user.lab_users.where(lab_id: params[:id]) 
+        @lab = Lab.where(id: params[:id]).first
       end
       labuser_ids = @labusers.map{|lu| lu.id }.flatten.uniq
       # find all machines for all attempts in this lab
-      sql = Vm.includes(:lab_user).where( lab_user_id: labuser_ids ).order(order)
+      sql = Vm.joins(:lab_user).where( lab_user_id: labuser_ids ).order(order)
       # get all user lab ids
       lab_ids = current_user.lab_users.map{|lu| lu.lab_id}.flatten.uniq 
       @labs = Lab.where(id: lab_ids)
@@ -55,10 +58,10 @@ class VmsController < ApplicationController
   
     if params[:admin]!=nil && @admin # admin user
       @tab='admin'
-      vms = Vm.includes(:lab_user).order(order)
+      vms = Vm.joins(:lab_user).order(order)
     else # simple user
       labuser_ids = current_user.lab_users.map{|lu| lu.id }.flatten.uniq
-      vms = Vm.includes(:lab_user).where( lab_user_id: labuser_ids ).order(order)
+      vms = Vm.joins(:lab_user).where( lab_user_id: labuser_ids ).order(order)
     end
     @vm=[]
     vms.each do |vm|
@@ -73,11 +76,11 @@ class VmsController < ApplicationController
   def index
     order = order_vms
     if params[:admin]!=nil && @admin # admin user
-      sql = Vm.includes(:lab_user).order(order)
+      sql = Vm.joins(:lab_user).order(order)
       @tab='admin'
     else  
       labuser_ids = current_user.lab_users.map{|lu| lu.id }.flatten.uniq
-      sql = Vm.includes(:lab_user).where( lab_user_id: labuser_ids ).order(order)
+      sql = Vm.joins(:lab_user).where( lab_user_id: labuser_ids ).order(order)
     end
     @vms = sql.paginate( :page => params[:page], :per_page => @per_page) 
     

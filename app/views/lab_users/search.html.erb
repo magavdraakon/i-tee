@@ -11,7 +11,7 @@
 <div id="index_t">
 <% if @users && @users.count>0  %>
 	<p>Found <%= @users.count %> users</p>
-	<%= form_for @users, :url => search_path do |f| %>
+	<%= form_tag search_path do  %>
 		<input type="hidden" name="t" value="User" />
 		<input type="hidden" name="u" value="<%= params[:u] %>" />
 		<table >
@@ -68,11 +68,11 @@
 		<label><input type="checkbox" id="rem_t" name="remove_token" onclick="manage_checkboxes(['reset_ex', 'reset_t']); show_date(document.getElementById('reset_ex'));"/>remove token</label>
 		<br/>
           <label><input type="checkbox" name="user" value="destroy" /> Destroy user(s)</label><br/>
-		<%= f.submit 'Update users', :confirm => 'Are you sure?'%>
+		<%= submit_tag 'Update users', data: {:confirm => 'Are you sure?'}%>
 	<% end #form %>
 <% elsif @labs && @labs.count>0 then %>
 <p>Found <%= @labs.count %> labs</p>
-	<%= form_for @labs, :url => search_path do |f| %>
+	<%= form_tag search_path do  %>
 		<input type="hidden" name="t" value="Lab" />
 		<input type="hidden" name="l" value="<%= params[:l] %>" />
 		<table >
@@ -125,11 +125,11 @@
 		<span id="expires" class="hidden"><%= datetime_select('user', 'token_expires', :default => 2.weeks.from_now) %></span>
 		<label><input type="checkbox" id="rem_t" name="remove_token"  onclick="manage_checkboxes([ 'reset_ex', 'reset_t']); show_date(document.getElementById('reset_ex'));"/>remove token</label>
 		<br/>
-		<%= f.submit 'Update labs', :confirm => 'Are you sure?'%>
+		<%= submit_tag 'Update labs', data: {:confirm => 'Are you sure?'}%>
 	<% end #form  %>
 <% elsif @lab_users && @lab_users.count>0 then %>
 <p>Found <%= @lab_users.count %> lab users</p>
-	<%= form_for @lab_users, :url => search_path do |f| %>
+	<%= form_tag search_path do %>
 		<input type="hidden" name="t" value="Lab user" />
 		<input type="hidden" name="u" value="<%= params[:u] %>" />
 		<input type="hidden" name="l" value="<%= params[:l] %>" />
@@ -164,16 +164,16 @@
 		
 		<% end # per lab%>
 		</table>
-		<label><input type="checkbox" name="lab" value="end" id="end_labs" onclick="manage_checkboxes(['restart_labs', 'rem_users', 'add_users'])" />End lab</label>
-		<label><input type="checkbox" name="lab" value="restart" id="restart_labs" onclick="manage_checkboxes(['end_labs', 'rem_users', 'add_users'])" />Restart lab</label>
+		<label><input type="checkbox" name="lab" value="end" id="end_labs" onclick="manage_checkboxes(['restart_labs', 'rem_users'])" />End lab</label>
+		<label><input type="checkbox" name="lab" value="restart" id="restart_labs" onclick="manage_checkboxes(['end_labs', 'rem_users'])" />Restart lab</label>
 		<br/>
-		<label><input type="checkbox" name="lab" value="remove" id="rem_users" onclick="manage_checkboxes(['restart_labs', 'end_labs', 'add_users'])" />Remove lab user</label>
+		<label><input type="checkbox" name="lab" value="remove" id="rem_users" onclick="manage_checkboxes(['restart_labs', 'end_labs'])" />Remove lab user</label>
 		<br/>
 		<label><input type="checkbox" name="vm" value="poweroff" id="power_vms" onclick="manage_checkboxes(['start_vms', 'restart_rdp']);" />Power off all VMs</label>
 		<label><input type="checkbox" name="vm" value="poweron" id="start_vms" onclick="manage_checkboxes(['power_vms', 'restart_rdp']);" />Power on all VMs</label>
 		<label><input type="checkbox" name="vm" value="reset_rdp" id="restart_rdp" onclick="manage_checkboxes(['power_vms', 'start_vms']);"/>Reset RDP for all VMs</label>
 		<br/>
-		<%= f.submit 'Update lab users', :confirm => 'Are you sure?'%>
+		<%= submit_tag 'Update lab users', data: {:confirm => 'Are you sure?'}%>
 	<% end #form  %>
 <% elsif params[:l] || params[:u] then %>
 	<h3>No matching results found</h3>

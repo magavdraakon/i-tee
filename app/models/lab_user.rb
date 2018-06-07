@@ -81,7 +81,7 @@ class LabUser < ActiveRecord::Base
         LabVmt.where('lab_id = ? ', self.lab_id).each do |template|
           vm = Vm.where('lab_vmt_id=? and lab_user_id=?', template.id, self.id).first
           unless vm
-            vm = Vm.create(:name=>"#{template.name}-#{self.user.username}", :lab_vmt=>template, :user=>self.user, :description=> 'Initialize the virtual machine by clicking <strong>Start</strong>.', :lab_user=>self)
+            vm = Vm.create(:name=>"#{template.name}-#{self.user.username}", :lab_vmt=>template, :description=> 'Initialize the virtual machine by clicking <strong>Start</strong>.', :lab_user=>self)
             logger.debug "\n #{vm.lab_user.id} Machine #{vm.id} - #{template.name}-#{self.user.username} successfully generated.\n"
           end
         end
@@ -124,8 +124,10 @@ class LabUser < ActiveRecord::Base
         result # forward the message from resource check
       end
     elsif self.end # lab is ended
+      logger.debug "ended labuser"
       {success: false, message: 'Ended mission can not be started'}
     else
+      logger.debug "lab already started"
       {success: true, message: 'Lab started..'}
 		end
   end
@@ -341,10 +343,11 @@ def self.add_users(params)
       #if there is no db row with the set parameters then create one
       unless lab.lab_users.where(user_id: c.id).first
         l.save
+        logger.debug "labuser created #{l.id}"
       end
     end
     # destroy all extra lab_users
-    lab.lab_users.where.not(id: params[:users]).destroy_all
+    lab.lab_users.where.not(user_id: params[:users]).destroy_all
   end
 end
 

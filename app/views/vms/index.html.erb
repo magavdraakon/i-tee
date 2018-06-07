@@ -75,7 +75,7 @@
   </table>
   <%= will_paginate @vms %><div class="page_info"><%= page_entries_info @vms %></div>
 </div>
-<span class="startall"><%=link_to('Start all machines',start_all_path+'/'+@lab.id.to_s, :class=>'button start-button') unless @tab=='admin' || @vms.empty? || @b_by!='lab' %></span>
+<span class="startall"><%=link_to('Start all machines',start_all_path+'/'+@lab.id.to_s, :class=>'button start-button') unless @tab=='admin' || @vms.empty? || @b_by!='lab' || @lab.blank? %></span>
 
 <br/>
 <%= link_to 'New virtual machine', new_vm_path, :class=>'add-button button'  if @admin && @tab=='admin' %>
