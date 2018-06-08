@@ -143,19 +143,18 @@ def self.get_vm_info(name, static=false)
 			if vmname != ''
 				vmt = LabVmt.where('name=?', vmname).first
 				if vmt
-					vm.merge!(Lab.select('id, name').where("id=?", vmt.lab_id).first.as_json)
+					vm['lab']=Lab.select('id, name').where("id=?", vmt.lab_id).first.as_json
 				end
 			end
 			username = vm['groups'][1] ? vm['groups'][1].gsub('/', '').strip : '' # second group is user name
 			if username != ''
 				user = User.select('id, username, name').where('username=?', username).first
 				if user
-					vm.merge!(user.as_json)
+					vm['user']=user.as_json
 				end
 			end
 		end
 	end
-
 	if vm['CurrentSnapshotNode']
 		value = vm[vm['CurrentSnapshotNode'].gsub('Name', 'Description')]
 		begin

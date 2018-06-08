@@ -76,7 +76,7 @@ class LabsController < ApplicationController
         @lab.remove_all_users if params[:remove] && params[:remove].to_s==1.to_s 
         
         format.html { redirect_to(@lab, :notice => "Lab was successfully created. #{params[:add]}") }
-        format.json  { render :json => { :success => true }.merge(@lab.as_json) }
+        format.json  { render :json => { :success => true, :lab=> @lab.as_json} }
       else
         format.html { render :action => 'new' }
         format.json  { render :json => {:success=>false, :errors=>@lab.errors}, :status => :unprocessable_entity }
@@ -98,7 +98,7 @@ class LabsController < ApplicationController
         @lab.remove_all_users if params[:remove].to_s==1.to_s 
           
         format.html { redirect_to(@lab, :notice => 'Lab was successfully updated.') }
-        format.json  { render :json => {:success=>true}.merge(@lab.as_json)}
+        format.json  { render :json => {:success=>true, :lab=> @lab.as_json} }
       else
         format.html { render :action => 'edit' }
         format.json  { render :json => {:success=>false, :errors=>@lab.errors}, :status => :unprocessable_entity }

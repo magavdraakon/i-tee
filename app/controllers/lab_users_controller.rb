@@ -47,15 +47,16 @@ class LabUsersController < ApplicationController
     @users= User.order('username')
     if request.format == 'json'
       if params[:conditions]
+        conditions = params[:conditions].as_json
         #fix start and end
-        if params[:conditions][:end] && params[:conditions][:end]==''
-          params[:conditions][:end]=nil
+        if conditions[:end] && conditions[:end]==''
+          conditions[:end]=nil
         end
-        if params[:conditions] && params[:conditions][:start]==''
-          params[:conditions][:start]=nil
+        if conditions && conditions[:start]==''
+          conditions[:start]=nil
         end
-        logger.debug "\n query params #{params[:conditions]}\n"
-        labusers = LabUser.where(params[:conditions]).map{|l| l.with_ping}
+        logger.debug "\n query params #{conditions}\n"
+        labusers = LabUser.where(conditions).map{|l| l.with_ping}
       else
         labusers = LabUser.all.map{|l| l.with_ping}
       end
@@ -109,7 +110,7 @@ class LabUsersController < ApplicationController
 
         if @lab_user.save
           format.html { redirect_to(:back, :notice => 'successful update.') }
-          format.json { render :json=> {:success => true}.merge(@lab_user.with_ping), :status=> :created}
+          format.json { render :json=> {:success => true, :lab_user => @lab_user.with_ping}, :status=> :created}
         else
           format.html { render :action => 'index' }
           format.json { render :json=> {:success => false, :errors => @lab_user.errors}, :status=> :unprocessable_entity}
@@ -125,7 +126,7 @@ class LabUsersController < ApplicationController
       if @lab_user.update_attributes(labuser_params)
 
         format.html { redirect_to(:back, :notice => 'successful update.') }
-        format.json  { render :json=>{:success=>true}.merge(@lab_user.as_json) }
+        format.json  { render :json=>{:success=>true, :lab_user=>@lab_user.as_json} }
       else
         format.html { render :action => 'edit' }
         format.json  { render :json => {:success=>false, :errors=> @lab_user.errors}, :status => :unprocessable_entity }

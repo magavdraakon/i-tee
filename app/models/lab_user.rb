@@ -14,15 +14,15 @@ class LabUser < ActiveRecord::Base
   def with_ping
     data = JSON.parse(self.to_json)
     if lab = JSON.parse(self.lab.to_json)
-      data['lab_user']['treshold_low'] = lab['lab']['ping_low']
-      data['lab_user']['treshold_mid'] = lab['lab']['ping_mid']
-      data['lab_user']['treshold_high'] = lab['lab']['ping_high']
-      data['lab_user']['ping_low'] = self.labuser_connections.where("end_at-start_at< ? ", lab['lab']['ping_low']).count
-      data['lab_user']['ping_mid'] = self.labuser_connections.where("end_at-start_at between ? and ? ", lab['lab']['ping_low'], lab['lab']['ping_mid']).count     
-      data['lab_user']['ping_high'] = self.labuser_connections.where("end_at-start_at between ? and ? ", lab['lab']['ping_mid'], lab['lab']['ping_high']).count
-      data['lab_user']['ping_down'] = self.labuser_connections.where("end_at-start_at > ? ", lab['lab']['ping_high']).count
+      data['treshold_low'] = lab['ping_low']
+      data['treshold_mid'] = lab['ping_mid']
+      data['treshold_high'] = lab['ping_high']
+      data['ping_low'] = self.labuser_connections.where("end_at-start_at< ? ", lab['ping_low']).count
+      data['ping_mid'] = self.labuser_connections.where("end_at-start_at between ? and ? ", lab['ping_low'], lab['ping_mid']).count     
+      data['ping_high'] = self.labuser_connections.where("end_at-start_at between ? and ? ", lab['ping_mid'], lab['ping_high']).count
+      data['ping_down'] = self.labuser_connections.where("end_at-start_at > ? ", lab['ping_high']).count
       peak = self.labuser_connections.order("end_at-start_at DESC").first
-      data['lab_user']['ping_peak'] = peak.end_at-peak.start_at if peak
+      data['ping_peak'] = peak.end_at-peak.start_at if peak
     end
     data
   end

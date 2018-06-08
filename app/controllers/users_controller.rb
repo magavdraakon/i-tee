@@ -33,26 +33,28 @@ class UsersController < ApplicationController
   def create
     params[:user] = (params[:user] ? params[:user] : params[:new_user])
     @user = User.new(user_params)
-    @user.password = 'randomness' unless user[:password]
+    @user.password = 'randomness' unless params[:user][:password] || params[:new_user][:password]
     @user.ldap = false
     @user.ldap = true if params[:ldap_user]=='yes'
     respond_to do |format|
       if @user.save
-        if params[:user][:token_expires] # if time is sent, generate new token
+        if params[:user][:token_expires] || params[:new_user][:token_expires] # if time is sent, generate new token
+          logger.debug "generating token"
           @user.reset_authentication_token!
         end
         if params[:token]
           #TODO:  Tokeni loomine
           @user.reset_authentication_token!
-          @user.token_expires=DateTime.new( params[:token]['expires(1i)'].to_i,
+          @user.token_expires = DateTime.new( params[:token]['expires(1i)'].to_i,
                                       params[:token]['expires(2i)'].to_i,
                                       params[:token]['expires(3i)'].to_i,
                                       params[:token]['expires(4i)'].to_i,
                                       params[:token]['expires(5i)'].to_i)
-          @user.save
+         
         end
+        @user.save
         format.html { redirect_to(users_path, :notice => 'User was successfully created.') }
-        format.json  { render :json =>{ :success=> true}.merge(@user.as_json), :status => :created }
+        format.json  { render :json =>{ :success=> true, :user=> @user.as_json}, :status => :created }
       else
         format.html { render :action => 'edit' }
         format.json  { render :json => { :success=> false, :errors => @user.errors}, :status => :unprocessable_entity }
@@ -80,7 +82,7 @@ class UsersController < ApplicationController
 
         if @user.update_attributes(user_params)
           format.html { redirect_to(users_path, :notice => 'User was successfully updated.') }
-          format.json  { render :json=> { :success=> true}.merge(@user.as_json)}
+          format.json  { render :json=> { :success=> true, :user=> @user.as_json}}
         else
           format.html { render :action => 'edit' }
           format.json  { render :json => { :success=> false, :errors => @user.errors}, :status => :unprocessable_entity }
@@ -117,6 +119,13 @@ private # -------------------------------------------------------
   end
 
   def user_params
-    params.require(:user).permit(:id, :email, :password, :username, :name, :authentication_token, :token_expires, :ldap, :role)
+    if !params[:user].empty?
+      logger.debug "user is present"
+      params.require(:user).permit(:id, :email, :password, :username, :name, :authentication_token, :token_expires, :ldap, :role)
+    elsif !params[:new_user].empty?
+      logger.debug "new_user is present"
+      params.require(:new_user).permit(:id, :email, :password, :username, :name, :authentication_token, :token_expires, :ldap, :role)
+    end  
+
   end
 end
