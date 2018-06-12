@@ -1,8 +1,8 @@
 class TokenAuthenticationsController < ApplicationController
    #at the moment, only allow managers to reset the tokens
-  before_filter :authorise_as_manager
-  before_filter :manager_tab
-  before_filter :set_user
+  before_action :authorise_as_manager
+  before_action :manager_tab
+  before_action :set_user
  
   def edit    
   end
@@ -32,7 +32,7 @@ class TokenAuthenticationsController < ApplicationController
   def destroy
     @user.authentication_token = nil
     @user.save
-    redirect_to :back
+    redirect_back fallback_location: manage_tokens_path
   end
 
 

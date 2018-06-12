@@ -8,16 +8,16 @@ class ApplicationController < ActionController::Base
   
 
   require 'will_paginate/array'
-  before_filter :check_for_cancel, :only => [:create, :update]
+  before_action :check_for_cancel, :only => [:create, :update]
 
   layout :set_layout
 
-  before_filter :authenticate_user_from_token!
-  before_filter :authenticate_user!, :except=>[ :about, :labinfo, :ping ]
-  before_filter :admin?
-  before_filter :manager?
-  before_filter :per_page
-  before_filter :set_headers
+  before_action :authenticate_user_from_token!
+  before_action :authenticate_user!, :except=>[ :about, :labinfo, :ping ]
+  before_action :admin?
+  before_action :manager?
+  before_action :per_page
+  before_action :set_headers
 
   def set_layout
     begin

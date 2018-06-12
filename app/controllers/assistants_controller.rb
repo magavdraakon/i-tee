@@ -1,8 +1,8 @@
 class AssistantsController < ApplicationController
   #restricted to admins
-  before_filter :authorise_as_admin
-  before_filter :set_assistant, only: [:show, :edit, :update, :destroy]
-  before_filter :admin_tab
+  before_action :authorise_as_admin
+  before_action :set_assistant, only: [:show, :edit, :update, :destroy]
+  before_action :admin_tab
   respond_to :html
 
   def index

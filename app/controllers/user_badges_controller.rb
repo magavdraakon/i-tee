@@ -1,7 +1,7 @@
 class UserBadgesController < ApplicationController
-  before_filter :authorise_as_admin
-  before_filter :admin_tab
-  before_filter :set_user_badge, :only=>[:show, :edit, :update, :destroy]
+  before_action :authorise_as_admin
+  before_action :admin_tab
+  before_action :set_user_badge, :only=>[:show, :edit, :update, :destroy]
 
   # GET /user_badges
   # GET /user_badges.json

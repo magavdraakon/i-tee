@@ -1,8 +1,8 @@
 class UsersController < ApplicationController
-  before_filter :authorise_as_manager, :except=>['show']
-  before_filter :manager_tab, :except=>['show']
-  before_filter :user_tab, :only=>['show']
-  before_filter :set_user, :only=>[:show, :edit, :update, :destroy]
+  before_action :authorise_as_manager, :except=>['show']
+  before_action :manager_tab, :except=>['show']
+  before_action :user_tab, :only=>['show']
+  before_action :set_user, :only=>[:show, :edit, :update, :destroy]
 
   def index
     set_order_by
@@ -88,7 +88,10 @@ class UsersController < ApplicationController
           format.json  { render :json => { :success=> false, :errors => @user.errors}, :status => :unprocessable_entity }
         end
       else
-        format.html { redirect_to(:back, :notice=> "Can't find user") }
+        format.html { 
+          flash[:notice]= "Can't find user"
+          redirect_back fallback_location: users_path
+         }
         format.json { render :json=> { :success=>false, :message=> "Can't find user"} }
       end
     end
@@ -101,10 +104,13 @@ class UsersController < ApplicationController
         logger.debug @user.as_json
         @user.destroy
         logger.debug "\n user removal END \n"
-        format.html { redirect_to(:back) }
+        format.html { redirect_back fallback_location: users_path) }
         format.json { render :json=> { :success=>true, :message=> 'user removed'} }
       else
-        format.html { redirect_to(:back, :notice=> "Can't find user") }
+        format.html { 
+          flash[:notice]= "Can't find user"
+          redirect_back fallback_location: users_path
+        }
         format.json { render :json=> { :success=>false, :message=> "Can't find user"} }
       end
     end

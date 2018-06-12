@@ -1,8 +1,9 @@
 require "base64"
 
-class GuacamoleConnection < ActiveRecord::Base
-	establish_connection "#{Rails.env}_guacamole"
+class GuacamoleConnection < GuacamoleDbBase
+	#establish_connection "#{Rails.env}_guacamole"
 	self.table_name = "guacamole_connection" 
+	self.primary_keys = :connection_id
 
 	has_many :guacamole_connection_parameters, class_name: 'GuacamoleConnectionParameter', primary_key: 'connection_id', foreign_key: 'connection_id'
 	has_many :guacamole_connection_permissions, class_name: 'GuacamoleConnectionPermission', primary_key: 'connection_id', foreign_key: 'connection_id'

@@ -1,0 +1,7 @@
+production:
+  adapter: mysql2
+  host: localhost
+  username: guacamole
+  password: password
+  database: guacamole
+  pool: 5

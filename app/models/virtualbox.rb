@@ -229,10 +229,10 @@ def self.open_guacamole(vm, user, admin=false)
         g_password = user.rdp_password
         g_name = user_prefix+vm
         # check if the user has a guacamole user
-        g_user = GuacamoleUser.where("username = ?", g_username ).first
+        g_user = GuacamoleUser.where(username: g_username ).first
         unless g_user
           # create user
-          g_user = GuacamoleUser.create(username: g_username, password_hash:  g_password, timezone: 'Etc/GMT+0')
+          g_user = GuacamoleUser.create({username: g_username, password_hash:  g_password, timezone: 'Etc/GMT+0'})
           unless g_user
             logger.debug g_user
             return {success: false, message: 'unable to add user to guacamole'} 
@@ -241,6 +241,7 @@ def self.open_guacamole(vm, user, admin=false)
         	# update password just in case
         	g_user.password_hash = user.rdp_password
         	g_user.apply_salt
+        	logger.debug g_user.as_json
         	g_user.save
         end 
         params = [
@@ -251,7 +252,7 @@ def self.open_guacamole(vm, user, admin=false)
 #             { parameter_name: 'color-depth', parameter_value: 255 }
         ]
         # check if there is a connection
-        g_conn = GuacamoleConnection.where("connection_name = ? ", g_name ).first
+        g_conn = GuacamoleConnection.where(connection_name: g_name ).first
         unless g_conn # find by full name
           # create connection
           # data format {connection_name, protocol, max_connections, max_connections_per_user, params {hostname, port, username, password, color-depth}
@@ -270,9 +271,9 @@ def self.open_guacamole(vm, user, admin=false)
           # update/create all parameters
           params.each do |p|
 	          # find parameter 
-	          param = GuacamoleConnectionParameter.where("connection_id=? and parameter_name=?", g_conn.connection_id, p[:parameter_name]).first
+	          param = GuacamoleConnectionParameter.where(connection_id: g_conn.connection_id, parameter_name: p[:parameter_name]).first
 	          if param #update
-	            GuacamoleConnectionParameter.where("connection_id=? and parameter_name=?", g_conn.connection_id, p[:parameter_name]).limit(1).update_all(parameter_value: p[:parameter_value])
+	            GuacamoleConnectionParameter.where(connection_id: g_conn.connection_id, parameter_name: p[:parameter_name]).limit(1).update_all(parameter_value: p[:parameter_value])
 	          else # create
 	            GuacamoleConnectionParameter.create(connection_id: g_conn.connection_id, parameter_name: p[:parameter_name], parameter_value: p[:parameter_value] )
 	          end
@@ -281,7 +282,7 @@ def self.open_guacamole(vm, user, admin=false)
         # check if the connection persist/has been created
         if g_conn
           # allow connection if none exists
-          permission = GuacamoleConnectionPermission.where("user_id=? and connection_id=? and permission=?", g_user.user_id, g_conn.connection_id , 'READ').first
+          permission = GuacamoleConnectionPermission.where(user_id: g_user.user_id, connection_id: g_conn.connection_id,permission: 'READ').first
           unless permission # if no permission, create one
             result = GuacamoleConnectionPermission.create(user_id: g_user.user_id, connection_id: g_conn.connection_id, permission: 'READ')
             unless result

@@ -1,7 +1,7 @@
 class LabVmtNetworksController < ApplicationController
-  before_filter :authorise_as_admin
-  before_filter :admin_tab
-  before_filter :set_lab_vmt_network, only: [:show, :edit, :update, :destroy]
+  before_action :authorise_as_admin
+  before_action :admin_tab
+  before_action :set_lab_vmt_network, only: [:show, :edit, :update, :destroy]
 
 
   # GET /lab_vmt_networks

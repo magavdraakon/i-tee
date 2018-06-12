@@ -352,7 +352,7 @@ class Vm < ActiveRecord::Base
         begin
           guacamole_connection = GuacamoleConnection.find(self.g_connection)
           begin
-            port_parameter = GuacamoleConnectionParameter.find([ guacamole_connection, 'port' ])
+            port_parameter = GuacamoleConnectionParameter.where(connection_id: guacamole_connection.id, parameter_name: 'port' ).first
             port_parameter.parameter_value = rdpPort
             port_parameter.save!
           rescue ActiveRecord::RecordNotFound => e

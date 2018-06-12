@@ -1,7 +1,7 @@
 class NetworksController < ApplicationController
-  before_filter :authorise_as_admin
-  before_filter :admin_tab
-  before_filter :set_network, :only=>[:show, :edit, :update, :destroy]
+  before_action :authorise_as_admin
+  before_action :admin_tab
+  before_action :set_network, :only=>[:show, :edit, :update, :destroy]
 
   # GET /networks
   # GET /networks.json

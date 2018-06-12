@@ -1,10 +1,10 @@
 class VmtsController < ApplicationController
   #restricted to admins 
-  before_filter :authorise_as_admin
+  before_action :authorise_as_admin
   #redirect to index view when trying to see unexisting things
-  before_filter :set_vmt, :only=>[:show, :edit, :update, :destroy]
+  before_action :set_vmt, :only=>[:show, :edit, :update, :destroy]
 
-  before_filter :admin_tab  
+  before_action :admin_tab  
   # GET /vmts
   # GET /vmts.xml
   def index

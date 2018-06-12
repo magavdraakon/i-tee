@@ -1,7 +1,8 @@
-class GuacamoleUser < ActiveRecord::Base
-	establish_connection "#{Rails.env}_guacamole"
+class GuacamoleUser < GuacamoleDbBase
+	# establish_connection "#{Rails.env}_guacamole"
 	self.table_name = "guacamole_user" 
-
+	self.primary_keys = :user_id
+	
 	has_many :guacamole_connection_permissions, class_name: 'GuacamoleConnectionPermission', primary_key: 'user_id', foreign_key: 'user_id'
 
 	before_create :apply_salt

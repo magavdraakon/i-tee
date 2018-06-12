@@ -1,11 +1,11 @@
 class LabUsersController < ApplicationController
-  before_filter :authorise_as_manager
+  before_action :authorise_as_manager
   #restricted to admins
-  before_filter :authorise_as_manager, :except=>[ :labinfo ]
+  before_action :authorise_as_manager, :except=>[ :labinfo ]
   #redirect to index view when trying to see unexisting things
-  before_filter :save_from_nil, :only=>[:show, :edit, :update, :destroy, :set_vta]
-  before_filter :manager_tab, :except=>[:search]
-  before_filter :search_tab, :only=>[:search]
+  before_action :save_from_nil, :only=>[:show, :edit, :update, :destroy, :set_vta]
+  before_action :manager_tab, :except=>[:search]
+  before_action :search_tab, :only=>[:search]
 
   def save_from_nil
     if params[:id] # find by id
@@ -94,7 +94,8 @@ class LabUsersController < ApplicationController
     # logic for when adding/removing multiple users at once to a specific lab
     if params[:lab_user] && params[:lab_user][:page]=='bulk_add'
       LabUser.add_users(params)
-      redirect_to(:back, :notice => 'successful update.')
+      flash[:notice] = 'successful update.'
+      redirect_back fallback_location: add_users_path
     else #adding a single user to a lab
       respond_to do |format|
         #create lab_user params based on lab_id and user_id
@@ -109,7 +110,10 @@ class LabUsersController < ApplicationController
         @lab_user = LabUser.new(labuser_params)
 
         if @lab_user.save
-          format.html { redirect_to(:back, :notice => 'successful update.') }
+          format.html { 
+            flash[:notice] = 'successful update.' 
+            redirect_back fallback_location: lab_users_path
+          }
           format.json { render :json=> {:success => true, :lab_user => @lab_user.with_ping}, :status=> :created}
         else
           format.html { render :action => 'index' }
@@ -124,8 +128,10 @@ class LabUsersController < ApplicationController
   def update
     respond_to do |format|
       if @lab_user.update_attributes(labuser_params)
-
-        format.html { redirect_to(:back, :notice => 'successful update.') }
+        format.html {
+          flash[:notice] = 'successful update.' 
+          redirect_back fallback_location: lab_users_path
+        }
         format.json  { render :json=>{:success=>true, :lab_user=>@lab_user.as_json} }
       else
         format.html { render :action => 'edit' }
@@ -260,9 +266,12 @@ class LabUsersController < ApplicationController
       notice += "#{n_missing.join(', ')} name missing<br/>" unless n_missing.empty?
       notice += "#{t_missing.join(', ')} token missing" unless t_missing.empty?
       
-      redirect_to(:back, :notice=>notice.html_safe)
+      flash[:notice] = notice.html_safe
+      redirect_back fallback_location: add_users_path
+
     else
-      redirect_to(:back, :alert=>'No import file specified.')
+      flash[:alert] = 'No import file specified.'
+      redirect_back fallback_location: lab_users_path
     end
   end
   

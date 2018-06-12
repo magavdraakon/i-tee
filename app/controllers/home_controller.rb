@@ -1,6 +1,6 @@
 class HomeController < ApplicationController
-  before_filter :authorise_as_admin, :only=>[:backup, :export, :import, :system_info, :template_info, :jobs, :delete_job, :run_job]
-  before_filter :home_tab, :except=>[:about]
+  before_action :authorise_as_admin, :only=>[:backup, :export, :import, :system_info, :template_info, :jobs, :delete_job, :run_job]
+  before_action :home_tab, :except=>[:about]
   require 'zip'
   # ist labs and import/export links
   def backup 
@@ -156,15 +156,15 @@ class HomeController < ApplicationController
   end
 
   def delete_job
-    job=Delayed::Job.find_by_id(params[:id])
+    job = Delayed::Job.find_by_id(params[:id])
     job.destroy
-    redirect_to :back
+    redirect_back fallback_location: jobs_path
   end
 
   def run_job
-    job=Delayed::Job.find_by_id(params[:id])
+    job = Delayed::Job.find_by_id(params[:id])
     job.invoke_job
-    redirect_to :back
+    redirect_back fallback_location: jobs_path
   end
 
   def template_info

@@ -1,7 +1,7 @@
 class VirtualboxController < ApplicationController
-	before_filter :authorise_as_admin
-	before_filter :set_user, only: [:update_password, :remove_password]
-	before_filter :virtualization_tab
+	before_action :authorise_as_admin
+	before_action :set_user, only: [:update_password, :remove_password]
+	before_action :virtualization_tab
 
 	def index
 		@vms = Virtualbox.get_machines(params[:state], params[:where])
@@ -56,13 +56,12 @@ class VirtualboxController < ApplicationController
 
 		if errors.count > 0
 			messages << "<b>Errors:</b>"
-			redirect_to :back, alert: (messages.join('</br>') + '<br/>' + errors.join('<br/>')).html_safe
+			flash[:alert] = (messages.join('</br>') + '<br/>' + errors.join('<br/>')).html_safe
+      redirect_back fallback_location: virtualization_path
 		else
-			redirect_to :back, notice: messages.join('</br>').html_safe
+			flash[:notice] = messages.join('</br>').html_safe
+      redirect_back fallback_location: virtualization_path
 		end
-
-	rescue ActionController::RedirectBackError
-		redirect_to(virtualization_path)
 	end
 
 	def rdp_password

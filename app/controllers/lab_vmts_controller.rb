@@ -1,9 +1,9 @@
 class LabVmtsController < ApplicationController
   #restricted to admins
-  before_filter :authorise_as_admin
+  before_action :authorise_as_admin
   #redirect to index view when trying to see unexisting things
-  before_filter :set_lab_vmt, :only=>[:edit, :show, :update, :destroy]
-  before_filter :admin_tab
+  before_action :set_lab_vmt, :only=>[:edit, :show, :update, :destroy]
+  before_action :admin_tab
    
   # GET /lab_vmts
   # GET /lab_vmts.xml
@@ -70,7 +70,7 @@ class LabVmtsController < ApplicationController
   def destroy
     @lab_vmt.destroy
     respond_to do |format|
-      format.html { redirect_to(:back) }
+      format.html { redirect_back fallback_location: lab_vmts_path }
       format.xml  { head :ok }
     end
   end

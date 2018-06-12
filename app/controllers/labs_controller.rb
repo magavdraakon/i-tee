@@ -1,12 +1,12 @@
 class LabsController < ApplicationController  
   #users can see courses, running labs and end their OWN lab
-  before_filter :authorise_as_admin, :except => [:user_labs, :start_lab, :end_lab, :restart_lab]
+  before_action :authorise_as_admin, :except => [:user_labs, :start_lab, :end_lab, :restart_lab]
 
   #redirect to index view when trying to see unexisting things
-  before_filter :set_lab, :only=>[:show, :edit, :update, :destroy]
+  before_action :set_lab, :only=>[:show, :edit, :update, :destroy]
   # set the menu tab to show the user
-  before_filter :course_tab, :only=>[:user_labs]
-  before_filter :admin_tab, :except=>[:user_labs]
+  before_action :course_tab, :only=>[:user_labs]
+  before_action :admin_tab, :except=>[:user_labs]
   
   # GET /labs
   # GET /labs.xml
@@ -131,9 +131,9 @@ class LabsController < ApplicationController
   def user_labs
     get_user # @user - either lab owner or current user
     if !@user && params[:username]
-          logger.debug "There is no user named '#{params[:username]}'"
-          flash[:notice] = "There is no user named '#{params[:username]}'"
-          redirect_to :back and return
+      logger.debug "There is no user named '#{params[:username]}'"
+      flash[:notice] = "There is no user named '#{params[:username]}'"
+      redirect_back fallback_location: my_labs_path+(params[:id] ? "/#{params[:id]}" : '')
     elsif !@admin && params[:username] then # simple user should not have the username in url
       logger.debug "\nmy_labs: Relocate user\n"
       # simple user should not have the username in url
@@ -154,9 +154,6 @@ class LabsController < ApplicationController
         redirect_to(error_401_path) and return
       end
     end
-    rescue ActionController::RedirectBackError # cant redirect back? go to the lab instead
-      logger.info '\nNo :back error\n'
-      redirect_to(my_labs_path+(params[:id] ? "/#{params[:id]}" : ''))
   end
   
   def start_lab_by_id
@@ -166,31 +163,36 @@ class LabsController < ApplicationController
         if @labuser
           # generating vm info if needed
           result =  @labuser.start_lab
-          format.html { redirect_to(:back) }
+          format.html { redirect_back fallback_location: my_labs_path }
           format.json {render :json=>{ :success => result[:success] , :message=> result[:message], :lab_user => @labuser.id, :start_time => @labuser.start }}
         else
-          format.html { redirect_to :back , :notice=> "Can't find lab user" }
+          format.html { 
+            flash[:notice] = "Can't find lab user"
+            redirect_back fallback_location: my_labs_path }
           format.json { render :json=> {:success => false , :message=>  "Can not find mission attempt" }}
         end
       else
-        format.html { redirect_to :back , :notice=> 'Restricted access' }
+        format.html { 
+          flash[:notice] =  'Restricted access' 
+          redirect_back fallback_location: my_labs_path }
         format.json { render :json=> {:success => false , :message=>  'No permission' }}
       end
     end
-    rescue ActionController::RedirectBackError # cant redirect back? go to the lab instead
-      logger.info "\nNo :back error\n"
-      redirect_to(my_labs_path)
   end
 
   # method for starting a lab, creates virtual machine dbrows and sets the start time for the lab
   def start_lab
     respond_to do |format|
-      @lab=Lab.find(params[:id])  
+      @lab = Lab.find(params[:id])  
+      fallback_path = my_labs_path+(@lab ? "/#{@lab.id}" : '')+(@lab && params[:username] ? "/#{params[:username]}" : '')
       get_user # @user - either lab owner or current user
       if !@user
         logger.debug "Can't find user: "
         logger.debug params
-        format.html { redirect_to :back , :notice=> "Can not find user" }
+        format.html {
+          flash[:notice] = "Can't find user"
+          redirect_back fallback_location: fallback_path
+        }
         format.json { render :json=> {:success => false , :message=>  "Can not find user" }}
       elsif !@admin && (params[:username] || params[:user_id])
         logger.debug '\n start_lab: Relocate user\n'
@@ -204,7 +206,10 @@ class LabsController < ApplicationController
           logger.debug "\nStarting '#{@lab_user.user.username}' lab '#{@lab_user.lab.name}' as admin\n" if @admin
           # generating vm info if needed
           result = @lab_user.start_lab
-          format.html { redirect_to(:back, notice: result[:message]) }
+          format.html { 
+            flash[:notice] = result[:message]
+            redirect_back fallback_location: fallback_path
+          }
           format.json {render :json=>{ :success => result[:success] , :message=> result[:message], :lab_user => @lab_user.id, :start_time => @lab_user.start }}
         else
           # no this user does not have this lab
@@ -220,9 +225,6 @@ class LabsController < ApplicationController
         format.html { redirect_to my_labs_path , :notice=> "Can't find lab" }
         format.json { render :json=> {:success => false , :message=>  "Can not find lab" }}
       end
-    rescue ActionController::RedirectBackError # cant redirect back? go to the lab instead
-      logger.info "\nNo :back error\n"
-      redirect_to(my_labs_path+(@lab ? "/#{@lab.id}" : '')+(@lab && params[:username] ? "/#{params[:username]}" : ''))
   end
   
   def end_lab_by_id
@@ -233,20 +235,26 @@ class LabsController < ApplicationController
           result = @labuser.end_lab
           logger.debug "mission #{@labuser.id} end result: #{result.as_json}"
           # back to the view the link was in
-          format.html { redirect_to(:back, notice: result[:message]) }
+          format.html {
+            flash[:notice] = result[:message]
+            redirect_back fallback_location: my_labs_path
+          }
           format.json {render :json=>{ :success => result[:success] , :message=> result[:message], :lab_user => @labuser.id , :end_time => @labuser.end}}
         else
-          format.html { redirect_to :back , :notice=> "Can't find lab user" }
+          format.html {
+            flash[:notice] = "Can't find lab user" 
+            redirect_back fallback_location: my_labs_path
+          }
           format.json { render :json=> {:success => false , :message=>  "Can't find lab user" }}
         end
       else
-        format.html { redirect_to :back , :notice=> 'Restricted access' }
+        format.html {
+          flash[:notice] = 'Restricted access' 
+          redirect_back fallback_location: my_labs_path
+        }
         format.json { render :json=> {:success => false , :message=>  'No permission error' }}
       end
     end
-    rescue ActionController::RedirectBackError # cant redirect back? go to the lab instead
-      logger.info "\nNo :back error\n"
-      redirect_to(my_labs_path)
   end
 
   # method to end lab by username and lab id
@@ -260,24 +268,33 @@ class LabsController < ApplicationController
             result = @labuser.end_lab
             logger.debug "mission #{@labuser.id} end result: #{result.as_json}"
             # back to the view the link was in
-            format.html { redirect_to(:back, notice: result[:message]) }
+            format.html {
+              flash[:notice] = result[:message]
+              redirect_back fallback_location: my_labs_path
+            }
             format.json {render :json=>{ :success => result[:success] , :message=> result[:message], :lab_user => @labuser.id , :end_time => @labuser.end}}
           else
-            format.html { redirect_to :back , :notice=> "Can't find lab user" }
+            format.html {
+              flash[:notice] = "Can't find lab user"
+              redirect_back fallback_location: my_labs_path
+            }
             format.json { render :json=> {:success => false , :message=>  "Can't find lab user" }}
           end
         else
-          format.html { redirect_to :back , :notice=> 'No such user' }
+          format.html {
+            flash[:notice] = 'No such user'
+            redirect_back fallback_location: my_labs_path
+          }
           format.json { render :json=> {:success => false , :message=>  'No such user' }}
         end  
       else
-        format.html { redirect_to :back , :notice=> 'Restricted access' }
+        format.html {
+          flash[:notice] = 'Restricted access'
+          redirect_back fallback_location: my_labs_path
+        }
         format.json { render :json=> {:success => false , :message=>  'No permission error' }}
       end
     end
-    rescue ActionController::RedirectBackError # cant redirect back? go to the lab instead
-      logger.info "\nNo :back error\n"
-      redirect_to(my_labs_path)
   end
 
   #method for ending a lab, deletes virtual machine db rows and sets the end date for the lab
@@ -290,7 +307,10 @@ class LabsController < ApplicationController
         result = @lab_user.end_lab
         logger.debug "mission #{@lab_user.id} end result: #{result.as_json}"
         # back to the view the link was in
-        format.html { redirect_to(:back, notice: result[:message]) }
+        format.html {
+          flash[:notice] = result[:message]
+          redirect_back fallback_location: my_labs_path+(@lab_user.lab ? "/#{@lab_user.lab.id}" : '')
+        }
         format.json {render :json=>{ :success => result[:success] , :message=> result[:message], :lab_user => @lab_user.id , :end_time => @lab_user.end}}
       else #this lab doesnt belong to this user, permission error
         format.html { redirect_to error_401_path , :notice=> 'Restricted access!' }
@@ -302,9 +322,6 @@ class LabsController < ApplicationController
         format.html { redirect_to my_labs_path, :notice => 'Can not find users lab!' }
         format.json { render :json=>{:success => false, :message=> 'can not find users lab' }}
       end
-    rescue ActionController::RedirectBackError # cant redirect back? go to the lab instead
-      logger.info '\nNo :back error\n'
-      redirect_to(my_labs_path+(@lab_user.lab ? "/#{@lab_user.lab.id}" : ''))
   end
   
 
@@ -315,31 +332,41 @@ class LabsController < ApplicationController
         if @labuser
           result = @labuser.restart_lab
           # back to the view the link was in
-          format.html { redirect_to(:back, notice: result[:message]) }
+          format.html {
+            flash[:notice] = result[:message]
+            redirect_back fallback_location: my_labs_path
+          }
           format.json {render :json=>{ :success => result[:success] , :message=> result[:message], :lab_user => @labuser.id, :start_time => @labuser.start }}
         else
-          format.html { redirect_to :back , :notice=> "Can't find lab user" }
+          format.html {
+            flash[:notice] = "Can't find lab user"
+            redirect_back fallback_location: my_labs_path
+          }
           format.json { render :json=> {:success => false , :message=>  "Can't find lab user" }}
         end
       else
-        format.html { redirect_to :back , :notice=> 'Restricted access' }
+        format.html {
+          flash[:notice] = 'Restricted access'
+          redirect_back fallback_location: my_labs_path
+        }
         format.json { render :json=> {:success => false , :message=>  'No permission error' }}
       end
     end
-    rescue ActionController::RedirectBackError # cant redirect back? go to the lab instead
-      logger.info "\nNo :back error\n"
-      redirect_to(my_labs_path)
   end
 
   # Restarting a lab means deleting virtual machines and removing start/end times
   def restart_lab
     respond_to do |format|
       @lab=Lab.find(params[:id])
+      fallback_path = my_labs_path+(@lab ? "/#{@lab.id}" : '')+(@lab && params[:username] ? "/#{params[:username]}" : '')
       get_user
       if !@user 
         logger.debug "Can't find user: "
         logger.debug params
-        format.html { redirect_to :back , :notice=> "Can't find user" }
+        format.html {
+          flash[:notice] = "Can't find user" 
+          redirect_back fallback_location: fallback_path
+        }
         format.json { render :json=> {:success => false , :message=>  "Can't find user" }}
       elsif !@admin && (params[:username] || params[:user_id])
         user = params[:username] ? params[:username] : params[:user_id]
@@ -354,7 +381,10 @@ class LabsController < ApplicationController
           # restart lab (stop ->  clear -> start)
           result = @lab_user.restart_lab
           # redirect back to the view the link was in
-          format.html { redirect_to(:back, notice: result[:message]) }
+          format.html {
+            flash[:notice] = result[:message]
+            redirect_back fallback_location: fallback_path
+          }
           format.json {render :json=>{ :success => result[:success] , :message=> result[:message], :lab_user => @lab_user.id, :start_time => @lab_user.start }}
         else # no this user does not have this lab
           format.html { redirect_to my_labs_path, :notice => 'That lab was not assigned to this user!' }
@@ -369,9 +399,6 @@ class LabsController < ApplicationController
         format.html { redirect_to my_labs_path , :notice=> "Can't find lab" }
         format.json { render :json=> {:success => false , :message=>  "Can't find lab" }}
       end
-    rescue ActionController::RedirectBackError # cant redirect back? go to the lab instead
-      logger.info "\nNo :back error\n"
-      redirect_to(my_labs_path+(@lab ? "/#{@lab.id}" : '')+(@lab && params[:username] ? "/#{params[:username]}" : ''))
   end
   
 
