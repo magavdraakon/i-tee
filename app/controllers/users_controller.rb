@@ -104,7 +104,7 @@ class UsersController < ApplicationController
         logger.debug @user.as_json
         @user.destroy
         logger.debug "\n user removal END \n"
-        format.html { redirect_back fallback_location: users_path) }
+        format.html { redirect_back fallback_location: users_path }
         format.json { render :json=> { :success=>true, :message=> 'user removed'} }
       else
         format.html { 

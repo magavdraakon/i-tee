@@ -10,7 +10,7 @@ gem 'devise_ldap_authenticatable'
 gem 'devise-encryptable'
 gem 'marked-rails'
 gem 'delayed_job_active_record'
-gem 'composite_primary_keys', ">= 10.9 "
+gem 'composite_primary_keys', ">= 10.9 ", git: 'https://github.com/feederco/composite_primary_keys.git'
 gem 'test-unit'
 # Use SCSS for stylesheets
 gem 'sass-rails'

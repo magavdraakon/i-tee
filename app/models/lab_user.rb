@@ -79,10 +79,10 @@ class LabUser < ActiveRecord::Base
       result = Check.has_free_resources
       if result && result[:success] # has resources
         LabVmt.where('lab_id = ? ', self.lab_id).each do |template|
-          vm = Vm.where('lab_vmt_id=? and lab_user_id=?', template.id, self.id).first
+          vm = self.vms.where(lab_vmt_id: template.id).first
           unless vm
-            vm = Vm.create(:name=>"#{template.name}-#{self.user.username}", :lab_vmt=>template, :description=> 'Initialize the virtual machine by clicking <strong>Start</strong>.', :lab_user=>self)
-            logger.debug "\n #{vm.lab_user.id} Machine #{vm.id} - #{template.name}-#{self.user.username} successfully generated.\n"
+            vm = self.vms.create!(:name=>"#{template.name}-#{self.user.username}", :lab_vmt=>template, :description=> 'Initialize the virtual machine by clicking <strong>Start</strong>.')
+            logger.debug "\n #{vm.lab_user.id} Machine #{vm.id} - #{vm.name} successfully generated.\n"
           end
         end
         # start delayed jobs for keeping up with the last activity
@@ -92,6 +92,7 @@ class LabUser < ActiveRecord::Base
         self.last_activity = Time.now
         self.activity = 'Lab start'
         unless self.vta_setup # do not repeat setup if set by api
+          logger.debug "doing VTA setup"
           # check if lab has assistant to be able to create the vta labuser
           lab = self.lab
           user = self.user

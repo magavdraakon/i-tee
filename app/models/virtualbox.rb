@@ -241,7 +241,6 @@ def self.open_guacamole(vm, user, admin=false)
         	# update password just in case
         	g_user.password_hash = user.rdp_password
         	g_user.apply_salt
-        	logger.debug g_user.as_json
         	g_user.save
         end 
         params = [

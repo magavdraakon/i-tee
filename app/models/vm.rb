@@ -1,5 +1,5 @@
 class Vm < ActiveRecord::Base
-  belongs_to :user
+  
   belongs_to :lab_vmt
   belongs_to :lab_user
   before_destroy :try_delete_vm
@@ -339,15 +339,19 @@ class Vm < ActiveRecord::Base
         end
         cookie_domain = ITee::Application::config.guacamole[:cookie_domain]
 
-	begin
-          guacamole_user = GuacamoleUser.find(self.lab_user.g_user)
-	rescue ActiveRecord::RecordNotFound => e
+	    
+          guacamole_user = GuacamoleUser.where(username: user_prefix+"#{self.lab_user.id}").first
+        if guacamole_user
+          guacamole_user.password_hash = self.lab_user.g_password
+          guacamole_user.apply_salt
+          guacamole_user.save!
+	       else
           self.lab_user.g_username = user_prefix+"#{self.lab_user.id}"
           self.lab_user.g_password = SecureRandom.base64
           guacamole_user = GuacamoleUser.create!(username: self.lab_user.g_username, password_hash: self.lab_user.g_password, timezone: 'Etc/GMT+0')
           self.lab_user.g_user = guacamole_user.user_id
           self.lab_user.save!
-	end
+	       end
 
         begin
           guacamole_connection = GuacamoleConnection.find(self.g_connection)
@@ -392,6 +396,8 @@ class Vm < ActiveRecord::Base
         end
 
         post = HttpRequest.post(url_prefix + "/api/tokens", {username: self.lab_user.g_username, password: self.lab_user.g_password})
+        logger.debug post
+        logger.debug post.body if post.body
         if post.body && post.body['authToken']
           uri = GuacamoleConnection.get_url(self.g_connection)
           path = url_prefix + "/#/client/#{uri}"

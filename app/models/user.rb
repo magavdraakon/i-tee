@@ -7,13 +7,17 @@ class User < ActiveRecord::Base
   # Setup accessible (or protected) attributes for your model
   #attr_accessible :name, :username, :email, :password, :password_confirmation, :remember_me, :token_expires, :role
 
-  has_many :vms#, :dependent => :destroy
   has_many :lab_users#, :dependent => :destroy
   before_destroy :del_labs # vms are deleted trough lab user
   before_save :nilify_email
  # has_many :user_badges, :dependent => :destroy
 
   validates_format_of :username, :with => /\A[[:alnum:]]+\.?[[:alnum:]_]+[[:alnum:]]?\z/ , :message => 'can only be alphanumeric with underscores, contain single periods and no spaces'
+
+  def vms
+    labuser_ids = self.lab_users.pluck(:id)
+    Vm.where(lab_user_id: labuser_ids)
+  end
 
   # Populate user model with name attribute
   def ldap_before_save
