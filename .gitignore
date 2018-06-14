@@ -4,8 +4,6 @@ db/schema.rb
 log/*.log
 tmp/**/*
 .redcar/*
-config/database.yml
-config/guacamole_base.yml
 config/ldap.yml
 config/environments/development.rb
 config/environments/production.rb

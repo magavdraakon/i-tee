@@ -112,8 +112,19 @@ Rails.application.configure do
   # Database connection configurations for I-Tee and Guacamole databases
   config.database = {
     "production" => config_file['database'],
-    "production_guacamole" => config_file['guacamole_database']
+    "production_guacamole" => config_file['guacamole_database'] # used in app/models/guaccamole_db_base
   }
+  # used in config/database.yml
+  ENV["ITEE_HOST"] = config_file['database']['host']
+  ENV["ITEE_USER"] = config_file['database']['username']
+  ENV["ITEE_PASSWORD"] = config_file['database']['password']
+  ENV["ITEE_DATABASE"] = config_file['database']['database']
+
+
+  ENV["GUACAMOLE_DB_HOST"] = config_file['guacamole_database']['host']
+  ENV["GUACAMOLE_DB_USER"] = config_file['guacamole_database']['username']  
+  ENV["GUACAMOLE_DB_PASSWORD"] = config_file['guacamole_database']['password']
+  ENV["GUACAMOLE_DB_NAME"] = config_file['guacamole_database']['database']
 
   # LDAP authentication configuration
   config.ldap = {
