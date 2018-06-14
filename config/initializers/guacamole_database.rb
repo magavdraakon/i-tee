@@ -1,1 +1,0 @@
-GUACAMOLE_DB = YAML.load_file(File.join(Rails.root, "config", "guacamole_base.yml"))[Rails.env.to_s]  
