@@ -14,6 +14,7 @@ class ApplicationController < ActionController::Base
 
   before_action :authenticate_user_from_token!
   before_action :authenticate_user!, :except=>[ :about, :labinfo, :ping ]
+  #skip_before_action :verify_authenticity_token , only: [:labinfo, :ping] # no csrf errors?
   before_action :admin?
   before_action :manager?
   before_action :per_page

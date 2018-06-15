@@ -245,9 +245,9 @@ def self.export_lab_separate(id)
 			end
 		end
 		# write to file
-		#puts JSON.pretty_generate(l.as_json['lab'])
+		#puts JSON.pretty_generate(l.as_json)
 		File.open(dirname+"/lab.json","w") do |f|
-		  f.write( JSON.pretty_generate( l.as_json['lab'] ) )
+		  f.write( JSON.pretty_generate( l.as_json ) )
 		end
 		# find all lab_vmts
 		
@@ -256,13 +256,13 @@ def self.export_lab_separate(id)
 		networks = [] # will fill networks into here
 		vmts = [] # will fill vmts into here
 		l.lab_vmts.each do |lvt|
-			lab_vmts << lvt.as_json['lab_vmt']
+			lab_vmts << lvt.as_json
 			lvt.lab_vmt_networks.each do |lvt_n|
-				lab_vmt_networks << lvt_n.as_json['lab_vmt_network']
-				networks << lvt_n.network.as_json['network']
+				lab_vmt_networks << lvt_n.as_json
+				networks << lvt_n.network.as_json
 			end
 
-			vmts << JSON.pretty_generate(lvt.vmt.as_json['vmt'])
+			vmts << JSON.pretty_generate(lvt.vmt.as_json)
 		end
 		# puts JSON.pretty_generate(lab_vmts)
 		File.open(dirname+"/lab_vmts.json","w") do |f|
@@ -293,21 +293,31 @@ def self.export_labuser(uuid, pretty)
 	lu = LabUser.where("uuid=?", uuid).first
 	if lu
 		if lu.start && !lu.end
+
+			lab = lu.lab
+			lab = {} unless lab
+			#logger.debug "LAB: #{lab.as_json.except('created_at', 'updated_at', 'description', 'short_description')}"
+			user = lu.user
+			user = {} unless user
+			#logger.debug "USER: #{user.as_json.slice('id', 'username', 'name', 'user_key') }"
+			assistant = lab.assistant unless lab # if lab is blank then there is no assistant
+			assistant = {} unless assistant
+			#logger.debug "ASSISTANT: #{assistant.as_json.except('created_at', 'updated_at') }"
 			data = {
 				success: true,
-				lab: lu.lab ? lu.lab.as_json['lab'].except('created_at', 'updated_at', 'description', 'short_description') : {},
-				assistant: lu.lab.assistant ? lu.lab.assistant.as_json['assistant'].except('created_at', 'updated_at')  : {},
-				labuser: lu.as_json['lab_user'].except('created_at', 'updated_at'),
-				user: lu.user ? lu.user.as_json['user'].slice('id', 'username', 'name', 'user_key') : {},
+				lab: lab.as_json.except('created_at', 'updated_at', 'description', 'short_description'),
+				assistant: assistant.as_json.except('created_at', 'updated_at'),
+				labuser: lu.as_json.except('created_at', 'updated_at'),
+				user: user.as_json.slice('id', 'username', 'name', 'user_key'),
 				vms: lu.vms.map { |vm|
-					r = vm.as_json['vm'].except('created_at', 'updated_at', 'description')
-					r['lab_vmt'] = vm.lab_vmt.as_json['lab_vmt'].except('created_at', 'updated_at')
+					r = vm.as_json.except('created_at', 'updated_at', 'description')
+					r['lab_vmt'] = vm.lab_vmt.as_json.except('created_at', 'updated_at')
 					r['lab_vmt']['lab_vmt_networks'] = vm.lab_vmt.lab_vmt_networks.map{ |n|
-						t = n.as_json['lab_vmt_network'].except('created_at', 'updated_at')
-						t['network'] = n.network.as_json['network'].except('created_at', 'updated_at')
+						t = n.as_json.except('created_at', 'updated_at')
+						t['network'] = n.network.as_json.except('created_at', 'updated_at')
 						t
 					}
-					r['lab_vmt']['vmt'] = vm.lab_vmt.vmt.as_json['vmt'].except('created_at', 'updated_at')
+					r['lab_vmt']['vmt'] = vm.lab_vmt.vmt.as_json.except('created_at', 'updated_at')
 					r
 				}
 			}
@@ -345,27 +355,27 @@ def self.export_lab(id)
 			end
 		end
 		# write to file
-		#puts JSON.pretty_generate(l.as_json['lab'])
+		#puts JSON.pretty_generate(l.as_json)
 		File.open(dirname+"/lab.json","w") do |f|
-		  f.write( JSON.pretty_generate( l.as_json['lab'] ) )
+		  f.write( JSON.pretty_generate( l.as_json ) )
 		end
 		File.open(dirname+"/assistant.json","w") do |f|
-		  f.write( JSON.pretty_generate( l.assistant ? l.assistant.as_json['assistant'] : {} ) )
+		  f.write( JSON.pretty_generate( l.assistant ? l.assistant.as_json : {} ) )
 		end
 		# find all lab_vmts
 		
 		lab_vmts = [] # will fill lab_vmts into here
 		l.lab_vmts.each do |lvt|
-			temp_vmt = JSON.parse( JSON.generate( lvt.as_json['lab_vmt'] ))
+			temp_vmt = JSON.parse( JSON.generate( lvt.as_json ))
 			lab_vmt_networks = []
 			lvt.lab_vmt_networks.each do |lvt_n|
-				temp = JSON.parse( JSON.generate( lvt_n.as_json['lab_vmt_network'] ))
-				temp['network'] = lvt_n.network.as_json['network']
+				temp = JSON.parse( JSON.generate( lvt_n.as_json ))
+				temp['network'] = lvt_n.network.as_json
 				
 				lab_vmt_networks<<temp
 			end
 			temp_vmt['lab_vmt_networks'] = lab_vmt_networks
-			vmt = lvt.vmt.as_json['vmt']
+			vmt = lvt.vmt.as_json
 			temp_vmt['vmt'] = vmt
 			lab_vmts << temp_vmt
 		end
