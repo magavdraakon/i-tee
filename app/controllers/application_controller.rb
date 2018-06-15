@@ -86,6 +86,7 @@ class ApplicationController < ActionController::Base
     origin = request.headers['origin']
     allowed = ITee::Application.config.allowed_origins
     if allowed.include?(origin) || allowed.include?('*')
+      logger.info "ALOWING ORIGIN: #{origin} based on config"
       headers['Access-Control-Allow-Origin'] = origin
       headers['Access-Control-Expose-Headers'] = 'ETag'
       headers['Access-Control-Allow-Methods'] = 'GET, POST, PATCH, PUT, DELETE, OPTIONS, HEAD'
