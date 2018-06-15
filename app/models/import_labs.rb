@@ -300,7 +300,7 @@ def self.export_labuser(uuid, pretty)
 			user = lu.user
 			user = {} unless user
 			#logger.debug "USER: #{user.as_json.slice('id', 'username', 'name', 'user_key') }"
-			assistant = lab.assistant unless lab # if lab is blank then there is no assistant
+			assistant = lab.assistant if lab # if lab is blank then there is no assistant
 			assistant = {} unless assistant
 			#logger.debug "ASSISTANT: #{assistant.as_json.except('created_at', 'updated_at') }"
 			data = {
