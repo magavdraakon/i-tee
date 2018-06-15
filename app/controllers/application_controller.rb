@@ -1,4 +1,6 @@
 class ApplicationController < ActionController::Base
+  before_action :set_headers
+
   rescue_from DeviseLdapAuthenticatable::LdapException do |exception|
     render :text => exception, :status => 500
   end
@@ -18,7 +20,6 @@ class ApplicationController < ActionController::Base
   before_action :admin?
   before_action :manager?
   before_action :per_page
-  before_action :set_headers
 
   def set_layout
     begin
