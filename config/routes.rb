@@ -49,7 +49,14 @@ Rails.application.routes.draw do
 
   resources :vmts
 
-  devise_for :users,  :controllers => {:registrations => 'users/registrations', :passwords=> 'users/passwords'}
+  #devise_for :users,  :controllers => {:registrations => 'users/registrations', :passwords=> 'users/passwords'}
+
+  devise_for :users, skip: [:sessions],  :controllers => {:registrations => 'users/registrations', :passwords=> 'users/passwords'}
+  as :user do
+    get 'sign_in', to: 'devise/sessions#new', as: :new_user_session
+    post 'sign_in', to: 'devise/sessions#create', as: :user_session
+    get 'sign_out', to: 'devise/sessions#destroy', as: :destroy_user_session
+  end
 
   #match 'users/edit', :to=>'devise/registrations#edit'
 
