@@ -56,10 +56,10 @@ class VirtualboxController < ApplicationController
 
 		if errors.count > 0
 			messages << "<b>Errors:</b>"
-			flash[:alert] = (messages.join('</br>') + '<br/>' + errors.join('<br/>')).html_safe
+			flash[:alert] = messages.join('<br/>') + '<br/>' + errors.join('<br/>')
       redirect_back fallback_location: virtualization_path
 		else
-			flash[:notice] = messages.join('</br>').html_safe
+			flash[:notice] = messages.join('<br/>')
       redirect_back fallback_location: virtualization_path
 		end
 	end
