@@ -33,12 +33,12 @@ class UsersController < ApplicationController
   def create
     params[:user] = (params[:user] ? params[:user] : params[:new_user])
     @user = User.new(user_params)
-    @user.password = 'randomness' unless params[:user][:password] || params[:new_user][:password]
+    @user.password = 'randomness' unless user_params[:password]
     @user.ldap = false
     @user.ldap = true if params[:ldap_user]=='yes'
     respond_to do |format|
       if @user.save
-        if params[:user][:token_expires] || params[:new_user][:token_expires] # if time is sent, generate new token
+        if user_params[:token_expires] # if time is sent, generate new token
           logger.debug "generating token"
           @user.reset_authentication_token!
         end
@@ -68,7 +68,7 @@ class UsersController < ApplicationController
       if @user
         @user.ldap = false
         @user.ldap = true if params[:ldap_user]=='yes'
-        if params[:user][:token_expires] # if time is sent, generate new token
+        if user_params[:token_expires] # if time is sent, generate new token
           @user.reset_authentication_token!
         end
         if params[:generate_token]=='yes'
