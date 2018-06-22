@@ -50,10 +50,10 @@
         </td>
         <td><%= vm['CurrentSnapshotName'] ? vm['CurrentSnapshotName'] : '-none-' %> </td>
         <td><%= vm['CurrentSnapshotDescription'] ? vm['CurrentSnapshotDescription'].to_time : '-none-' %></td>
-        <td><%= link_to "Take new snapshot", "/manage_vm/take_snapshot/#{vm['name']}" if vm['VMState']!='running' %></td>
+        <td><%= link_to "Take new snapshot", "/manage_vm/take_snapshot/#{vm['name']}", data: { turbolinks: false } if vm['VMState']!='running' %></td>
         <td>
-        	<%= link_to "start", "/manage_vm/start/#{vm['name']}" if vm['VMState']!='running' %>
-        	<%= link_to "stop", "/manage_vm/stop/#{vm['name']}" if vm['VMState']=='running'%>
+        	<%= link_to "start", "/manage_vm/start/#{vm['name']}", data: { turbolinks: false } if vm['VMState']!='running' %>
+        	<%= link_to "stop", "/manage_vm/stop/#{vm['name']}", data: { turbolinks: false } if vm['VMState']=='running'%>
         </td>
       </tr>
     <% end %>

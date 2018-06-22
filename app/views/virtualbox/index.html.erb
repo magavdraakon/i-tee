@@ -74,9 +74,9 @@
 
         </td>
         <td>
-        	<%= link_to "start", "/manage_vm/start/#{vm['name']}" if vm['VMState']!='running' %>
-        	<%= link_to "stop", "/manage_vm/stop/#{vm['name']}" if vm['VMState']=='running'%>
-        	<%= link_to "reset RDP", "/manage_vm/reset_rdp/#{vm['name']}" if vm['VMState']=='running'%>
+        	<%= link_to "start", "/manage_vm/start/#{vm['name']}", data: { turbolinks: false } if vm['VMState']!='running' %>
+        	<%= link_to "stop", "/manage_vm/stop/#{vm['name']}", data: { turbolinks: false } if vm['VMState']=='running'%>
+        	<%= link_to "reset RDP", "/manage_vm/reset_rdp/#{vm['name']}", data: { turbolinks: false } if vm['VMState']=='running'%>
         </td>
       </tr>
     <% end %>
