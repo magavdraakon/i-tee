@@ -54,7 +54,7 @@
 
   <% if @labs!=[] %>
         <div class="manage_lab loader">
-            <%= link_to('Start lab', start_lab_path+'/'+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : '' ), :class=>'button submit-button sl-button') unless @lab_user.start %>
+            <%= link_to('Start lab', start_lab_path+'/'+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : '' ), data: { turbolinks: false }, :class=>'button submit-button sl-button') unless @lab_user.start %>
         </div>
     <% if @lab_user.start %>
       <!-- started at: <%#=@lab_user.start%><br/>
@@ -93,12 +93,12 @@
 
             <td style="text-align:right;">
               <% if @lab.vms_by_one %>
-                <div class=" loader" ><%= link_to('Start', start_vm_path+'/'+vm.id.to_s, :class=> 'button start-button') if (state!='running' && state!='paused') || !rdp_port %>
-                <%= link_to('Pause', pause_vm_path+'/'+vm.id.to_s, :class=>'button pause-button') if state == 'running' && rdp_port && allow_restart %>
-                <%= link_to('Resume', resume_vm_path+'/'+vm.id.to_s, :class=>'button start-button') if state == 'paused' && rdp_port %>
-                <%= link_to('Stop', stop_vm_path+'/'+vm.id.to_s, :class=> 'button stop-button') if state == 'running' && rdp_port && allow_restart %>
+                <div class=" loader" ><%= link_to('Start', start_vm_path+'/'+vm.id.to_s, data: { turbolinks: false }, :class=> 'button start-button') if (state!='running' && state!='paused') || !rdp_port %>
+                <%= link_to('Pause', pause_vm_path+'/'+vm.id.to_s, data: { turbolinks: false }, :class=>'button pause-button') if state == 'running' && rdp_port && allow_restart %>
+                <%= link_to('Resume', resume_vm_path+'/'+vm.id.to_s, data: { turbolinks: false }, :class=>'button start-button') if state == 'paused' && rdp_port %>
+                <%= link_to('Stop', stop_vm_path+'/'+vm.id.to_s, data: { turbolinks: false }, :class=> 'button stop-button') if state == 'running' && rdp_port && allow_restart %>
               <% end %>
-              <%= link_to('Reset RDP', rdp_reset_path+'/'+vm.id.to_s, :class=>'button start-button') if state=='running' && rdp_port && allow_remote %>
+              <%= link_to('Reset RDP', rdp_reset_path+'/'+vm.id.to_s, data: { turbolinks: false }, :class=>'button start-button') if state=='running' && rdp_port && allow_remote %>
               </div>
             <% if allow_remote && state=='running' %>
                 <div class="remote_connections">
@@ -129,24 +129,24 @@
 <div class="manage_lab">
     <% if !@lab_user.end && @lab_user.vms.count>0 %>
         <span class="loader">
-          <%= link_to('Start all',start_all_path+'/'+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : ''),
+          <%= link_to('Start all',start_all_path+'/'+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : ''), data: { turbolinks: false },
                       :class=> 'button start-button sl-button')  %>
         </span>
          <span class="loader">
-          <%= link_to('Stop all',stop_all_path+'/'+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : ''),
+          <%= link_to('Stop all',stop_all_path+'/'+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : ''), data: { turbolinks: false },
                       :class=> 'button stop-button sl-button')  %>
         </span>
     <% end %>
     <% if @lab_user.start && @lab.restartable %>
         <span class="loader">
-          <%= link_to('Restart lab',restart_lab_path+'/'+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : ''),
+          <%= link_to('Restart lab',restart_lab_path+'/'+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : ''), data: { turbolinks: false },
                       :class=>'add-button button rl-button',
                       :confirm => 'This will delete all saved data. Are you sure?') %>
         </span>
     <%end%>
     <% unless  @lab_user.end  || !@lab.endable %>
         <span class="loader">
-          <%= link_to('End lab', end_lab_path+'/'+@lab_user.id.to_s,
+          <%= link_to('End lab', end_lab_path+'/'+@lab_user.id.to_s, data: { turbolinks: false },
                       :class=>'delete-button button el-button',
                       :confirm => 'This will delete all saved data. Are you sure?')   %>
         </span>

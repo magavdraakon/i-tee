@@ -200,7 +200,7 @@ Rails.application.configure do
     # Compress JavaScripts and CSS
     config.assets.compress = true  # TODO! check if this is needed
     
-    config.assets.compile = true
+    config.assets.compile = false
     
     # Generate digests for assets URLs.
     config.assets.digest = true
