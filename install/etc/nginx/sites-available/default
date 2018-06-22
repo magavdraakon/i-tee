@@ -28,6 +28,7 @@ server {
 		send_timeout                3600;
 		proxy_set_header Host            $host;
 		proxy_set_header X-Forwarded-For $remote_addr;
+		proxy_set_header X-Forwarded-Proto https;
 	}
 
 	location /lab-proxy/ {
