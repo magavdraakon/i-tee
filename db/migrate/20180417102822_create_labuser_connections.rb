@@ -1,4 +1,4 @@
-class CreateLabuserConnections < ActiveRecord::Migration
+class CreateLabuserConnections < ActiveRecord::Migration[5.2]
   def change
     create_table :labuser_connections do |t|
       t.integer :lab_user_id

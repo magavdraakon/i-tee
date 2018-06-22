@@ -1,4 +1,4 @@
-class CreateMaterials < ActiveRecord::Migration
+class CreateMaterials < ActiveRecord::Migration[5.2]
   def self.up
     create_table :materials do |t|
       t.string :name

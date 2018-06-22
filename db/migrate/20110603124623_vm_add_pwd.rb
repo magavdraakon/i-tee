@@ -1,4 +1,4 @@
-class VmAddPwd < ActiveRecord::Migration
+class VmAddPwd < ActiveRecord::Migration[5.2]
   def self.up
     add_column :vms, :password, :string
   end

@@ -1,4 +1,4 @@
-class CreateMacs < ActiveRecord::Migration
+class CreateMacs < ActiveRecord::Migration[5.2]
   def self.up
     create_table :macs do |t|
       t.string :mac

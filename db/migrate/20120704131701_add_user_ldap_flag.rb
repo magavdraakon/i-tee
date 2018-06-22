@@ -1,4 +1,4 @@
-class AddUserLdapFlag < ActiveRecord::Migration
+class AddUserLdapFlag < ActiveRecord::Migration[5.2]
   def self.up
     # by default all users are ldap users
     add_column :users, :ldap, :boolean, :default => true

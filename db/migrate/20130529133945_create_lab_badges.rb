@@ -1,4 +1,4 @@
-class CreateLabBadges < ActiveRecord::Migration
+class CreateLabBadges < ActiveRecord::Migration[5.2]
   def change
     create_table :lab_badges do |t|
       t.integer :lab_id

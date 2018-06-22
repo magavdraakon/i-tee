@@ -1,4 +1,4 @@
-class AddShortDescToLab < ActiveRecord::Migration
+class AddShortDescToLab < ActiveRecord::Migration[5.2]
   def self.up
     add_column :labs, :short_description, :string
   end

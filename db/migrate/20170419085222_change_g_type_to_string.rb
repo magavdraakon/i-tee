@@ -1,4 +1,4 @@
-class ChangeGTypeToString < ActiveRecord::Migration
+class ChangeGTypeToString < ActiveRecord::Migration[5.2]
   def up
     change_column :lab_vmts, :g_type, :string, :null => false, :default => 'none'
     LabVmt.where(g_type: '0').update_all(g_type: 'none')

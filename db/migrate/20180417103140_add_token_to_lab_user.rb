@@ -1,4 +1,4 @@
-class AddTokenToLabUser < ActiveRecord::Migration
+class AddTokenToLabUser < ActiveRecord::Migration[5.2]
   def change
     add_column :lab_users, :token, :string
     add_index :lab_users, :token, :unique => true

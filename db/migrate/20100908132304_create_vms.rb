@@ -1,4 +1,4 @@
-class CreateVms < ActiveRecord::Migration
+class CreateVms < ActiveRecord::Migration[5.2]
   def self.up
     create_table :vms do |t|
       t.string :name

@@ -1,4 +1,4 @@
-class AddLabUserToVm < ActiveRecord::Migration
+class AddLabUserToVm < ActiveRecord::Migration[5.2]
   def change
     add_column :vms, :lab_user_id, :integer
 

@@ -1,4 +1,4 @@
-class AddUidToLabuser < ActiveRecord::Migration
+class AddUidToLabuser < ActiveRecord::Migration[5.2]
   def change
     add_column :lab_users, :uuid, :string
     add_index :lab_users, :uuid, :unique => true

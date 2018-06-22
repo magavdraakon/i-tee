@@ -1,4 +1,4 @@
-class AddKeypairToUser < ActiveRecord::Migration
+class AddKeypairToUser < ActiveRecord::Migration[5.2]
   def self.up
     add_column :users, :keypair, :boolean
   end

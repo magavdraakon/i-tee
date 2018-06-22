@@ -1,4 +1,4 @@
-class CreateLabUsers < ActiveRecord::Migration
+class CreateLabUsers < ActiveRecord::Migration[5.2]
   def self.up
     create_table :lab_users do |t|
       t.integer :lab_id

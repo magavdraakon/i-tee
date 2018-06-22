@@ -1,4 +1,4 @@
-class AddOrderToLabVmt < ActiveRecord::Migration
+class AddOrderToLabVmt < ActiveRecord::Migration[5.2]
   def change
     add_column :lab_vmts, :position, :integer, :default => 0
   end

@@ -1,4 +1,4 @@
-class CreateLabVmts < ActiveRecord::Migration
+class CreateLabVmts < ActiveRecord::Migration[5.2]
   def self.up
     create_table :lab_vmts do |t|
       t.string :name

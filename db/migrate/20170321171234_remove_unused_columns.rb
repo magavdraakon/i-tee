@@ -1,4 +1,4 @@
-class RemoveUnusedColumns < ActiveRecord::Migration
+class RemoveUnusedColumns < ActiveRecord::Migration[5.2]
   def up
     remove_column :vmts, :operating_system_id
     remove_column :vmts, :shellinabox

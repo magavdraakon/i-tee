@@ -1,4 +1,4 @@
-class CreateLabVmtNetworks < ActiveRecord::Migration
+class CreateLabVmtNetworks < ActiveRecord::Migration[5.2]
   def change
     create_table :lab_vmt_networks do |t|
       t.integer :network_id

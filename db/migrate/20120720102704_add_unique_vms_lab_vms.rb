@@ -1,4 +1,4 @@
-class AddUniqueVmsLabVms < ActiveRecord::Migration
+class AddUniqueVmsLabVms < ActiveRecord::Migration[5.2]
   def self.up
     add_index :vms, :name, :unique => true
     add_index :lab_vmts, :name, :unique => true

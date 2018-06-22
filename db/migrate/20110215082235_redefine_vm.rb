@@ -1,4 +1,4 @@
-class RedefineVm < ActiveRecord::Migration
+class RedefineVm < ActiveRecord::Migration[5.2]
   def self.up
       drop_table :vms #drop old table and create the new one
     create_table :vms do |t|

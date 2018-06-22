@@ -1,4 +1,4 @@
-class CreateHosts < ActiveRecord::Migration
+class CreateHosts < ActiveRecord::Migration[5.2]
   def self.up
     create_table :hosts do |t|
       t.string :name

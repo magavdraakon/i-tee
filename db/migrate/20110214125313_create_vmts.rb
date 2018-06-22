@@ -1,4 +1,4 @@
-class CreateVmts < ActiveRecord::Migration
+class CreateVmts < ActiveRecord::Migration[5.2]
   def self.up
     create_table :vmts do |t|
       t.string :image

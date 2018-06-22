@@ -1,4 +1,4 @@
-class RemoveVmUserReference < ActiveRecord::Migration
+class RemoveVmUserReference < ActiveRecord::Migration[5.2]
   def self.up
     remove_column :vms, :user_id
   end

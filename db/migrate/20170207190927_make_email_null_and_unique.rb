@@ -1,4 +1,4 @@
-class MakeEmailNullAndUnique < ActiveRecord::Migration
+class MakeEmailNullAndUnique < ActiveRecord::Migration[5.2]
   def up
     change_column :users, :email, :string, :null => true, :unique => true, :default => nil
   end

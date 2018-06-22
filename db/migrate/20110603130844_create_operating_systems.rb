@@ -1,4 +1,4 @@
-class CreateOperatingSystems < ActiveRecord::Migration
+class CreateOperatingSystems < ActiveRecord::Migration[5.2]
   def self.up
     create_table :operating_systems do |t|
       t.string :name

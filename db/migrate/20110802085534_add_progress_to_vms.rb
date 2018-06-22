@@ -1,4 +1,4 @@
-class AddProgressToVms < ActiveRecord::Migration
+class AddProgressToVms < ActiveRecord::Migration[5.2]
   def self.up
     add_column :vms, :progress, :text
   end

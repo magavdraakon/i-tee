@@ -1,4 +1,4 @@
-class VmtAddUnOsSh < ActiveRecord::Migration
+class VmtAddUnOsSh < ActiveRecord::Migration[5.2]
   def self.up
     add_column :vmts, :username, :string
     add_column :vmts, :operating_system_id, :integer
