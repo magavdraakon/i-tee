@@ -86,90 +86,93 @@ Rails.application.configure do
   # .yaml is recommended extensions, so let's use that
   if File.exist?('/etc/i-tee/config.yaml')
     config_file = YAML.load_file("/etc/i-tee/config.yaml")
-  end
+  
 
-  config.allowed_origins = config_file.key?('allowed_origins') ? config_file['allowed_origins'] : [ 'https://'+config_file['rdp_host'] ]
+    config.allowed_origins = config_file.key?('allowed_origins') ? config_file['allowed_origins'] : [ 'https://'+config_file['rdp_host'] ]
 
-  # Administrator and manager usernames
-  config.admins = config_file.key?('admins') ? config_file['admins'] : [ ]
-  config.managers = config_file.key?('managers') ? config_file['managers'] : [ ]
+    # Administrator and manager usernames
+    config.admins = config_file.key?('admins') ? config_file['admins'] : [ ]
+    config.managers = config_file.key?('managers') ? config_file['managers'] : [ ]
 
-  # Outside root URL of I-Tee instance (e.g. https://localhost:8880/i-tee)
-  config.application_url = config_file['application_url']
+    # Outside root URL of I-Tee instance (e.g. https://localhost:8880/i-tee)
+    config.application_url = config_file['application_url']
 
-  # hostname for rdp sessions
-  config.rdp_host = config_file['rdp_host']
-  config.rdp_password_length = 14
+    # hostname for rdp sessions
+    config.rdp_host = config_file['rdp_host']
+    config.rdp_password_length = 14
 
-  # Layout to use
-  config.skin = config_file.key?('skin') ? config_file['skin'] : 'EIK'
-  # pagination limits
-  config.per_page = config_file.key?('per_page') ? config_file['per_page'] :15
-
-  # place for lab export / import jsons
-  config.export_location = '/var/labs/exports'
-
-  # Database connection configurations for I-Tee and Guacamole databases
-  config.database = {
-    "production" => config_file['database'],
-    "production_guacamole" => config_file['guacamole_database'] # used in app/models/guaccamole_db_base
-  }
-  # used in config/database.yml
-  ENV["ITEE_HOST"] = config_file['database']['host']
-  ENV["ITEE_USER"] = config_file['database']['username']
-  ENV["ITEE_PASSWORD"] = config_file['database']['password']
-  ENV["ITEE_DATABASE"] = config_file['database']['database']
+    # Layout to use
+    config.skin = config_file.key?('skin') ? config_file['skin'] : 'EIK'
+    # pagination limits
+    config.per_page = config_file.key?('per_page') ? config_file['per_page'] :15
 
 
-  ENV["GUACAMOLE_DB_HOST"] = config_file['guacamole_database']['host']
-  ENV["GUACAMOLE_DB_USER"] = config_file['guacamole_database']['username']  
-  ENV["GUACAMOLE_DB_PASSWORD"] = config_file['guacamole_database']['password']
-  ENV["GUACAMOLE_DB_NAME"] = config_file['guacamole_database']['database']
 
-  # LDAP authentication configuration
-  config.ldap = {
-    "host" => config_file['ldap']['host'],
-    "port" => config_file['ldap']['port'],
-    "attribute" => config_file['ldap'].key?('attribute') ? config_file['ldap']['attribute'] : 'uid',
-    "base" => config_file['ldap']['base'],
-    "ssl" => config_file['ldap']['ssl'] ? true : false,
-    "admin_user" => config_file['ldap']['user'],
-    "admin_password" => config_file['ldap']['password'],
-    "group_base" => config_file['ldap']['group_base'],
-    "require_attribute" => {
-      "objectClass" => 'inetOrgPerson',
-      "authorizationRole" => 'postsAdmin'
+    
+
+  
+
+    # Database connection configurations for I-Tee and Guacamole databases
+    config.database = {
+      "production" => config_file['database'],
+      "production_guacamole" => config_file['guacamole_database'] # used in app/models/guaccamole_db_base
     }
-  }
+    # used in config/database.yml
+    ENV["ITEE_HOST"] = config_file['database']['host']
+    ENV["ITEE_USER"] = config_file['database']['username']
+    ENV["ITEE_PASSWORD"] = config_file['database']['password']
+    ENV["ITEE_DATABASE"] = config_file['database']['database']
 
-  # Guacamole configuration
-  if config_file.key?('guacamole')
-    config.guacamole = {
 
-      # Domain name set to Guacamole authentication cookie
-      cookie_domain: config_file['guacamole'].key?('cookie_domain') ?
-                     config_file['guacamole']['cookie_domain'] : '',
+    ENV["GUACAMOLE_DB_HOST"] = config_file['guacamole_database']['host']
+    ENV["GUACAMOLE_DB_USER"] = config_file['guacamole_database']['username']  
+    ENV["GUACAMOLE_DB_PASSWORD"] = config_file['guacamole_database']['password']
+    ENV["GUACAMOLE_DB_NAME"] = config_file['guacamole_database']['database']
 
-      # Guacamole username prefix
-      user_prefix: config_file['guacamole'].key?('prefix') ?
-                   config_file['guacamole']['prefix'] : 'dev',
-
-      # Full url to Guacamole API endpoints (e.g. https://localhost/guacamole)
-      url_prefix: config_file['guacamole']['url_prefix'],
-
-      max_connections: 5,
-      max_connections_per_user: 2
+    # LDAP authentication configuration
+    config.ldap = {
+      "host" => config_file['ldap']['host'],
+      "port" => config_file['ldap']['port'],
+      "attribute" => config_file['ldap'].key?('attribute') ? config_file['ldap']['attribute'] : 'uid',
+      "base" => config_file['ldap']['base'],
+      "ssl" => config_file['ldap']['ssl'] ? true : false,
+      "admin_user" => config_file['ldap']['user'],
+      "admin_password" => config_file['ldap']['password'],
+      "group_base" => config_file['ldap']['group_base'],
+      "require_attribute" => {
+        "objectClass" => 'inetOrgPerson',
+        "authorizationRole" => 'postsAdmin'
+      }
     }
 
-    if config_file['guacamole'].key?('rdp_host')
+    # Guacamole configuration
+    if config_file.key?('guacamole')
+      config.guacamole = {
 
-      # I-Tee host used by Guacamole to connect to machines via RDP (e.g. localhost)
-      config.guacamole[:rdp_host] = config_file['guacamole']['rdp_host']
+        # Domain name set to Guacamole authentication cookie
+        cookie_domain: config_file['guacamole'].key?('cookie_domain') ?
+                      config_file['guacamole']['cookie_domain'] : '',
 
+        # Guacamole username prefix
+        user_prefix: config_file['guacamole'].key?('prefix') ?
+                    config_file['guacamole']['prefix'] : 'dev',
+
+        # Full url to Guacamole API endpoints (e.g. https://localhost/guacamole)
+        url_prefix: config_file['guacamole']['url_prefix'],
+
+        max_connections: 5,
+        max_connections_per_user: 2
+      }
+
+      if config_file['guacamole'].key?('rdp_host')
+
+        # I-Tee host used by Guacamole to connect to machines via RDP (e.g. localhost)
+        config.guacamole[:rdp_host] = config_file['guacamole']['rdp_host']
+
+      end
     end
+
   end
-
-
   if config_file.key?('development') && config_file['development']
 
     # Code is not reloaded between requests
@@ -203,5 +206,6 @@ Rails.application.configure do
     config.assets.digest = true
 
   end
-
+  # place for lab export / import jsons
+  config.export_location = '/var/labs/exports'
 end

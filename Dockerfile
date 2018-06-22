@@ -37,7 +37,7 @@ COPY /docker/application.rb /var/www/i-tee/config/application.rb
 COPY /docker/devise.rb /var/www/i-tee/config/initializers/devise.rb
 COPY /docker/production.rb /var/www/i-tee/config/environments/production.rb
 
-#RUN bundle exec rake assets:precompile
+RUN RAILS_ENV=production bundle exec rake SECRET_KEY_BASE=for_asset_build  assets:precompile
 EXPOSE 80
 CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]
 
