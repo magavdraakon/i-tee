@@ -68,6 +68,7 @@ ExecStartPre=/bin/sh -c "docker create \\
 	--env "VBOX_USER=vbox" \\
 	--env "VBOX_HOST=172.17.0.1" \\
 	--env "VBOX_PORT=22" \\
+	--env "RAILS_SERVE_STATIC_FILES=true" \
 	--env "ITEE_SECRET_TOKEN=$(pwgen 128 1)" \\
 	--volume /etc/i-tee/config.yaml:/etc/i-tee/config.yaml:ro \\
 	--volume /etc/i-tee/id_rsa:/root/.ssh/id_rsa:ro \\
