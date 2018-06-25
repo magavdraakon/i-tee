@@ -14,10 +14,12 @@ ExecStartPre=/bin/sh -c "docker create \
 	--add-host \"host.local:172.17.0.1\" \
 	--name i-tee \
 	--publish "172.17.0.1:8080:80" \
+	--env "RAILS_LOG_TO_STDOUT=1" \
 	--env "VBOX_USER=vbox" \
 	--env "VBOX_HOST=172.17.0.1" \
 	--env "VBOX_PORT=22" \
 	--env "ITEE_SECRET_TOKEN=REPLACE_ME" \
+	--env "RAILS_SERVE_STATIC_FILES=true" \
 	--volume /etc/i-tee/config.yaml:/etc/i-tee/config.yaml:ro \
 	--volume /etc/i-tee/id_rsa:/root/.ssh/id_rsa:ro \
 	--volume /etc/i-tee/known_hosts:/root/.ssh/known_hosts:ro \
