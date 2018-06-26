@@ -65,6 +65,7 @@ ExecStartPre=/bin/sh -c "docker create \\
 	--add-host \"host.local:172.17.0.1\" \\
 	--name i-tee \\
 	--publish "172.17.0.1:8080:80" \\
+	--env "RAILS_LOG_TO_STDOUT=1" \\
 	--env "VBOX_USER=vbox" \\
 	--env "VBOX_HOST=172.17.0.1" \\
 	--env "VBOX_PORT=22" \\
