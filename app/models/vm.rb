@@ -106,8 +106,8 @@ class Vm < ActiveRecord::Base
     end
   end
 
-  def stop_vm
-    state = self.state
+  def stop_vm(info=nil)
+    state = self.state(info)
     if state=='running' || state=='paused'
       if self.lab_vmt.allow_restart
         begin
@@ -127,11 +127,9 @@ class Vm < ActiveRecord::Base
     end
   end
 
-  def start_vm
-
+  def start_vm(info=nil)
     result = {notice: '', alert: ''}
-
-    state = self.state
+    state = self.state(info)
     if state == 'running' || state == 'paused'
       result[:alert]="Unable to start <b>#{self.lab_vmt.nickname}</b>, it is already running"
       return result
@@ -218,11 +216,11 @@ class Vm < ActiveRecord::Base
       desc += '<br/>To create a connection with this machine using Windows use two commands:<br/>'
       desc += '<srong>'+self.remote('win','', username, password, rdp_port)+'</strong>' #"<strong>cmdkey /generic:#{rdp_host} /user:localhost\\#{self.lab_user.user.username} /pass:#{self.password}</strong><br/>"
       #desc += "<strong>mstsc.exe /v:#{rdp_host}:#{rdp_port_prefix}#{port} /f</strong><br/>"
-      logger.debug "\n setting #{self.id} description to \n #{desc}"
+      logger.debug "setting #{self.id} description to #{desc}"
       self.description = desc
 
       self.save
-      logger.debug "\n save successful "
+      logger.debug "save successful "
 
       result[:notice] = "Machine <b>#{self.lab_vmt.nickname}</b> successfully started<br/>"
 

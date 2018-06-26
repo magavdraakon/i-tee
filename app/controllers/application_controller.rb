@@ -11,15 +11,15 @@ class ApplicationController < ActionController::Base
 
   require 'will_paginate/array'
   before_action :check_for_cancel, :only => [:create, :update]
-
   layout :set_layout
-
   before_action :authenticate_user_from_token!
   before_action :authenticate_user!, :except=>[ :about, :labinfo, :ping ]
   #skip_before_action :verify_authenticity_token , only: [:labinfo, :ping] # no csrf errors?
   before_action :admin?
   before_action :manager?
   before_action :per_page
+
+  around_action :tag_logs_with_user
 
   def set_layout
     begin
@@ -83,6 +83,10 @@ class ApplicationController < ActionController::Base
   
   private#-------------------------------------------------------------------
 
+  def json_request?
+    request.format.symbol == :json
+  end
+
   def set_headers
     origin = request.headers['origin']
     allowed = ITee::Application.config.allowed_origins
@@ -128,9 +132,7 @@ class ApplicationController < ActionController::Base
   end
 
   def user_tab
-
-      @tab='user'
-
+    @tab='user'
   end
 
   def search_tab
@@ -170,6 +172,19 @@ class ApplicationController < ActionController::Base
         end
       end
     end
+  end
+
+  def tag_logs_with_user
+    log_user = current_user
+
+    logger.tagged( !log_user.blank? ? "user-#{log_user.id}" : "no user") do
+      logger.tagged( !log_user.blank? ? "#{log_user.username}" : "anonymous" ) do
+        logger.tagged( !log_user.blank? ? "#{log_user.name}" : "anonymous" ) do
+          yield
+        end
+      end
+    end
+
   end
   
 end

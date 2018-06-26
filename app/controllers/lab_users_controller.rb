@@ -3,24 +3,25 @@ class LabUsersController < ApplicationController
   #restricted to admins
   before_action :authorise_as_manager, :except=>[ :labinfo ]
   #redirect to index view when trying to see unexisting things
+  before_action :get_user, :only=>[:create ,:show, :edit, :update, :destroy, :set_vta]
   before_action :save_from_nil, :only=>[:show, :edit, :update, :destroy, :set_vta]
+
   before_action :manager_tab, :except=>[:search]
   before_action :search_tab, :only=>[:search]
 
   def save_from_nil
     if params[:id] # find by id
       @lab_user = LabUser.where('id=?',params[:id]).first
-      if @lab_user==nil # cant find!
+      if @lab_user.blank? # cant find!
         respond_to do |format|
            format.html  {redirect_to lab_users_path, :notice=>'Invalid  id.' }
            format.json  { render :json => {:success=>false, :message=>"Can't find lab user"} }
         end
       end
     elsif params[:lab_id] # find by lab_id and userid/username
-      get_user
       if @user
         @lab_user = LabUser.where('user_id=? and lab_id=?', @user.id, params[:lab_id]).last # last is the newest
-        if @lab_user==nil # cant find!
+        if @lab_user.blank? # cant find!
           respond_to do |format|
              format.html  {redirect_to lab_users_path, :notice=>'Invalid  id.' }
              format.json  { render :json => {:success=>false, :message=>"Can't find lab user"} }
@@ -55,7 +56,7 @@ class LabUsersController < ApplicationController
         if conditions && conditions[:start]==''
           conditions[:start]=nil
         end
-        logger.debug "\n query params #{conditions}\n"
+        logger.info "FIND LABUSER: #{conditions}"
         labusers = LabUser.where(conditions).map{|l| l.with_ping}
       else
         labusers = LabUser.all.map{|l| l.with_ping}
@@ -101,7 +102,6 @@ class LabUsersController < ApplicationController
         #create lab_user params based on lab_id and user_id
         if params[:lab_id]
           params[:lab_user] = { lab_id: params[:lab_id] }
-          get_user
           if @user
             params[:lab_user][:user_id] = @user.id
           end
@@ -114,10 +114,17 @@ class LabUsersController < ApplicationController
             flash[:notice] = 'successful update.' 
             redirect_back fallback_location: lab_users_path
           }
-          format.json { render :json=> {:success => true, :lab_user => @lab_user.with_ping}, :status=> :created}
+          format.json { 
+            logger.info "LABUSER CREATE SUCCESS: labuser=#{@lab_user.id} lab=#{@lab_user.lab.id} user=#{@lab_user.user.id} [#{@lab_user.user.username}]"
+            render :json=> {:success => true, :lab_user => @lab_user.with_ping}, :status=> :created
+          }
         else
           format.html { render :action => 'index' }
-          format.json { render :json=> {:success => false, :errors => @lab_user.errors}, :status=> :unprocessable_entity}
+          format.json { 
+            logger.error "LABUSER CREATE FAILED: lab=#{params[:lab_id]} user=#{params[:user_id]} " + ( @user ? "[#{user.username}]" : '')
+            logger.error @lab_user.errors.as_json
+            render :json=> {:success => false, :errors => @lab_user.errors}, :status=> :unprocessable_entity
+          }
         end #end if
       end #end respond_to
     end #end else

@@ -321,15 +321,18 @@ def self.export_labuser(uuid, pretty)
 					r
 				}
 			}
+			logger.info "GETTING LABUSER INFO SUCCESS: labuser=#{lu.id} lab=#{lab.id} user=#{user.id} [#{user.username}]"
 			if pretty
 				JSON.pretty_generate(data)
 			else
 				data
 			end
 		else
+			logger.error "GETTING LABUSER INFO INFO FAILED: attempt inactive uuid=#{uuid} labuser=#{lu.id} lab=#{lu.lab.id} user=#{lu.user.id} [#{lu.user.username}]"
 			return {success: false, message: "Unable to find active labuser with given uid"}
 		end
 	else
+		logger.error "GETTING LABUSER INFO INFO FAILED: no such labuser uuid=#{uuid}"
 		return {success: false, message: "Unable to find labuser with given uid"}
 	end
 end
