@@ -11,8 +11,11 @@ RUN apt-get update -qq && \
 WORKDIR /var/www/i-tee
 
 # Setting env up
-ENV RAILS_ENV='production'
-ENV RAKE_ENV='production' 
+ENV RAILS_ENV='production' \
+    RAKE_ENV='production' \
+    RAILS_LOG_TO_STDOUT='1' \
+    RAILS_SERVE_STATIC_FILES='true'
+    
 # Adding gems
 COPY /Gemfile /var/www/i-tee/Gemfile
 COPY /Gemfile.lock /var/www/i-tee/Gemfile.lock
