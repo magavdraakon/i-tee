@@ -109,7 +109,7 @@
           <%= labVmt_form.label :primary %>  <%= labVmt_form.check_box :primary %><br/>
           <div class="field">
             <%= labVmt_form.label :g_type, 'Guacamole connection' %>
-            <%= labVmt_form.select :g_type, options_for_select([ 'none', 'rdp', 'vnc', 'ssh' ], labVmt_form.object.g_type) %>
+            <%= labVmt_form.select :g_type, options_for_select([ 'none', 'rdp', 'vnc', 'ssh','GuacV2' ], labVmt_form.object.g_type) %>
           </div>
           <%= labVmt_form.label :position %> <%= labVmt_form.number_field :position %>
           <div class="networks">
