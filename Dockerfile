@@ -5,7 +5,7 @@ RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends build-essential sudo openssh-client libyaml-0-2 libgmp-dev libmysqlclient-dev libsqlite3-dev bundler nodejs \
     && apt-get clean autoclean \
     && apt-get autoremove -y \
-    && rm -rf  /var/lib/apt  /var/lib/dpkg  /var/lib/cache /var/lib/log \
+    && rm -rf /var/lib/apt/lists/* \
     && mkdir -p /var/run/sshd /var/labs/run
 
 WORKDIR /var/www/i-tee
