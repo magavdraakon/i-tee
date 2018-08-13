@@ -176,10 +176,21 @@ class VmsController < ApplicationController
   # get vm info for labuser
   def labuser_vms
     respond_to do |format|
-      @labuser = LabUser.find(params[:id])
-      result = @labuser.vms_info
-      format.html {redirect_to root_path, :notice => 'Permission error'}
-      format.json {render :json=> { :success=> true, :vms=>result, :lab_user=> @labuser.id}}
+      @labuser = LabUser.where(id: params[:id]).first
+      if @labuser
+        result = @labuser.vms_info
+        format.html {redirect_to root_path, :notice => 'Permission error'}
+        format.json {
+          logger.info "GETTING LABUSER VMS SUCCESS: labuser=#{@labuser.id} lab=#{@labuser.lab.id} user=#{@labuser.user.id} [#{@labuser.user.username}]"
+          render :json=> { :success=> true, :vms=>result, :lab_user=> @labuser.id}
+        }
+      else        
+        format.html { redirect_to root_path , :notice=> 'permission error' }
+        format.json { 
+          logger.error "GETTING LABUSER VMS FAILED: invalid labuser id labuser=#{params[:id]}"
+          render :json=> {:success => false , :message=>  "Can't find mission" }
+        }
+      end      
     end
     rescue Timeout::Error
       respond_to do |format|        
@@ -187,14 +198,10 @@ class VmsController < ApplicationController
           flash[:notice] = 'Permission error'
           redirect_back fallback_location: root_path
         }
-        format.json {render :json=> { :success=> false, :message=>'Starting all virtual machines failed, try starting them one by one.', :lab_user=> @labuser.id}}
-      end
-    rescue ActiveRecord::RecordNotFound
-      respond_to do |format|
-        logger.debug "Can't find labuser: "
-        logger.debug params
-        format.html { redirect_to root_path , :notice=> 'permission error' }
-        format.json { render :json=> {:success => false , :message=>  "Can't find mission" }}
+        format.json {
+          logger.error "GETTING LABUSER VMS FAILED: time out labuser=#{@labuser.id} lab=#{@labuser.lab.id} user=#{@labuser.user.id} [#{@labuser.user.username}]"
+          render :json=> { :success=> false, :message=>'Getting all vms info took too long. try again later', :lab_user=> @labuser.id}
+        }
       end
   end
 
@@ -451,10 +458,16 @@ end
         #redirect to url https://xxx.yyy.com/#/client/zzz
         redirect_to( result[:url] )
       }
-      format.json  { render :json => result }
+      format.json  { 
+        logger.info "OPENING GUACMOLE SUCCESSS: vm=#{@vm.id} [#{@vm.name}] labuser=#{@vm.lab_user_id} lab=#{@vm.lab_user.lab.id} user=#{@vm.lab_user.user.id} [#{@vm.lab_user.user.username}]"
+        render :json => result 
+      }
       else
         format.html  { redirect_to( not_found_path, :notice=> result[:message]) }
-        format.json  { render :json => {:success=>result[:success], :message=> result[:message] } }
+        format.json  { 
+          logger.error "OPENING GUACMOLE FAILED: vm=#{@vm.id} [#{@vm.name}] labuser=#{@vm.lab_user_id} lab=#{@vm.lab_user.lab.id} user=#{@vm.lab_user.user.id} [#{@vm.lab_user.user.username}]"
+          render :json => {:success=>result[:success], :message=> result[:message] } 
+        }
       end
     end
   end
@@ -564,7 +577,10 @@ private #-----------------------------------------------------------------------
     unless @vm
       respond_to do |format|
         format.html  {redirect_to(vms_path,:notice=>'invalid id.')}
-        format.json  { render :json => {:success=>false, :message=>"Can't find vm"} }
+        format.json  { 
+          logger.error "VM NOT FOUND: vm=#{params[:id]}"
+          render :json => {:success=>false, :message=>"Can't find vm"} 
+        }
       end
     end
   end

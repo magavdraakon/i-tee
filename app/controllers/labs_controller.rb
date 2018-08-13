@@ -159,23 +159,32 @@ class LabsController < ApplicationController
   def start_lab_by_id
     respond_to do |format|
       if @admin && params[:labuser_id]
-        @labuser= LabUser.where('id=?', params[:labuser_id]).first
+        @labuser = LabUser.where(id: params[:labuser_id]).first
         if @labuser
           # generating vm info if needed
           result =  @labuser.start_lab
           format.html { redirect_back fallback_location: my_labs_path }
-          format.json {render :json=>{ :success => result[:success] , :message=> result[:message], :lab_user => @labuser.id, :start_time => @labuser.start }}
+          format.json {
+            logger.info "LAB START SUCCESS: labuser=#{@labuser.id} lab=#{@labuser.lab.id} user=#{@labuser.user.id} [#{@labuser.user.username}]"
+            render :json=>{ :success => result[:success] , :message=> result[:message], :lab_user => @labuser.id, :start_time => @labuser.start }
+          }
         else
           format.html { 
             flash[:notice] = "Can't find lab user"
             redirect_back fallback_location: my_labs_path }
-          format.json { render :json=> {:success => false , :message=>  "Can not find mission attempt" }}
+          format.json { 
+            logger.error "LAB START FAILURE: invalid id labuser=#{params[:labuser_id]}"
+            render :json=> {:success => false , :message=>  "Can not find mission attempt" }
+          }
         end
       else
         format.html { 
           flash[:notice] =  'Restricted access' 
           redirect_back fallback_location: my_labs_path }
-        format.json { render :json=> {:success => false , :message=>  'No permission' }}
+        format.json { 
+          logger.error "LAB START FAILURE: invalid role or missing id labuser=#{params[:labuser_id]}"
+          render :json=> {:success => false , :message=>  'No permission' }
+        }
       end
     end
   end
@@ -195,7 +204,7 @@ class LabsController < ApplicationController
         }
         format.json { render :json=> {:success => false , :message=>  "Can not find user" }}
       elsif !@admin && (params[:username] || params[:user_id])
-        logger.debug '\n start_lab: Relocate user\n'
+        logger.debug 'start_lab: Relocate user'
         # simple user should not have the username in url
         format.html { redirect_to my_labs_path+(params[:id] ? "/#{params[:id]}" : '') }
         format.json { render :json=>{:success => false , :message=> 'No permission' }}
@@ -203,7 +212,7 @@ class LabsController < ApplicationController
         # ok, there is such lab, but does the user have it?
         @lab_user = LabUser.where('lab_id=? and user_id=?', @lab.id, @user.id).last
         if @lab_user!=nil       # yes, this user has this lab
-          logger.debug "\nStarting '#{@lab_user.user.username}' lab '#{@lab_user.lab.name}' as admin\n" if @admin
+          logger.debug "Starting '#{@lab_user.user.username}' lab '#{@lab_user.lab.name}' as admin" if @admin
           # generating vm info if needed
           result = @lab_user.start_lab
           format.html { 
@@ -239,20 +248,29 @@ class LabsController < ApplicationController
             flash[:notice] = result[:message]
             redirect_back fallback_location: my_labs_path
           }
-          format.json {render :json=>{ :success => result[:success] , :message=> result[:message], :lab_user => @labuser.id , :end_time => @labuser.end}}
+          format.json {
+            logger.info "LAB END SUCCESS: labuser=#{@labuser.id} lab=#{@labuser.lab.id} user=#{@labuser.user.id} [#{@labuser.user.username}]"
+            render :json=>{ :success => result[:success] , :message=> result[:message], :lab_user => @labuser.id , :end_time => @labuser.end}
+          }
         else
           format.html {
             flash[:notice] = "Can't find lab user" 
             redirect_back fallback_location: my_labs_path
           }
-          format.json { render :json=> {:success => false , :message=>  "Can't find lab user" }}
+          format.json { 
+            logger.error "LAB END FAILURE: invalid id labuser=#{params[:labuser_id]}"
+            render :json=> {:success => false , :message=>  "Can't find lab user" }
+          }
         end
       else
         format.html {
           flash[:notice] = 'Restricted access' 
           redirect_back fallback_location: my_labs_path
         }
-        format.json { render :json=> {:success => false , :message=>  'No permission error' }}
+        format.json { 
+          logger.error "LAB END FAILURE: invalid role or missing id labuser=#{params[:labuser_id]}"
+          render :json=> {:success => false , :message=>  'No permission error' }
+        }
       end
     end
   end

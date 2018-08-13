@@ -10,6 +10,7 @@ class UsersController < ApplicationController
     #@users= @users.paginate(:page=>params[:page], :per_page=>10).order(order)
     @users = User.select('id, name, username, role, last_sign_in_ip, last_sign_in_at, ldap, email, authentication_token, token_expires').order(@order).paginate(:page=>params[:page], :per_page=>@per_page)
     if params[:conditions]
+      logger.info "FIND USER: #{params[:conditions].as_json}"
       users = User.where(params[:conditions].as_json)
     else
       users = User.all
@@ -54,10 +55,16 @@ class UsersController < ApplicationController
         end
         @user.save
         format.html { redirect_to(users_path, :notice => 'User was successfully created.') }
-        format.json  { render :json =>{ :success=> true, :user=> @user.as_json}, :status => :created }
+        format.json  { 
+          logger.info "USER CREATE SUCCESS: user=#{@user.id} [#{@user.username}]"
+          render :json =>{ :success=> true, :user=> @user.as_json}, :status => :created 
+        }
       else
         format.html { render :action => 'edit' }
-        format.json  { render :json => { :success=> false, :errors => @user.errors}, :status => :unprocessable_entity }
+        format.json  { 
+          logger.error "USER CREATE FAILURE: [#{@user.username}]"
+          logger.error @user.errors.as_json
+          render :json => { :success=> false, :errors => @user.errors}, :status => :unprocessable_entity }
       end
     end
   end
@@ -82,17 +89,27 @@ class UsersController < ApplicationController
 
         if @user.update_attributes(user_params)
           format.html { redirect_to(users_path, :notice => 'User was successfully updated.') }
-          format.json  { render :json=> { :success=> true, :user=> @user.as_json}}
+          format.json  { 
+            logger.info "USER UPDATE SUCCESS: user=#{@user.id} [#{@user.username}]"
+            render :json=> { :success=> true, :user=> @user.as_json}
+          }
         else
           format.html { render :action => 'edit' }
-          format.json  { render :json => { :success=> false, :errors => @user.errors}, :status => :unprocessable_entity }
+          format.json  { 
+            logger.error "USER UPDATE FAILURE: user=#{@user.id} [#{@user.username}]"
+            logger.error @user.errors.as_json
+            render :json => { :success=> false, :errors => @user.errors}, :status => :unprocessable_entity 
+          }
         end
       else
         format.html { 
           flash[:notice]= "Can't find user"
           redirect_back fallback_location: users_path
          }
-        format.json { render :json=> { :success=>false, :message=> "Can't find user"} }
+        format.json { 
+          logger.error "USER UPDATE FAILURE: invalid user id user=#{params[:id]} "
+          render :json=> { :success=>false, :message=> "Can't find user"} 
+        }
       end
     end
   end
