@@ -20,6 +20,10 @@
     <%= f.label :description %><br />
     <%= f.text_area( :description,  :rows => 20) %>
   </div>
+   <div class="field">
+    <%= f.label :config %><br />
+    <%= f.text_area( :config,  :rows => 10, placeholder: '{"this":"Configuration JSON"}') %>
+  </div>
     <fieldset><legend>Lab settings</legend>
       <div class="field">
         <%= f.check_box( :startAll)  %> <%= f.label :startAll ,'Start all machines with lab start' %>

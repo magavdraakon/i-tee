@@ -296,13 +296,19 @@ def self.export_labuser(uuid, pretty)
 
 			lab = lu.lab
 			lab = {} unless lab
-			#logger.debug "LAB: #{lab.as_json.except('created_at', 'updated_at', 'description', 'short_description')}"
+			
 			user = lu.user
 			user = {} unless user
 			#logger.debug "USER: #{user.as_json.slice('id', 'username', 'name', 'user_key') }"
 			assistant = lab.assistant if lab # if lab is blank then there is no assistant
 			assistant = {} unless assistant
 			#logger.debug "ASSISTANT: #{assistant.as_json.except('created_at', 'updated_at') }"
+			conf = JSON.parse(lab.config || '{}') # extract config JSON string to hash
+			#logger.debug conf
+			lab = JSON.parse(lab.to_json) # convert lab to hash
+			lab[:config] = conf # overwrite conf with hash version
+			#logger.debug "LAB: #{lab.as_json.except('created_at', 'updated_at', 'description', 'short_description')}"
+
 			data = {
 				success: true,
 				lab: lab.as_json.except('created_at', 'updated_at', 'description', 'short_description'),
@@ -321,7 +327,7 @@ def self.export_labuser(uuid, pretty)
 					r
 				}
 			}
-			logger.info "GETTING LABUSER INFO SUCCESS: labuser=#{lu.id} lab=#{lab.id} user=#{user.id} [#{user.username}]"
+			logger.info "GETTING LABUSER INFO SUCCESS: labuser=#{lu.id} lab=#{lab[:id]} user=#{user.id} [#{user.username}]"
 			if pretty
 				JSON.pretty_generate(data)
 			else
