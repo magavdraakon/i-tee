@@ -1,8 +1,8 @@
-FROM ruby:2.2.5
+FROM ruby:2.5.1
 MAINTAINER margus.ernits@rangeforce.com
 
 RUN apt-get update -qq && \
-    apt-get install -y --no-install-recommends build-essential sudo openssh-client libyaml-0-2 libgmp-dev libmysqlclient-dev libsqlite3-dev bundler nodejs \
+    apt-get install -y --no-install-recommends build-essential sudo openssh-client libyaml-0-2 libgmp-dev default-libmysqlclient-dev libsqlite3-dev bundler nodejs \
     && apt-get clean autoclean \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/* \
