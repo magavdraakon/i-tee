@@ -103,7 +103,12 @@ class Vm < ActiveRecord::Base
         return true # if machine does not exist, it is deleted
       else
         logger.error e
-        raise "Deleting VM #{self.name} failed"
+        # check vm state again and try to delete 
+        info = Virtualbox.get_vm_info(self.name, true)
+        state = info['VMState']
+        logger.info "VM '#{self.name}' state is #{state} after an error was caught. trying to delete"
+        Virtualbox.delete_vm(name)
+        logger.debug "#{self.name} VM deleted"
       end
     end
   end
