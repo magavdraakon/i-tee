@@ -165,7 +165,7 @@ class LabsController < ApplicationController
           result =  @labuser.start_lab
           format.html { redirect_back fallback_location: my_labs_path }
           format.json {
-            logger.info "LAB START SUCCESS: labuser=#{@labuser.id} lab=#{@labuser.lab.id} user=#{@labuser.user.id} [#{@labuser.user.username}]"
+            logger.info "LAB START SUCCESS: labuser=#{@labuser.id} lab=#{@labuser.lab_id} user=#{@labuser.user_id} [#{@labuser.user.username}]"
             render :json=>{ :success => result[:success] , :message=> result[:message], :lab_user => @labuser.id, :start_time => @labuser.start }
           }
         else

@@ -19,7 +19,8 @@ class ApplicationController < ActionController::Base
   before_action :manager?
   before_action :per_page
 
-  around_action :tag_logs_with_user
+  around_action :tag_logs_with_user, :except =>[:ping]
+  around_action :tag_logs_with_ping, :only=>[:ping]
 
   def set_layout
     begin
@@ -183,6 +184,13 @@ class ApplicationController < ActionController::Base
           yield
         end
       end
+    end
+
+  end
+
+  def tag_logs_with_ping
+    logger.tagged( 'ping') do
+      yield      
     end
 
   end

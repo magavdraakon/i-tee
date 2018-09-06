@@ -72,11 +72,17 @@ class LabUser < ActiveRecord::Base
   	info={:running=>running, :paused=>paused, :stopped=>stopped}
   end
 
+  # info to include in event logging 
+  def log_info
+    "labuser=#{self.id} lab=#{self.lab_id } user=#{self.user_id} #{self.user ? '['+self.user.username+']' : ''}"
+  end
+
 # create needed Vm-s based on the lab templates and set start to now
   def start_lab
     lab = self.lab
     user = self.user
-    logger.info "LAB START CALLED: labuser=#{self.id} lab=#{lab.id} user=#{user.id} [#{user.username}]"
+    loginfo = self.log_info.to_s
+    logger.info "LAB START CALLED: #{loginfo}"
   	if self.start.blank? && self.end.blank?  # can only start labs that are not started or finished
       result = Check.has_free_resources
       if result && result[:success] # has resources
@@ -87,7 +93,7 @@ class LabUser < ActiveRecord::Base
             logger.debug "#{vm.lab_user.id} Machine #{vm.id} - #{vm.name} successfully generated."
           end
         end
-        logger.debug "LAB VMS CREATED: labuser=#{self.id} lab=#{lab.id} user=#{user.id} [#{user.username}]"
+        logger.debug "LAB VMS CREATED: #{loginfo}"
         # start delayed jobs for keeping up with the last activity
         LabUser.rdp_status(self.id)
       	# set new start time
@@ -95,7 +101,7 @@ class LabUser < ActiveRecord::Base
         self.last_activity = Time.now
         self.activity = 'Lab start'
         unless self.vta_setup # do not repeat setup if set by api
-          logger.debug "BEGIN LAB VTA SETUP: labuser=#{self.id} lab=#{lab.id} user=#{user.id} [#{user.username}]"
+          logger.debug "BEGIN LAB VTA SETUP: #{loginfo}"
           # check if lab has assistant to be able to create the vta labuser
           if !lab.assistant_id.blank?
             assistant = lab.assistant
@@ -106,24 +112,24 @@ class LabUser < ActiveRecord::Base
               # save to user
               user.user_key = result['key'];
               unless user.save
-                logger.error "LAB VTA SETUP FAILURE: save failed labuser=#{self.id} lab=#{lab.id} user=#{user.id} [#{user.username}]"
+                logger.error "LAB VTA SETUP FAILURE: save failed #{loginfo}"
                 return {success: false, message: 'unable to remember user token in assistant'}
               end
-              logger.info "LAB VTA SETUP SUCCESS: labuser=#{self.id} lab=#{lab.id} user=#{user.id} [#{user.username}]"
+              logger.info "LAB VTA SETUP SUCCESS: #{loginfo}"
             else
-              logger.error "LAB VTA SETUP FAILURE: request error labuser=#{self.id} lab=#{lab.id} user=#{user.id} [#{user.username}]"
+              logger.error "LAB VTA SETUP FAILURE: request error #{loginfo}"
               logger.error result
               return {success: false, message: 'unable to communicate with assistant'}
             end
           end
         end
       	self.save
-        logger.debug "LAB VMS: labuser=#{self.id} lab=#{lab.id} user=#{user.id} [#{user.username}]"
-        logger.debug self.vms.as_json
+        logger.debug "LAB VMS: #{loginfo} \n #{self.vms.as_json}"
 
   			if self.lab.startAll
   				self.start_all_vms
   			end
+        # success log in controller
         {success: true, message: 'Lab started'}
       else
         result # forward the message from resource check
@@ -143,8 +149,9 @@ class LabUser < ActiveRecord::Base
 # called during restart_lab
   def end_lab
     lab = self.lab
-    user = self.user
-    logger.info "LAB END CALLED: labuser=#{self.id} lab=#{lab.id} user=#{user.id} [#{user.username}]"
+    user = self.user    
+    loginfo = self.log_info.to_s
+    logger.info "LAB END CALLED: #{loginfo}"
     if !self.start.blank? && self.end.blank?  # can only end labs that are started and not ended
       begin
         machines = Vm.where(lab_user_id: self.id) 
@@ -160,7 +167,7 @@ class LabUser < ActiveRecord::Base
         end
         # remove the db entries, the before destroy filter should realize there is no vm to destroy and will be 'skipped'
         machines.destroy_all
-        logger.debug "VMS DELETED: labuser=#{self.id} lab=#{lab.id} user=#{user.id} [#{user.username}]"
+        logger.debug "VMS DELETED: #{loginfo}"
       rescue Exception => e
         logger.error e
         return {success: false, message: "Mission end failed" }
@@ -171,12 +178,12 @@ class LabUser < ActiveRecord::Base
       self.token = SecureRandom.uuid # used by client
       self.end = Time.now
       if self.save
-        logger.debug "REMOVE DELAYED JOBS: labuser=#{self.id} lab=#{lab.id} user=#{user.id} [#{user.username}]"
+        logger.debug "REMOVE DELAYED JOBS: #{loginfo}"
         # remove pending delayed jobs
         Delayed::Job.where('queue=?', "labuser-#{self.id}").destroy_all
         return {success: true, message: "Mission ended" }
       else
-        logger.error "unable to end mission #{self.id}"
+        logger.error "LAB END FAILED: save failed #{loginfo}"
         return {success: false, message: "Unable to end this mission" }
       end
     elsif self.start.blank?
@@ -186,8 +193,9 @@ class LabUser < ActiveRecord::Base
     end
   end
 
-  def restart_lab
-    logger.info "LAB RESTART CALLED: labuser=#{self.id}"
+  def restart_lab    
+    loginfo = self.log_info.to_s
+    logger.info "LAB RESTART CALLED: #{loginfo}"
     self.end_lab
     self.vta_setup = false # assistant labuser needs to be reset
     self.start = nil
@@ -202,8 +210,9 @@ class LabUser < ActiveRecord::Base
 
 	def start_all_vms
     lab = self.lab
-    user = self.user
-    logger.info "START ALL VMS CALLED: labuser=#{self.id} lab=#{lab.id} user=#{user.id} [#{user.username}]"
+    user = self.user    
+    loginfo = self.log_info.to_s
+    logger.info "START ALL VMS CALLED: #{loginfo}"
     # olny if lab is started
     if self.start && !self.end 
   		feedback =''
@@ -216,18 +225,18 @@ class LabUser < ActiveRecord::Base
           add = (start[:notice]!='' ? start[:notice] : (start[:alert]!='' ? start[:alert] : "<b>#{vm.lab_vmt.nickname}</b> was not started")	)
           feedback = feedback + add +'<br/>'
           unless add.include?('successfully started')
-            logger.error "VM START FAILURE: vm=#{vm.id} [#{vm.name}] labuser=#{self.id} lab=#{lab.id} user=#{user.id} [#{user.username}]"
+            logger.error "VM START FAILURE: vm=#{vm.id} [#{vm.name}] #{loginfo}"
             success = false # one machine fails = all fails
           else
-            logger.info "VM START SUCCESS: vm=#{vm.id} [#{vm.name}] labuser=#{self.id} lab=#{lab.id} user=#{user.id} [#{user.username}]"
+            logger.info "VM START SUCCESS: vm=#{vm.id} [#{vm.name}] #{loginfo}"
           end
           
   			end #end if not running or paused
   		end
-  		logger.info "START ALL VMS SUMMARY: labuser=#{self.id} lab=#{lab.id} user=#{user.id} [#{user.username}] #{feedback}"
+  		logger.info "START ALL VMS SUMMARY: #{loginfo} #{feedback}"
   		{ success: success, message: feedback}
     else
-      logger.error "START ALL VMS FAILURE: lab not started labuser=#{self.id} lab=#{lab.id} user=#{user.id} [#{user.username}]"
+      logger.error "START ALL VMS FAILURE: lab not started #{loginfo}"
       { success: false, message: 'unable to start machines in inactive mission'}
     end
 	end
@@ -235,26 +244,28 @@ class LabUser < ActiveRecord::Base
 	def stop_all_vms # TODO: should check if lab is started?
     lab = self.lab
     user = self.user
-    logger.info "STOP ALL VMS CALLED: labuser=#{self.id} lab=#{lab.id} user=#{user.id} [#{user.username}]"
+    loginfo = self.log_info.to_s
+    logger.info "STOP ALL VMS CALLED: #{loginfo}"
 		feedback=''
 		self.vms.each do |vm|
       info = vm.vm_info || {'VMState': 'stopped', 'vrdeport': 0}
 			if vm.state(info)=='running' || vm.state(info)=='paused'  # has to be running or paused
 				stop = vm.stop_vm(info)
         if stop[:success]
-  				logger.info "VM STOP SUCCESS: vm=#{vm.id} [#{vm.name}] labuser=#{self.id} lab=#{lab.id} user=#{user.id} [#{user.username}]"
+  				logger.info "VM STOP SUCCESS: vm=#{vm.id} [#{vm.name}] #{loginfo}"
   				feedback = feedback+"<b>#{vm.lab_vmt.nickname}</b> stopped<br/>"
         else
-          logger.error "VM STOP FAILURE: vm=#{vm.id} [#{vm.name}] labuser=#{self.id} lab=#{lab.id} user=#{user.id} [#{user.username}]"
+          logger.error "VM STOP FAILURE: vm=#{vm.id} [#{vm.name}] #{loginfo}"
           feedback = feedback+"<b>#{vm.lab_vmt.nickname}</b> not stopped<br/>"
         end
 			end #end if not running or paused
 		end
-    logger.info "STOP ALL VMS SUMMARY: labuser=#{self.id} lab=#{lab.id} user=#{user.id} [#{user.username}] #{feedback}"
+    logger.info "STOP ALL VMS SUMMARY: #{loginfo} #{feedback}"
     # if no feedbck then no macines were stopped
 		{success: feedback!='' , message:feedback}
 	end
 
+  # deprecated?
 	def destroy_all_vms
 		self.vms.each do |vm|
 			vm.destroy
@@ -305,6 +316,8 @@ class LabUser < ActiveRecord::Base
     # find lab
     lab = self.lab
     user = self.user
+    loginfo = self.log_info.to_s
+    logger.info "SET VTA INFO CALLED: #{loginfo}"
     if lab
       logger.debug 'found lab'
       if user
@@ -346,9 +359,9 @@ class LabUser < ActiveRecord::Base
     end
     logger.debug answer
     if answer[:success]
-      logger.info "SETTING VTA INFO SUCCESS: labuser=#{self.id} lab=#{lab.id} user=#{user.id} [#{user.username}]"
+      logger.info "SET VTA INFO SUCCESS: #{loginfo}"
     else
-      logger.error "SETTING VTA INFO FAILED: labuser=#{self.id} lab=#{lab.id} user=#{user.id} [#{user.username}]"
+      logger.error "SET VTA INFO FAILED: #{loginfo}"
     end
     answer
   end

@@ -416,24 +416,32 @@ end
  end
 
  def self.set_network(vm, slot, type, name='')
-	cmd_prefix = "utils/vboxmanage modifyvm #{Shellwords.escape(vm)}"
-	name = Shellwords.escape(name)
+ 	begin 
+		cmd_prefix = "utils/vboxmanage modifyvm #{Shellwords.escape(vm)}"
+		name = Shellwords.escape(name)
 
-	if type == 'nat'
-		stdout = %x(#{cmd_prefix} --nic#{slot} nat 2>&1)
-	elsif type == 'intnet'
-		stdout = %x(#{cmd_prefix} --nic#{slot} intnet 2>&1 &&
-		            #{cmd_prefix} --intnet#{slot} #{name} 2>&1)
-	elsif type == 'bridgeadapter'
-		stdout = %x(#{cmd_prefix} --nic#{slot} bridged 2>&1 &&
-		            #{cmd_prefix} --bridgeadapter#{slot} #{name} 2>&1)
-	elsif type == 'hostonlyadapter'
-		stdout = %x(#{cmd_prefix} --nic#{slot} hostonly 2>&1 &&
-		            #{cmd_prefix} --hostonlyadapter#{slot} #{name} 2>&1)
-	end
-	if $?.exitstatus != 0
-		logger.error "Failed to set vm network: #{stdout}"
-		raise 'Failed to set vm network'
+		if type == 'nat'
+			stdout = %x(#{cmd_prefix} --nic#{slot} nat 2>&1)
+		elsif type == 'intnet'
+			stdout = %x(#{cmd_prefix} --nic#{slot} intnet 2>&1 )
+			raise stdout if $?.exitstatus != 0
+			stdout = %x(#{cmd_prefix} --intnet#{slot} #{name} 2>&1)
+		elsif type == 'bridgeadapter'
+			stdout = %x(#{cmd_prefix} --nic#{slot} bridged 2>&1)
+			raise stdout if $?.exitstatus != 0
+			stdout = %x(#{cmd_prefix} --bridgeadapter#{slot} #{name} 2>&1)
+		elsif type == 'hostonlyadapter'
+			stdout = %x(#{cmd_prefix} --nic#{slot} hostonly 2>&1 )
+			raise stdout if $?.exitstatus != 0
+			stdout = %x(#{cmd_prefix} --hostonlyadapter#{slot} #{name} 2>&1)
+		end
+		
+		raise stdout if $?.exitstatus != 0
+
+	rescue  Exception => e 
+		message = e.message || "unexpected error while setting vm network"
+		logger.error "Failed to set vm '#{vm}' network '#{name}': #{message}"
+		raise "Failed to set vm network"
 	end
  end
 
