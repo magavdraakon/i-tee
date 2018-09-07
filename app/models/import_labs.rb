@@ -303,7 +303,7 @@ def self.export_labuser(uuid, pretty)
 			assistant = lab.assistant if lab # if lab is blank then there is no assistant
 			assistant = {} unless assistant
 			#logger.debug "ASSISTANT: #{assistant.as_json.except('created_at', 'updated_at') }"
-			conf = JSON.parse(lab.config || '{}') # extract config JSON string to hash
+			conf = JSON.parse( ( lab.config.blank? ? '{}' : lab.config ) )  # extract config JSON string to hash
 			#logger.debug conf
 			lab = JSON.parse(lab.to_json) # convert lab to hash
 			lab[:config] = conf # overwrite conf with hash version
