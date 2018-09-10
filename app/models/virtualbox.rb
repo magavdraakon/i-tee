@@ -441,21 +441,48 @@ end
 	end
 
  def self.set_groups(vm, groups)
-	stdout = %x(utils/vboxmanage modifyvm #{Shellwords.escape(vm)} --groups #{Shellwords.escape(groups.join(','))} 2>&1)
-	if $?.exitstatus != 0
-		logger.error "Failed to set vm groups: #{stdout}"
-		raise 'Failed to set vm groups'
+ 	loginfo = "vm=#{vm} groups=#{groups.join(',')}"
+	logger.debug "SET GROUPS CALLED: #{loginfo}"
+	retry_sleep = 1
+	(0..5).each do |try|
+		stdout = %x(utils/vboxmanage modifyvm #{Shellwords.escape(vm)} --groups #{Shellwords.escape(groups.join(','))} 2>&1)
+		if $?.exitstatus != 0
+			logger.warn "SET GROUPS: failed try=#{try} #{loginfo}\n #{stdout}"
+			if try < 5
+				sleep retry_sleep
+				next  # go to next loop if not last
+			else # last attempt failed
+				raise "Failed to set vm groups try=#{try}/5 groups=#{groups.join(',')}"
+			end
+		else # success
+			logger.debug "SET GROUPS SUCCESS: try=#{try} #{loginfo}"
+			return true
+		end
 	end
  end
 
- def self.set_extra_data(vm, key, value = nil)
-	value = value == nil ? '' : Shellwords.escape(value)
-	stdout = %x(utils/vboxmanage setextradata #{Shellwords.escape(vm)} #{Shellwords.escape(key)} #{value} 2>&1)
-	if $?.exitstatus != 0
-		logger.error "Failed to set vm extra data: #{stdout}"
-		raise 'Failed to set vm extra data'
+	def self.set_extra_data(vm, key, value = nil)
+	 	loginfo = "vm=#{vm} field=#{key} value=#{value}"
+	 	logger.debug "SET EXTRA DATA CALLED: #{loginfo}"
+	 	retry_sleep = 1
+		value = value == nil ? '' : Shellwords.escape(value)
+		(0..5).each do |try|
+			logger.debug "SET EXTRA DATA: try=#{try} #{loginfo}"
+			stdout = %x(utils/vboxmanage setextradata #{Shellwords.escape(vm)} #{Shellwords.escape(key)} #{value} 2>&1)
+			if $?.exitstatus != 0
+				logger.warn "SET EXTRA DATA: failed try=#{try} #{loginfo}\n #{stdout}"
+				if try < 5
+					sleep retry_sleep
+					next  # go to next loop if not last
+				else # last attempt failed
+					raise "Failed to set vm extra data try=#{try}/5 field=#{key} value=#{value}"
+				end
+			else # success
+				logger.debug "SET EXTRA DATA SUCCESS: try=#{try} #{loginfo}"
+				return true
+			end
+		end
 	end
- end
 
 	def self.set_network(vm, slot, type, name='')
 		loginfo = "vm=#{vm} slot=#{slot} type=#{type} name=#{name}"
