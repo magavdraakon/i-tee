@@ -198,7 +198,7 @@ class Vm < ActiveRecord::Base
         image = self.lab_vmt.vmt.image
         logger.debug "START_VM: Machine does not exist, creating from vmt=#{image} #{loginfo}"
         Virtualbox.clone(image, name) # will return true or raise an error caught below
-        
+
         logger.debug "START_VM: Configuring machine #{loginfo}"
         groupname,dummy,username = name.rpartition('-')
 
@@ -228,7 +228,7 @@ class Vm < ActiveRecord::Base
                       .gsub('{slot}', nw.slot.to_s)
                       .gsub('{labVmt}', self.lab_vmt.name)
         logger.info "START_VM: set newtwork slot=#{nw.slot} type=#{nw.network.net_type} name=#{network_name} #{loginfo}"
-        Virtualbox.set_network(name, nw.slot, nw.network.net_type, network_name)
+        Virtualbox.set_network(name, nw.slot, nw.network.net_type, network_name) # will return true or raise an error
         # add to a list of network-ip pairs if ip is set
         ips << "#{nw.slot}=#{nw.ip}" unless nw.ip.blank?
       end

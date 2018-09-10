@@ -387,6 +387,7 @@ end
  end
 
 	def self.clone(vm, name, snapshot = '')
+		logger.info "VM CLONE CALLED: snapshot=#{snapshot} vmt=#{vm} vm=#{name}"
 		begin 
 			# if snapshot is not defined look for latest
 			if snapshot.blank? && !(snapshot === false) # do not get latest snapshot if specifically said to not use a snapshot
@@ -395,27 +396,29 @@ end
 			end
 			retry_sleep = 3 # seconds to wait before retry cloning
 			if !snapshot.blank? # only if snapshot set
+				loginfo = "snapshot=#{snapshot} vmt=#{vm} vm=#{name}"
 				(0..5).each do |try|
-					logger.debug "VM CLONE: Cloning from snapshot try=#{try}/5 snapshot=#{snapshot} vmt=#{vm} vm=#{name}"
+					logger.debug "VM CLONE: Cloning from snapshot try=#{try}/5 #{loginfo}"
 					stdout = %x(utils/vboxmanage clonevm #{Shellwords.escape(vm)} --snapshot #{Shellwords.escape(snapshot)} --options link --name #{Shellwords.escape(name)} --register 2>&1)
 					if $?.exitstatus != 0
-						logger.warn "VM CLONE: Failed to clone vm try=#{try}/5 snapshot=#{snapshot} vmt=#{vm} vm=#{name} \n#{stdout}"
+						logger.warn "VM CLONE: Failed to clone vm try=#{try}/5 #{loginfo} \n#{stdout}"
 						if try < 5
 							sleep retry_sleep
 							next  # go to next loop if not last
 						end
 					else # success!
-						logger.info "VM CLONE SUCCESS: Cloned from snapshot try=#{try}/5 snapshot=#{snapshot} vmt=#{vm} vm=#{name}"
+						logger.info "VM CLONE SUCCESS: Cloned from snapshot try=#{try}/5 #{loginfo}"
 						return true # exit cloning if successful
 					end
 				end # eof loop
 			end # eof if snapshot
 			# we will reach here if cloning fails above or no snapshot is found, try to clone directly from machine instead
+			loginfo = "vmt=#{vm} vm=#{name}"
 			(0..5).each do |try|
-				logger.debug "VM CLONE: Cloning from template try=#{try}/5 vmt=#{vm} vm=#{name}"
+				logger.debug "VM CLONE: Cloning from template try=#{try}/5 #{loginfo}"
 				stdout = %x(utils/vboxmanage clonevm #{Shellwords.escape(vm)} --name #{Shellwords.escape(name)} --register 2>&1)
 				if $?.exitstatus != 0
-					logger.warn "VM CLONE: Failed to clone vm try=#{try}/5 vmt=#{vm} vm=#{name} \n#{stdout}"
+					logger.warn "VM CLONE: Failed to clone vm try=#{try}/5 #{loginfo} \n#{stdout}"
 					if try < 5
 						sleep retry_sleep
 						next  # go to next loop if not last
@@ -423,7 +426,7 @@ end
 					# last loop
 					raise "Failed to clone vm from template try=#{try}/5 vmt=#{vm}" # will be raised to caller
 				else # success!
-					logger.info "VM CLONE SUCCESS: Cloned from template try=#{try}/5 vmt=#{vm} vm=#{name}"
+					logger.info "VM CLONE SUCCESS: Cloned from template try=#{try}/5 #{loginfo}"
 					return true # exit cloning if successful
 				end
 			end # eof loop
@@ -454,55 +457,90 @@ end
 	end
  end
 
- def self.set_network(vm, slot, type, name='')
- 	begin 
+	def self.set_network(vm, slot, type, name='')
+		loginfo = "vm=#{vm} slot=#{slot} type=#{type} name=#{name}"
+		logger.info "SET NETWORK CALLED: #{loginfo}"
+		retry_sleep = 1
 		cmd_prefix = "utils/vboxmanage modifyvm #{Shellwords.escape(vm)}"
 		name = Shellwords.escape(name)
-
+		# compile a list of commands to run based on network type (1-2 commands)
+		commands = []
 		if type == 'nat'
-			stdout = %x(#{cmd_prefix} --nic#{slot} nat 2>&1)
+			commands << "--nic#{slot} nat"
 		elsif type == 'intnet'
-			stdout = %x(#{cmd_prefix} --nic#{slot} intnet 2>&1 )
-			raise stdout if $?.exitstatus != 0
-			stdout = %x(#{cmd_prefix} --intnet#{slot} #{name} 2>&1)
+			commands << "--nic#{slot} intnet"
+			commands << "--intnet#{slot} #{name}"
 		elsif type == 'bridgeadapter'
-			stdout = %x(#{cmd_prefix} --nic#{slot} bridged 2>&1)
-			raise stdout if $?.exitstatus != 0
-			stdout = %x(#{cmd_prefix} --bridgeadapter#{slot} #{name} 2>&1)
+			commands << "--nic#{slot} bridged"
+			commands << "--bridgeadapter#{slot} #{name}"
 		elsif type == 'hostonlyadapter'
-			stdout = %x(#{cmd_prefix} --nic#{slot} hostonly 2>&1 )
-			raise stdout if $?.exitstatus != 0
-			stdout = %x(#{cmd_prefix} --hostonlyadapter#{slot} #{name} 2>&1)
+			commands << "--nic#{slot} hostonly"
+			commands << "--hostonlyadapter#{slot} #{name}"
 		end
-		
-		raise stdout if $?.exitstatus != 0
-
-	rescue  Exception => e 
-		message = e.message || "unexpected error while setting vm network"
-		logger.error "Failed to set vm '#{vm}' network '#{name}': #{message}"
-		raise "Failed to set vm network"
-	end
+		# run each command
+		commands.each do |cmnd|
+			(0..5).each do |try|
+				logger.debug "SET NETWORK: calling #{cmnd} try=#{try}/5 #{loginfo}"
+				stdout = %x(#{cmd_prefix} #{cmnd} 2>&1 )
+				# try command again if failed
+				if $?.exitstatus != 0
+					logger.warn "SET NETWORK: #{cmnd} failed try=#{try}/5 #{loginfo} \n#{stdout}"
+					if try < 5
+						sleep retry_sleep
+						next  # go to next loop if not last
+					else # last attempt failed
+						raise "Failed to set vm network try=#{try}/5 slot=#{slot} type=#{type} name=#{name}"
+					end
+				else # success 
+					logger.info "SET NETWORK: #{cmnd} successful try=#{try}/5 #{loginfo}"
+					break # break out of the loop, continue to the next command
+				end
+			end # eof loop
+		end # eof commands
+		return true # we make it here if commands loop and the loop inside finish
  end
 
- def self.set_running_network(vm, slot, type, name='')
- 	cmd_prefix = "utils/vboxmanage controlvm #{Shellwords.escape(vm)}"
-	name = Shellwords.escape(name)
-	if type == 'null'
-		stdout = %x(#{cmd_prefix} nic#{slot} null 2>&1)	
-	elsif type == 'nat'
-		stdout = %x(#{cmd_prefix} nic#{slot} nat 2>&1)
-	elsif type == 'intnet'
-		stdout = %x(#{cmd_prefix} nic#{slot} intnet #{name} 2>&1)
-	elsif type == 'bridgeadapter'
-		stdout = %x(#{cmd_prefix} nic#{slot} bridged #{name} 2>&1)
-	elsif type == 'hostonlyadapter'
-		stdout = %x(#{cmd_prefix} nic#{slot} hostonly #{name} 2>&1)
+	def self.set_running_network(vm, slot, type, name='')
+		loginfo = "vm=#{vm} slot=#{slot} type=#{type} name=#{name}"
+		logger.info "SET RUNNING NETWORK CALLED: #{loginfo}"
+		retry_sleep = 1
+		cmd_prefix = "utils/vboxmanage controlvm #{Shellwords.escape(vm)}"
+		name = Shellwords.escape(name)
+		command = ''
+		# choose command based on type
+		if type == 'null'
+			command = "nic#{slot} null"
+		elsif type == 'nat'
+			command = "nic#{slot} nat"
+		elsif type == 'intnet'
+			command = "nic#{slot} intnet #{name}"
+		elsif type == 'bridgeadapter'
+			command = "nic#{slot} bridged #{name}"
+		elsif type == 'hostonlyadapter'
+			command = "nic#{slot} hostonly #{name}"
+		end
+		if !command.bank?
+			(0..5).each do |try|
+				logger.debug "SET RUNNING NETWORK: try=#{try}/5 #{loginfo}"
+				stdout = %x(#{cmd_prefix} #{command} 2>&1 )
+				# try command again if failed
+				if $?.exitstatus != 0
+					logger.warn "SET RUNNING NETWORK: failed try=#{try}/5 #{loginfo} \n#{stdout}"
+					if try < 5
+						sleep retry_sleep
+						next  # go to next loop if not last
+					else # last attempt failed
+						raise "Failed to set vm network try=#{try}/5 slot=#{slot} type=#{type} name=#{name}"
+					end
+				else # success 
+					logger.info "SET RUNNING NETWORK SUCCESS: try=#{try}/5 #{loginfo}"
+					return true
+				end
+			end # eof loop
+		else
+			raise "Unsupported network type slot=#{slot} type=#{type} name=#{name}"
+		end
 	end
-	if $?.exitstatus != 0
-		logger.error "Failed to set vm network: #{stdout}"
-		raise 'Failed to set vm network'
-	end
- end
 
  def self.reset_vm_rdp(vm)
 	stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} vrde off 2>&1)
