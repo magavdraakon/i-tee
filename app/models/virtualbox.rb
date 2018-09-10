@@ -352,15 +352,31 @@ end
 	end
  end
 
- def self.stop_vm(vm)
-	stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} poweroff 2>&1)
-	if $?.exitstatus != 0
-		unless stdout == "VBoxManage: error: Machine '#{vm}' is not currently running\n"
-			logger.error "Failed to stop vm: #{stdout}"
-			raise 'Failed to stop vm'
-		end
+	def self.stop_vm(vm)
+		logger.info "VM STOP CALLED: vm=#{vm}"
+		retry_sleep = 2 # seconds to wait before retry
+		(0..5).each do |try|
+			logger.debug "VM STOP: try=#{try}/5 vm=#{vm}"
+			stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} poweroff 2>&1)
+			if $?.exitstatus != 0
+				if stdout.start_with? == "VBoxManage: error: Machine '#{vm}' is not currently running\n" 
+					logger.info "VM STOP SUCCESS: already stopped try=#{try}/5 vm=#{vm}"
+					return true # exit if successful
+				else
+					logger.warn "VM STOP: failed try=#{try}/5 vm=#{vm} \n#{stdout}"
+					if try < 5
+						sleep retry_sleep
+						next  # go to next loop if not last
+					else # last attempt failed
+						raise "Failed to stop vm try=#{try}/5"
+					end
+				end
+			else # success status
+				logger.info "VM STOP SUCCESS: try=#{try}/5 vm=#{vm}"
+				return true # exit if successful
+			end
+		end # eof loop
 	end
- end
 
  def self.pause_vm(vm)
 	stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} savestate 2>&1)
@@ -378,12 +394,25 @@ end
 	end
  end
 
- def self.delete_vm(vm)
-	stdout = %x(utils/vboxmanage unregistervm #{Shellwords.escape(vm)} --delete 2>&1)
-	if $?.exitstatus != 0
-		logger.error "Failed to delete vm: #{stdout}"
-		raise 'Failed to delete vm'
-	end
+	def self.delete_vm(vm)
+		logger.info "VM DELETE CALLED: vm=#{vm}"
+		retry_sleep = 2 # seconds to wait before retry
+	 	(0..5).each do |try|
+			logger.debug "VM DELETE: try=#{try}/5 vm=#{vm}"
+			stdout = %x(utils/vboxmanage unregistervm #{Shellwords.escape(vm)} --delete 2>&1)
+			if $?.exitstatus != 0
+				logger.warn "VM DELETE: failed try=#{try}/5 vm=#{vm} \n#{stdout}"
+				if try < 5
+					sleep retry_sleep
+					next  # go to next loop if not last
+				else # last attempt failed
+					raise "Failed to delete vm try=#{try}/5"
+				end
+			else # success
+				logger.info "VM DELETE SUCCESS: try=#{try}/5 vm=#{vm}"
+				return true # exit if successful
+			end
+		end
  end
 
 	def self.clone(vm, name, snapshot = '')

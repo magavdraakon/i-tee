@@ -18,23 +18,15 @@ class Vm < ActiveRecord::Base
   def try_delete_vm
     loginfo = self.log_info.to_s
     logger.debug "VM BEFORE_DESTROY CALLED: #{loginfo}" 
-    do_delete = true
     begin
       info = Virtualbox.get_vm_info(self.name, true)
+      logger.debug "VM BEFORE_DESTROY: Will try to stop & delete the vm #{loginfo}"
+      self.delete_vm
+      logger.info "VM STOPPED & DELETED: #{loginfo}"
     rescue Exception => e
-      unless e.message == 'Not found'
-        raise e
-      end
-      logger.debug "VM ALREADY DELETED: #{loginfo}"
-      do_delete = false
-    end
-    # only if vbox has the machine description
-    if do_delete
-      logger.debug "Will try to stop & delete the vm '#{self.name}'"
-      begin
-        self.delete_vm
-        logger.info "VM STOPPED & DELETED: #{loginfo}"
-      rescue Exception => e 
+      if e.message == 'Not found'
+        logger.debug "VM BEFORE_DESTROY: already deleted #{loginfo}"
+      else
         raise e
       end
     end
@@ -108,41 +100,17 @@ class Vm < ActiveRecord::Base
     loginfo = self.log_info.to_s
     logger.info "DELETE_VM CALLED: #{loginfo}"
     begin
-      do_stop = true
-      (0..5).each do |try|
-        begin
-          if do_stop # try to stop machine until machine is stopped state
-            info = Virtualbox.get_vm_info(self.name, true)
-            state = info['VMState']
-            if state=='running' || state=='paused'
-              logger.debug "DELETE_VM: stopping machine try=#{try} #{loginfo}"
-              Virtualbox.stop_vm(name)
-              logger.debug "DELETE_VM: stopped vm try=#{try} #{loginfo}"
-              sleep 1 # wait a bit 
-              do_stop = false
-            end
-          end
-          logger.debug "DELETE_VM: deleting machine try=#{try} #{loginfo}"
-          Virtualbox.delete_vm(name)
-          logger.info "DELETE_VM SUCCESS: try=#{try} #{loginfo}"
-          return true
-        rescue Exception => e
-          if e.message == 'Not found'
-            logger.debug "DELETE_VM SUCCESS: already deleted try=#{try} #{loginfo}"
-            return true # if machine does not exist, it is deleted
-          else
-            logger.error e
-            info = Virtualbox.get_vm_info(self.name, true)
-            state = info['VMState']
-            logger.info "DELETE_VM: an error was caught try=#{try} state=#{state} #{loginfo}"
-            if try < 5
-              sleep 1
-              next  # go to next loop if not last
-            end
-            raise e.message # raise error again
-          end
-        end # end rescue
-      end # end loop
+      info = Virtualbox.get_vm_info(self.name, true)
+      state = info['VMState']
+      if state=='running' || state=='paused'
+        logger.debug "DELETE_VM: stopping machine #{loginfo}"
+        Virtualbox.stop_vm(name) # tries 6 times to stop, raises error or returns true
+        logger.debug "DELETE_VM: stopped vm #{loginfo}"
+      end
+      logger.debug "DELETE_VM: deleting machine #{loginfo}"
+      Virtualbox.delete_vm(name) # tries 6 times to delete, raises error or returns true
+      logger.info "DELETE_VM SUCCESS: deleted vm #{loginfo}"
+      return true
     rescue Exception => e
       if e.message == 'Not found'
         logger.debug "DELETE_VM SUCCESS: already deleted #{loginfo}"
@@ -152,6 +120,7 @@ class Vm < ActiveRecord::Base
         info = Virtualbox.get_vm_info(self.name, true)
         state = info['VMState']
         logger.error "DELETE_VM FAILED: state=#{state} #{loginfo}"
+        raise e
       end
     end
   end

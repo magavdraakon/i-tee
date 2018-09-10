@@ -157,13 +157,8 @@ class LabUser < ActiveRecord::Base
         machines = Vm.where(lab_user_id: self.id) 
         # to make sure vms are being removed, do it one by one
         machines.each do |vm|
-          begin
-            vm.delete_vm
-            logger.info "#{vm.name} stopped and deleted @ lab end"
-          rescue Exception => e 
-            logger.error e
-            return {success: false, message: "Mission end failed" }
-          end
+          vm.delete_vm
+          logger.info "#{vm.name} stopped and deleted @ lab end"
         end
         # remove the db entries, the before destroy filter should realize there is no vm to destroy and will be 'skipped'
         machines.destroy_all
