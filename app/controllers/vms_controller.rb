@@ -445,27 +445,25 @@ end
     respond_to do |format|
       result = @vm.open_guacamole
       if result && result[:success]
-      format.html {
-        # set cookie
-        cookies[:GUAC_AUTH] = {
-          value: result[:token],
-          #expires: 1.hour.from_now,
-          domain: result[:domain], #%w(rangeforce.com), # %w(.example.com .example.org)
-          path: URI(ITee::Application::config.guacamole[:url_prefix]).path,
-          #:secure,
-          #:httponly
+        format.html {
+          # set cookie
+          cookies[:GUAC_AUTH] = {
+            value: result[:token],
+            #expires: 1.hour.from_now,
+            domain: result[:domain], #%w(rangeforce.com), # %w(.example.com .example.org)
+            path: URI(ITee::Application::config.guacamole[:url_prefix]).path,
+            #:secure,
+            #:httponly
+          }
+          #redirect to url https://xxx.yyy.com/#/client/zzz
+          redirect_to( result[:url] )
         }
-        #redirect to url https://xxx.yyy.com/#/client/zzz
-        redirect_to( result[:url] )
-      }
-      format.json  { 
-        logger.info "OPENING GUACMOLE SUCCESSS: vm=#{@vm.id} [#{@vm.name}] labuser=#{@vm.lab_user_id} lab=#{@vm.lab_user.lab.id} user=#{@vm.lab_user.user.id} [#{@vm.lab_user.user.username}]"
-        render :json => result 
-      }
+        format.json  { 
+          render :json => result 
+        }
       else
         format.html  { redirect_to( not_found_path, :notice=> result[:message]) }
         format.json  { 
-          logger.error "OPENING GUACMOLE FAILED: vm=#{@vm.id} [#{@vm.name}] labuser=#{@vm.lab_user_id} lab=#{@vm.lab_user.lab.id} user=#{@vm.lab_user.user.id} [#{@vm.lab_user.user.username}]"
           render :json => {:success=>result[:success], :message=> result[:message] } 
         }
       end

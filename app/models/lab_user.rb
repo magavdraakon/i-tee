@@ -93,7 +93,7 @@ class LabUser < ActiveRecord::Base
             logger.debug "#{vm.lab_user.id} Machine #{vm.id} - #{vm.name} successfully generated."
           end
         end
-        logger.debug "LAB VMS CREATED: #{loginfo}"
+        logger.debug "LAB START: vms db entries created #{loginfo}"
         # start delayed jobs for keeping up with the last activity
         LabUser.rdp_status(self.id)
       	# set new start time
@@ -101,7 +101,7 @@ class LabUser < ActiveRecord::Base
         self.last_activity = Time.now
         self.activity = 'Lab start'
         unless self.vta_setup # do not repeat setup if set by api
-          logger.debug "BEGIN LAB VTA SETUP: #{loginfo}"
+          logger.debug "LAB START: begin VTA setup #{loginfo}"
           # check if lab has assistant to be able to create the vta labuser
           if !lab.assistant_id.blank?
             assistant = lab.assistant
@@ -112,33 +112,33 @@ class LabUser < ActiveRecord::Base
               # save to user
               user.user_key = result['key'];
               unless user.save
-                logger.error "LAB VTA SETUP FAILURE: save failed #{loginfo}"
+                logger.error "LAB START FAILED: VTA setup failed - save failed #{loginfo}"
                 return {success: false, message: 'unable to remember user token in assistant'}
               end
-              logger.info "LAB VTA SETUP SUCCESS: #{loginfo}"
+              logger.info "LAB START: VTA setup success #{loginfo}"
             else
-              logger.error "LAB VTA SETUP FAILURE: request error #{loginfo}"
+              logger.error "LAB START FAILED: VTA setup failed - request error #{loginfo}"
               logger.error result
               return {success: false, message: 'unable to communicate with assistant'}
             end
           end
         end
       	self.save
-        logger.debug "LAB VMS: #{loginfo} \n #{self.vms.as_json}"
+        logger.debug "LAB START: VMS #{loginfo} \n #{self.vms.as_json}"
 
   			if self.lab.startAll
   				self.start_all_vms
   			end
-        # success log in controller
+        logger.info "LAB START SUCCESS: #{loginfo}"
         {success: true, message: 'Lab started'}
       else
         result # forward the message from resource check
       end
     elsif self.end # lab is ended
-      logger.debug "ended labuser"
+      logger.warn "LAB START FAILED: ended labuser #{loginfo}"
       {success: false, message: 'Ended mission can not be started'}
     else
-      logger.debug "lab already started"
+      logger.warn "LAB START SUCCESS: lab already started #{loginfo}"
       {success: true, message: 'Lab started..'}
 		end
   end

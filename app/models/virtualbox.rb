@@ -386,17 +386,56 @@ end
 	end
  end
 
- def self.clone(vm, name, snapshot = '')
-	if snapshot
-		stdout = %x(utils/vboxmanage clonevm #{Shellwords.escape(vm)} --snapshot #{Shellwords.escape(snapshot)} --options link --name #{Shellwords.escape(name)} --register 2>&1)
-	else
-		stdout = %x(utils/vboxmanage clonevm #{Shellwords.escape(vm)} --name #{Shellwords.escape(name)} --register 2>&1)
+	def self.clone(vm, name, snapshot = '')
+		begin 
+			# if snapshot is not defined look for latest
+			if snapshot.blank? && !(snapshot === false) # do not get latest snapshot if specifically said to not use a snapshot
+				template = Virtualbox.get_vm_info(vm)
+				snapshot = template['CurrentSnapshotName']
+			end
+			retry_sleep = 3 # seconds to wait before retry cloning
+			if !snapshot.blank? # only if snapshot set
+				(0..5).each do |try|
+					logger.debug "VM CLONE: Cloning from snapshot try=#{try}/5 snapshot=#{snapshot} vmt=#{vm} vm=#{name}"
+					stdout = %x(utils/vboxmanage clonevm #{Shellwords.escape(vm)} --snapshot #{Shellwords.escape(snapshot)} --options link --name #{Shellwords.escape(name)} --register 2>&1)
+					if $?.exitstatus != 0
+						logger.warn "VM CLONE: Failed to clone vm try=#{try}/5 snapshot=#{snapshot} vmt=#{vm} vm=#{name} \n#{stdout}"
+						if try < 5
+							sleep retry_sleep
+							next  # go to next loop if not last
+						end
+					else # success!
+						logger.info "VM CLONE SUCCESS: Cloned from snapshot try=#{try}/5 snapshot=#{snapshot} vmt=#{vm} vm=#{name}"
+						return true # exit cloning if successful
+					end
+				end # eof loop
+			end # eof if snapshot
+			# we will reach here if cloning fails above or no snapshot is found, try to clone directly from machine instead
+			(0..5).each do |try|
+				logger.debug "VM CLONE: Cloning from template try=#{try}/5 vmt=#{vm} vm=#{name}"
+				stdout = %x(utils/vboxmanage clonevm #{Shellwords.escape(vm)} --name #{Shellwords.escape(name)} --register 2>&1)
+				if $?.exitstatus != 0
+					logger.warn "VM CLONE: Failed to clone vm try=#{try}/5 vmt=#{vm} vm=#{name} \n#{stdout}"
+					if try < 5
+						sleep retry_sleep
+						next  # go to next loop if not last
+					end
+					# last loop
+					raise "Failed to clone vm from template try=#{try}/5 vmt=#{vm}" # will be raised to caller
+				else # success!
+					logger.info "VM CLONE SUCCESS: Cloned from template try=#{try}/5 vmt=#{vm} vm=#{name}"
+					return true # exit cloning if successful
+				end
+			end # eof loop
+		rescue Exception => e
+			logger.error e
+			if e.message == 'Not found'
+				raise "Template machine not found vmt=#{vm}"
+			else
+				raise e.message
+			end
+		end
 	end
-	if $?.exitstatus != 0
-		logger.error "Failed to clone vm: #{stdout}"
-		raise 'Failed to clone vm'
-	end
- end
 
  def self.set_groups(vm, groups)
 	stdout = %x(utils/vboxmanage modifyvm #{Shellwords.escape(vm)} --groups #{Shellwords.escape(groups.join(','))} 2>&1)

@@ -194,59 +194,11 @@ class Vm < ActiveRecord::Base
 
     begin
       unless Virtualbox.all_machines.include? name
-        retry_sleep = 3 # seconds to wait before retry cloning
+
         image = self.lab_vmt.vmt.image
         logger.debug "START_VM: Machine does not exist, creating from vmt=#{image} #{loginfo}"
-        # Create new instance of template
-        begin
-          imageinfo = Virtualbox.get_vm_info(image)
-          current_snapshot = imageinfo['CurrentSnapshotName']
-          raise "START_VM: no template snapshot vmt=#{image} #{loginfo}" if current_snapshot.blank?
-          (0..5).each do |try|
-            begin
-              logger.debug "START_VM: Cloning from snapshot try=#{try} snapshot=#{current_snapshot} vmt=#{image} #{loginfo}"
-              Virtualbox.clone(image, name, current_snapshot)
-              logger.debug "START_VM: successfully Cloned from snapshot try=#{try} snapshot=#{current_snapshot} vmt=#{image} #{loginfo}"
-              break # continue out of the loop
-            rescue Exception => e
-              logger.warn e
-              if try < 5
-                sleep retry_sleep
-                next  # go to next loop if not last
-              end
-              logger.warn "START_VM: cloning from snapshot failed try=#{try} snapshot=#{current_snapshot} vmt=#{image} #{loginfo}"
-              raise e.message # raise error again
-            end # end rescue
-          end # end loop
-         
-        rescue Exception => e
-          if e.message == 'Not found'
-            logger.error "START_VM FAILED: template machine not found vmt=#{image} #{loginfo}"
-            result[:alert]="Unable to start <b>#{self.lab_vmt.nickname}</b>, template not found"
-            return result # if machine does not exist, it is deleted
-          else
-            logger.error e
-            # either cloning from snapshot failed 6 times or there is no snapshot. try to clone from template 6 times
-            (0..5).each do |try|
-              begin
-                logger.debug "START_VM: Cloning try=#{try} vmt=#{image} #{loginfo}"
-                Virtualbox.clone(image, name)
-                logger.debug "START_VM: successfully Cloned try=#{try} vmt=#{image} #{loginfo}"
-                break # continue out of the loop
-              rescue Exception => e
-                logger.warn e
-                if try < 5
-                  sleep retry_sleep
-                  next  # go to next loop if not last
-                end
-                # last try failed, return error
-                logger.error "START_VM FAILED: cloning failed try=#{try} vmt=#{image} #{loginfo}"
-                result[:alert]="Unable to start <b>#{self.lab_vmt.nickname}</b>, Cloning failed"
-                return result # if machine does not exist, it is deleted
-              end # end rescue
-            end # end loop
-          end # end machine exists
-        end # end rescue
+        Virtualbox.clone(image, name) # will return true or raise an error caught below
+        
         logger.debug "START_VM: Configuring machine #{loginfo}"
         groupname,dummy,username = name.rpartition('-')
 
