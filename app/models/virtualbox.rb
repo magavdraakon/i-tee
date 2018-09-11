@@ -307,14 +307,30 @@ def self.open_guacamole(vm, user, admin=false)
 end
 
 	def self.set_port_range(vm, range='9000-11000')
-		logger.info "utils/vboxmanage modifyvm #{Shellwords.escape(vm)} --vrdeport #{Shellwords.escape(range)} "
-		stdout = %x(utils/vboxmanage modifyvm #{Shellwords.escape(vm)} --vrdeport #{Shellwords.escape(range)}  2>&1)
-		if $?.exitstatus != 0
-			unless stdout.start_with? "VBoxManage: error: The machine '#{vm}' is already locked by a session (or being locked or unlocked)\n"
-				logger.error "Failed to set vm port range: #{stdout}"
-				raise 'Failed to set vm port range'
+		logger.info "SET PORT RANGE CALLED: vm=#{vm} range=#{range}"
+		retry_sleep = 1 # seconds to wait before retry
+		(0..5).each do |try|
+			logger.debug "SET PORT RANGE: try=#{try}/5 vm=#{vm} range=#{range}"
+			stdout = %x(utils/vboxmanage modifyvm #{Shellwords.escape(vm)} --vrdeport #{Shellwords.escape(range)}  2>&1)
+			if $?.exitstatus != 0
+				if stdout.start_with? "VBoxManage: error: The machine '#{vm}' is already locked by a session (or being locked or unlocked)\n"
+					# machine is running
+					logger.info "SET PORT RANGE: can not set port range for running vm try=#{try}/5 vm=#{vm}"
+					return true # exit with true although port range was not changed?
+				else
+					logger.warn "SET PORT RANGE: failed try=#{try}/5 vm=#{vm} range=#{range} \n#{stdout}"
+					if try < 5
+						sleep retry_sleep
+						next  # go to next loop if not last
+					else # last attempt failed
+						raise "Failed to set vm port range try=#{try}/5 range=#{range}"
+					end
+				end
+			else # success 
+				logger.info "SET PORT RANGE SUCCESS: try=#{try}/5 vm=#{vm}"
+				return true
 			end
-		end
+		end # end loop
 
 	end
 
@@ -341,16 +357,32 @@ end
 	end
  end
 
- def self.start_vm(vm)
- 	Virtualbox.set_port_range(vm) # set default port range of 9000-11000 
-	stdout = %x(utils/vboxmanage startvm #{Shellwords.escape(vm)} --type headless  2>&1)
-	if $?.exitstatus != 0
-		unless stdout.start_with? "VBoxManage: error: The machine '#{vm}' is already locked by a session (or being locked or unlocked)\n"
-			logger.error "Failed to start vm: #{stdout}"
-			raise 'Failed to start vm'
-		end
+	def self.start_vm(vm)
+		logger.info "VM START CALLED: vm=#{vm}"
+		Virtualbox.set_port_range(vm) # set default port range of 9000-11000 
+		retry_sleep = 2 # seconds to wait before retry
+		(0..5).each do |try|
+			logger.debug "VM START: try=#{try}/5 vm=#{vm}"
+			stdout = %x(utils/vboxmanage startvm #{Shellwords.escape(vm)} --type headless  2>&1)
+			if $?.exitstatus != 0
+				if stdout.start_with? "VBoxManage: error: The machine '#{vm}' is already locked by a session (or being locked or unlocked)\n"
+					logger.info "VM START SUCCESS: already started try=#{try}/5 vm=#{vm}"
+					return true # exit if successful
+				else
+					logger.warn "VM START: failed try=#{try}/5 vm=#{vm} \n#{stdout}"
+					if try < 5
+						sleep retry_sleep
+						next  # go to next loop if not last
+					else # last attempt failed
+						raise "Failed to start vm try=#{try}/5"
+					end
+				end
+			else
+				logger.info "VM START SUCCESS: try=#{try}/5 vm=#{vm}"
+				return true # exit if successful
+			end
+		end # eof loop
 	end
- end
 
 	def self.stop_vm(vm)
 		logger.info "VM STOP CALLED: vm=#{vm}"
