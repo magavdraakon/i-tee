@@ -190,7 +190,7 @@ Rails.application.configure do
     # Code is not reloaded between requests
     config.cache_classes = true
 
-    if config_file.key?('log_level') && ['fatal','error','info','warn','debug'].include? config_file['log_level']
+    if config_file.key?('log_level') && ['fatal','error','info','warn','debug'].include?(config_file['log_level'])
       config.log_level = config_file['log_level'].to_sym
     else
       # Log level (defaults to :info)
