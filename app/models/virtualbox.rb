@@ -90,8 +90,10 @@ def self.template_machines
 end
 
 def self.get_vm_info(name, static=false)
-	logger.debug "VIRTUALBOX. get vm info '#{name}'"
-	stdout = %x(utils/vboxmanage showvminfo #{Shellwords.escape(name)} --machinereadable 2>&1)
+	logger.debug "GET VM INFO CALLED: vm=#{name} "
+	@@vm_mutex.synchronize do
+		stdout = %x(utils/vboxmanage showvminfo #{Shellwords.escape(name)} --machinereadable 2>&1)
+	end
 	unless $?.exitstatus == 0
 		if stdout.start_with? "VBoxManage: error: Could not find a registered machine named '#{name}'"
 			raise 'Not found'
@@ -339,7 +341,9 @@ end
 	end
 
  def self.state(vm)
-	stdout = %x(utils/vboxmanage showvminfo #{Shellwords.escape(vm)} 2>/dev/null | grep -E '^State:')
+ 	@@vm_mutex.synchronize do
+		stdout = %x(utils/vboxmanage showvminfo #{Shellwords.escape(vm)} 2>/dev/null | grep -E '^State:')
+	end
 	state = "#{stdout}".split(' ')[1]
 
 	if $?.exitstatus != 0
@@ -395,7 +399,9 @@ end
 		retry_sleep = 2 # seconds to wait before retry
 		(0..5).each do |try|
 			logger.debug "VM STOP: try=#{try}/5 vm=#{vm}"
-			stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} poweroff 2>&1)
+			@@vm_mutex.synchronize do
+				stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} poweroff 2>&1)
+			end
 			if $?.exitstatus != 0
 				if stdout.start_with? "VBoxManage: error: Machine '#{vm}' is not currently running" 
 					logger.info "VM STOP SUCCESS: already stopped try=#{try}/5 vm=#{vm}"
@@ -437,7 +443,9 @@ end
 		retry_sleep = 2 # seconds to wait before retry
 	 	(0..5).each do |try|
 			logger.debug "VM DELETE: try=#{try}/5 vm=#{vm}"
-			stdout = %x(utils/vboxmanage unregistervm #{Shellwords.escape(vm)} --delete 2>&1)
+			@@vm_mutex.synchronize do
+				stdout = %x(utils/vboxmanage unregistervm #{Shellwords.escape(vm)} --delete 2>&1)
+			end
 			if $?.exitstatus != 0
 				logger.warn "VM DELETE: failed try=#{try}/5 vm=#{vm} \n#{stdout}"
 				if try < 5
@@ -466,7 +474,9 @@ end
 				loginfo = "snapshot=#{snapshot} vmt=#{vm} vm=#{name}"
 				(0..5).each do |try|
 					logger.debug "VM CLONE: Cloning from snapshot try=#{try}/5 #{loginfo}"
-					stdout = %x(utils/vboxmanage clonevm #{Shellwords.escape(vm)} --snapshot #{Shellwords.escape(snapshot)} --options link --name #{Shellwords.escape(name)} --register 2>&1)
+					@@vm_mutex.synchronize do
+						stdout = %x(utils/vboxmanage clonevm #{Shellwords.escape(vm)} --snapshot #{Shellwords.escape(snapshot)} --options link --name #{Shellwords.escape(name)} --register 2>&1)
+					end
 					if $?.exitstatus != 0
 						logger.warn "VM CLONE: Failed to clone vm try=#{try}/5 #{loginfo} \n#{stdout}"
 						if try < 5
@@ -483,7 +493,9 @@ end
 			loginfo = "vmt=#{vm} vm=#{name}"
 			(0..5).each do |try|
 				logger.debug "VM CLONE: Cloning from template try=#{try}/5 #{loginfo}"
-				stdout = %x(utils/vboxmanage clonevm #{Shellwords.escape(vm)} --name #{Shellwords.escape(name)} --register 2>&1)
+				@@vm_mutex.synchronize do
+					stdout = %x(utils/vboxmanage clonevm #{Shellwords.escape(vm)} --name #{Shellwords.escape(name)} --register 2>&1)
+				end
 				if $?.exitstatus != 0
 					logger.warn "VM CLONE: Failed to clone vm try=#{try}/5 #{loginfo} \n#{stdout}"
 					if try < 5
@@ -509,12 +521,15 @@ end
 
  def self.set_groups(vm, groups)
  	loginfo = "vm=#{vm} groups=#{groups.join(',')}"
-	logger.debug "SET GROUPS CALLED: #{loginfo}"
+	logger.info "SET GROUPS CALLED: #{loginfo}"
 	retry_sleep = 1
 	(0..5).each do |try|
-		stdout = %x(utils/vboxmanage modifyvm #{Shellwords.escape(vm)} --groups #{Shellwords.escape(groups.join(','))} 2>&1)
+		logger.debug "SET GROUPS: try=#{try}/5 #{loginfo}"
+		@@vm_mutex.synchronize do
+			stdout = %x(utils/vboxmanage modifyvm #{Shellwords.escape(vm)} --groups #{Shellwords.escape(groups.join(','))} 2>&1)
+		end
 		if $?.exitstatus != 0
-			logger.warn "SET GROUPS: failed try=#{try} #{loginfo}\n #{stdout}"
+			logger.warn "SET GROUPS: failed try=#{try}/5 #{loginfo}\n #{stdout}"
 			if try < 5
 				sleep retry_sleep
 				next  # go to next loop if not last
@@ -522,7 +537,7 @@ end
 				raise "Failed to set vm groups try=#{try}/5 groups=#{groups.join(',')}"
 			end
 		else # success
-			logger.debug "SET GROUPS SUCCESS: try=#{try} #{loginfo}"
+			logger.info "SET GROUPS SUCCESS: try=#{try}/5 #{loginfo}"
 			return true
 		end
 	end
@@ -530,14 +545,16 @@ end
 
 	def self.set_extra_data(vm, key, value = nil)
 	 	loginfo = "vm=#{vm} field=#{key} value=#{value}"
-	 	logger.debug "SET EXTRA DATA CALLED: #{loginfo}"
+	 	logger.info "SET EXTRA DATA CALLED: #{loginfo}"
 	 	retry_sleep = 1
 		value = value == nil ? '' : Shellwords.escape(value)
 		(0..5).each do |try|
-			logger.debug "SET EXTRA DATA: try=#{try} #{loginfo}"
-			stdout = %x(utils/vboxmanage setextradata #{Shellwords.escape(vm)} #{Shellwords.escape(key)} #{value} 2>&1)
+			logger.debug "SET EXTRA DATA: try=#{try}/5 #{loginfo}"
+			@@vm_mutex.synchronize do
+				stdout = %x(utils/vboxmanage setextradata #{Shellwords.escape(vm)} #{Shellwords.escape(key)} #{value} 2>&1)
+			end
 			if $?.exitstatus != 0
-				logger.warn "SET EXTRA DATA: failed try=#{try} #{loginfo}\n #{stdout}"
+				logger.warn "SET EXTRA DATA: failed try=#{try}/5 #{loginfo}\n #{stdout}"
 				if try < 5
 					sleep retry_sleep
 					next  # go to next loop if not last
@@ -545,7 +562,7 @@ end
 					raise "Failed to set vm extra data try=#{try}/5 field=#{key} value=#{value}"
 				end
 			else # success
-				logger.debug "SET EXTRA DATA SUCCESS: try=#{try} #{loginfo}"
+				logger.info "SET EXTRA DATA SUCCESS: try=#{try}/5 #{loginfo}"
 				return true
 			end
 		end
@@ -575,7 +592,9 @@ end
 		commands.each do |cmnd|
 			(0..5).each do |try|
 				logger.debug "SET NETWORK: calling #{cmnd} try=#{try}/5 #{loginfo}"
-				stdout = %x(#{cmd_prefix} #{cmnd} 2>&1 )
+				@@vm_mutex.synchronize do
+					stdout = %x(#{cmd_prefix} #{cmnd} 2>&1 )
+				end
 				# try command again if failed
 				if $?.exitstatus != 0
 					logger.warn "SET NETWORK: #{cmnd} failed try=#{try}/5 #{loginfo} \n#{stdout}"
@@ -616,7 +635,9 @@ end
 		if !command.bank?
 			(0..5).each do |try|
 				logger.debug "SET RUNNING NETWORK: try=#{try}/5 #{loginfo}"
-				stdout = %x(#{cmd_prefix} #{command} 2>&1 )
+				@@vm_mutex.synchronize do
+					stdout = %x(#{cmd_prefix} #{command} 2>&1 )
+				end
 				# try command again if failed
 				if $?.exitstatus != 0
 					logger.warn "SET RUNNING NETWORK: failed try=#{try}/5 #{loginfo} \n#{stdout}"
@@ -637,7 +658,9 @@ end
 	end
 
  def self.reset_vm_rdp(vm)
-	stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} vrde off 2>&1)
+ 	@@vm_mutex.synchronize do
+		stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} vrde off 2>&1)
+	end
 	if $?.exitstatus != 0
 		unless stdout.start_with? "VBoxManage: error: Machine '#{vm}' is not currently running"
 			logger.error "Failed to stop vm: #{stdout}"
@@ -645,8 +668,9 @@ end
 		end
 		return
 	end
-
-	stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} vrde on 2>&1)
+	@@vm_mutex.synchronize do
+		stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} vrde on 2>&1)
+	end
 	if $?.exitstatus != 0
 		unless stdout.start_with? "VBoxManage: error: Machine '#{vm}' is not currently running"
 			logger.error "Failed to stop vm: #{stdout}"
@@ -669,8 +693,9 @@ end
 	vmname = vm.gsub("-template",'')
 	nr = info['CurrentSnapshotName'] ? info['CurrentSnapshotName'].gsub("#{vmname}-",'').gsub('-template','').to_i + 1 : 1
  	name = "#{vmname}-#{nr}-template"
-
-	stdout = %x(utils/vboxmanage snapshot #{Shellwords.escape(vm)} take #{Shellwords.escape(name)} --description "#{Time.now}" 2>&1)
+ 	@@vm_mutex.synchronize do
+		stdout = %x(utils/vboxmanage snapshot #{Shellwords.escape(vm)} take #{Shellwords.escape(name)} --description "#{Time.now}" 2>&1)
+	end
 	if $?.exitstatus != 0
 		logger.error "Failed to take snapshot: #{stdout}"
 		raise 'Failed to take snapshot'
@@ -773,7 +798,9 @@ end
 					raise "unknown key #{l}" unless codes[l]
 					result << codes[l].join(' ')
 				end
-			 	stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} keyboardputscancode #{result.join(' ')} 2>&1)
+				@@vm_mutex.synchronize do
+			 		stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} keyboardputscancode #{result.join(' ')} 2>&1)
+			 	end
 				if $?.exitstatus != 0
 					raise 'Failed to send text to vm'
 				end
@@ -781,7 +808,9 @@ end
 			end
 			# put line return if there are more rows after this one
 			if lines[index+1]
-			 	stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} keyboardputscancode #{codes['enter'].join(' ')} 2>&1)
+				@@vm_mutex.synchronize do
+				 	stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} keyboardputscancode #{codes['enter'].join(' ')} 2>&1)
+				end
 				if $?.exitstatus != 0
 					raise 'Failed to send enter to vm'
 				end
@@ -807,7 +836,9 @@ end
 	 		result << codes[l][0]
 	 	end
 	 	logger.info "keyboardputscancode #{result.join(' ')}"
-	 	stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} keyboardputscancode #{result.join(' ')} 2>&1)
+	 	@@vm_mutex.synchronize do
+		 	stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} keyboardputscancode #{result.join(' ')} 2>&1)
+		end
 		if $?.exitstatus != 0
 			raise 'Failed to send keys to vm'
 		end
@@ -819,7 +850,9 @@ end
 	 		result << codes[l][1]
 	 	end
 	 	logger.info "keyboardputscancode #{result.join(' ')}"
-	 	stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} keyboardputscancode #{result.join(' ')} 2>&1)
+	 	@@vm_mutex.synchronize do
+	 		stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} keyboardputscancode #{result.join(' ')} 2>&1)
+	 	end
 		if $?.exitstatus != 0
 			raise 'Failed to send keys to vm'
 		end
