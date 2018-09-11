@@ -190,8 +190,12 @@ Rails.application.configure do
     # Code is not reloaded between requests
     config.cache_classes = true
 
-    # Log level (defaults to :info)
-    config.log_level = :info
+    if config_file.key?('log_level') && ['fatal','error','info','warn','debug'].include? config_file['log_level']
+      config.log_level = config_file['log_level'].to_sym
+    else
+      # Log level (defaults to :info)
+      config.log_level = :info
+    end
 
     # Full error reports are disabled and caching is turned on
     config.consider_all_requests_local       = false
