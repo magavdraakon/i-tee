@@ -93,7 +93,7 @@ def self.get_vm_info(name, static=false)
 	logger.debug "VIRTUALBOX. get vm info '#{name}'"
 	stdout = %x(utils/vboxmanage showvminfo #{Shellwords.escape(name)} --machinereadable 2>&1)
 	unless $?.exitstatus == 0
-		if stdout.lines.first == "VBoxManage: error: Could not find a registered machine named '#{name}'\n"
+		if stdout.start_with? "VBoxManage: error: Could not find a registered machine named '#{name}'"
 			raise 'Not found'
 		end
 		logger.error "Failed to get vm info: #{stdout}"
@@ -317,7 +317,7 @@ end
 				stdout = %x(utils/vboxmanage modifyvm #{Shellwords.escape(vm)} --vrdeport #{Shellwords.escape(range)}  2>&1)
 			end
 			if $?.exitstatus != 0
-				if stdout.start_with? "VBoxManage: error: The machine '#{vm}' is already locked by a session (or being locked or unlocked)\n"
+				if stdout.start_with? "VBoxManage: error: The machine '#{vm}' is already locked by a session (or being locked or unlocked)"
 					# machine is running
 					logger.info "SET PORT RANGE: can not set port range for running vm try=#{try}/5 vm=#{vm}"
 					return true # exit with true although port range was not changed?
@@ -371,7 +371,7 @@ end
 				stdout = %x(utils/vboxmanage startvm #{Shellwords.escape(vm)} --type headless  2>&1)
 			end
 			if $?.exitstatus != 0
-				if stdout.start_with? "VBoxManage: error: The machine '#{vm}' is already locked by a session (or being locked or unlocked)\n"
+				if stdout.start_with? "VBoxManage: error: The machine '#{vm}' is already locked by a session (or being locked or unlocked)"
 					logger.info "VM START SUCCESS: already started try=#{try}/5 vm=#{vm}"
 					return true # exit if successful
 				else
@@ -397,7 +397,7 @@ end
 			logger.debug "VM STOP: try=#{try}/5 vm=#{vm}"
 			stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} poweroff 2>&1)
 			if $?.exitstatus != 0
-				if stdout.start_with? == "VBoxManage: error: Machine '#{vm}' is not currently running\n" 
+				if stdout.start_with? "VBoxManage: error: Machine '#{vm}' is not currently running" 
 					logger.info "VM STOP SUCCESS: already stopped try=#{try}/5 vm=#{vm}"
 					return true # exit if successful
 				else
@@ -639,7 +639,7 @@ end
  def self.reset_vm_rdp(vm)
 	stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} vrde off 2>&1)
 	if $?.exitstatus != 0
-		unless stdout == "VBoxManage: error: Machine '#{vm}' is not currently running\n"
+		unless stdout.start_with? "VBoxManage: error: Machine '#{vm}' is not currently running"
 			logger.error "Failed to stop vm: #{stdout}"
 			raise 'Failed to disable RDP'
 		end
@@ -648,7 +648,7 @@ end
 
 	stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} vrde on 2>&1)
 	if $?.exitstatus != 0
-		unless stdout == "VBoxManage: error: Machine '#{vm}' is not currently running\n"
+		unless stdout.start_with? "VBoxManage: error: Machine '#{vm}' is not currently running"
 			logger.error "Failed to stop vm: #{stdout}"
 			raise 'Failed to enable RDP'
 		end
