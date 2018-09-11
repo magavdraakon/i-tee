@@ -91,6 +91,7 @@ end
 
 def self.get_vm_info(name, static=false)
 	logger.debug "GET VM INFO CALLED: vm=#{name} "
+	stdout = ''
 	@@vm_mutex.synchronize do
 		stdout = %x(utils/vboxmanage showvminfo #{Shellwords.escape(name)} --machinereadable 2>&1)
 	end
@@ -315,6 +316,7 @@ end
 		retry_sleep = 1 # seconds to wait before retry
 		(0..5).each do |try|
 			logger.debug "SET PORT RANGE: try=#{try}/5 vm=#{vm} range=#{range}"
+			stdout = ''
 			@@vm_mutex.synchronize do
 				stdout = %x(utils/vboxmanage modifyvm #{Shellwords.escape(vm)} --vrdeport #{Shellwords.escape(range)}  2>&1)
 			end
@@ -341,6 +343,7 @@ end
 	end
 
  def self.state(vm)
+ 	stdout = ''
  	@@vm_mutex.synchronize do
 		stdout = %x(utils/vboxmanage showvminfo #{Shellwords.escape(vm)} 2>/dev/null | grep -E '^State:')
 	end
@@ -371,6 +374,7 @@ end
 		retry_sleep = 2 # seconds to wait before retry
 		(0..5).each do |try|
 			logger.debug "VM START: try=#{try}/5 vm=#{vm}"
+			stdout = ''
 			@@vm_mutex.synchronize do
 				stdout = %x(utils/vboxmanage startvm #{Shellwords.escape(vm)} --type headless  2>&1)
 			end
@@ -399,6 +403,7 @@ end
 		retry_sleep = 2 # seconds to wait before retry
 		(0..5).each do |try|
 			logger.debug "VM STOP: try=#{try}/5 vm=#{vm}"
+			stdout = ''
 			@@vm_mutex.synchronize do
 				stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} poweroff 2>&1)
 			end
@@ -443,6 +448,7 @@ end
 		retry_sleep = 2 # seconds to wait before retry
 	 	(0..5).each do |try|
 			logger.debug "VM DELETE: try=#{try}/5 vm=#{vm}"
+			stdout = ''
 			@@vm_mutex.synchronize do
 				stdout = %x(utils/vboxmanage unregistervm #{Shellwords.escape(vm)} --delete 2>&1)
 			end
@@ -474,6 +480,7 @@ end
 				loginfo = "snapshot=#{snapshot} vmt=#{vm} vm=#{name}"
 				(0..5).each do |try|
 					logger.debug "VM CLONE: Cloning from snapshot try=#{try}/5 #{loginfo}"
+					stdout = ''
 					@@vm_mutex.synchronize do
 						stdout = %x(utils/vboxmanage clonevm #{Shellwords.escape(vm)} --snapshot #{Shellwords.escape(snapshot)} --options link --name #{Shellwords.escape(name)} --register 2>&1)
 					end
@@ -493,6 +500,7 @@ end
 			loginfo = "vmt=#{vm} vm=#{name}"
 			(0..5).each do |try|
 				logger.debug "VM CLONE: Cloning from template try=#{try}/5 #{loginfo}"
+				stdout = ''
 				@@vm_mutex.synchronize do
 					stdout = %x(utils/vboxmanage clonevm #{Shellwords.escape(vm)} --name #{Shellwords.escape(name)} --register 2>&1)
 				end
@@ -525,6 +533,7 @@ end
 	retry_sleep = 1
 	(0..5).each do |try|
 		logger.debug "SET GROUPS: try=#{try}/5 #{loginfo}"
+		stdout = ''
 		@@vm_mutex.synchronize do
 			stdout = %x(utils/vboxmanage modifyvm #{Shellwords.escape(vm)} --groups #{Shellwords.escape(groups.join(','))} 2>&1)
 		end
@@ -550,6 +559,7 @@ end
 		value = value == nil ? '' : Shellwords.escape(value)
 		(0..5).each do |try|
 			logger.debug "SET EXTRA DATA: try=#{try}/5 #{loginfo}"
+			stdout = ''
 			@@vm_mutex.synchronize do
 				stdout = %x(utils/vboxmanage setextradata #{Shellwords.escape(vm)} #{Shellwords.escape(key)} #{value} 2>&1)
 			end
@@ -592,6 +602,7 @@ end
 		commands.each do |cmnd|
 			(0..5).each do |try|
 				logger.debug "SET NETWORK: calling #{cmnd} try=#{try}/5 #{loginfo}"
+				stdout = ''
 				@@vm_mutex.synchronize do
 					stdout = %x(#{cmd_prefix} #{cmnd} 2>&1 )
 				end
@@ -635,6 +646,7 @@ end
 		if !command.bank?
 			(0..5).each do |try|
 				logger.debug "SET RUNNING NETWORK: try=#{try}/5 #{loginfo}"
+				stdout = ''
 				@@vm_mutex.synchronize do
 					stdout = %x(#{cmd_prefix} #{command} 2>&1 )
 				end
@@ -658,6 +670,7 @@ end
 	end
 
  def self.reset_vm_rdp(vm)
+ 	stdout = ''
  	@@vm_mutex.synchronize do
 		stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} vrde off 2>&1)
 	end
@@ -668,6 +681,7 @@ end
 		end
 		return
 	end
+	stdout = ''
 	@@vm_mutex.synchronize do
 		stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} vrde on 2>&1)
 	end
@@ -693,6 +707,7 @@ end
 	vmname = vm.gsub("-template",'')
 	nr = info['CurrentSnapshotName'] ? info['CurrentSnapshotName'].gsub("#{vmname}-",'').gsub('-template','').to_i + 1 : 1
  	name = "#{vmname}-#{nr}-template"
+ 	stdout = ''
  	@@vm_mutex.synchronize do
 		stdout = %x(utils/vboxmanage snapshot #{Shellwords.escape(vm)} take #{Shellwords.escape(name)} --description "#{Time.now}" 2>&1)
 	end
@@ -798,6 +813,7 @@ end
 					raise "unknown key #{l}" unless codes[l]
 					result << codes[l].join(' ')
 				end
+				stdout = ''
 				@@vm_mutex.synchronize do
 			 		stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} keyboardputscancode #{result.join(' ')} 2>&1)
 			 	end
@@ -808,6 +824,7 @@ end
 			end
 			# put line return if there are more rows after this one
 			if lines[index+1]
+				stdout = ''
 				@@vm_mutex.synchronize do
 				 	stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} keyboardputscancode #{codes['enter'].join(' ')} 2>&1)
 				end
@@ -836,6 +853,7 @@ end
 	 		result << codes[l][0]
 	 	end
 	 	logger.info "keyboardputscancode #{result.join(' ')}"
+	 	stdout = ''
 	 	@@vm_mutex.synchronize do
 		 	stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} keyboardputscancode #{result.join(' ')} 2>&1)
 		end
@@ -850,6 +868,7 @@ end
 	 		result << codes[l][1]
 	 	end
 	 	logger.info "keyboardputscancode #{result.join(' ')}"
+	 	stdout = ''
 	 	@@vm_mutex.synchronize do
 	 		stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} keyboardputscancode #{result.join(' ')} 2>&1)
 	 	end
