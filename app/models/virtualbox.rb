@@ -2,9 +2,7 @@ class Virtualbox < ActiveRecord::Base
 
 # this is a class to activate different command-line vboxmanage commands and translate the results for the rails app
 
-def initialize
-	@vm_mutex = Mutex.new
-end
+	@@vm_mutex = Mutex.new
 
 def self.get_machines(state='', where={}, sort='')
 	unless where
@@ -315,7 +313,9 @@ end
 		retry_sleep = 1 # seconds to wait before retry
 		(0..5).each do |try|
 			logger.debug "SET PORT RANGE: try=#{try}/5 vm=#{vm} range=#{range}"
-			stdout = %x(utils/vboxmanage modifyvm #{Shellwords.escape(vm)} --vrdeport #{Shellwords.escape(range)}  2>&1)
+			@@vm_mutex.synchronize do
+				stdout = %x(utils/vboxmanage modifyvm #{Shellwords.escape(vm)} --vrdeport #{Shellwords.escape(range)}  2>&1)
+			end
 			if $?.exitstatus != 0
 				if stdout.start_with? "VBoxManage: error: The machine '#{vm}' is already locked by a session (or being locked or unlocked)\n"
 					# machine is running
@@ -362,14 +362,12 @@ end
  end
 
 	def self.start_vm(vm)
-		@vm_mutex.synchronize do
-			logger.info "VM START CALLED: vm=#{vm}"
-			Virtualbox.set_port_range(vm) # set default port range of 9000-11000 
-		end
+		logger.info "VM START CALLED: vm=#{vm}"
+		Virtualbox.set_port_range(vm) # set default port range of 9000-11000 
 		retry_sleep = 2 # seconds to wait before retry
 		(0..5).each do |try|
 			logger.debug "VM START: try=#{try}/5 vm=#{vm}"
-			@vm_mutex.synchronize do
+			@@vm_mutex.synchronize do
 				stdout = %x(utils/vboxmanage startvm #{Shellwords.escape(vm)} --type headless  2>&1)
 			end
 			if $?.exitstatus != 0
