@@ -214,19 +214,16 @@ class LabUser < ActiveRecord::Base
       success = true
   		self.vms.each do |vm|
         info = vm.vm_info || {'VMState': 'stopped', 'vrdeport': 0}
-  			if vm.state(info)!='running' && vm.state(info)!='paused'  # cant be running nor paused
-  				start = vm.start_vm(info) 
-          logger.debug start.as_json
-          add = (start[:notice]!='' ? start[:notice] : (start[:alert]!='' ? start[:alert] : "<b>#{vm.lab_vmt.nickname}</b> was not started")	)
-          feedback = feedback + add +'<br/>'
-          unless add.include?('successfully started')
-            logger.error "VM START FAILURE: vm=#{vm.id} [#{vm.name}] #{loginfo}"
-            success = false # one machine fails = all fails
-          else
-            logger.info "VM START SUCCESS: vm=#{vm.id} [#{vm.name}] #{loginfo}"
-          end
-          
-  			end #end if not running or paused
+				start = vm.start_vm(info) 
+        logger.debug start.as_json
+        add = (start[:notice]!='' ? start[:notice] : (start[:alert]!='' ? start[:alert] : "<b>#{vm.lab_vmt.nickname}</b> was not started")	)
+        feedback = feedback + add +'<br/>'
+        unless add.include?('successfully started')
+          logger.error "VM START FAILURE: vm=#{vm.id} [#{vm.name}] #{loginfo}"
+          success = false # one machine fails = all fails
+        else
+          logger.info "VM START SUCCESS: vm=#{vm.id} [#{vm.name}] #{loginfo}"
+        end
   		end
   		logger.info "START ALL VMS SUMMARY: #{loginfo} #{feedback}"
   		{ success: success, message: feedback}

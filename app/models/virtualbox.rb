@@ -4,6 +4,20 @@ class Virtualbox < ActiveRecord::Base
 
 	@@vm_mutex = Mutex.new
 
+	def self.vboxmanage(cmnd) # if vm_mutex is not false use syncronize
+		stdout = ''
+		if @@vm_mutex
+			puts "syncronizing"
+			@@vm_mutex.synchronize do
+				stdout = %x(utils/vboxmanage #{cmnd} )
+			end
+		else
+			stdout = %x(utils/vboxmanage #{cmnd})
+		end
+		status = $?.exitstatus
+		return {stdout: stdout, exitstatus: status }
+	end
+
 def self.get_machines(state='', where={}, sort='')
 	unless where
 		where={}
@@ -89,89 +103,102 @@ def self.template_machines
 	end
 end
 
-def self.get_vm_info(name, static=false)
-	logger.debug "GET VM INFO CALLED: vm=#{name} "
-	stdout = ''
-	@@vm_mutex.synchronize do
-		stdout = %x(utils/vboxmanage showvminfo #{Shellwords.escape(name)} --machinereadable 2>&1)
-	end
-	unless $?.exitstatus == 0
-		if stdout.start_with? "VBoxManage: error: Could not find a registered machine named '#{name}'"
-			raise 'Not found'
-		end
-		logger.error "Failed to get vm info: #{stdout}"
-		raise 'Failed to get vm info'
-	end
-
-	vm = {}
-	stdout.split(/\n+/).each do |row|
-		if row.strip!=''
-			f=row.split('=')
-			value=f.last.gsub('"', '').gsub('<not set>', '')
-			field=f.first.gsub('"', '')
-				
-
-			if field.include? '['
-				subfield = field.slice(field.index('[')..field.index(']'))
-				field.gsub!(subfield,'')
-				subfield.gsub!('[','').gsub!( ']','')
-
-				if subfield.include? '/'
-					s=subfield.split('/')
-					subsub = s.last
-					subfield=s.first
-				end
-			end
-
-			if subfield
-				unless vm[field] # create empty hash to house the subfield
-					vm[field] = {}
-				end
-				if subsub
-					unless vm[field][subfield] # create empty hash to house the sub-subfield
-						vm[field][subfield]={}
+	def self.get_vm_info(name, static=false)
+		logger.debug "GET VM INFO CALLED: vm=#{name} "
+		retry_sleep = 1 # seconds to wait before retry
+		result = false
+		(0..5).each do |try|
+			logger.debug "GET VM INFO: try=#{try}/5 vm=#{name}"
+			result = Virtualbox.vboxmanage("showvminfo #{Shellwords.escape(name)} --machinereadable 2>&1")
+			if result[:exitstatus] != 0
+				logger.debug "GET VM INFO: failed try=#{try}/5 vm=#{name}\n#{result[:stdout]}"
+				if try < 5
+					sleep retry_sleep
+					next  # go to next loop if not last
+				else # last attempt failed, error depends on output
+					if result[:stdout].start_with? "VBoxManage: error: Could not find a registered machine named '#{name}'"
+						logger.warn "GET VM INFO FAILED: no such machine try=#{try}/5 vm=#{name}"
+						raise 'Not found'
+					else
+						logger.error "GET VM INFO FAILED: try=#{try}/5 vm=#{name}"
+						raise 'Failed to get vm info try=#{try}/5'
 					end
-					vm[field][subfield][subsub] = value
-				else
-					vm[field][subfield] = value
 				end
 			else
-				vm[field] = value
+				logger.debug "GET VM INFO SUCCESS: try=#{try}/5 vm=#{name}"
+				break # exit loop
 			end
-		end
-	end
-	# field-specific parsing
-	if vm['groups']
-		vm['groups'] = vm['groups'].split(',')
-		unless static
-			vmname = vm['groups'][0] ? vm['groups'][0].gsub('/', '').strip : '' # first group is machine name
-			if vmname != ''
-				vmt = LabVmt.where('name=?', vmname).first
-				if vmt
-					vm['lab']=Lab.select('id, name').where("id=?", vmt.lab_id).first.as_json
-				end
-			end
-			username = vm['groups'][1] ? vm['groups'][1].gsub('/', '').strip : '' # second group is user name
-			if username != ''
-				user = User.select('id, username, name').where('username=?', username).first
-				if user
-					vm['user']=user.as_json
-				end
-			end
-		end
-	end
-	if vm['CurrentSnapshotNode']
-		value = vm[vm['CurrentSnapshotNode'].gsub('Name', 'Description')]
-		begin
-			value.to_time
-		rescue
-			value= ''
-		end
-		vm['CurrentSnapshotDescription']=value
-	end
+		end # eof loop
+		vm = {}
+		if result 
+			result[:stdout].split(/\n+/).each do |row|
+				if row.strip!=''
+					f=row.split('=')
+					value=f.last.gsub('"', '').gsub('<not set>', '')
+					field=f.first.gsub('"', '')
+						
 
-	vm
-end
+					if field.include? '['
+						subfield = field.slice(field.index('[')..field.index(']'))
+						field.gsub!(subfield,'')
+						subfield.gsub!('[','').gsub!( ']','')
+
+						if subfield.include? '/'
+							s=subfield.split('/')
+							subsub = s.last
+							subfield=s.first
+						end
+					end
+
+					if subfield
+						unless vm[field] # create empty hash to house the subfield
+							vm[field] = {}
+						end
+						if subsub
+							unless vm[field][subfield] # create empty hash to house the sub-subfield
+								vm[field][subfield]={}
+							end
+							vm[field][subfield][subsub] = value
+						else
+							vm[field][subfield] = value
+						end
+					else
+						vm[field] = value
+					end
+				end
+			end
+			# field-specific parsing
+			if vm['groups']
+				vm['groups'] = vm['groups'].split(',')
+				unless static
+					vmname = vm['groups'][0] ? vm['groups'][0].gsub('/', '').strip : '' # first group is machine name
+					if vmname != ''
+						vmt = LabVmt.where('name=?', vmname).first
+						if vmt
+							vm['lab']=Lab.select('id, name').where("id=?", vmt.lab_id).first.as_json
+						end
+					end
+					username = vm['groups'][1] ? vm['groups'][1].gsub('/', '').strip : '' # second group is user name
+					if username != ''
+						user = User.select('id, username, name').where('username=?', username).first
+						if user
+							vm['user']=user.as_json
+						end
+					end
+				end
+			end
+			if vm['CurrentSnapshotNode']
+				value = vm[vm['CurrentSnapshotNode'].gsub('Name', 'Description')]
+				begin
+					value.to_time
+				rescue
+					value= ''
+				end
+				vm['CurrentSnapshotDescription']=value
+			end
+		end # eof if result
+		vm
+	end
 
 def self.get_all_rdp(user, port)
     [
@@ -316,17 +343,14 @@ end
 		retry_sleep = 1 # seconds to wait before retry
 		(0..5).each do |try|
 			logger.debug "SET PORT RANGE: try=#{try}/5 vm=#{vm} range=#{range}"
-			stdout = ''
-			@@vm_mutex.synchronize do
-				stdout = %x(utils/vboxmanage modifyvm #{Shellwords.escape(vm)} --vrdeport #{Shellwords.escape(range)}  2>&1)
-			end
-			if $?.exitstatus != 0
-				if stdout.start_with? "VBoxManage: error: The machine '#{vm}' is already locked by a session (or being locked or unlocked)"
+			result = Virtualbox.vboxmanage("modifyvm #{Shellwords.escape(vm)} --vrdeport #{Shellwords.escape(range)}  2>&1")
+			if result[:exitstatus] != 0
+				if result[:stdout].start_with? "VBoxManage: error: The machine '#{vm}' is already locked by a session (or being locked or unlocked)"
 					# machine is running
 					logger.info "SET PORT RANGE: can not set port range for running vm try=#{try}/5 vm=#{vm}"
 					return true # exit with true although port range was not changed?
 				else
-					logger.warn "SET PORT RANGE: failed try=#{try}/5 vm=#{vm} range=#{range} \n#{stdout}"
+					logger.warn "SET PORT RANGE: failed try=#{try}/5 vm=#{vm} range=#{range} \n#{result[:stdout]}"
 					if try < 5
 						sleep retry_sleep
 						next  # go to next loop if not last
@@ -339,9 +363,9 @@ end
 				return true
 			end
 		end # end loop
-
 	end
 
+	# NOT IN USE?
  def self.state(vm)
  	stdout = ''
  	@@vm_mutex.synchronize do
@@ -374,16 +398,13 @@ end
 		retry_sleep = 2 # seconds to wait before retry
 		(0..5).each do |try|
 			logger.debug "VM START: try=#{try}/5 vm=#{vm}"
-			stdout = ''
-			@@vm_mutex.synchronize do
-				stdout = %x(utils/vboxmanage startvm #{Shellwords.escape(vm)} --type headless  2>&1)
-			end
-			if $?.exitstatus != 0
-				if stdout.start_with? "VBoxManage: error: The machine '#{vm}' is already locked by a session (or being locked or unlocked)"
+			result = Virtualbox.vboxmanage("startvm #{Shellwords.escape(vm)} --type headless  2>&1")
+			if result[:exitstatus] != 0
+				if result[:stdout].start_with? "VBoxManage: error: The machine '#{vm}' is already locked by a session (or being locked or unlocked)"
 					logger.info "VM START SUCCESS: already started try=#{try}/5 vm=#{vm}"
 					return true # exit if successful
 				else
-					logger.warn "VM START: failed try=#{try}/5 vm=#{vm} \n#{stdout}"
+					logger.warn "VM START: failed try=#{try}/5 vm=#{vm} \n#{result[:stdout]}"
 					if try < 5
 						sleep retry_sleep
 						next  # go to next loop if not last
@@ -403,16 +424,13 @@ end
 		retry_sleep = 2 # seconds to wait before retry
 		(0..5).each do |try|
 			logger.debug "VM STOP: try=#{try}/5 vm=#{vm}"
-			stdout = ''
-			@@vm_mutex.synchronize do
-				stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} poweroff 2>&1)
-			end
-			if $?.exitstatus != 0
-				if stdout.start_with? "VBoxManage: error: Machine '#{vm}' is not currently running" 
+			result = Virtualbox.vboxmanage("controlvm #{Shellwords.escape(vm)} poweroff 2>&1")
+			if result[:exitstatus] != 0
+				if result[:stdout].start_with? "VBoxManage: error: Machine '#{vm}' is not currently running" 
 					logger.info "VM STOP SUCCESS: already stopped try=#{try}/5 vm=#{vm}"
 					return true # exit if successful
 				else
-					logger.warn "VM STOP: failed try=#{try}/5 vm=#{vm} \n#{stdout}"
+					logger.warn "VM STOP: failed try=#{try}/5 vm=#{vm} \n#{result[:stdout]}"
 					if try < 5
 						sleep retry_sleep
 						next  # go to next loop if not last
@@ -427,33 +445,56 @@ end
 		end # eof loop
 	end
 
- def self.pause_vm(vm)
-	stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} savestate 2>&1)
-	if $?.exitstatus != 0
-		logger.error "Failed to pause vm: #{stdout}"
-		raise 'Failed to pause vm'
+	def self.pause_vm(vm)
+ 		logger.info "VM PAUSE CALLED: vm=#{vm}"
+		retry_sleep = 1 # seconds to wait before retry
+		(0..5).each do |try|
+			logger.debug "VM PAUSE: try=#{try}/5 vm=#{vm}"
+			result = Virtualbox.vboxmanage("controlvm #{Shellwords.escape(vm)} savestate 2>&1")
+			if result[:exitstatus] != 0
+				logger.warn "VM PAUSE: failed try=#{try}/5 vm=#{vm} \n#{result[:stdout]}"
+				if try < 5
+					sleep retry_sleep
+					next  # go to next loop if not last
+				else # last attempt failed
+					raise "Failed to pause vm try=#{try}/5"
+				end
+			else # success status
+				logger.info "VM PAUSE SUCCESS: try=#{try}/5 vm=#{vm}"
+				return true # exit if successful
+			end
+		end # eof loop
 	end
- end
 
- def self.resume_vm(vm)
-	stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} resume 2>&1)
-	if $?.exitstatus != 0
-		logger.error "Failed to resume vm: #{stdout}"
-		raise 'Failed to resume vm'
+	def self.resume_vm(vm)
+ 		logger.info "VM RESUME CALLED: vm=#{vm}"
+		retry_sleep = 1 # seconds to wait before retry
+		(0..5).each do |try|
+			logger.debug "VM RESUME: try=#{try}/5 vm=#{vm}"
+			result = Virtualbox.vboxmanage("controlvm #{Shellwords.escape(vm)} resume 2>&1")
+			if result[:exitstatus] != 0
+				logger.warn "VM RESUME: failed try=#{try}/5 vm=#{vm} \n#{result[:stdout]}"
+				if try < 5
+					sleep retry_sleep
+					next  # go to next loop if not last
+				else # last attempt failed
+					raise "Failed to resume vm try=#{try}/5"
+				end
+			else # success status
+				logger.info "VM RESUME SUCCESS: try=#{try}/5 vm=#{vm}"
+				return true # exit if successful
+			end
+		end # eof loop
 	end
- end
 
 	def self.delete_vm(vm)
 		logger.info "VM DELETE CALLED: vm=#{vm}"
 		retry_sleep = 2 # seconds to wait before retry
 	 	(0..5).each do |try|
 			logger.debug "VM DELETE: try=#{try}/5 vm=#{vm}"
-			stdout = ''
-			@@vm_mutex.synchronize do
-				stdout = %x(utils/vboxmanage unregistervm #{Shellwords.escape(vm)} --delete 2>&1)
-			end
-			if $?.exitstatus != 0
-				logger.warn "VM DELETE: failed try=#{try}/5 vm=#{vm} \n#{stdout}"
+			result = Virtualbox.vboxmanage("unregistervm #{Shellwords.escape(vm)} --delete 2>&1")
+			if result[:exitstatus] != 0
+				logger.warn "VM DELETE: failed try=#{try}/5 vm=#{vm} \n#{result[:stdout]}"
 				if try < 5
 					sleep retry_sleep
 					next  # go to next loop if not last
@@ -472,7 +513,7 @@ end
 		begin 
 			# if snapshot is not defined look for latest
 			if snapshot.blank? && !(snapshot === false) # do not get latest snapshot if specifically said to not use a snapshot
-				template = Virtualbox.get_vm_info(vm)
+				template = Virtualbox.get_vm_info(vm) # will try to find machine multiple times
 				snapshot = template['CurrentSnapshotName']
 			end
 			retry_sleep = 3 # seconds to wait before retry cloning
@@ -480,12 +521,9 @@ end
 				loginfo = "snapshot=#{snapshot} vmt=#{vm} vm=#{name}"
 				(0..5).each do |try|
 					logger.debug "VM CLONE: Cloning from snapshot try=#{try}/5 #{loginfo}"
-					stdout = ''
-					@@vm_mutex.synchronize do
-						stdout = %x(utils/vboxmanage clonevm #{Shellwords.escape(vm)} --snapshot #{Shellwords.escape(snapshot)} --options link --name #{Shellwords.escape(name)} --register 2>&1)
-					end
-					if $?.exitstatus != 0
-						logger.warn "VM CLONE: Failed to clone vm try=#{try}/5 #{loginfo} \n#{stdout}"
+					result = Virtualbox.vboxmanage("clonevm #{Shellwords.escape(vm)} --snapshot #{Shellwords.escape(snapshot)} --options link --name #{Shellwords.escape(name)} --register 2>&1")
+					if result[:exitstatus] != 0
+						logger.warn "VM CLONE: Failed to clone vm try=#{try}/5 #{loginfo} \n#{result[:stdout]}"
 						if try < 5
 							sleep retry_sleep
 							next  # go to next loop if not last
@@ -500,12 +538,9 @@ end
 			loginfo = "vmt=#{vm} vm=#{name}"
 			(0..5).each do |try|
 				logger.debug "VM CLONE: Cloning from template try=#{try}/5 #{loginfo}"
-				stdout = ''
-				@@vm_mutex.synchronize do
-					stdout = %x(utils/vboxmanage clonevm #{Shellwords.escape(vm)} --name #{Shellwords.escape(name)} --register 2>&1)
-				end
-				if $?.exitstatus != 0
-					logger.warn "VM CLONE: Failed to clone vm try=#{try}/5 #{loginfo} \n#{stdout}"
+				result = Virtualbox.vboxmanage("clonevm #{Shellwords.escape(vm)} --name #{Shellwords.escape(name)} --register 2>&1")
+				if result[:exitstatus] != 0
+					logger.warn "VM CLONE: Failed to clone vm try=#{try}/5 #{loginfo} \n#{result[:stdout]}"
 					if try < 5
 						sleep retry_sleep
 						next  # go to next loop if not last
@@ -533,12 +568,9 @@ end
 	retry_sleep = 1
 	(0..5).each do |try|
 		logger.debug "SET GROUPS: try=#{try}/5 #{loginfo}"
-		stdout = ''
-		@@vm_mutex.synchronize do
-			stdout = %x(utils/vboxmanage modifyvm #{Shellwords.escape(vm)} --groups #{Shellwords.escape(groups.join(','))} 2>&1)
-		end
-		if $?.exitstatus != 0
-			logger.warn "SET GROUPS: failed try=#{try}/5 #{loginfo}\n #{stdout}"
+		result = Virtualbox.vboxmanage("modifyvm #{Shellwords.escape(vm)} --groups #{Shellwords.escape(groups.join(','))} 2>&1")
+		if result[:exitstatus] != 0
+			logger.warn "SET GROUPS: failed try=#{try}/5 #{loginfo}\n #{result[:stdout]}"
 			if try < 5
 				sleep retry_sleep
 				next  # go to next loop if not last
@@ -559,12 +591,9 @@ end
 		value = value == nil ? '' : Shellwords.escape(value)
 		(0..5).each do |try|
 			logger.debug "SET EXTRA DATA: try=#{try}/5 #{loginfo}"
-			stdout = ''
-			@@vm_mutex.synchronize do
-				stdout = %x(utils/vboxmanage setextradata #{Shellwords.escape(vm)} #{Shellwords.escape(key)} #{value} 2>&1)
-			end
-			if $?.exitstatus != 0
-				logger.warn "SET EXTRA DATA: failed try=#{try}/5 #{loginfo}\n #{stdout}"
+			result = Virtualbox.vboxmanage("setextradata #{Shellwords.escape(vm)} #{Shellwords.escape(key)} #{value} 2>&1")
+			if result[:exitstatus] != 0
+				logger.warn "SET EXTRA DATA: failed try=#{try}/5 #{loginfo}\n #{result[:stdout]}"
 				if try < 5
 					sleep retry_sleep
 					next  # go to next loop if not last
@@ -582,7 +611,7 @@ end
 		loginfo = "vm=#{vm} slot=#{slot} type=#{type} name=#{name}"
 		logger.info "SET NETWORK CALLED: #{loginfo}"
 		retry_sleep = 1
-		cmd_prefix = "utils/vboxmanage modifyvm #{Shellwords.escape(vm)}"
+		cmd_prefix = "modifyvm #{Shellwords.escape(vm)}"
 		name = Shellwords.escape(name)
 		# compile a list of commands to run based on network type (1-2 commands)
 		commands = []
@@ -602,13 +631,10 @@ end
 		commands.each do |cmnd|
 			(0..5).each do |try|
 				logger.debug "SET NETWORK: calling #{cmnd} try=#{try}/5 #{loginfo}"
-				stdout = ''
-				@@vm_mutex.synchronize do
-					stdout = %x(#{cmd_prefix} #{cmnd} 2>&1 )
-				end
+				result = Virtualbox.vboxmanage("#{cmd_prefix} #{cmnd} 2>&1")
 				# try command again if failed
-				if $?.exitstatus != 0
-					logger.warn "SET NETWORK: #{cmnd} failed try=#{try}/5 #{loginfo} \n#{stdout}"
+				if result[:exitstatus] != 0
+					logger.warn "SET NETWORK: #{cmnd} failed try=#{try}/5 #{loginfo} \n#{result[:stdout]}"
 					if try < 5
 						sleep retry_sleep
 						next  # go to next loop if not last
@@ -628,7 +654,7 @@ end
 		loginfo = "vm=#{vm} slot=#{slot} type=#{type} name=#{name}"
 		logger.info "SET RUNNING NETWORK CALLED: #{loginfo}"
 		retry_sleep = 1
-		cmd_prefix = "utils/vboxmanage controlvm #{Shellwords.escape(vm)}"
+		cmd_prefix = "controlvm #{Shellwords.escape(vm)}"
 		name = Shellwords.escape(name)
 		command = ''
 		# choose command based on type
@@ -646,13 +672,10 @@ end
 		if !command.bank?
 			(0..5).each do |try|
 				logger.debug "SET RUNNING NETWORK: try=#{try}/5 #{loginfo}"
-				stdout = ''
-				@@vm_mutex.synchronize do
-					stdout = %x(#{cmd_prefix} #{command} 2>&1 )
-				end
+				result = Virtualbox.vboxmanage("#{cmd_prefix} #{command} 2>&1")
 				# try command again if failed
-				if $?.exitstatus != 0
-					logger.warn "SET RUNNING NETWORK: failed try=#{try}/5 #{loginfo} \n#{stdout}"
+				if result[:exitstatus] != 0
+					logger.warn "SET RUNNING NETWORK: failed try=#{try}/5 #{loginfo} \n#{result[:stdout]}"
 					if try < 5
 						sleep retry_sleep
 						next  # go to next loop if not last
@@ -670,24 +693,18 @@ end
 	end
 
  def self.reset_vm_rdp(vm)
- 	stdout = ''
- 	@@vm_mutex.synchronize do
-		stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} vrde off 2>&1)
-	end
-	if $?.exitstatus != 0
-		unless stdout.start_with? "VBoxManage: error: Machine '#{vm}' is not currently running"
-			logger.error "Failed to stop vm: #{stdout}"
+ 	result = Virtualbox.vboxmanage("controlvm #{Shellwords.escape(vm)} vrde off 2>&1")
+	if result[:exitstatus] != 0
+		unless result[:stdout].start_with? "VBoxManage: error: Machine '#{vm}' is not currently running"
+			logger.error "Failed to stop vm: #{result[:stdout]}"
 			raise 'Failed to disable RDP'
 		end
 		return
 	end
-	stdout = ''
-	@@vm_mutex.synchronize do
-		stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} vrde on 2>&1)
-	end
-	if $?.exitstatus != 0
-		unless stdout.start_with? "VBoxManage: error: Machine '#{vm}' is not currently running"
-			logger.error "Failed to stop vm: #{stdout}"
+	result = Virtualbox.vboxmanage("controlvm #{Shellwords.escape(vm)} vrde on 2>&1")
+	if result[:exitstatus] != 0
+		unless result[:stdout].start_with? "VBoxManage: error: Machine '#{vm}' is not currently running"
+			logger.error "Failed to stop vm: #{result[:stdout]}"
 			raise 'Failed to enable RDP'
 		end
 	end
@@ -707,12 +724,9 @@ end
 	vmname = vm.gsub("-template",'')
 	nr = info['CurrentSnapshotName'] ? info['CurrentSnapshotName'].gsub("#{vmname}-",'').gsub('-template','').to_i + 1 : 1
  	name = "#{vmname}-#{nr}-template"
- 	stdout = ''
- 	@@vm_mutex.synchronize do
-		stdout = %x(utils/vboxmanage snapshot #{Shellwords.escape(vm)} take #{Shellwords.escape(name)} --description "#{Time.now}" 2>&1)
-	end
-	if $?.exitstatus != 0
-		logger.error "Failed to take snapshot: #{stdout}"
+ 	result = Virtualbox.vboxmanage("snapshot #{Shellwords.escape(vm)} take #{Shellwords.escape(name)} --description "+'"'+Time.now+'" 2>&1')
+	if result[:exitstatus] != 0
+		logger.error "Failed to take snapshot: #{result[:stdout]}"
 		raise 'Failed to take snapshot'
 	end
  end
@@ -801,7 +815,7 @@ end
 		logger.debug "sent #{lines.count} lines"
 		lines.each_with_index do |row, index|
 			row.scan(/.{1,4}/).each do |chunk| # max 4 characters at a time
-				result = []
+				input = []
 				keys = chunk.split('')
 				keys.each do |l|
 					l = 'space' if l==' '
@@ -811,24 +825,18 @@ end
 					l = 'backspace' if l=='\\' || l.ord == 92
 					l = 'pound' if l=='#'
 					raise "unknown key #{l}" unless codes[l]
-					result << codes[l].join(' ')
+					input << codes[l].join(' ')
 				end
-				stdout = ''
-				@@vm_mutex.synchronize do
-			 		stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} keyboardputscancode #{result.join(' ')} 2>&1)
-			 	end
-				if $?.exitstatus != 0
+				result = Virtualbox.vboxmanage("controlvm #{Shellwords.escape(vm)} keyboardputscancode #{input.join(' ')} 2>&1")
+				if result[:exitstatus] != 0
 					raise 'Failed to send text to vm'
 				end
 				sleep 0.2
 			end
 			# put line return if there are more rows after this one
 			if lines[index+1]
-				stdout = ''
-				@@vm_mutex.synchronize do
-				 	stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} keyboardputscancode #{codes['enter'].join(' ')} 2>&1)
-				end
-				if $?.exitstatus != 0
+				result = Virtualbox.vboxmanage("controlvm #{Shellwords.escape(vm)} keyboardputscancode #{codes['enter'].join(' ')} 2>&1")
+				if result[:exitstatus] != 0
 					raise 'Failed to send enter to vm'
 				end
 				sleep 0.2
@@ -846,33 +854,27 @@ end
  	begin
 	 	codes = Virtualbox.scancodes
 	 	keys = pattern.split('+').map { |v| v.strip.downcase }
-	 	result = []
+	 	input = []
 	 	# press down
 	 	keys.each do |l|
 	 		raise "unknown key #{l}" unless codes[l]
-	 		result << codes[l][0]
+	 		input << codes[l][0]
 	 	end
-	 	logger.info "keyboardputscancode #{result.join(' ')}"
-	 	stdout = ''
-	 	@@vm_mutex.synchronize do
-		 	stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} keyboardputscancode #{result.join(' ')} 2>&1)
-		end
-		if $?.exitstatus != 0
+	 	logger.info "keyboardputscancode #{input.join(' ')}"
+	 	result = Virtualbox.vboxmanage("controlvm #{Shellwords.escape(vm)} keyboardputscancode #{input.join(' ')} 2>&1")
+		if result[:exitstatus] != 0
 			raise 'Failed to send keys to vm'
 		end
 		sleep 0.2
-		result = []
+		input = []
 	 	#release
 	 	keys.each do |l|
 	 		raise "unknown key #{l}" unless codes[l]
-	 		result << codes[l][1]
+	 		input << codes[l][1]
 	 	end
-	 	logger.info "keyboardputscancode #{result.join(' ')}"
-	 	stdout = ''
-	 	@@vm_mutex.synchronize do
-	 		stdout = %x(utils/vboxmanage controlvm #{Shellwords.escape(vm)} keyboardputscancode #{result.join(' ')} 2>&1)
-	 	end
-		if $?.exitstatus != 0
+	 	logger.info "keyboardputscancode #{input.join(' ')}"
+	 	result = Virtualbox.vboxmanage("controlvm #{Shellwords.escape(vm)} keyboardputscancode #{input.join(' ')} 2>&1")
+		if result[:exitstatus] != 0
 			raise 'Failed to send keys to vm'
 		end
 		{success: true, message: "Keys successfully sent"}
