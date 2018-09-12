@@ -65,7 +65,7 @@ class VmsController < ApplicationController
     end
     @vm=[]
     vms.each do |vm|
-      @vm.push(vm) if vm.state==@state
+      @vm.push(vm) if vm.state(false, false)==@state
     end
     @vms=@vm.paginate(:page=>params[:page], :per_page=>@per_page)
     render :action=>'index'

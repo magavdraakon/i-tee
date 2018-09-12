@@ -49,11 +49,11 @@ class Vm < ActiveRecord::Base
     end
   end
 
-  def vm_info
+  def vm_info(try_again=true)
     loginfo = self.log_info.to_s
     logger.debug "VM INFO CALLED: #{loginfo}"
     begin
-      return Virtualbox.get_vm_info(name, true)
+      return Virtualbox.get_vm_info(name, true, try_again)
     rescue Exception => e
       unless e.message == 'Not found'
         raise e
@@ -63,10 +63,10 @@ class Vm < ActiveRecord::Base
     end
   end
 
-  def state(info=nil)
+  def state(info=nil, try_again=true)
     loginfo = self.log_info.to_s
     logger.debug "VM STATE CALLED: #{loginfo}"
-    info = self.vm_info if info.blank?
+    info = self.vm_info(try_again) if info.blank?
     if info
       state = info['VMState']
       unless state == 'running' or state == 'paused'
@@ -79,10 +79,10 @@ class Vm < ActiveRecord::Base
     state
   end
 
-  def rdp_port(info=nil)
+  def rdp_port(info=nil, try_again=true)
     loginfo = self.log_info.to_s
     logger.debug "VM RDP PORT CALLED: #{loginfo}"
-    info = self.vm_info if info.blank?
+    info = self.vm_info(try_again) if info.blank?
     if info
       rdp_port = info['vrdeport'].to_i
       if rdp_port == -1

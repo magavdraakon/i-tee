@@ -103,32 +103,47 @@ def self.template_machines
 	end
 end
 
-	def self.get_vm_info(name, static=false)
+	def self.get_vm_info(name, static=false, try_again=true)
 		logger.debug "GET VM INFO CALLED: vm=#{name} "
 		retry_sleep = 1 # seconds to wait before retry
 		result = false
-		(0..5).each do |try|
-			logger.debug "GET VM INFO: try=#{try}/5 vm=#{name}"
+		if try_again
+			(0..5).each do |try|
+				logger.debug "GET VM INFO: try=#{try}/5 vm=#{name}"
+				result = Virtualbox.vboxmanage("showvminfo #{Shellwords.escape(name)} --machinereadable 2>&1")
+				if result[:exitstatus] != 0
+					logger.debug "GET VM INFO: failed try=#{try}/5 vm=#{name}\n#{result[:stdout]}"
+					if try < 5
+						sleep retry_sleep
+						next  # go to next loop if not last
+					else # last attempt failed, error depends on output
+						if result[:stdout].start_with? "VBoxManage: error: Could not find a registered machine named '#{name}'"
+							logger.warn "GET VM INFO FAILED: no such machine try=#{try}/5 vm=#{name}"
+							raise 'Not found'
+						else
+							logger.error "GET VM INFO FAILED: try=#{try}/5 vm=#{name}"
+							raise "Failed to get vm info try=#{try}/5"
+						end
+					end
+				else
+					logger.debug "GET VM INFO SUCCESS: try=#{try}/5 vm=#{name}"
+					break # exit loop
+				end
+			end # eof loop
+		else
+			# for views for faster loading!
 			result = Virtualbox.vboxmanage("showvminfo #{Shellwords.escape(name)} --machinereadable 2>&1")
 			if result[:exitstatus] != 0
-				logger.debug "GET VM INFO: failed try=#{try}/5 vm=#{name}\n#{result[:stdout]}"
-				if try < 5
-					sleep retry_sleep
-					next  # go to next loop if not last
-				else # last attempt failed, error depends on output
-					if result[:stdout].start_with? "VBoxManage: error: Could not find a registered machine named '#{name}'"
-						logger.warn "GET VM INFO FAILED: no such machine try=#{try}/5 vm=#{name}"
-						raise 'Not found'
-					else
-						logger.error "GET VM INFO FAILED: try=#{try}/5 vm=#{name}"
-						raise 'Failed to get vm info try=#{try}/5'
-					end
+				logger.debug "GET VM INFO: failed vm=#{name}\n#{result[:stdout]}"
+				if result[:stdout].start_with? "VBoxManage: error: Could not find a registered machine named '#{name}'"
+					logger.warn "GET VM INFO FAILED: no such machine vm=#{name}"
+					raise 'Not found'
+				else
+					logger.error "GET VM INFO FAILED: vm=#{name}"
+					raise 'Failed to get vm info'
 				end
-			else
-				logger.debug "GET VM INFO SUCCESS: try=#{try}/5 vm=#{name}"
-				break # exit loop
 			end
-		end # eof loop
+		end
 		vm = {}
 		if result 
 			result[:stdout].split(/\n+/).each do |row|
