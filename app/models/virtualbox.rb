@@ -739,7 +739,7 @@ end
 	vmname = vm.gsub("-template",'')
 	nr = info['CurrentSnapshotName'] ? info['CurrentSnapshotName'].gsub("#{vmname}-",'').gsub('-template','').to_i + 1 : 1
  	name = "#{vmname}-#{nr}-template"
- 	result = Virtualbox.vboxmanage("snapshot #{Shellwords.escape(vm)} take #{Shellwords.escape(name)} --description "+'"'+Time.now+'" 2>&1')
+ 	result = Virtualbox.vboxmanage("snapshot #{Shellwords.escape(vm)} take #{Shellwords.escape(name)} --description "+'"'+"#{Time.now}"+'" 2>&1')
 	if result[:exitstatus] != 0
 		logger.error "Failed to take snapshot: #{result[:stdout]}"
 		raise 'Failed to take snapshot'
