@@ -57,9 +57,12 @@ class LabUsersController < ApplicationController
           conditions[:start]=nil
         end
         logger.info "FIND LABUSER: #{conditions}"
-        labusers = LabUser.where(conditions).map{|l| l.with_ping}
+        labusers = LabUser.where(conditions)
       else
-        labusers = LabUser.all.map{|l| l.with_ping}
+        labusers = LabUser.all
+      end
+      if params[:with_ping]
+        labusers = labusers.map{|l| l.with_ping}
       end
     end
     respond_to do |format|
@@ -116,7 +119,7 @@ class LabUsersController < ApplicationController
           }
           format.json { 
             logger.info "LABUSER CREATE SUCCESS: labuser=#{@lab_user.id} lab=#{@lab_user.lab.id} user=#{@lab_user.user.id} [#{@lab_user.user.username}]"
-            render :json=> {:success => true, :lab_user => @lab_user.with_ping}, :status=> :created
+            render :json=> {:success => true, :lab_user => @lab_user}, :status=> :created
           }
         else
           format.html { render :action => 'index' }
