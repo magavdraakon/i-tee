@@ -19,7 +19,8 @@ class Vm < ActiveRecord::Base
     loginfo = self.log_info.to_s
     logger.debug "VM BEFORE_DESTROY CALLED: #{loginfo}" 
     begin
-      info = Virtualbox.get_vm_info(self.name, true)
+      # TODO: should we use retry in getting vm info if lab end should have deleted all machines already and retrying will only generate more expected error messages
+      info = Virtualbox.get_vm_info(self.name, true, false) # try only once
       logger.debug "VM BEFORE_DESTROY: Will try to stop & delete the vm #{loginfo}"
       self.delete_vm
       logger.info "VM STOPPED & DELETED: #{loginfo}"
@@ -154,7 +155,7 @@ class Vm < ActiveRecord::Base
     loginfo = self.log_info.to_s
     logger.info "START_VM CALLED: #{loginfo}"
     result = {notice: '', alert: ''}
-    state = self.state(info)
+    state = self.state(info, false) # if info not sent, try to find state only once
     if state == 'running' || state == 'paused'
       logger.info "START_VM: already running #{loginfo}"
       result[:alert]="Unable to start <b>#{self.lab_vmt.nickname}</b>, it is already running"

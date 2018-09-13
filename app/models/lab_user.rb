@@ -213,7 +213,7 @@ class LabUser < ActiveRecord::Base
   		feedback =''
       success = true
   		self.vms.each do |vm|
-        info = vm.vm_info || {'VMState': 'stopped', 'vrdeport': 0}
+        info = vm.vm_info(false) || {'VMState': 'stopped', 'vrdeport': 0} # only try reading info once
 				start = vm.start_vm(info) 
         logger.debug start.as_json
         add = (start[:notice]!='' ? start[:notice] : (start[:alert]!='' ? start[:alert] : "<b>#{vm.lab_vmt.nickname}</b> was not started")	)
