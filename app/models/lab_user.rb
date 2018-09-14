@@ -1,7 +1,7 @@
 class LabUser < ActiveRecord::Base
   belongs_to :user
   belongs_to :lab
-  has_many :vms
+  has_many :vms, -> {joins(:lab_vmt).order("lab_vmts.position ASC")}
   has_many :labuser_connections, :dependent => :destroy
   
   validates_presence_of :user_id, :lab_id
@@ -212,7 +212,7 @@ class LabUser < ActiveRecord::Base
     if self.start && !self.end 
   		feedback =''
       success = true
-  		self.vms.each do |vm|
+  		self.vms.reverse.each do |vm|
         info = vm.vm_info(false) || {'VMState': 'stopped', 'vrdeport': 0} # only try reading info once
 				start = vm.start_vm(info) 
         logger.debug start.as_json

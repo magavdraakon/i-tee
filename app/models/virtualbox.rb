@@ -7,7 +7,6 @@ class Virtualbox < ActiveRecord::Base
 	def self.vboxmanage(cmnd) # if vm_mutex is not false use syncronize
 		stdout = ''
 		if @@vm_mutex
-			puts "syncronizing"
 			@@vm_mutex.synchronize do
 				stdout = %x(utils/vboxmanage #{cmnd} )
 			end
