@@ -18,10 +18,7 @@ class Vm < ActiveRecord::Base
   def try_delete_vm
     loginfo = self.log_info.to_s
     logger.debug "VM BEFORE_DESTROY CALLED: #{loginfo}" 
-    begin
-      # TODO: should we use retry in getting vm info if lab end should have deleted all machines already and retrying will only generate more expected error messages
-      info = Virtualbox.vm_info(self.name) # try only once
-      logger.debug "VM BEFORE_DESTROY: Will try to stop & delete the vm #{loginfo}"
+    begin     
       self.delete_vm
       logger.info "VM STOPPED & DELETED: #{loginfo}"
     rescue Exception => e
@@ -101,13 +98,9 @@ class Vm < ActiveRecord::Base
     loginfo = self.log_info.to_s
     logger.info "DELETE_VM CALLED: #{loginfo}"
     begin
-      info = Virtualbox.vm_info(self.name)
-      state = info['VMState']
-      if state=='running' || state=='paused'
-        logger.debug "DELETE_VM: stopping machine #{loginfo}"
-        Virtualbox.stop_vm(name) # tries 6 times to stop, raises error or returns true
-        logger.debug "DELETE_VM: stopped vm #{loginfo}"
-      end
+      logger.debug "DELETE_VM: stopping machine #{loginfo}"
+      Virtualbox.stop_vm(name) # tries 6 times to stop, raises error or returns true
+      logger.debug "DELETE_VM: stopped vm #{loginfo}"
       logger.debug "DELETE_VM: deleting machine #{loginfo}"
       Virtualbox.delete_vm(name) # tries 6 times to delete, raises error or returns true
       logger.info "DELETE_VM SUCCESS: deleted vm #{loginfo}"
@@ -118,9 +111,7 @@ class Vm < ActiveRecord::Base
         return true # if machine does not exist, it is deleted
       else
         logger.error e
-        info = Virtualbox.vm_info(self.name)
-        state = info['VMState']
-        logger.error "DELETE_VM FAILED: state=#{state} #{loginfo}"
+        logger.error "DELETE_VM FAILED: #{loginfo}"
         raise e
       end
     end
@@ -129,26 +120,21 @@ class Vm < ActiveRecord::Base
   def stop_vm(info=nil)
     loginfo = self.log_info.to_s
     logger.info "STOP_VM CALLED: #{loginfo}"
-    state = self.state(info)
-    if state=='running' || state=='paused'
-      if self.lab_vmt.allow_restart
-        begin
-          Virtualbox.stop_vm(name)
-          self.description = 'Power on the virtual machine by clicking <strong>Start</strong>.'
-          self.save
-          logger.info "STOP_VM SUCCESS: #{loginfo}"
-          {success: true, message: "#{self.lab_vmt.nickname} successfully shut down"}
-        rescue Exception => e
-          logger.error "STOP_VM FAILED: #{loginfo}"
-          # ignore failure, Virtualbox model logs the message
-          {success: false, message: "Failed to stop machine #{self.lab_vmt.nickname}"}
-        end       
-      else
-        {success: true, message: "Machine #{self.lab_vmt.nickname} can not be shut down"}
-      end
+    if self.lab_vmt.allow_restart
+      begin
+        Virtualbox.stop_vm(name)
+        self.description = 'Power on the virtual machine by clicking <strong>Start</strong>.'
+        self.save
+        logger.info "STOP_VM SUCCESS: #{loginfo}"
+        {success: true, message: "#{self.lab_vmt.nickname} successfully shut down"}
+      rescue Exception => e
+        logger.error "STOP_VM FAILED: #{loginfo}"
+        # ignore failure, Virtualbox model logs the message
+        {success: false, message: "Failed to stop machine #{self.lab_vmt.nickname}"}
+      end       
     else
-      {success: true, message: "Machine #{self.lab_vmt.nickname} was already shut down"}
-    end
+      {success: true, message: "Machine #{self.lab_vmt.nickname} can not be shut down"}
+    end    
   end
 
   def start_vm(info=nil)
