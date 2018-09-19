@@ -143,10 +143,8 @@ private # -------------------------------------------------------
 
   def user_params
     if !params[:user].empty?
-      logger.debug "user is present"
       params.require(:user).permit(:id, :email, :password, :username, :name, :authentication_token, :token_expires, :ldap, :role)
     elsif !params[:new_user].empty?
-      logger.debug "new_user is present"
       params.require(:new_user).permit(:id, :email, :password, :username, :name, :authentication_token, :token_expires, :ldap, :role)
     end  
 

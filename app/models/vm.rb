@@ -20,12 +20,12 @@ class Vm < ActiveRecord::Base
     logger.debug "VM BEFORE_DESTROY CALLED: #{loginfo}" 
     begin
       # TODO: should we use retry in getting vm info if lab end should have deleted all machines already and retrying will only generate more expected error messages
-      info = Virtualbox.get_vm_info(self.name, true, false) # try only once
+      info = Virtualbox.vm_info(self.name) # try only once
       logger.debug "VM BEFORE_DESTROY: Will try to stop & delete the vm #{loginfo}"
       self.delete_vm
       logger.info "VM STOPPED & DELETED: #{loginfo}"
     rescue Exception => e
-      if e.message == 'Not found'
+      if ['Not found', "VM '#{name}' Not found", "VM '#{name}' deleted", "VM '#{name}' already deleted"].include?(e.message)
         logger.debug "VM BEFORE_DESTROY: already deleted #{loginfo}"
       else
         raise e
@@ -54,9 +54,9 @@ class Vm < ActiveRecord::Base
     loginfo = self.log_info.to_s
     logger.debug "VM INFO CALLED: #{loginfo}"
     begin
-      return Virtualbox.get_vm_info(name, true, try_again)
+      return Virtualbox.vm_info(name)
     rescue Exception => e
-      unless e.message == 'Not found'
+      unless ['Not found', "VM '#{name}' Not found"].include?(e.message)
         raise e
       end
       logger.debug "VM NOT FOUND: in Virtualbox #{loginfo}"
@@ -101,7 +101,7 @@ class Vm < ActiveRecord::Base
     loginfo = self.log_info.to_s
     logger.info "DELETE_VM CALLED: #{loginfo}"
     begin
-      info = Virtualbox.get_vm_info(self.name, true)
+      info = Virtualbox.vm_info(self.name)
       state = info['VMState']
       if state=='running' || state=='paused'
         logger.debug "DELETE_VM: stopping machine #{loginfo}"
@@ -113,12 +113,12 @@ class Vm < ActiveRecord::Base
       logger.info "DELETE_VM SUCCESS: deleted vm #{loginfo}"
       return true
     rescue Exception => e
-      if e.message == 'Not found'
+      if ['Not found', "VM '#{name}' Not found", "VM '#{name}' deleted", "VM '#{name}' already deleted"].include?(e.message)
         logger.debug "DELETE_VM SUCCESS: already deleted #{loginfo}"
         return true # if machine does not exist, it is deleted
       else
         logger.error e
-        info = Virtualbox.get_vm_info(self.name, true)
+        info = Virtualbox.vm_info(self.name)
         state = info['VMState']
         logger.error "DELETE_VM FAILED: state=#{state} #{loginfo}"
         raise e
@@ -163,92 +163,108 @@ class Vm < ActiveRecord::Base
     end
 
     begin
-      unless Virtualbox.all_machines.include? name
-
+      continue = true
+      unless Virtualbox.search_machines(name).include?(name) # machine does not exist yet
+        continue = false
         image = self.lab_vmt.vmt.image
         logger.debug "START_VM: Machine does not exist, creating from vmt=#{image} #{loginfo}"
-        Virtualbox.clone(image, name) # will return true or raise an error caught below
+        clone_result = Virtualbox.clone(image, name) # will return message or raise an error caught below
+        continue = (clone_result == "VM #{name} cloned from '#{image}'" )
+        if continue
+          logger.debug "START_VM: Configuring machine #{loginfo}"
+          groupname,dummy,username = name.rpartition('-')
 
-        logger.debug "START_VM: Configuring machine #{loginfo}"
-        groupname,dummy,username = name.rpartition('-')
+          # set group
+          Virtualbox.set_groups(name, [ "/#{groupname}", "/#{username}" ])
 
-        Virtualbox.set_groups(name, [ "/#{groupname}", "/#{username}" ])
-        Virtualbox.set_extra_data(name, "VBoxAuthSimple/users/#{username}", Digest::SHA256.hexdigest(password))
-        Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiBIOSVersion", name)
-        Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiBIOSReleaseDate", username)
-        Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiSystemProduct", Rails.configuration.application_url)
-        Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiSystemFamily", "System Family")
-        Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiSystemVendor", "I-tee Distance Laboratory System")
-        if self.lab_vmt.expose_uuid
-          Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiSystemVersion", self.lab_user.uuid)
-	      else
-          Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiSystemVersion", "System Version")
+          # set extra data
+          extra = [
+            {key: "VBoxAuthSimple/users/#{username}", value: Digest::SHA256.hexdigest(password) },
+            {key: "VBoxInternal/Devices/pcbios/0/Config/DmiBIOSVersion", value: name},
+            {key: "VBoxInternal/Devices/pcbios/0/Config/DmiBIOSReleaseDate", value: username},
+            {key: "VBoxInternal/Devices/pcbios/0/Config/DmiSystemProduct", value: Rails.configuration.application_url},
+            {key: "VBoxInternal/Devices/pcbios/0/Config/DmiSystemFamily", value: "System Family"},
+            {key: "VBoxInternal/Devices/pcbios/0/Config/DmiSystemVendor", value: "I-tee Distance Laboratory System"}
+          ]
+
+          if self.lab_vmt.expose_uuid
+            extra << {key:"VBoxInternal/Devices/pcbios/0/Config/DmiSystemVersion", value: self.lab_user.uuid}
+  	      else
+            extra << {key:"VBoxInternal/Devices/pcbios/0/Config/DmiSystemVersion", value: "System Version"}
+          end
+          if !self.lab_user.lab.lab_hash.blank? and !self.lab_user.user.user_key.blank?
+            extra << {key:"VBoxInternal/Devices/pcbios/0/Config/DmiSystemSerial", value:  "#{self.lab_user.lab.lab_hash}/#{self.lab_user.user.user_key}"}
+          else
+            extra << {key:"VBoxInternal/Devices/pcbios/0/Config/DmiSystemSerial", value: "System Serial"}
+          end
+          # bulk setting
+          Virtualbox.set_extra(name, extra) unless extra.empty?
+        end # if clone success
+      end # EOF clone
+      if continue # only if not cloning or cloning finished
+        # set networks
+        ips = []
+        self.lab_vmt.lab_vmt_networks.each do |nw|
+          # substituting placeholders with data
+          network_name = nw.network.name.gsub('{year}', Time.now.year.to_s)
+                        .gsub('{user}', self.lab_user.user.username)
+                        .gsub('{slot}', nw.slot.to_s)
+                        .gsub('{labVmt}', self.lab_vmt.name)
+          logger.info "START_VM: set newtwork slot=#{nw.slot} type=#{nw.network.net_type} name=#{network_name} #{loginfo}"
+          Virtualbox.set_network(name, nw.slot, nw.network.net_type, network_name) # will return true or raise an error
+          # add to a list of network-ip pairs if ip is set
+          ips << "#{nw.slot}=#{nw.ip}" unless nw.ip.blank?
         end
-        if !self.lab_user.lab.lab_hash.blank? and !self.lab_user.user.user_key.blank?
-          Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSerial", "#{self.lab_user.lab.lab_hash}/#{self.lab_user.user.user_key}")
+        # add list of pre-determined ips if there are any
+        unless ips.blank?
+          joined = ips.join('|')
+          logger.debug "START_VM: Setting ip addresses: #{joined} #{loginfo}"
+          Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSKU", joined)
         else
-          Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSerial", "System Serial")
+          Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSKU", "System SKU")
         end
-      end
-      ips = []
-      self.lab_vmt.lab_vmt_networks.each do |nw|
-        # substituting placeholders with data
-        network_name = nw.network.name.gsub('{year}', Time.now.year.to_s)
-                      .gsub('{user}', self.lab_user.user.username)
-                      .gsub('{slot}', nw.slot.to_s)
-                      .gsub('{labVmt}', self.lab_vmt.name)
-        logger.info "START_VM: set newtwork slot=#{nw.slot} type=#{nw.network.net_type} name=#{network_name} #{loginfo}"
-        Virtualbox.set_network(name, nw.slot, nw.network.net_type, network_name) # will return true or raise an error
-        # add to a list of network-ip pairs if ip is set
-        ips << "#{nw.slot}=#{nw.ip}" unless nw.ip.blank?
-      end
-      # add list of pre-determined ips if there are any
-      unless ips.blank?
-        joined = ips.join('|')
-        logger.debug "START_VM: Setting ip addresses: #{joined} #{loginfo}"
-        Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSKU", joined)
-      else
-        Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSKU", "System SKU")
-      end
 
-      # set all admin user passwords
-      users = User.where(role: 2) # admin
-      users.each do |user|
-        logger.debug "START_VM: setting #{user.username}-admin password #{loginfo}"
-        hash = Digest::SHA256.hexdigest(user.rdp_password)
+        # set all admin user passwords
         begin
-          Virtualbox.set_extra_data(name, "VBoxAuthSimple/users/#{user.username}-admin", hash);
+          admin_extra = []
+          users = User.where(role: 2) # admin
+          users.each do |user|
+            logger.debug "START_VM: setting #{user.username}-admin password #{loginfo}"
+            pw_hash = Digest::SHA256.hexdigest(user.rdp_password)
+            admin_extra << {key: "VBoxAuthSimple/users/#{user.username}-admin", value: pw_hash}
+          end
+          # bulk setting
+          Virtualbox.set_extra(name, admin_extra) unless admin_extra.empty?
         rescue Exception => e
           logger.error "START_VM: Failed to set RDP password #{loginfo}: #{e.message}"
         end
+
+        logger.debug "START_VM: Starting machine #{loginfo}"
+        Virtualbox.start_vm(name)
+
+        username = self.lab_user.user.username
+        password = self.password 
+        rdp_port = self.rdp_port 
+
+        desc = 'To create a connection with this machine using linux/unix use<br/>'
+        desc += '<srong>'+self.remote('rdesktop','', username, password, rdp_port)+'</strong>'
+        desc += '<br/> or use xfreerdp as<br/>'
+        desc += '<srong>'+self.remote('xfreerdp','', username, password, rdp_port)+'</strong>'
+        desc += '<br/>To create a connection with this machine using Windows use two commands:<br/>'
+        desc += '<srong>'+self.remote('win','', username, password, rdp_port)+'</strong>' #"<strong>cmdkey /generic:#{rdp_host} /user:localhost\\#{self.lab_user.user.username} /pass:#{self.password}</strong><br/>"
+        #desc += "<strong>mstsc.exe /v:#{rdp_host}:#{rdp_port_prefix}#{port} /f</strong><br/>"
+        logger.debug "START_VM: setting description to #{desc} #{loginfo}"
+        self.description = desc
+
+        self.save
+        logger.info "START_VM SUCCESS: #{loginfo}"
+
+        result[:notice] = "Machine <b>#{self.lab_vmt.nickname}</b> successfully started<br/>"
+
+        self.lab_user.last_activity = Time.now
+        self.lab_user.activity = "Start vm - '#{self.name}'"
+        self.lab_user.save
       end
-
-      logger.debug "START_VM: Starting machine #{loginfo}"
-      Virtualbox.start_vm(name)
-
-      username = self.lab_user.user.username
-      password = self.password 
-      rdp_port = self.rdp_port 
-
-      desc = 'To create a connection with this machine using linux/unix use<br/>'
-      desc += '<srong>'+self.remote('rdesktop','', username, password, rdp_port)+'</strong>'
-      desc += '<br/> or use xfreerdp as<br/>'
-      desc += '<srong>'+self.remote('xfreerdp','', username, password, rdp_port)+'</strong>'
-      desc += '<br/>To create a connection with this machine using Windows use two commands:<br/>'
-      desc += '<srong>'+self.remote('win','', username, password, rdp_port)+'</strong>' #"<strong>cmdkey /generic:#{rdp_host} /user:localhost\\#{self.lab_user.user.username} /pass:#{self.password}</strong><br/>"
-      #desc += "<strong>mstsc.exe /v:#{rdp_host}:#{rdp_port_prefix}#{port} /f</strong><br/>"
-      logger.debug "START_VM: setting description to #{desc} #{loginfo}"
-      self.description = desc
-
-      self.save
-      logger.info "START_VM SUCCESS: #{loginfo}"
-
-      result[:notice] = "Machine <b>#{self.lab_vmt.nickname}</b> successfully started<br/>"
-
-      self.lab_user.last_activity = Time.now
-      self.lab_user.activity = "Start vm - '#{self.name}'"
-      self.lab_user.save
-
     rescue Exception => e
       logger.error "START_VM FAILED: #{e.message} #{loginfo}"
       result[:notice] = ''
