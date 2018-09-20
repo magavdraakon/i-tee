@@ -88,6 +88,10 @@ Rails.application.configure do
     config_file = YAML.load_file("/etc/i-tee/config.yaml")
   
 
+    # take vbox config
+    config.vbox = config_file.key?('vbox') ? config_file['vbox'] : false
+
+
     config.allowed_origins = config_file.key?('allowed_origins') ? config_file['allowed_origins'] : [ 'https://'+config_file['rdp_host'] ]
 
     # Administrator and manager usernames
