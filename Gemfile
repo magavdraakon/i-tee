@@ -28,6 +28,10 @@ gem 'jbuilder', '~> 2.0'
 # for railties app_generator_test
 gem "bootsnap", ">= 1.1.0", require: false
 
+
+gem 'awesome_print'
+gem 'rails_semantic_logger'
+
 group :assets do
   gem 'execjs'
   gem 'therubyracer', :platforms => :ruby

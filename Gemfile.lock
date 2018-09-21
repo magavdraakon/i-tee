@@ -50,6 +50,7 @@ GEM
       minitest (~> 5.1)
       tzinfo (~> 1.1)
     arel (9.0.0)
+    awesome_print (1.8.0)
     bcrypt (3.1.12)
     bootsnap (1.3.0)
       msgpack (~> 1.0)
@@ -139,6 +140,9 @@ GEM
       nokogiri (>= 1.6)
     rails-html-sanitizer (1.0.4)
       loofah (~> 2.2, >= 2.2.2)
+    rails_semantic_logger (4.3.1)
+      rails (>= 3.2)
+      semantic_logger (~> 4.3)
     railties (5.2.0)
       actionpack (= 5.2.0)
       activesupport (= 5.2.0)
@@ -165,6 +169,8 @@ GEM
       sprockets (>= 2.8, < 4.0)
       sprockets-rails (>= 2.0, < 4.0)
       tilt (>= 1.1, < 3)
+    semantic_logger (4.3.0)
+      concurrent-ruby (~> 1.0)
     spring (2.0.2)
       activesupport (>= 4.2)
     sprockets (3.7.2)
@@ -200,6 +206,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  awesome_print
   bootsnap (>= 1.1.0)
   byebug
   coffee-rails
@@ -215,6 +222,7 @@ DEPENDENCIES
   mysql2
   puma
   rails (= 5.2)
+  rails_semantic_logger
   rubyzip
   sass-rails
   spring
@@ -225,4 +233,4 @@ DEPENDENCIES
   will_paginate
 
 BUNDLED WITH
-   1.16.1
+   1.16.4
