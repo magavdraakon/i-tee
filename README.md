@@ -25,6 +25,10 @@ i-tee contains three layers such as: Virtualisation, Web frontend (access contro
 
 # Prerequirements
 
+
+* Install https://bitbucket.org/rangeforce/vboxmanager/src/master/ for VM management
+
+
 * Bare metal host for virtualization
 * Working LDAP server and bind user
 * Good knowledge of GNU/Linux
@@ -35,6 +39,10 @@ i-tee contains three layers such as: Virtualisation, Web frontend (access contro
 * Create I-Tee base configuration file `/etc/i-tee/config.yaml`
 ```json
   {
+  	"vbox":{
+        "host":"http://localhost:4567",
+        "token":"vboxmanagertoken"
+    },
 	"ldap" : {
 		"host" : "LDAP_SERVER",
 		"port" : 1234,
