@@ -4,7 +4,12 @@ class VirtualboxController < ApplicationController
 	before_action :virtualization_tab
 
 	def index
-		@vms = Virtualbox.get_machines(params[:state], params[:where])
+		begin
+			@vms = Virtualbox.get_machines(params[:state], params[:where])
+		rescue Exception => e
+			logger.error e
+			redirect_to root_path, alert: e.message
+		end
 	end
 
 	def templates

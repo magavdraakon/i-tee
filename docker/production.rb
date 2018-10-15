@@ -88,6 +88,10 @@ Rails.application.configure do
     config_file = YAML.load_file("/etc/i-tee/config.yaml")
   
 
+    # take vbox config
+    config.vbox = config_file.key?('vbox') ? config_file['vbox'] : false
+
+
     config.allowed_origins = config_file.key?('allowed_origins') ? config_file['allowed_origins'] : [ 'https://'+config_file['rdp_host'] ]
 
     # Administrator and manager usernames
@@ -190,8 +194,12 @@ Rails.application.configure do
     # Code is not reloaded between requests
     config.cache_classes = true
 
-    # Log level (defaults to :info)
-    config.log_level = :info
+    if config_file.key?('log_level') && ['fatal','error','info','warn','debug'].include?(config_file['log_level'])
+      config.log_level = config_file['log_level'].to_sym
+    else
+      # Log level (defaults to :info)
+      config.log_level = :info
+    end
 
     # Full error reports are disabled and caching is turned on
     config.consider_all_requests_local       = false

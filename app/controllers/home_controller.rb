@@ -133,10 +133,11 @@ class HomeController < ApplicationController
   
   def system_info
     @level = Rails.logger.level
+    logger.info "LOG LEVEL IS #{@level}"
     @levels = [['debug',0],['info',1],['warn',2],['error',3],['fatal',4]]
     unless params[:loglevel].blank?
       level = params[:loglevel].to_i
-      logger.info "change log level to #{level}"
+      logger.info "CHANGE LOG LEVEL to #{level}"
       if level>=0 && level<=4
         Rails.logger.level = level
         redirect_to system_path, notice: "Log level changed"

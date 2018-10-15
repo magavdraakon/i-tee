@@ -165,7 +165,6 @@ class LabsController < ApplicationController
           result =  @labuser.start_lab
           format.html { redirect_back fallback_location: my_labs_path }
           format.json {
-            logger.info "LAB START SUCCESS: labuser=#{@labuser.id} lab=#{@labuser.lab_id} user=#{@labuser.user_id} [#{@labuser.user.username}]"
             render :json=>{ :success => result[:success] , :message=> result[:message], :lab_user => @labuser.id, :start_time => @labuser.start }
           }
         else
@@ -173,7 +172,7 @@ class LabsController < ApplicationController
             flash[:notice] = "Can't find lab user"
             redirect_back fallback_location: my_labs_path }
           format.json { 
-            logger.error "LAB START FAILURE: invalid id labuser=#{params[:labuser_id]}"
+            logger.error "LAB START FAILED: invalid id labuser=#{params[:labuser_id]}"
             render :json=> {:success => false , :message=>  "Can not find mission attempt" }
           }
         end
@@ -182,7 +181,7 @@ class LabsController < ApplicationController
           flash[:notice] =  'Restricted access' 
           redirect_back fallback_location: my_labs_path }
         format.json { 
-          logger.error "LAB START FAILURE: invalid role or missing id labuser=#{params[:labuser_id]}"
+          logger.error "LAB START FAILED: invalid role or missing id labuser=#{params[:labuser_id]}"
           render :json=> {:success => false , :message=>  'No permission' }
         }
       end

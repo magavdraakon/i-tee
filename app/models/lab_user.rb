@@ -1,7 +1,7 @@
 class LabUser < ActiveRecord::Base
   belongs_to :user
   belongs_to :lab
-  has_many :vms
+  has_many :vms, -> {joins(:lab_vmt).order("lab_vmts.position ASC")}
   has_many :labuser_connections, :dependent => :destroy
   
   validates_presence_of :user_id, :lab_id
@@ -93,7 +93,7 @@ class LabUser < ActiveRecord::Base
             logger.debug "#{vm.lab_user.id} Machine #{vm.id} - #{vm.name} successfully generated."
           end
         end
-        logger.debug "LAB VMS CREATED: #{loginfo}"
+        logger.debug "LAB START: vms db entries created #{loginfo}"
         # start delayed jobs for keeping up with the last activity
         LabUser.rdp_status(self.id)
       	# set new start time
@@ -101,7 +101,7 @@ class LabUser < ActiveRecord::Base
         self.last_activity = Time.now
         self.activity = 'Lab start'
         unless self.vta_setup # do not repeat setup if set by api
-          logger.debug "BEGIN LAB VTA SETUP: #{loginfo}"
+          logger.debug "LAB START: begin VTA setup #{loginfo}"
           # check if lab has assistant to be able to create the vta labuser
           if !lab.assistant_id.blank?
             assistant = lab.assistant
@@ -112,33 +112,33 @@ class LabUser < ActiveRecord::Base
               # save to user
               user.user_key = result['key'];
               unless user.save
-                logger.error "LAB VTA SETUP FAILURE: save failed #{loginfo}"
+                logger.error "LAB START FAILED: VTA setup failed - save failed #{loginfo}"
                 return {success: false, message: 'unable to remember user token in assistant'}
               end
-              logger.info "LAB VTA SETUP SUCCESS: #{loginfo}"
+              logger.info "LAB START: VTA setup success #{loginfo}"
             else
-              logger.error "LAB VTA SETUP FAILURE: request error #{loginfo}"
+              logger.error "LAB START FAILED: VTA setup failed - request error #{loginfo}"
               logger.error result
               return {success: false, message: 'unable to communicate with assistant'}
             end
           end
         end
       	self.save
-        logger.debug "LAB VMS: #{loginfo} \n #{self.vms.as_json}"
+        logger.debug "LAB START: VMS #{loginfo} \n #{self.vms.as_json}"
 
   			if self.lab.startAll
   				self.start_all_vms
   			end
-        # success log in controller
+        logger.info "LAB START SUCCESS: #{loginfo}"
         {success: true, message: 'Lab started'}
       else
         result # forward the message from resource check
       end
     elsif self.end # lab is ended
-      logger.debug "ended labuser"
+      logger.warn "LAB START FAILED: ended labuser #{loginfo}"
       {success: false, message: 'Ended mission can not be started'}
     else
-      logger.debug "lab already started"
+      logger.warn "LAB START SUCCESS: lab already started #{loginfo}"
       {success: true, message: 'Lab started..'}
 		end
   end
@@ -157,13 +157,8 @@ class LabUser < ActiveRecord::Base
         machines = Vm.where(lab_user_id: self.id) 
         # to make sure vms are being removed, do it one by one
         machines.each do |vm|
-          begin
-            vm.delete_vm
-            logger.info "#{vm.name} stopped and deleted @ lab end"
-          rescue Exception => e 
-            logger.error e
-            return {success: false, message: "Mission end failed" }
-          end
+          vm.delete_vm
+          logger.info "#{vm.name} stopped and deleted @ lab end"
         end
         # remove the db entries, the before destroy filter should realize there is no vm to destroy and will be 'skipped'
         machines.destroy_all
@@ -217,21 +212,18 @@ class LabUser < ActiveRecord::Base
     if self.start && !self.end 
   		feedback =''
       success = true
-  		self.vms.each do |vm|
-        info = vm.vm_info || {'VMState': 'stopped', 'vrdeport': 0}
-  			if vm.state(info)!='running' && vm.state(info)!='paused'  # cant be running nor paused
-  				start = vm.start_vm(info) 
-          logger.debug start.as_json
-          add = (start[:notice]!='' ? start[:notice] : (start[:alert]!='' ? start[:alert] : "<b>#{vm.lab_vmt.nickname}</b> was not started")	)
-          feedback = feedback + add +'<br/>'
-          unless add.include?('successfully started')
-            logger.error "VM START FAILURE: vm=#{vm.id} [#{vm.name}] #{loginfo}"
-            success = false # one machine fails = all fails
-          else
-            logger.info "VM START SUCCESS: vm=#{vm.id} [#{vm.name}] #{loginfo}"
-          end
-          
-  			end #end if not running or paused
+  		self.vms.reverse.each do |vm|
+        info = vm.vm_info(false) || {'VMState': 'stopped', 'vrdeport': 0} # only try reading info once
+				start = vm.start_vm(info) 
+        logger.debug start.as_json
+        add = (start[:notice]!='' ? start[:notice] : (start[:alert]!='' ? start[:alert] : "<b>#{vm.lab_vmt.nickname}</b> was not started")	)
+        feedback = feedback + add +'<br/>'
+        unless add.include?('successfully started')
+          logger.error "VM START FAILURE: vm=#{vm.id} [#{vm.name}] #{loginfo}"
+          success = false # one machine fails = all fails
+        else
+          logger.info "VM START SUCCESS: vm=#{vm.id} [#{vm.name}] #{loginfo}"
+        end
   		end
   		logger.info "START ALL VMS SUMMARY: #{loginfo} #{feedback}"
   		{ success: success, message: feedback}
