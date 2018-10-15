@@ -22,9 +22,9 @@ Exported lab folders will be created in the same folder</p>
     		<td><%= i[:folder] %></td>
 	    	<td style="<%= i[:time]!='' && i[:time] > l.updated_at ? 'background: skyblue;' : '' %>"><%= i[:time] %></td>
     		<td>
-    			<%= link_to '[Import]',  '/import/'+ i[:folder] if i[:folder]!='-none-'%> 
+    			<%= link_to '[Import]',  '/import/'+ Base64.encode64(i[:folder]) if i[:folder]!='-none-'%> 
     			<%= link_to '[Export]', '/export/'+ l.id.to_s %>
-    			<%= link_to '[Download as zip]', '/download_export/'+ i[:folder] if i[:folder]!='-none-' %>
+    			<%= link_to '[Download as zip]', '/download_export/'+ Base64.encode64(i[:folder]) if i[:folder]!='-none-' %>
     		</td>
     	</tr>
     	<% end %>

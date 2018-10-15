@@ -12,7 +12,7 @@ class HomeController < ApplicationController
   # import from folder
   def import
     if params[:name]
-      result =ImportLabs.import_from_folder(params[:name])
+      result =ImportLabs.import_from_folder(Base64.decode64(params[:name]))
       if result
         if result[:success]
           redirect_to backup_path, notice: result[:message]
@@ -50,10 +50,10 @@ class HomeController < ApplicationController
   def download_export
     if params[:name]
       #Attachment name
-      filename = params[:name]+'.zip'
+      filename = Base64.decode64(params[:name]).gsub('.','')+'.zip'
       temp_file = Tempfile.new(filename)
       dir = Rails.configuration.export_location ? Rails.configuration.export_location : '/var/labs/exports'
-      dirname =  dir+'/'+params[:name]
+      dirname =  dir+'/'+Base64.decode64(params[:name])
       begin
         #This is the tricky part
         #Initialize the temp file as a zip file

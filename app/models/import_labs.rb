@@ -30,14 +30,14 @@ def self.list_importable_labs
 	Find.find(@@dir) do |f|  
 	  if File.directory?(f) && f!=@@dir
 	  	time = ''
-	  	name = f.gsub(@@dir, '')
+	  	name = f.gsub(@@dir+'/', '')
 	  	filename = f+'/timestamp.txt'
 		if File.exists?(filename) && File.file?(filename)
 			file = File.open(filename , 'r') 
 			time = file.read.to_datetime
 		end
 		# find if this lab 
-		lab = Lab.where(" REPLACE(name, ' ', '_') = ? ", name.gsub('/','') ).first
+		lab = Lab.where(name: name.gsub('.','/').gsub('_', ' ') ).first
 		unless lab
 			folders << {folder: name, time: time}
 		end
@@ -47,7 +47,7 @@ def self.list_importable_labs
 end
 
 def self.get_lab_timestamp(name)
-	foldername = name.gsub(' ', '_')
+	foldername = name.gsub(' ', '_').gsub('/', '.')
 	dirname = @@dir+'/'+foldername
 	if File.exists?(dirname) && File.directory?(dirname)
 		filename = dirname+'/timestamp.txt'
@@ -231,7 +231,7 @@ def self.export_lab_separate(id)
 		unless File.exists?(@@dir) && File.directory?(@@dir)
 			return {success: false, message: "folder does not exist #{@@dir}"}
 		end
-		dirname = @@dir+'/'+l.name.gsub(' ', '_')
+		dirname = @@dir+'/'+l.name.gsub(' ', '_').gsub('/', '.')
 		# check if folder exists
 		unless File.directory?(dirname)
 			# make folder
@@ -352,7 +352,7 @@ def self.export_lab(id)
 		unless File.exists?(@@dir) && File.directory?(@@dir)
 			return {success: false, message: "folder does not exist #{@@dir}"}
 		end
-		dirname = @@dir+'/'+l.name.gsub(' ', '_')
+		dirname = @@dir+'/'+l.name.gsub(' ', '_').gsub('/', '.')
 		# check if folder exists
 		unless File.directory?(dirname)
 			# make folder

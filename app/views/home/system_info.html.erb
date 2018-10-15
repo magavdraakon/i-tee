@@ -2,6 +2,7 @@
 
 <p><%=AppVersion::APP_VERSION.chomp%></p>
 <p><%=AppVersion::PLATFORM_INFO%></p>
+<p>Running as: <%= %x(whoami 2>&1)%></p>
 
 <%= form_tag(system_path, method: "post", role:'form') do %>
 	<p>Current log level is <%= @levels[@level][0] %>
@@ -13,9 +14,13 @@
 	
 <% end %>
 
-<p>
+<% begin %>
+	<p>
   Number of virtual machines total: <%= Virtualbox.all_machines.length %><br/>
   Number of running virtual machines: <%= Virtualbox.running_machines.length %></p>
+<% rescue Exception => e %>
+	<p><b style="color:red">PROBLEM WITH VBOXMANAGER SETUP: <%= e.message %></b></p>
+<% end %>
   Memory information [GB]<hr>
   <pre><%=%x(free -g)%></pre>
   Disk information<hr>
