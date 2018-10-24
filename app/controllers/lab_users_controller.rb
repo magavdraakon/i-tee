@@ -124,7 +124,7 @@ class LabUsersController < ApplicationController
         else
           format.html { render :action => 'index' }
           format.json { 
-            logger.error "LABUSER CREATE FAILED: lab=#{params[:lab_id]} user=#{params[:user_id]} " + ( @user ? "[#{user.username}]" : '')
+            logger.error "LABUSER CREATE FAILED: lab=#{params[:lab_id]} user=#{params[:user_id]} " + ( @user ? "[#{@user.username}]" : '')
             logger.error @lab_user.errors.as_json
             render :json=> {:success => false, :errors => @lab_user.errors}, :status=> :unprocessable_entity
           }
