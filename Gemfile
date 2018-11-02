@@ -2,7 +2,7 @@ source 'http://rubygems.org'
 
 gem 'puma'
 gem 'rails', '5.2'
-gem 'rubyzip'
+gem 'rubyzip', ">= 1.2.2"
 gem 'will_paginate'
 gem 'mysql2'#, '~> 0.3.21'
 gem 'devise'
