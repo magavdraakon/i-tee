@@ -4,11 +4,11 @@ production:
   username: <%=ENV["ITEE_USER"]%>
   password: <%=ENV["ITEE_PASSWORD"]%>
   database: <%=ENV["ITEE_DATABASE"]%>
-  pool: 50
+  pool: 5
 production_guacamole:
   adapter: mysql2
   host: <%= ENV["GUACAMOLE_DB_HOST"]%>
   username: <%= ENV["GUACAMOLE_DB_USER"]%>
   password: <%= ENV["GUACAMOLE_DB_PASSWORD"]%>
   database: <%= ENV["GUACAMOLE_DB_NAME"]%>
-  pool: 50
+  pool: 5
