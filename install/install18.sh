@@ -176,6 +176,7 @@ install_virtualbox() {
 	curl "http://download.virtualbox.org/virtualbox/$VERSION/Oracle_VM_VirtualBox_Extension_Pack-$VERSION.vbox-extpack" > \
 		"/tmp/Oracle_VM_VirtualBox_Extension_Pack-$VERSION.vbox-extpack"
 	vboxmanage extpack install --replace "/tmp/Oracle_VM_VirtualBox_Extension_Pack-$VERSION.vbox-extpack"
+	su - vbox -c "vboxmanage extpack install --replace '/tmp/Oracle_VM_VirtualBox_Extension_Pack-$SUBVERSION.vbox-extpack'" || true
 	su - vbox -c "vboxmanage setproperty vrdeauthlibrary VBoxAuthSimple"
 
 	apt-mark hold virtualbox-5.2  2>&1 | tee -a $LOGFILE
