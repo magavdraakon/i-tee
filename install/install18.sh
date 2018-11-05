@@ -230,8 +230,8 @@ apt-get install python-certbot-nginx -y 2>&1 | tee -a $LOGFILE
 
 certbot certonly --standalone --agree-tos --register-unsafely-without-email --preferred-challenges http -d $(hostname -f) 2>&1 | tee -a $LOGFILE
 
-sed -i -e "s|/etc/ssl/certs/ssl-cert-snakeoil.pem|/etc/letsencrypt/live/$(hostname -f)/fullchain.pem|g" /etc/nginx/sites-availiable/default
-sed -i -e "s|/etc/ssl/private/ssl-cert-snakeoil.key|/etc/letsencrypt/live/$(hostname -f)/privkey.pem|g" /etc/nginx/sites-availiable/default
+sed -i -e "s|/etc/ssl/certs/ssl-cert-snakeoil.pem|/etc/letsencrypt/live/$(hostname -f)/fullchain.pem|g" /etc/nginx/sites-available/default
+sed -i -e "s|/etc/ssl/private/ssl-cert-snakeoil.key|/etc/letsencrypt/live/$(hostname -f)/privkey.pem|g" /etc/nginx/sites-available/default
 
 echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}Adding crontab to automatically update the letsencrypt certificate ${NC}" 2>&1 | tee -a $LOGFILE
 
@@ -424,7 +424,7 @@ docker exec -i mysql mysql -uguacamole -p"$GUACAMOLE_PASSWORD" <<< "select * fro
 
 echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}Installing VboxManager with memcache ${NC}" 2>&1 | tee -a $LOGFILE
 
-git clone git@bitbucket.org:rangeforce/vboxmanager.git
+git clone https://bitbucket.org/rangeforce/vboxmanager.git
 cd vboxmanager 
 /bin/bash setup.sh
 
