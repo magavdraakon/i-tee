@@ -13,7 +13,6 @@ NC='\033[0m'
 mkdir -p /etc/i-tee
 LOGFILE=/etc/i-tee/install.log
 
-
 echo -e "\n${YELLOW}" 2>&1 | tee -a $LOGFILE
 echo -e "#####################################################" 2>&1 | tee -a $LOGFILE
 echo -e "##############-I-TEE INSTALLATION SCRIPT-############" 2>&1 | tee -a $LOGFILE
@@ -43,7 +42,6 @@ chmod +x /usr/local/bin/json-util
 
 apt-get update > /dev/null
 apt-get install --no-install-recommends -y rsync curl ssh hostname ferm ssl-cert nginx apache2-utils pwgen 2>&1 | tee -a $LOGFILE
-
 
 ### Install static files
 echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}Copying static files and services ${NC}" 2>&1 | tee -a $LOGFILE
@@ -112,13 +110,10 @@ cp ./etc/systemd/system/docker.service.d/noiptables.conf /etc/systemd/system/doc
 cp ./etc/sysctl.d/80-labs.conf /etc/sysctl.d/80-labs.conf
 set -e
 
-
 #rise sshd limits
 echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}Rising sshd connection limits to 250 ${NC}" 2>&1 | tee -a $LOGFILE
 echo "MaxSessions 250" >> /etc/ssh/sshd_config
 echo "MaxStartups 250" >> /etc/ssh/sshd_config
-
-
 
 ### Create users, groups and respective directories
 echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}Creating users, groups and respective directories ${NC}" 2>&1 | tee -a $LOGFILE
@@ -135,7 +130,6 @@ chmod u+s,g+s /var/labs -R
 echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}Setting up virtualbox password ${NC}" 2>&1 | tee -a $LOGFILE
 VBOX_PASSWORD=$(< /dev/urandom tr -dc _A-Za-z0-9 | head -c20)
 echo "vbox:$VBOX_PASSWORD" | chpasswd
-
 
 ### Install packages
 echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}Installing Docker ${NC}" 2>&1 | tee -a $LOGFILE
@@ -189,7 +183,6 @@ install_virtualbox
 echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}Installing netdata ${NC}" 2>&1 | tee -a $LOGFILE
 apt-get install netdata -y  2>&1 | tee -a $LOGFILE
 
-
 ### Cleanup
 echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}Cleanup: Deleting old container if exists ${NC}" 2>&1 | tee -a $LOGFILE
 echo "Deleting containers"
@@ -235,7 +228,6 @@ sed -i -e "s|/etc/ssl/certs/ssl-cert-snakeoil.pem|/etc/letsencrypt/live/$(hostna
 sed -i -e "s|/etc/ssl/private/ssl-cert-snakeoil.key|/etc/letsencrypt/live/$(hostname -f)/privkey.pem|g" /etc/nginx/sites-available/default
 
 echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}Adding crontab to automatically update the letsencrypt certificate ${NC}" 2>&1 | tee -a $LOGFILE
-
 
 echo "45 2 * * 6 /usr/bin/certbot renew" >> /var/spool/cron/crontabs/root
 
@@ -363,9 +355,7 @@ itee_magic
 
 
 ### Startup
-
 echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}Pulling Docker images: ${NC}" 2>&1 | tee -a $LOGFILE
-
 
 docker pull guacamole/guacd &
 docker pull keijokapp/guacamole &
@@ -417,21 +407,16 @@ echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}FIlling I-Tee database ${NC}"
 docker exec -ti i-tee rake db:migrate RAILS_ENV=production
 
 
-
 echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}Deleting default guacamole user ${NC}" 2>&1 | tee -a $LOGFILE
 docker exec -i mysql mysql -uguacamole -p"$GUACAMOLE_PASSWORD" <<< "update guacamole.guacamole_user set disabled='1' where username='guacadmin';"
 docker exec -i mysql mysql -uguacamole -p"$GUACAMOLE_PASSWORD" <<< "select * from guacamole.guacamole_user where username='guacadmin';"
 
-
 echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}Installing VboxManager with memcache ${NC}" 2>&1 | tee -a $LOGFILE
 
+cd /var/labs/
 git clone https://bitbucket.org/rangeforce/vboxmanager.git
 cd vboxmanager 
 /bin/bash setup.sh
-
-
-
-
 
 echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${GREEN}I-Tee installed and should be availiable at https://$(hostname -f)/ ${NC}" 2>&1 | tee -a $LOGFILE
 
