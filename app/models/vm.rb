@@ -338,13 +338,13 @@ class Vm < ActiveRecord::Base
         desc = "cmdkey /generic:#{rdp_host} /user:localhost&#92;#{username} /pass:#{password}&amp;&amp;"
         desc += "mstsc.exe /v:#{rdp_host}:#{rdp_port} /f"
       when 'rdesktop'
-        desc ="rdesktop  -u#{username} -p#{password} -N -a16 #{rdp_host}:#{rdp_port}"
+        desc ="rdesktop  -u#{username} -p \"#{password}\" -N -a16 #{rdp_host}:#{rdp_port}"
       when 'xfreerdp'
-        desc ="xfreerdp  --plugin cliprdr -g 90% -u #{username} -p #{password} #{rdp_host}:#{rdp_port}"
+        desc ="xfreerdp  --plugin cliprdr -g 90% -u #{username} -p \"#{password}\" #{rdp_host}:#{rdp_port}"
       when 'mac'
         desc ="open rdp://#{username}:#{password}@#{rdp_host}:#{rdp_port}"
       else
-        desc ="rdesktop  -u#{username} -p#{password} -N -a16 #{rdp_host}:#{rdp_port}"
+        desc ="rdesktop  -u#{username} -p \"#{password}\" -N -a16 #{rdp_host}:#{rdp_port}"
     end
 
   end
