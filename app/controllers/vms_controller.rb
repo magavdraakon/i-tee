@@ -232,55 +232,36 @@ class VmsController < ApplicationController
 
   #start all the machines this user has in a given lab
   def start_all
+    @fallback_location = lab_view_path
     respond_to do |format|
-      @lab=Lab.find(params[:id])
-      fallback_path = my_labs_path+(@lab ? "/#{@lab.id}" : '')+(@lab && params[:username] ? "/#{params[:username]}" : '')
-      get_user
-      if !@user
-        logger.debug "Can't find user: "
-        logger.debug params
-        format.html { 
-          flash[:notice] = "Can't find user"
-          redirect_back fallback_location: fallback_path
+      begin
+        @labuser = LabUser.where(id: params[:id]).first 
+        raise "Lab attempt not found" unless @labuser 
+        raise "permission denied" unless @admin || @labuser.user == current_user # unless admin or owner
+        logger.debug "Starting all vms in'#{@labuser.user.username}' lab '#{@labuser.lab.name}' as admin" if @admin && @labuser.user != current_user # admin in someone else's lab
+        @fallback_location = lab_view_path+"/"+@labuser.id.to_s
+        result = @labuser.start_all_vms
+        format.html {
+          flash[:notice] = result[:message].html_safe
+          redirect_back fallback_location: @fallback_location
         }
-        format.json { render :json=> {:success => false , :message=>  "Can't find user" }}
-      elsif !@admin && (params[:username] || params[:user_id])
-        logger.debug '\n start_lab: Relocate user\n'
-        # simple user should not have the username in url
-        format.html { redirect_to my_labs_path+(params[:id] ? "/#{params[:id]}" : '') }
-        format.json { render :json=>{:success => false , :message=> 'No permission error' }}
-      else
-        # ok, there is such lab, but does the user have it?  
-        @labuser = LabUser.where('lab_id=? and user_id=?', @lab.id, @user.id).last
-        if @labuser!=nil #user has this lab
-          result = @labuser.start_all_vms
-          format.html {
-            flash[:notice] = result[:message].html_safe
-            redirect_back fallback_location: fallback_path
-          }
-          format.json {render :json=> { :success=> result[:success], :message=>result[:message], :lab_user=> @labuser.id}}
-        else
-          # no this user does not have this lab
-          format.html { redirect_to my_labs_path, :notice => 'That lab was not assigned to this user!' }
-          format.json { render :json=>{:success => false, :message=> 'That lab was not assigned to this user!' }}
-        end      
-      end
-    end
-    rescue Timeout::Error
-      respond_to do |format|        
+        format.json {render :json=> { :success=> result[:success], :message=>result[:message], :lab_user=> @labuser.id}}
+      rescue Timeout::Error
         format.html {
           flash[:notice] = '<br/>Starting all virtual machines failed, try starting them one by one.'.html_safe
-          redirect_back fallback_location: fallback_path
+          redirect_back fallback_location: @fallback_location
         }
         format.json {render :json=> { :success=> false, :message=>'Starting all virtual machines failed, try starting them one by one.', :lab_user=> @labuser.id}}
+      rescue Exception => e
+        logger.error e
+        message = e.message || "Problem starting all vms in Lab Attempt"
+        format.html { 
+          flash[:alert] =  message
+          redirect_back fallback_location: @fallback_location
+        }
+        format.json { render :json=> {:success => false , :message=> message }}
       end
-    rescue ActiveRecord::RecordNotFound
-      respond_to do |format|
-        logger.debug "Can't find lab: "
-        logger.debug params
-        format.html { redirect_to my_labs_path , :notice=> "Can't find lab" }
-        format.json { render :json=> {:success => false , :message=>  "Can't find lab" }}
-      end
+    end
   end
   
   # start one machine 
@@ -297,7 +278,7 @@ class VmsController < ApplicationController
       flash[:alert] = result[:alert].html_safe if is_alert
       
       format.html  {
-        redirect_back fallback_location: my_labs_path+(@vm.lab_vmt.lab ? "/#{@vm.lab_vmt.lab.id}" : '')+(@vm.lab_vmt.lab && params[:username] ? "/#{params[:username]}" : '')
+        redirect_back fallback_location: lab_view_path+"/"+@vm.lab_user_id.to_s
       }
       format.json  { render :json => {:success=>is_notice, :message=> is_notice ? 'Machine started' : 'Machine start failed'} }
     end
@@ -312,7 +293,7 @@ class VmsController < ApplicationController
       # TODO! check if really resumed
       format.html  { 
         flash[:notice] = result[:message].html_safe 
-        redirect_back fallback_location: my_labs_path+(@vm.lab_vmt.lab ? "/#{@vm.lab_vmt.lab.id}" : '')+(@vm.lab_vmt.lab && params[:username] ? "/#{params[:username]}" : '')
+        redirect_back fallback_location: lab_view_path+"/"+@vm.lab_user_id.to_s
       }
       format.json  { render :json => {:success=>result[:success], :message=> result[:message]  } }
     end
@@ -327,7 +308,7 @@ class VmsController < ApplicationController
       # TODO! check if really paused
       format.html  {
         flash[:notice] = result[:message].html_safe 
-        redirect_back fallback_location: my_labs_path+(@vm.lab_vmt.lab ? "/#{@vm.lab_vmt.lab.id}" : '')+(@vm.lab_vmt.lab && params[:username] ? "/#{params[:username]}" : '')
+        redirect_back fallback_location: lab_view_path+"/"+@vm.lab_user_id.to_s
       }
       format.json  { render :json => {:success=>result[:success], :message=> result[:message] } }
     end
@@ -360,55 +341,36 @@ class VmsController < ApplicationController
 
   #stop all the machines this user has in a given lab
 def stop_all
+  @fallback_location = lab_view_path
   respond_to do |format|
-    @lab=Lab.find(params[:id])
-    fallback_path = my_labs_path+(@lab ? "/#{@lab.id}" : '')+(@lab && params[:username] ? "/#{params[:username]}" : '')
-    get_user
-    if !@user
-      logger.debug "Can't find user: "
-      logger.debug params
-      format.html { 
-        flash[:notice] = "Can't find user"
-        redirect_back fallback_location: fallback_path
-      }
-      format.json { render :json=> {:success => false , :message=>  "Can't find user" }}
-    elsif !@admin && (params[:username] || params[:user_id])
-      logger.debug '\n start_lab: Relocate user\n'
-      # simple user should not have the username in url
-      format.html { redirect_to my_labs_path+(params[:id] ? "/#{params[:id]}" : '') }
-      format.json { render :json=>{:success => false , :message=> 'No permission error' }}
-    else
-      # ok, there is such lab, but does the user have it?  
-      @labuser = LabUser.where('lab_id=? and user_id=?', @lab.id, @user.id).last
-      if @labuser!=nil #user has this lab
-        result = @labuser.stop_all_vms
-        format.html {
-          flash[:notice] = result[:message].html_safe
-          redirect_back fallback_location: fallback_path
-        }
-        format.json {render :json=> { :success=> result[:success], :message=>result[:message], :lab_user=> @labuser.id}}
-      else
-        # no this user does not have this lab
-        format.html { redirect_to my_labs_path, :notice => 'That lab was not assigned to this user!' }
-        format.json { render :json=>{:success => false, :message=> 'That lab was not assigned to this user!' }}
-      end  
-    end
-  end
-  rescue Timeout::Error
-    respond_to do |format|        
+    begin
+      @labuser = LabUser.where(id: params[:id]).first 
+      raise "Lab attempt not found" unless @labuser 
+      raise "permission denied" unless @admin || @labuser.user == current_user # unless admin or owner
+      logger.debug "Stopping all vms in'#{@labuser.user.username}' lab '#{@labuser.lab.name}' as admin" if @admin && @labuser.user != current_user # admin in someone else's lab
+      @fallback_location = lab_view_path+"/"+@labuser.id.to_s
+      result = @labuser.stop_all_vms
       format.html {
-        flash[:notice] = '<br/>Starting all virtual machines failed, try stoppping them one by one.'.html_safe
-        redirect_back fallback_location: fallback_path
+        flash[:notice] = result[:message].html_safe
+        redirect_back fallback_location: @fallback_location
       }
-      format.json {render :json=> { :success=> false, :message=>'Starting all virtual machines failed, try stoppping them one by one.', :lab_user=> @labuser.id}}
+      format.json {render :json=> { :success=> result[:success], :message=>result[:message], :lab_user=> @labuser.id}}
+    rescue Timeout::Error
+      format.html {
+        flash[:notice] = '<br/>Stopping all virtual machines failed, try stopping them one by one.'.html_safe
+        redirect_back fallback_location: @fallback_location
+      }
+      format.json {render :json=> { :success=> false, :message=>'Stopping all virtual machines failed, try stopping them one by one.', :lab_user=> @labuser.id}}
+    rescue Exception => e
+      logger.error e
+      message = e.message || "Problem stopping all vms in Lab Attempt"
+      format.html { 
+        flash[:alert] =  message
+        redirect_back fallback_location: @fallback_location
+      }
+      format.json { render :json=> {:success => false , :message=> message }}
     end
-  rescue ActiveRecord::RecordNotFound
-    respond_to do |format|
-      logger.debug "Can't find lab: "
-      logger.debug params
-      format.html { redirect_to my_labs_path , :notice=> "Can't find lab" }
-      format.json { render :json=> {:success => false , :message=>  "Can't find lab" }}
-    end
+  end  
 end
 
 
@@ -421,7 +383,7 @@ end
       # TODO! check if really stopped
       format.html  {
         flash[:notice] = result[:message].html_safe 
-        redirect_back fallback_location: my_labs_path+(@vm.lab_vmt.lab ? "/#{@vm.lab_vmt.lab.id}" : '')+(@vm.lab_vmt.lab && params[:username] ? "/#{params[:username]}" : '')
+        redirect_back fallback_location: lab_view_path+"/"+@vm.lab_user_id.to_s
       }
       format.json  { render :json => {:success=>result[:success], :message=> result[:message] } }
     end
@@ -433,7 +395,7 @@ end
       result = @vm.reset_rdp
       format.html  {
         flash[:notice] = result[:message] 
-        redirect_back fallback_location: my_labs_path+(@vm.lab_vmt.lab ? "/#{@vm.lab_vmt.lab.id}" : '')+(@vm.lab_vmt.lab && params[:username] ? "/#{params[:username]}" : '')
+        redirect_back fallback_location: lab_view_path+"/"+@vm.lab_user_id.to_s
       }
       format.json  { render :json => {:success=>result[:success], :message=> result[:message] } }
     end

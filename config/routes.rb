@@ -111,7 +111,7 @@ Rails.application.routes.draw do
   match 'rdp_of', :to=> 'vms#get_rdp', via: [:get, :post]
   match 'rdp_reset', :to=> 'vms#rdp_reset', via: [:get, :post]
   
-    #no id
+  #no id
   match 'start_all', :to=> 'vms#start_all', via: [:get, :post]
   match 'stop_all', :to=> 'vms#stop_all', via: [:get, :post]
   match 'start_all_by_id', :to=> 'vms#start_all_by_id', via: [:get, :post]
@@ -149,10 +149,6 @@ Rails.application.routes.draw do
   match 'vms_by_state', :to=>'vms#vms_by_state', via: [:get, :post]
   match 'vms_by_state/:state', :to=>'vms#vms_by_state', via: [:get, :post]
   
-  match 'my_labs/:id/:username', :to => 'labs#user_labs', via: [:get, :post]
-  match 'my_labs/:id', :to => 'labs#user_labs', via: [:get, :post]
-  match 'my_labs', :to =>'labs#user_labs', via: [:get, :post]
-
   match 'open_guacamole', :to=>'vms#open_guacamole', via: [:get, :post]
   match 'open_guacamole/:id', :to=>'vms#open_guacamole' , via: [:get, :post]
 
@@ -162,6 +158,9 @@ Rails.application.routes.draw do
   match 'user_labs/:username', :to=>'labs#user_labs', via: [:get, :post]
   match 'user_labs/:username/:id', :to => 'labs#user_labs', via: [:get, :post]
 
+  match 'lab_view/:id', :to=> 'labs#lab_view', via: [:get]
+  match 'lab_view', :to=> 'labs#lab_view', via: [:get]
+  
   
   match 'not_found', :to=>"home#error_404", via: [:get, :post]
 

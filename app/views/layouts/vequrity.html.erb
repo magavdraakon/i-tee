@@ -30,7 +30,7 @@
     <%if user_signed_in?%>
     <div id="m_menu">
           <%=link_to 'Home', root_path, :class=>'hb b_menu'+(@tab=='home' ? ' current_tab' : '')%>
-          <%=link_to 'Labs', my_labs_path, :class=>'cb b_menu'+(@tab=='courses' ? ' current_tab' : '')%>
+          <%=link_to 'Labs', lab_view_path, :class=>'cb b_menu'+(@tab=='courses' ? ' current_tab' : '')%>
           <%=link_to 'My machines', vms_path, :class=>'vb b_menu'+(@tab=='vms' ? ' current_tab' : '') %>
           <%if  @admin   %>
                 <%=link_to 'Manage labs', labs_path, :class=>'ab b_menu'+(@tab=='admin' ? ' current_tab' : '') %>

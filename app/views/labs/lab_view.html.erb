@@ -1,38 +1,27 @@
-<%if @labs!=[] %>
+<%if !@lab_users.blank? %>
 
 <% content_for :sidebar do %>
         <ul>
-        <% if @started!=[] %>
-          <li class="upper">Started</li>
-          <% @started.each do |lab| %>
+          <%
+            ns_shown = false
+            e_shown = false
+          %>
+           <li class="upper">Started</li>
+          <% @lab_users.each do |labuser| %>
+            <%if !ns_shown && labuser.start.blank? && labuser.end.blank? 
+              ns_shown = true   %>
+              <li class="upper">Not started</li>
+            <% end %>
+            <%if !e_shown && !labuser.start.blank? && !labuser.end.blank? 
+              e_shown = true   %>
+             <li class="upper">Completed</li>
+            <% end %>
             <% classes='' #default
-               classes= 'current_lab' if lab.id==@lab.id %>
+               classes= 'current_lab' if labuser.id==@lab_user.id %>
             <li class="<%= classes %>">
-              <%= link_to(lab.name, :controller=>'labs', :action=>'user_labs', :id=>lab.id)%>
+              <%= link_to(labuser.lab.name, lab_view_path+"/"+labuser.id.to_s)%>
             </li>
-          <% end %>
-        <% end %>
-        <% if @not_started!=[] %>
-          <li class="upper">Not started</li>
-          <% @not_started.each do |lab| %>
-            <% classes='' #default
-               classes= 'current_lab' if lab.id==@lab.id %>
-            <li class="<%= classes %>">
-              <%= link_to(lab.name, :controller=>'labs', :action=>'user_labs', :id=>lab.id)%>
-            </li>
-          <% end %>
-        <% end %>
-        <% if @complete!=[] %>
-          <li class="upper">Completed</li>
-          <% @complete.each do |lab| %>
-            <% classes='' #default
-               classes= 'current_lab' if lab.id==@lab.id %>
-            <li class="<%= classes %>">
-              <%= link_to(lab.name, :controller=>'labs', :action=>'user_labs', :id=>lab.id)%>
-            </li>
-          <% end %>
-        <% end %>
-        
+          <% end %>        
         </ul>
 <%end%>  
 
@@ -45,16 +34,16 @@
 <%end%>
 
 
-<h1><%=@lab.name %></h1>
+<h1><%=@lab_user.lab.name %></h1>
 
 <div class="marked">
-  <%= link_m @lab.description %>
+  <%= link_m @lab_user.lab.description %>
 </div>
 
 
-  <% if @labs!=[] %>
+  <% if !@lab_users.blank? %>
         <div class="manage_lab loader">
-            <%= link_to('Start lab', start_lab_path+'/'+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : '' ), data: { turbolinks: false }, :class=>'button submit-button sl-button') unless @lab_user.start %>
+            <%= link_to('Start lab', start_lab_path+'/'+@lab_user.id.to_s, data: { turbolinks: false }, :class=>'button submit-button sl-button') unless @lab_user.start %>
         </div>
     <% if @lab_user.start %>
       <!-- started at: <%#=@lab_user.start%><br/>
@@ -92,7 +81,7 @@
             </td>
 
             <td style="text-align:right;">
-              <% if @lab.vms_by_one %>
+              <% if @lab_user.lab.vms_by_one %>
                 <div class=" loader" ><%= link_to('Start', start_vm_path+'/'+vm.id.to_s, data: { turbolinks: false }, :class=> 'button start-button') if (state!='running' && state!='paused') || !rdp_port %>
                 <%= link_to('Pause', pause_vm_path+'/'+vm.id.to_s, data: { turbolinks: false }, :class=>'button pause-button') if state == 'running' && rdp_port && allow_restart %>
                 <%= link_to('Resume', resume_vm_path+'/'+vm.id.to_s, data: { turbolinks: false }, :class=>'button start-button') if state == 'paused' && rdp_port %>
@@ -129,22 +118,22 @@
 <div class="manage_lab">
     <% if !@lab_user.end && @lab_user.vms.count>0 %>
         <span class="loader">
-          <%= link_to('Start all',start_all_path+'/'+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : ''), data: { turbolinks: false },
+          <%= link_to('Start all',start_all_path+'/'+@lab_user.id.to_s, data: { turbolinks: false },
                       :class=> 'button start-button sl-button')  %>
         </span>
          <span class="loader">
-          <%= link_to('Stop all',stop_all_path+'/'+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : ''), data: { turbolinks: false },
+          <%= link_to('Stop all',stop_all_path+'/'+@lab_user.id.to_s, data: { turbolinks: false },
                       :class=> 'button stop-button sl-button')  %>
         </span>
     <% end %>
-    <% if @lab_user.start && @lab.restartable %>
+    <% if @lab_user.start && @lab_user.lab.restartable %>
         <span class="loader">
-          <%= link_to('Restart lab',restart_lab_path+'/'+@lab.id.to_s+(@admin && params[:username] ? "/#{params[:username]}" : ''), data: { turbolinks: false },
+          <%= link_to('Restart lab',restart_lab_path+'/'+@lab_user.id.to_s, data: { turbolinks: false },
                       :class=>'add-button button rl-button',
                       :confirm => 'This will delete all saved data. Are you sure?') %>
         </span>
     <%end%>
-    <% unless  @lab_user.end  || !@lab.endable %>
+    <% unless  @lab_user.end  || !@lab_user.lab.endable %>
         <span class="loader">
           <%= link_to('End lab', end_lab_path+'/'+@lab_user.id.to_s, data: { turbolinks: false },
                       :class=>'delete-button button el-button',

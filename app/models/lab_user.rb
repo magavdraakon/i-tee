@@ -86,7 +86,7 @@ class LabUser < ActiveRecord::Base
   	if self.start.blank? && self.end.blank?  # can only start labs that are not started or finished
       result = Check.has_free_resources
       if result && result[:success] # has resources
-        LabVmt.where('lab_id = ? ', self.lab_id).each do |template|
+        LabVmt.where(lab_id: self.lab_id).each do |template|
           vm = self.vms.where(lab_vmt_id: template.id).first
           unless vm
             vm = self.vms.create!(:name=>"#{template.name}-#{self.user.username}", :lab_vmt=>template, :description=> 'Initialize the virtual machine by clicking <strong>Start</strong>.')
@@ -176,6 +176,7 @@ class LabUser < ActiveRecord::Base
         logger.debug "REMOVE DELAYED JOBS: #{loginfo}"
         # remove pending delayed jobs
         Delayed::Job.where('queue=?', "labuser-#{self.id}").destroy_all
+        logger.info "LAB END SUCCESS: #{loginfo}"
         return {success: true, message: "Mission ended" }
       else
         logger.error "LAB END FAILED: save failed #{loginfo}"
@@ -191,15 +192,25 @@ class LabUser < ActiveRecord::Base
   def restart_lab    
     loginfo = self.log_info.to_s
     logger.info "LAB RESTART CALLED: #{loginfo}"
-    self.end_lab
-    self.vta_setup = false # assistant labuser needs to be reset
-    self.start = nil
-    self.pause = nil
-    self.end = nil
-    # destroy old ping info
-    self.labuser_connections.destroy_all
-    self.save
-    self.start_lab
+    result = self.end_lab
+    if result[:success] 
+      self.vta_setup = false # assistant labuser needs to be reset
+      self.start = nil
+      self.pause = nil
+      self.end = nil
+      # destroy old ping info
+      self.labuser_connections.destroy_all
+      self.save
+      result = self.start_lab
+      if result[:success] 
+        logger.info "LAB RESTART SUCCESS: #{loginfo}"
+        return {success: true, message: "Mission restarted" }
+      else
+        return {success: false, message: "Unable to restart this mission (start failed)" }
+      end
+    else
+       return {success: false, message: "Unable to restart this mission (end failed)" }
+    end
   end
 
 

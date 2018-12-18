@@ -45,8 +45,8 @@
 						<%= link_to lab_user.lab.name, "/user_labs/#{user.username}/#{lab_user.lab.id}"  %>
 						<%= lab_user.start ? (lab_user.end ? '( Completed @ '+lab_user.end.to_s+' )' : '( Running )') : '( Uninitialized )' %>
 						<%= "#{lab_user.vms.count} Vms" if lab_user.vms.count>0 %> 
-						<%= link_to('Start lab',start_lab_path+'/'+lab_user.lab.id.to_s+'/'+lab_user.user.username , :class=>'submit-button button') if !lab_user.start %>
-                      <%= link_to('Restart lab',restart_lab_path+'/'+lab_user.lab.id.to_s+'/'+lab_user.user.username, :class=>'add-button button', :confirm => 'This will delete all saved data. Are you sure?') if lab_user.start %>
+						<%= link_to('Start lab',start_lab_path+'/'+lab_user.id.to_s, :class=>'submit-button button') if !lab_user.start %>
+                      <%= link_to('Restart lab',restart_lab_path+'/'+lab_user.id.to_s, :class=>'add-button button', :confirm => 'This will delete all saved data. Are you sure?') if lab_user.start %>
                       <%= link_to('End lab', end_lab_path+'/'+lab_user.id.to_s, :class=>'delete-button button', :confirm => 'This will delete all saved data. Are you sure?' ) if lab_user.start && !lab_user.end %>
 					</div>
 				<% end %>
