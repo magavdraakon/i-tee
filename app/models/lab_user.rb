@@ -11,6 +11,7 @@ class LabUser < ActiveRecord::Base
   before_create :create_uuid
 
   # used in labuser index json format to include info on ping 
+  # TODO: add last ping timestamp for 'last activity'
   def with_ping
     data = JSON.parse(self.to_json)
     if lab = JSON.parse(self.lab.to_json)

@@ -117,7 +117,7 @@ class LabsController < ApplicationController
           format.json  { render :json => {:success=>true, :message=>'Lab deleted'} }
         else
           format.html { redirect_to(labs_url, :notice=>"Can't find lab") }
-          format.json  { render :json => {:success=>false, :message=>"Can't find lab"}}
+          format.json  { render :json => {:success=>false, :message=>"Can't find lab"}, :status => :not_found }
         end
     end
   end
@@ -358,7 +358,10 @@ class LabsController < ApplicationController
   def set_lab
     @lab = Lab.where(id: params[:id]).first
     unless @lab
-      redirect_to(labs_path,:notice=>'invalid id.')
+      respond_to do |format|
+        format.html { redirect_to(labs_path,:notice=>'invalid id.') }
+        format.json { render :json => {:success=>false, :message=>"Can't find lab" }, :status => :not_found}
+      end
     end
   end
 
