@@ -1,0 +1,44 @@
+
+var clip = document.querySelector('#clip')
+var parent = document.getElementById('holder');
+var hider = document.getElementById('hider');
+
+parent.onmouseenter=function(){
+  document.activeElement.blur()
+}
+
+var tunnel = new Guacamole.WebSocketTunnel(ws_host);
+var client = new Guacamole.Client(tunnel);
+parent.appendChild(client.getDisplay().getElement());
+
+client.onstatechange = function(state) {
+  //console.log('State: ', state);
+  if(state === 3) {
+    // connected
+    console.log('connected')
+    hider.style.display="none"
+  } else {
+    //console.log('connecting')
+    hider.style.display="block"
+  }
+};
+
+function connect(){
+  if(tunnel.state === Guacamole.Tunnel.State.OPEN) {
+    client.disconnect();
+  }    
+	client.connect('token='+token+'&width=' + parent.clientWidth + '&height=' + parent.clientHeight );
+}
+connect();
+var reconnect = true;
+// keep trying to connect while tunnel is not ready
+tunnel.onstatechange = function(state) {
+  if(state === Guacamole.Tunnel.State.CLOSED && reconnect) {
+    console.log('reconnect')
+    setTimeout(connect, 1000);
+  }
+};
+
+window.onunload = function() {
+  client.disconnect();
+};

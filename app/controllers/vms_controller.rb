@@ -4,8 +4,8 @@ class VmsController < ApplicationController
   
   #before_action :authorise_as_admin, :except => [:show, :index, :init_vm, :stop_vm, :pause_vm, :resume_vm, :start_vm, :start_all]
   #redirect to index view when trying to see unexisting things
-  before_action :set_vm, :only=>[:show, :edit, :update, :destroy, :start_vm, :stop_vm, :pause_vm, :resume_vm, :get_state, :get_rdp, :rdp_reset,:open_guacamole, :send_text, :send_keys ]
-  before_action :auth_as_owner, :only=>[:show, :start_vm, :stop_vm, :pause_vm, :resume_vm, :get_state, :get_rdp, :rdp_reset ,:open_guacamole, :send_text, :send_keys]       
+  before_action :set_vm, :only=>[:show, :edit, :update, :destroy, :start_vm, :stop_vm, :pause_vm, :resume_vm, :get_state, :get_rdp, :rdp_reset,:open_guacamole, :send_text, :send_keys, :guacamole_view, :readonly_view ]
+  before_action :auth_as_owner, :only=>[:show, :start_vm, :stop_vm, :pause_vm, :resume_vm, :get_state, :get_rdp, :rdp_reset ,:open_guacamole, :send_text, :send_keys, :guacamole_view, :readonly_view]       
   
   before_action :admin_tab, :except=>[:show,:index, :vms_by_lab, :vms_by_state]
   before_action :vm_tab, :only=>[:show,:index, :vms_by_lab, :vms_by_state]
@@ -528,6 +528,27 @@ end
         format.html { redirect_to root_path , :notice=> 'Restricted access' }
         format.json { render :json=> {:success => false , :message=>  'Unable to find lab attempt'} }
       end
+    end
+  end
+
+  def guacamole_view
+    respond_to do |format|
+      @token = @vm.rdp_token
+      @ws_host = Rails.configuration.guacamole2["ws_host"]
+      format.html{
+        render 'guacamole_view', layout: false
+      }
+    end
+  end
+
+  def readonly_view
+    respond_to do |format|
+      @token = @vm.rdp_token(nil, true)
+      @ws_host = Rails.configuration.guacamole2["ws_host"]
+      @readonly = true
+      format.html{
+        render 'guacamole_view', layout: false
+      }
     end
   end
 

@@ -1,0 +1,118 @@
+// return original text while changing the text
+function set_text(el,text){
+  var original = el.innerHTML
+  el.innerHTML = text
+  return original;
+}
+// set element text to text after time
+function restore_text(el, text, time){
+  time = typeof(time) == 'undefined' ? 500 : time;
+  setTimeout(function(){
+    el.innerHTML = text;
+  }, time)
+}
+// Keys to release on clipboard close
+var controlKeyCodes = [
+  0xFE03, // ISO Level 3 Shift (AltGr)
+  0xFFE1, // Left shift
+  0xFFE2, // Right shift
+  0xFFE3, // Left ctrl
+  0xFFE4, // Right ctrl
+  0xFFE5, // Caps Lock
+  0xFFE7, // Left meta
+  0xFFE8, // Right meta
+  0xFFE9, // Left alt
+  0xFFEA, // Right alt
+  0xFFEB, // Left hyper
+  0xFFEC  // Right hyper
+];
+function releaseControlKeys(event) {
+  var el = event.target
+  var original = set_text(el, "Releasing...")
+  for(var i=0; i< controlKeyCodes.length; i++) {
+    keycode = controlKeyCodes[i]
+    client.sendKeyEvent(0, keyCode);
+  }
+  restore_text(el, original)    
+}
+// Mouse
+var mouse = new Guacamole.Mouse(client.getDisplay().getElement());
+mouse.onmousedown = 
+mouse.onmouseup   =
+mouse.onmousemove = function(mouseState) {
+  client.sendMouseState(mouseState);
+};
+
+// Keyboard
+var keyboard = new Guacamole.Keyboard(document);
+keyboard.onkeydown = function(keysym) {
+  if(document.activeElement==clip) {
+    return true;
+  }
+  client.sendKeyEvent(1, keysym);
+  return false;
+};
+keyboard.onkeyup = function(keysym) {
+  if(document.activeElement==clip) {
+    return true;
+  }
+  client.sendKeyEvent(0, keysym);
+  return false;
+};
+
+var guestClip = ''
+var userClip = ''
+
+function changeClip(event){
+  event.stopPropagation()
+  userClip = event.target.value
+}
+function take2clip(event){
+  var el = event.target
+  var original = set_text(el, "Importing")
+
+  clip.value=guestClip;
+  restore_text(el, original)
+}
+
+function send2clip(event){
+  var el = event.target
+  var original = set_text(el, "Copying")
+  var clipStream = client.createClipboardStream('text/plain')
+  console.log('sending to clipboard')
+  clipStream.sendBlob(btoa(userClip));
+  clipStream.sendEnd();
+  restore_text(el, original)
+}
+
+client.onclipboard = function(stream){
+  // Assemble received data into a single string
+  var data = [];
+  stream.onblob = function(blob) {
+    data.push(atob(blob));
+  };
+  stream.onend = function() {
+    console.log("clipboard in:", data.join(''))
+    guestClip = data.join('')
+  }
+
+}
+
+function pressEnter(){
+	client.sendKeyEvent(1, 0xFF0D);
+	client.sendKeyEvent(0, 0xFF0D)
+}
+
+function sendControlAltDelete(event) {
+  var el = event.target
+  var original = set_text(el, "Sending...")
+  client.sendKeyEvent(1, 0xffe3); // control
+  client.sendKeyEvent(1, 0xffe9); // alt
+  client.sendKeyEvent(1, 0xffff); // delete
+  // releasing them in reverse order does not seem to work as well
+  client.sendKeyEvent(0, 0xffe3); // control
+  client.sendKeyEvent(0, 0xffe9); // alt
+  client.sendKeyEvent(0, 0xffff); // delete
+  restore_text(el, original)
+}
+//https://www.w3schools.com/jsref/jsref_charcodeat.asp

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <%= favicon_link_tag 'iteelogo.png' %>
+	<title><%= @vm.nickname %></title>
+  <%= stylesheet_link_tag 'guacamole-view' %>
+</head>
+<body>
+<div id="wrapper" class="<%= !@readonly ? 'sidebar' : '' %>">
+  <div id="holder">
+  	
+  </div>
+  <div id="hider">
+    
+  </div>
+</div>
+<% if !@readonly %>
+  <ul id="menu">
+    <li id="clipboard">
+      <textarea id="clip" placeholder="clipboard content" onchange="changeClip(event)"></textarea>
+      <button onclick="send2clip(event)">Copy</button>
+      <button onclick="take2clip(event)">Import</button>
+    </li>
+    <li onclick="releaseControlKeys(event)">Release stuck keys</li>
+    <li onclick="sendControlAltDelete(event)">Ctrl+Alt+Del</li>
+    <li><%= link_to('Reset RDP', rdp_reset_path+'/'+@vm.id.to_s, data: { turbolinks: false })%></li>
+  </ul>
+<% end # if readonly%>
+<script type="text/javascript">
+  var token = '<%= @token %>';
+  var ws_host = '<%= @ws_host %>';
+</script>
+<%= javascript_include_tag "guacamole-common.min.js"  %>
+<%= javascript_include_tag "guacamole-connect.js"  %>
+<%= javascript_include_tag "guacamole-interact.js" if !@readonly  %>
+
+</body>
+</html>

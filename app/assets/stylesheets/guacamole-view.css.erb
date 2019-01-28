@@ -1,0 +1,80 @@
+
+* {  box-sizing: border-box;}
+html, body {
+  width: 100%;
+  height:100%;
+  margin:0;
+  padding:0;
+}
+html {
+  background: black;
+}
+#wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow:hidden;  
+}
+#wrapper.sidebar {
+  left:30px;
+  width:96%;
+  width: calc(100% - 30px);
+}
+
+a {
+  color:white;
+  text-decoration: none;
+}
+.sidebar #holder {
+  cursor: none;
+}
+#hider {
+  
+  background: black url(<%=asset_path 'vequritas.svg'%>) center center no-repeat;
+  background-size: 25%;
+  display:none;
+}
+#holder, #hider {
+  position: absolute;
+  top:0;
+  left:0;
+  right:0;
+  bottom: 0;
+  margin: auto;
+  width: 100%;
+  height: 100%;      
+  max-width: 1920px;
+  max-height: 1080px;    
+}
+#menu {
+  background: black;
+  border-right:grey solid 1px;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left:0;
+  width: 30px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  color:white;
+  overflow: hidden;
+  transition: all 0.4s ease;
+}
+#menu li {
+  width: 400px;
+  padding:10px;
+  opacity: 0;
+  transition: opacity 0.1s ease-in;
+}
+#menu textarea {
+  height: 300px;
+  width: 100%;
+}
+#menu:hover {
+  width: 400px;
+}
+#menu:hover li {
+  opacity: 1;
+  transition: opacity 0.2s 0.3s ease-in;
+}

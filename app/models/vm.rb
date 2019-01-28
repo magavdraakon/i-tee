@@ -93,6 +93,55 @@ class Vm < ActiveRecord::Base
     rdp_port
   end
 
+  def rdp_token(info=nil, readonly=false, try_again = true)
+    loginfo = self.log_info.to_s
+    logger.debug "VM RDP TOKEN CALLED: #{loginfo}"
+    info = self.vm_info(try_again) if info.blank?
+    state = self.state(info, false) # get curent state
+    token = false
+    if info && state=='running' # only if machine exists an is running
+      begin
+        groupname,dummy,username = self.name.rpartition('-')
+
+        data = {
+          "connection": {
+            "type": "rdp", 
+            "settings": { 
+              "hostname": Rails.configuration.guacamole2["guacd_host"], 
+              "username": username, 
+              "password": self.password, 
+              "port": self.rdp_port(info), 
+              "clipboard-encoding": "UTF-8"
+            } 
+          } 
+        }
+        unless readonly
+          data[:connection][:settings][:"resize-method"] = "display-update"
+        else
+          data[:connection][:settings][:"read-only"] = true
+        end
+        iv = '9999999999999999' # SecureRandom.random_bytes(16)
+        cipher = OpenSSL::Cipher.new('AES-256-CBC')
+        cipher.encrypt  # set cipher to be encryption mode
+        cipher.key = Rails.configuration.guacamole2["cipher_password"]
+        cipher.iv  = iv
+        encrypted = ''
+        encrypted << cipher.update(data.to_json)
+        encrypted << cipher.final
+        value = {
+          iv:  Base64.encode64(iv),
+          value: Base64.encode64(encrypted)
+        }
+        token = Base64.encode64(value.to_json).gsub(/\n/, '')
+      rescue Exception => e
+        logger.error e
+        logger.info e.backtrace.join("\n")
+      end
+    end
+    logger.debug "VM RDP TOKEN: #{token} #{loginfo}"
+    token
+  end
+
 # check if vbox knows this vm, stop if needed, but always delete
   def delete_vm
     loginfo = self.log_info.to_s
@@ -137,6 +186,9 @@ class Vm < ActiveRecord::Base
     end    
   end
 
+  def nickname 
+    self.lab_vmt.nickname
+  end
   def start_vm(info=nil)
     loginfo = self.log_info.to_s
     logger.info "START_VM CALLED: #{loginfo}"

@@ -111,6 +111,10 @@ Rails.application.routes.draw do
   match 'rdp_of', :to=> 'vms#get_rdp', via: [:get, :post]
   match 'rdp_reset', :to=> 'vms#rdp_reset', via: [:get, :post]
   
+  # guacamole
+  match 'vm/:id/rdp', :to=>'vms#guacamole_view', via: [:get]
+  match 'vm/:id/readonly', :to=>'vms#readonly_view', via: [:get]
+
     #no id
   match 'start_all', :to=> 'vms#start_all', via: [:get, :post]
   match 'stop_all', :to=> 'vms#stop_all', via: [:get, :post]

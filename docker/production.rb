@@ -175,6 +175,8 @@ Rails.application.configure do
 
       end
     end
+    # new guacamole
+    config.guacamole2 = config_file.key?('guacamole2') ? config_file['guacamole2'] : {}
 
   end
   if config_file.key?('development') && config_file['development']
