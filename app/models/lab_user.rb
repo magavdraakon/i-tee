@@ -23,6 +23,8 @@ class LabUser < ActiveRecord::Base
       data['ping_down'] = self.labuser_connections.where("end_at-start_at > ? ", lab['ping_high']).count
       peak = self.labuser_connections.order("end_at-start_at DESC").first
       data['ping_peak'] = peak.end_at-peak.start_at if peak
+      last_ping = self.labuser_connections.order("end_at DESC").first
+      data['last_ping'] = last_ping.end_at
     end
     data
   end
