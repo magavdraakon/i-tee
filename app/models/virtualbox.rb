@@ -354,10 +354,10 @@ class Virtualbox < ActiveRecord::Base
 	# get token for machine by name
 	def self.open_rdp(vm, user, readonly=false)
 		machine = Virtualbox.vm_info(vm)
-		if user.role > 0
+		if user.is_admin?
 			return Virtualbox.guacamole_token(machine['vrdeport'].to_i, nil, nil, readonly)
 		else
-			return {success: false, message: 'Permission denied'} 
+			raise 'Permission denied'
 		end
 	end
 

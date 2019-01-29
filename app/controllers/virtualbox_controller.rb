@@ -119,23 +119,37 @@ class VirtualboxController < ApplicationController
 	# open guacamole-lite
 	def rdp_connection
 		respond_to do |format|
-			@readonly = false
-      @token = Virtualbox.open_rdp(params[:name], current_user, @readonly)
-      @ws_host = Rails.configuration.guacamole2["ws_host"]
-      format.html{
-        render 'vms/guacamole_view', layout: false
-      }
+			begin
+				@readonly = false
+	      @token = Virtualbox.open_rdp(params[:name], current_user, @readonly)
+	      @ws_host = Rails.configuration.guacamole2["ws_host"]
+	      format.html{
+	        render 'vms/guacamole_view', layout: false
+	      }
+	    rescue Exception => e
+	    	format.html{
+	    		flash[:alert] = e.message
+	        redirect_to virtualization_path
+	      }
+	    end
     end
 	end
 	# open guacamole-lit readonly (no mouse & keyboard)
 	def readonly_connection
 		respond_to do |format|
-			@readonly = true
-      @token = Virtualbox.open_rdp(params[:name], current_user, @readonly)
-      @ws_host = Rails.configuration.guacamole2["ws_host"]
-      format.html{
-        render 'vms/guacamole_view', layout: false
-      }
+			begin
+				@readonly = true
+	      @token = Virtualbox.open_rdp(params[:name], current_user, @readonly)
+	      @ws_host = Rails.configuration.guacamole2["ws_host"]
+	      format.html{
+	        render 'vms/guacamole_view', layout: false
+	      }
+      rescue Exception => e
+	    	format.html{
+	    		flash[:alert] = e.message
+	        redirect_to virtualization_path
+	      }
+	    end
     end
 	end
 
