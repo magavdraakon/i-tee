@@ -21,6 +21,7 @@ class Check
 		else
 			{success: false, message: 'Sorry, there are currently not enough resources to start the attempt. Please try again in a while.'}
 		end
+		{success: true, message: "Sufficient resources found"}
 	end
 
 end

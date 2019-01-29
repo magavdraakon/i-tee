@@ -13,7 +13,9 @@
 //= require jquery
 //= require jquery_ujs
 //= require turbolinks
-//= require_tree .
+//= require marked
+//= require prettify
+// require_tree .
 
 var remote_timeout = '';
 

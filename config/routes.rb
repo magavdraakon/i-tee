@@ -22,6 +22,11 @@ Rails.application.routes.draw do
   match 'vm_details/:name', :to=>'virtualbox#vm_details', via: [:get, :post]
   match 'virtualbox_guacamole/:name', :to=>'virtualbox#open_guacamole', via:[:get]
 
+  match 'virtualbox_rdp/:name', :to=>'virtualbox#rdp_connection', via:[:get]  
+  match 'virtualbox_readonly/:name', :to=>'virtualbox#readonly_connection', via:[:get]
+  match 'rdp_admin', :to=>'virtualbox#rdp_admin', via:[:post]
+
+
   match 'jobs',:to=> 'home#jobs', via: [:get, :post]
   match 'jobs/:id', :to=>'home#delete_job', via: [:delete]
   match 'jobs/:id', :to=>'home#run_job', via: [:put]

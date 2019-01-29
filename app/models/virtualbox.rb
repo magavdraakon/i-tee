@@ -326,6 +326,81 @@ class Virtualbox < ActiveRecord::Base
 	end
 
 
+# set global admin credentials to machines, 
+	# only set admin for machines not in db if only_others is true to save time as machine start sets the global admin already
+	# 
+	def self.set_admin(only_others=false)
+		logger.info "SET ADMIN CALLED"
+		username = Rails.configuration.guacamole2["username"]
+		password = Rails.configuration.guacamole2["password"]
+		raise "No username or password given, check the configuration!" unless username && password
+
+		hash = Digest::SHA256.hexdigest(password)
+    Virtualbox.all_machines.each do |vm|
+      begin
+      	if only_others && Vm.where(name: vm).first
+      		logger.debug "SET ADMIN: skipping #{vm} as it is in database and probably has the password already"
+      		next
+      	end
+        Virtualbox.set_extra_data(vm, "VBoxAuthSimple/users/#{username}", hash);
+        logger.debug "SET ADMIN: successfully set global admin for #{vm}"
+      rescue Exception => e
+        logger.error "SET ADMIN: Failed to set RDP password for machine #{vm}: #{e.message}"
+      end
+    end
+    logger.info "SET ADMIN END"
+	end
+
+	# get token for machine by name
+	def self.open_rdp(vm, user, readonly=false)
+		machine = Virtualbox.vm_info(vm)
+		if user.role > 0
+			return Virtualbox.guacamole_token(machine['vrdeport'].to_i, nil, nil, readonly)
+		else
+			return {success: false, message: 'Permission denied'} 
+		end
+	end
+
+	# generate guacamole token based on port, username and password
+	def self.guacamole_token(port, username=nil, password=nil, readonly=false)
+		username = Rails.configuration.guacamole2["username"] unless username
+		password = Rails.configuration.guacamole2["password"] unless password
+		raise "No username or password given" unless username && password
+		data = {
+      "connection": {
+        "type": "rdp", 
+        "settings": { 
+          "hostname": Rails.configuration.guacamole2["guacd_host"], 
+          "username": username, 
+          "password": password, 
+          "port": port, 
+          "clipboard-encoding": "UTF-8"
+        } 
+      } 
+    }
+    unless readonly
+      data[:connection][:settings][:"resize-method"] = "display-update"
+    else
+      data[:connection][:settings][:"read-only"] = true
+    end
+    iv = SecureRandom.random_bytes(16)
+    cipher = OpenSSL::Cipher.new('AES-256-CBC')
+    cipher.encrypt  # set cipher to be encryption mode
+    cipher.key = Rails.configuration.guacamole2["cipher_password"]
+    cipher.iv  = iv
+    encrypted = ''
+    encrypted << cipher.update(data.to_json)
+    encrypted << cipher.final
+    value = {
+      iv:  Base64.encode64(iv),
+      value: Base64.encode64(encrypted)
+    }
+    token = Base64.encode64(value.to_json).gsub(/\n/, '')
+    token
+	end
+
+
+
  #### OLD METHODS some are still needed afterwards
 
 # this is a class to activate different command-line vboxmanage commands and translate the results for the rails app
@@ -594,6 +669,9 @@ class Virtualbox < ActiveRecord::Base
 			{success: false, message: 'please start this virtual machine before trying to establish a connection'}
 		end
 	end
+
+
+
 
 	# NOT IN USE?
 	def self.state(vm)

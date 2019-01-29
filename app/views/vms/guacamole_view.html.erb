@@ -2,7 +2,7 @@
 <html>
 <head>
   <%= favicon_link_tag 'iteelogo.png' %>
-	<title><%= @vm.nickname %></title>
+	<title><%= @vm ? @vm.nickname : params[:name]%></title>
   <%= stylesheet_link_tag 'guacamole-view' %>
 </head>
 <body>
@@ -23,7 +23,10 @@
     </li>
     <li onclick="releaseControlKeys(event)">Release stuck keys</li>
     <li onclick="sendControlAltDelete(event)">Ctrl+Alt+Del</li>
-    <li><%= link_to('Reset RDP', rdp_reset_path+'/'+@vm.id.to_s, data: { turbolinks: false })%></li>
+    <li>
+      <%= link_to('Reset RDP', rdp_reset_path+'/'+@vm.id.to_s, data: { turbolinks: false }) if @vm %>
+      <%= link_to "reset RDP", "/manage_vm/reset_rdp/#{params[:name]}" unless @vm %>
+    </li>
   </ul>
 <% end # if readonly%>
 <script type="text/javascript">

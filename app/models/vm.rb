@@ -102,37 +102,7 @@ class Vm < ActiveRecord::Base
     if info && state=='running' # only if machine exists an is running
       begin
         groupname,dummy,username = self.name.rpartition('-')
-
-        data = {
-          "connection": {
-            "type": "rdp", 
-            "settings": { 
-              "hostname": Rails.configuration.guacamole2["guacd_host"], 
-              "username": username, 
-              "password": self.password, 
-              "port": self.rdp_port(info), 
-              "clipboard-encoding": "UTF-8"
-            } 
-          } 
-        }
-        unless readonly
-          data[:connection][:settings][:"resize-method"] = "display-update"
-        else
-          data[:connection][:settings][:"read-only"] = true
-        end
-        iv = '9999999999999999' # SecureRandom.random_bytes(16)
-        cipher = OpenSSL::Cipher.new('AES-256-CBC')
-        cipher.encrypt  # set cipher to be encryption mode
-        cipher.key = Rails.configuration.guacamole2["cipher_password"]
-        cipher.iv  = iv
-        encrypted = ''
-        encrypted << cipher.update(data.to_json)
-        encrypted << cipher.final
-        value = {
-          iv:  Base64.encode64(iv),
-          value: Base64.encode64(encrypted)
-        }
-        token = Base64.encode64(value.to_json).gsub(/\n/, '')
+        token = Virtualbox.guacamole_token(self.rdp_port(info), username, self.password, readonly)
       rescue Exception => e
         logger.error e
         logger.info e.backtrace.join("\n")
@@ -262,19 +232,15 @@ class Vm < ActiveRecord::Base
           Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSKU", "System SKU")
         end
 
-        # set all admin user passwords
+        # set global admin user password
         begin
-          admin_extra = []
-          users = User.where(role: 2) # admin
-          users.each do |user|
-            logger.debug "START_VM: setting #{user.username}-admin password #{loginfo}"
-            pw_hash = Digest::SHA256.hexdigest(user.rdp_password)
-            admin_extra << {key: "VBoxAuthSimple/users/#{user.username}-admin", value: pw_hash}
-          end
-          # bulk setting
+          admin_username = Rails.configuration.guacamole2["username"]
+          admin_password = Rails.configuration.guacamole2["password"]
+          pw_hash = Digest::SHA256.hexdigest(admin_password)
+          admin_extra << {key: "VBoxAuthSimple/users/#{admin_username}", value: pw_hash}
           Virtualbox.set_extra(name, admin_extra) unless admin_extra.empty?
         rescue Exception => e
-          logger.error "START_VM: Failed to set RDP password #{loginfo}: #{e.message}"
+          logger.error "START_VM: Failed to set global RDP password #{loginfo}: #{e.message}"
         end
 
         logger.debug "START_VM: Starting machine #{loginfo}"
