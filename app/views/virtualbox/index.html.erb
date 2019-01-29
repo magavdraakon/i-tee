@@ -57,7 +57,7 @@
         <td><%= vm['VRDEActiveConnection']+'line' if vm['VRDEActiveConnection'] %></td>
         <td>
         	<% if vm['VMState']=='running' %>
-            <%= link_to "Open in browser", "virtualbox_rdp/#{vm['name']}", target: '_blank' %>
+            <%= link_to "Open in browser", "virtualbox_rdp/#{vm['name']}", target: '_blank' %> | 
             <%= link_to "Open read only", "virtualbox_readonly/#{vm['name']}", target: '_blank' %>
             <div class="remote_connections">
               <span onclick="toggleOtherOsButtons(this)" class="showtoggle">&lt; more</span>
