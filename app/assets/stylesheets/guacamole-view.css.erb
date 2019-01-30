@@ -46,6 +46,15 @@ a {
   max-width: 1920px;
   max-height: 1080px;    
 }
+#filler {
+  background: rgba(0,0,0,0.4);
+  position: absolute;
+  height: 100%;
+  top: 0;
+  left:0;
+  right:0;
+  display: none;
+}
 #menu {
   background: black;
   border-right:grey solid 1px;
@@ -54,27 +63,82 @@ a {
   bottom: 0;
   left:0;
   width: 30px;
+  height: 100%;
   list-style: none;
   padding: 0;
   margin: 0;
   color:white;
   overflow: hidden;
   transition: all 0.4s ease;
+  cursor:pointer;
 }
 #menu li {
-  width: 400px;
+  width: 98%;
   padding:10px;
+  margin:auto;
+  display:none;
   opacity: 0;
   transition: opacity 0.1s ease-in;
 }
+#menu li.action:hover{
+  background: #111;
+  cursor: pointer;
+}
+#menu li.action a {
+  display: block;
+}
 #menu textarea {
-  height: 300px;
+  height: 250px;
   width: 100%;
 }
-#menu:hover {
+#menu:before, #menu:after {
+  content: " ";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left:0;
+  right: 0;
+  margin: auto;
+  border:solid 2px #888;
+  border-width: 0 2px 0 2px;
+  width: 10px;
+  height: 30px;
+  opacity: 0.6;  
+  transition: opacity 0.1s ease-in;
+}
+#menu:after {
+  width: 0;
+  border-width: 0 2px 0 0;
+}
+#menu:hover:before ,#menu:hover:after {
+  opacity:1;
+
+}
+#menu.open:before, #menu.open:after{
+  display: none;
+}
+#menu.open {  
+  overflow-y: auto;
+  cursor: initial;
   width: 400px;
 }
-#menu:hover li {
+#menu.open li {
   opacity: 1;
+  display: block;
   transition: opacity 0.2s 0.3s ease-in;
+}
+#clipboard {
+  text-align:center;
+}
+#clipboard button {
+  margin:5px;
+      color: #fff;
+    background-color: #337ab7;
+    border-color: #2e6da4;
+    cursor: pointer;
+
+    border-radius: 4px;
+    line-height: 1.42857143;
+    font-size: 14px;
+    padding: 6px 12px;
 }

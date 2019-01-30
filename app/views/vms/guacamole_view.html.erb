@@ -15,15 +15,17 @@
   </div>
 </div>
 <% if !@readonly %>
-  <ul id="menu">
+  
+  <div id="filler" onclick="toggle_menu(event, 'open');"></div>
+  <ul id="menu" onclick="toggle_menu(event, 'open');">
     <li id="clipboard">
-      <textarea id="clip" placeholder="clipboard content" onchange="changeClip(event)"></textarea>
-      <button onclick="send2clip(event)">Copy</button>
-      <button onclick="take2clip(event)">Import</button>
+      <textarea id="clip" placeholder="Text to copy" onchange="changeClip(event)"></textarea>
+      <button onclick="send2clip(event)">Copy to VM</button>
+      <textarea id="inside" placeholder="VM clipboard contents" disabled></textarea>
     </li>
-    <li onclick="releaseControlKeys(event)">Release stuck keys</li>
-    <li onclick="sendControlAltDelete(event)">Ctrl+Alt+Del</li>
-    <li>
+    <li class="action" onclick="releaseControlKeys(event)">Release stuck keys</li>
+    <li class="action" onclick="sendControlAltDelete(event)">Ctrl+Alt+Del</li>
+    <li class="action">
       <%= link_to('Reset RDP', rdp_reset_path+'/'+@vm.id.to_s, data: { turbolinks: false }) if @vm %>
       <%= link_to "reset RDP", "/manage_vm/reset_rdp/#{params[:name]}" unless @vm %>
     </li>

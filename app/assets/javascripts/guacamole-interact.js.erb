@@ -1,3 +1,6 @@
+//= require jquery
+//= require jquery_ujs
+
 // return original text while changing the text
 function set_text(el,text){
   var original = el.innerHTML
@@ -30,7 +33,7 @@ function releaseControlKeys(event) {
   var el = event.target
   var original = set_text(el, "Releasing...")
   for(var i=0; i< controlKeyCodes.length; i++) {
-    keycode = controlKeyCodes[i]
+    keyCode = controlKeyCodes[i]
     client.sendKeyEvent(0, keyCode);
   }
   restore_text(el, original)    
@@ -94,6 +97,7 @@ client.onclipboard = function(stream){
   stream.onend = function() {
     console.log("clipboard in:", data.join(''))
     guestClip = data.join('')
+    document.querySelector('#inside').value = guestClip
   }
 
 }
@@ -116,3 +120,32 @@ function sendControlAltDelete(event) {
   restore_text(el, original)
 }
 //https://www.w3schools.com/jsref/jsref_charcodeat.asp
+
+function toggle_menu(event, cl){
+  event.stopPropagation();
+  var menu = document.querySelector("#menu");
+  var filler = document.querySelector("#filler");
+  if ([menu, filler].indexOf(event.target)>=0){
+    var existing = "";
+    if (typeof(menu.getAttribute('class'))=='string'){
+      existing = menu.getAttribute('class')
+    }
+    if (existing.indexOf(cl)>=0 ){ // close menu
+      $(filler).css({
+        display: 'none',
+        left: 0
+      });
+      menu.setAttribute('class', existing.replace(cl, ''))
+    } else { // open menu
+      $(filler).show();
+      $(filler).animate({
+        left: "400px"
+      }, 400)
+      menu.setAttribute('class', existing + " " + cl)
+    }
+
+  } else {
+    return false;
+  }
+  
+}
