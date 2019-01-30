@@ -41,7 +41,7 @@ curl -L https://github.com/keijokapp/json-util/releases/download/1.0/json-util -
 chmod +x /usr/local/bin/json-util
 
 apt-get update > /dev/null
-apt-get install --no-install-recommends -y rsync curl ssh hostname ferm ssl-cert nginx apache2-utils pwgen 2>&1 | tee -a $LOGFILE
+apt-get install --no-install-recommends -y rsync curl ssh hostname ferm ssl-cert nginx apache2-utils pwgen nodejs npm 2>&1 | tee -a $LOGFILE
 
 ### Install static files
 echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}Copying static files and services ${NC}" 2>&1 | tee -a $LOGFILE
@@ -82,7 +82,7 @@ ExecStartPre=/bin/sh -c "docker create \\
 	--env "VBOX_USER=vbox" \\
 	--env "VBOX_HOST=172.17.0.1" \\
 	--env "VBOX_PORT=22" \\
-	--env "ITEE_SECRET_TOKEN=$(pwgen 128 1)" \\
+	--env "ITEE_GUAC_TOKEN=$(pwgen 128 1)" \\
 	--volume /etc/i-tee/config.yaml:/etc/i-tee/config.yaml:ro \\
 	--volume /etc/i-tee/id_rsa:/root/.ssh/id_rsa:ro \\
 	--volume /etc/i-tee/known_hosts:/root/.ssh/known_hosts:ro \\
@@ -130,6 +130,9 @@ chmod u+s,g+s /var/labs -R
 echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}Setting up virtualbox password ${NC}" 2>&1 | tee -a $LOGFILE
 VBOX_PASSWORD=$(< /dev/urandom tr -dc _A-Za-z0-9 | head -c20)
 echo "vbox:$VBOX_PASSWORD" | chpasswd
+
+GUAC_TOKEN=$(pwgen 32 1) 2>&1 | tee -a $LOGFILE
+echo "guacamole-proxy secret token: $GUAC_TOKEN" >> /root/i-tee-passwords.txt
 
 ### Install packages
 echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}Installing Docker ${NC}" 2>&1 | tee -a $LOGFILE
@@ -244,9 +247,11 @@ if [ -d "/opt/mysql/data" ];
 itee_magic() {
     echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}Starting with I-Tee installation ${NC}" 2>&1 | tee -a $LOGFILE
     
-    	ITEE_PASSWORD=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c20)
+    ITEE_PASSWORD=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c20)
 	GUACAMOLE_PASSWORD=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c20)
 	MYSQL_PASSWORD=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c20)
+    GUACADMINPASS=$(pwgen 32 1)
+    GUACADMINUSER=$(pwgen 8 1)
 	
 	echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}Generated ITEE_PASSWORD = $ITEE_PASSWORD  ${NC}" 2>&1 | tee -a $LOGFILE
 	echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}Generated GUACAMOLE_PASSWORD = $GUACAMOLE_PASSWORD  ${NC}" 2>&1 | tee -a $LOGFILE
@@ -308,6 +313,25 @@ itee_magic() {
 		\"database\": \"guacamole\" \
 	}"
 	JSON=$(printf "%s %s" "$JSON" "$JSON_VALUE" | json-util set guacamole_database)
+    
+    JSON_VALUE="{
+        \"ws_host\":\"wss://$FULL_HOSTNAME_ENCODED/gml/\", \
+        \"cipher_password\":\"$GUAC_TOKEN\", \
+        \"guacd_host\":\"host.local\", \
+        \"username\":\"admin$GUACADMINUSER\", \
+        \"password\":\"$GUACADMINPASS\" \
+    }"
+    JSON=$(printf "%s %s" "$JSON" "$JSON_VALUE" | json-util set guacamole2)
+
+    if [ -z "$(printf %s \"$JSON\" | json-util get vbox)" ]
+	then
+		JSON_VALUE="{ \
+			\"host\": \"http://172.18.0.1:12121\", \
+			\"token\": \"REPLACE_WITH_MEMCACHE_TOKEN\" \
+		}"
+		JSON=$(printf "%s %s" "$JSON" "$JSON_VALUE" | json-util set vbox)
+
+
 
 	if [ -z "$(printf %s \"$JSON\" | json-util get guacamole.url_prefix)" ]
 	then
@@ -361,7 +385,7 @@ docker pull guacamole/guacd &
 docker pull keijokapp/guacamole &
 wait
 
-docker pull keijokapp/phpvirtualbox &
+docker pull jazzdd/phpvirtualbox &
 wait
 
 docker pull rangeforce/i-tee:latest &
@@ -410,6 +434,46 @@ docker exec -ti i-tee rake db:migrate RAILS_ENV=production
 echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}Deleting default guacamole user ${NC}" 2>&1 | tee -a $LOGFILE
 docker exec -i mysql mysql -uguacamole -p"$GUACAMOLE_PASSWORD" <<< "update guacamole.guacamole_user set disabled='1' where username='guacadmin';"
 docker exec -i mysql mysql -uguacamole -p"$GUACAMOLE_PASSWORD" <<< "select * from guacamole.guacamole_user where username='guacadmin';"
+
+echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}Installing Guacamole-proxy ${NC}" 2>&1 | tee -a $LOGFILE
+
+mkdir /var/guacamole-proxy
+git clone git@bitbucket.org:rangeforce/guacamole-proxy.git /var/guacamole-proxy
+groupadd guacamole
+sudo useradd -U -r -d /var/guacamole-proxy guacamole
+cd /var/guacamole-proxy
+npm install --save bunyan
+npm install --save bunyan-syslog
+npm install --save guacamole-lite
+chown guacamole:guacamole /var/guacamole-proxy
+chmod 750 /var/guacamole-proxy
+
+cat > /usr/local/lib/systemd/system/guacamole-proxy.service <<EOL
+[Unit]
+Description=Guacamole Proxy server
+Requires=guacd.service
+After=guacd.service
+
+[Service]
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=guacamole
+User=guacamole
+Environment=GUAC_SECRET=$GUAC_TOKEN
+ExecStart=/usr/bin/nodejs /var/guacamole-proxy/app.js
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
+EOL
+
+systemctl daemon-reload
+systemctl enable guacamole-proxy.service
+systemctl start guacamole-proxy.service
+systemctl status guacamole-proxy.service
+
+
 
 echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}Installing VboxManager with memcache ${NC}" 2>&1 | tee -a $LOGFILE
 
