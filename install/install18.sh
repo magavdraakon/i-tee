@@ -438,7 +438,7 @@ docker exec -i mysql mysql -uguacamole -p"$GUACAMOLE_PASSWORD" <<< "select * fro
 echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}Installing Guacamole-proxy ${NC}" 2>&1 | tee -a $LOGFILE
 
 mkdir /var/guacamole-proxy
-git clone git@bitbucket.org:rangeforce/guacamole-proxy.git /var/guacamole-proxy
+git clone https://bitbucket.org/rangeforce/guacamole-proxy.git /var/guacamole-proxy
 groupadd guacamole
 sudo useradd -U -r -d /var/guacamole-proxy guacamole
 cd /var/guacamole-proxy
