@@ -49,14 +49,14 @@ mouse.onmousemove = function(mouseState) {
 // Keyboard
 var keyboard = new Guacamole.Keyboard(document);
 keyboard.onkeydown = function(keysym) {
-  if(document.activeElement==clip) {
+  if($("#menu").hasClass('open')) {
     return true;
   }
   client.sendKeyEvent(1, keysym);
   return false;
 };
 keyboard.onkeyup = function(keysym) {
-  if(document.activeElement==clip) {
+  if($("#menu").hasClass('open')) {
     return true;
   }
   client.sendKeyEvent(0, keysym);

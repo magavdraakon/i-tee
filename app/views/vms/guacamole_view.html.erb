@@ -21,7 +21,7 @@
     <li id="clipboard">
       <textarea id="clip" placeholder="Text to copy" onchange="changeClip(event)"></textarea>
       <button onclick="send2clip(event)">Copy to VM</button>
-      <textarea id="inside" placeholder="VM clipboard contents" disabled></textarea>
+      <textarea id="inside" placeholder="VM clipboard contents" readonly></textarea>
     </li>
     <li class="action" onclick="releaseControlKeys(event)">Release stuck keys</li>
     <li class="action" onclick="sendControlAltDelete(event)">Ctrl+Alt+Del</li>
