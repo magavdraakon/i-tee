@@ -82,7 +82,7 @@ ExecStartPre=/bin/sh -c "docker create \\
 	--env "VBOX_USER=vbox" \\
 	--env "VBOX_HOST=172.17.0.1" \\
 	--env "VBOX_PORT=22" \\
-	--env "ITEE_GUAC_TOKEN=$(pwgen 128 1)" \\
+	--env "ITEE_SECRET_TOKEN=$(pwgen 128 1)" \\
 	--volume /etc/i-tee/config.yaml:/etc/i-tee/config.yaml:ro \\
 	--volume /etc/i-tee/id_rsa:/root/.ssh/id_rsa:ro \\
 	--volume /etc/i-tee/known_hosts:/root/.ssh/known_hosts:ro \\
@@ -236,13 +236,13 @@ echo "45 2 * * 6 /usr/bin/certbot renew" >> /var/spool/cron/crontabs/root
 
 # Create I-Tee configuration and install MySQL database
 
-if [ -d "/opt/mysql/data" ];
-    then
-        echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}Backing up current mysql data to /opt/mysql/data.backup ${NC}" 2>&1 | tee -a $LOGFILE
-        cp -r /opt/mysql/data /opt/mysql/data.backup_$(date +%Y-%m-%d)
-	echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}Removing old mysql data ${NC}" 2>&1 | tee -a $LOGFILE
-	rm -rf /opt/mysql/data
-fi
+#if [ -d "/opt/mysql/data" ];
+#    then
+#        echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}Backing up current mysql data to /opt/mysql/data.backup ${NC}" 2>&1 | tee -a $LOGFILE
+#        cp -r /opt/mysql/data /opt/mysql/data.backup_$(date +%Y-%m-%d)
+#	echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}Removing old mysql data ${NC}" 2>&1 | tee -a $LOGFILE
+#	rm -rf /opt/mysql/data
+#fi
 
 itee_magic() {
     echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}Starting with I-Tee installation ${NC}" 2>&1 | tee -a $LOGFILE
@@ -313,25 +313,23 @@ itee_magic() {
 		\"database\": \"guacamole\" \
 	}"
 	JSON=$(printf "%s %s" "$JSON" "$JSON_VALUE" | json-util set guacamole_database)
-    
-    JSON_VALUE="{ \
-        \"ws_host\":\"wss://$FULL_HOSTNAME_ENCODED/gml/\", \
-        \"cipher_password\":\"$GUAC_TOKEN\", \
-        \"guacd_host\":\"host.local\", \
-        \"username\":\"admin$GUACADMINUSER\", \
-        \"password\":\"$GUACADMINPASS\" \
-    }"
-    JSON=$(printf "%s %s" "$JSON" "$JSON_VALUE" | json-util set guacamole2)
-
-    if [ -z "$(printf %s \"$JSON\" | json-util get vbox)" ]
+	
+	JSON_VALUE="{ \
+		\"ws_host\":\"wss://$FULL_HOSTNAME_ENCODED/gml/\", \
+		\"cipher_password\":\"$GUAC_TOKEN\", \
+		\"guacd_host\":\"host.local\", \
+		\"username\":\"admin$GUACADMINUSER\", \
+		\"password\":\"$GUACADMINPASS\" \
+	}"
+	JSON=$(printf "%s %s" "$JSON" "$JSON_VALUE" | json-util set guacamole2)
+	if [ -z "$(printf %s \"$JSON\" | json-util get vbox)" ]
 	then
 		JSON_VALUE="{ \
 			\"host\": \"http://172.18.0.1:12121\", \
 			\"token\": \"REPLACE_WITH_MEMCACHE_TOKEN\" \
 		}"
 		JSON=$(printf "%s %s" "$JSON" "$JSON_VALUE" | json-util set vbox)
-
-
+	fi
 	if [ -z "$(printf %s \"$JSON\" | json-util get guacamole.url_prefix)" ]
 	then
 		JSON_VALUE="{ \
@@ -438,7 +436,6 @@ echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}Installing Guacamole-proxy ${
 
 mkdir /var/guacamole-proxy
 git clone https://bitbucket.org/rangeforce/guacamole-proxy.git /var/guacamole-proxy
-groupadd guacamole
 sudo useradd -U -r -d /var/guacamole-proxy guacamole
 cd /var/guacamole-proxy
 npm install --save bunyan
@@ -459,6 +456,7 @@ StandardError=syslog
 SyslogIdentifier=guacamole
 User=guacamole
 Environment=GUAC_SECRET=$GUAC_TOKEN
+Environment=WEBSOCKET_PORT=6666
 ExecStart=/usr/bin/nodejs /var/guacamole-proxy/app.js
 Restart=always
 RestartSec=3
