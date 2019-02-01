@@ -36,6 +36,7 @@ class LabUser < ActiveRecord::Base
       result << {
         vm_id: vm.id,
         rdp_token: vm.rdp_token(info), # guacamole token
+        ws_host: (Rails.configuration.guacamole2["ws_host"] || false),
         nickname: vm.lab_vmt.nickname,
         state: vm.state(info),
         expose_uuid: vm.lab_vmt.expose_uuid,

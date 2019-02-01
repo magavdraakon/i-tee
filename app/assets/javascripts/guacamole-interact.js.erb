@@ -14,22 +14,23 @@ function restore_text(el, text, time){
     el.innerHTML = text;
   }, time)
 }
-// Keys to release on clipboard close
-var controlKeyCodes = [
-  0xFE03, // ISO Level 3 Shift (AltGr)
-  0xFFE1, // Left shift
-  0xFFE2, // Right shift
-  0xFFE3, // Left ctrl
-  0xFFE4, // Right ctrl
-  0xFFE5, // Caps Lock
-  0xFFE7, // Left meta
-  0xFFE8, // Right meta
-  0xFFE9, // Left alt
-  0xFFEA, // Right alt
-  0xFFEB, // Left hyper
-  0xFFEC  // Right hyper
-];
+
 function releaseControlKeys(event) {
+  // Keys to release on clipboard close
+  var controlKeyCodes = [
+    0xFE03, // ISO Level 3 Shift (AltGr)
+    0xFFE1, // Left shift
+    0xFFE2, // Right shift
+    0xFFE3, // Left ctrl
+    0xFFE4, // Right ctrl
+    0xFFE5, // Caps Lock
+    0xFFE7, // Left meta
+    0xFFE8, // Right meta
+    0xFFE9, // Left alt
+    0xFFEA, // Right alt
+    0xFFEB, // Left hyper
+    0xFFEC  // Right hyper
+  ];
   var el = event.target
   var original = set_text(el, "Releasing...")
   for(var i=0; i< controlKeyCodes.length; i++) {
