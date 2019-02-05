@@ -99,7 +99,8 @@ class Vm < ActiveRecord::Base
     info = self.vm_info(try_again) if info.blank?
     state = self.state(info, false) # get curent state
     token = false
-    if info && state=='running' # only if machine exists an is running
+    if info && state=='running' && self.lab_vmt.allow_remote && self.lab_vmt.g_type != 'none' 
+      # only if machine exists, is running, and rdp is allowed
       begin
         groupname,dummy,username = self.name.rpartition('-')
         token = Virtualbox.guacamole_token(self.rdp_port(info), username, self.password, readonly)

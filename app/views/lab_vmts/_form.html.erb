@@ -34,6 +34,10 @@
       <%= f.label :allow_remote %>
       <%= f.check_box :allow_remote %>
     </div>
+     <div class="field">
+      <%= f.label :allow_clipboard %>
+      <%= f.check_box :allow_clipboard %>
+    </div>
     <div class="field">
       <%= f.label :g_type, 'Guacamole connection' %>
       <%= f.select :g_type, options_for_select([ 'none', 'rdp', 'vnc', 'ssh' ], f.object.g_type) %>

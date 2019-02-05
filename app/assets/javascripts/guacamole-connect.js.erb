@@ -1,7 +1,8 @@
 
 var parent = document.getElementById('holder');
 var hider = document.getElementById('hider');
-
+var ws_host = parent.dataset.host;
+var token = parent.dataset.token;
 parent.onmouseenter=function(){
   document.activeElement.blur()
 }

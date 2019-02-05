@@ -90,17 +90,19 @@ function send2clip(event){
 }
 
 client.onclipboard = function(stream){
+  var inside = document.querySelector('#inside')
   // Assemble received data into a single string
   var data = [];
   stream.onblob = function(blob) {
     data.push(atob(blob));
   };
   stream.onend = function() {
-    console.log("clipboard in:", data.join(''))
-    guestClip = data.join('')
-    document.querySelector('#inside').value = guestClip
+    if (inside){ 
+      console.log("clipboard in:", data.join(''))
+      guestClip = data.join('')
+      inside.value = guestClip
+    }
   }
-
 }
 
 function pressEnter(){

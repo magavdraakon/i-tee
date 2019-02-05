@@ -7,7 +7,7 @@
 </head>
 <body>
 <div id="wrapper" class="<%= !@readonly ? 'sidebar' : '' %>">
-  <div id="holder">
+  <div id="holder" data-host="<%= @ws_host %>" data-token="<%= @token %>">
   	
   </div>
   <div id="hider">
@@ -18,11 +18,13 @@
   
   <div id="filler" onclick="toggle_menu(event, 'open');"></div>
   <ul id="menu" onclick="toggle_menu(event, 'open');">
-    <li id="clipboard">
-      <textarea id="clip" placeholder="Text to copy" onchange="changeClip(event)"></textarea>
-      <button onclick="send2clip(event)">Copy to VM</button>
-      <textarea id="inside" placeholder="VM clipboard contents" readonly></textarea>
-    </li>
+    <% if @vm.blank? || @vm.lab_vmt.allow_clipboard %>
+      <li id="clipboard">
+        <textarea id="clip" placeholder="Text to copy" onchange="changeClip(event)"></textarea>
+        <button onclick="send2clip(event)">Copy to VM</button>
+        <textarea id="inside" placeholder="VM clipboard contents" readonly></textarea>
+      </li>
+    <% end %>
     <li class="action" onclick="releaseControlKeys(event)">Release stuck keys</li>
     <li class="action" onclick="sendControlAltDelete(event)">Ctrl+Alt+Del</li>
     <li class="action">
@@ -31,10 +33,7 @@
     </li>
   </ul>
 <% end # if readonly%>
-<script type="text/javascript">
-  var token = '<%= @token %>';
-  var ws_host = '<%= @ws_host %>';
-</script>
+
 <%= javascript_include_tag "guacamole-common.min.js"  %>
 <%= javascript_include_tag "guacamole-connect.js"  %>
 <%= javascript_include_tag "guacamole-interact.js" if !@readonly  %>

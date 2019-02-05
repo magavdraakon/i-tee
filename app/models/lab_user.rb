@@ -45,6 +45,7 @@ class LabUser < ActiveRecord::Base
         guacamole_type: vm.lab_vmt.g_type,
         position: vm.lab_vmt.position,
         primary: vm.lab_vmt.primary,
+        allow_clipboard: vm.lab_vmt.allow_clipboard,
         vm_rdp: vm.get_all_rdp(info),
         connection: vm.get_connection_info(info)
       }

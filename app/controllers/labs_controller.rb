@@ -460,7 +460,7 @@ class LabsController < ApplicationController
 
   def lab_params
     params.require(:lab).permit(:id, :name, :description, :config, :short_description, :host_id, :restartable, :endable, :startAll, :vms_by_one, :poll_freq, :end_timeout, :power_timeout, :lab_hash, :lab_token, :assistant_id, :ping_low, :ping_mid, :ping_high, 
-      lab_vmts_attributes: [:id, :name, :lab_id, :vmt_id, :allow_remote, :nickname, :position, :g_type, :primary, :allow_restart, :expose_uuid, :enable_rdp, :_destroy, lab_vmt_networks_attributes: [:id, :network_id, :slot, :lab_vmt_id, :promiscuous, :reinit_mac,:ip, :_destroy]
+      lab_vmts_attributes: [:id, :name, :lab_id, :vmt_id, :allow_remote, :allow_clipboard, :nickname, :position, :g_type, :primary, :allow_restart, :expose_uuid, :enable_rdp, :_destroy, lab_vmt_networks_attributes: [:id, :network_id, :slot, :lab_vmt_id, :promiscuous, :reinit_mac,:ip, :_destroy]
         ]
       )
   end
