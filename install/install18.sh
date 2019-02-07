@@ -131,7 +131,7 @@ echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}Setting up virtualbox passwor
 VBOX_PASSWORD=$(< /dev/urandom tr -dc _A-Za-z0-9 | head -c20)
 echo "vbox:$VBOX_PASSWORD" | chpasswd
 
-GUAC_TOKEN=$(pwgen 32 1) 2>&1 | tee -a $LOGFILE
+GUAC_TOKEN=$(pwgen 32 1)
 echo "guacamole-proxy secret token: $GUAC_TOKEN" >> /root/i-tee-passwords.txt
 
 ### Install packages
@@ -211,7 +211,6 @@ fi
 systemctl stop nginx.service
 systemctl restart ferm.service
 # Configure SSL keys used by proxy
-#TODO: request letsencrypt certificate
 #set +e
 # These commands will not overwrite existing files
 #ln -s /etc/ssl/certs/ssl-cert-snakeoil.pem /etc/ssl/private/i-tee.crt
@@ -432,11 +431,21 @@ echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}Deleting default guacamole us
 docker exec -i mysql mysql -uguacamole -p"$GUACAMOLE_PASSWORD" <<< "update guacamole.guacamole_user set disabled='1' where username='guacadmin';"
 docker exec -i mysql mysql -uguacamole -p"$GUACAMOLE_PASSWORD" <<< "select * from guacamole.guacamole_user where username='guacadmin';"
 
+
+echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}Installing VboxManager with memcache ${NC}" 2>&1 | tee -a $LOGFILE
+
+cd /var/labs/
+git clone https://bitbucket.org/rangeforce/vboxmanager.git
+cd vboxmanager
+/bin/bash setup.sh
+
+
 echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}Installing Guacamole-proxy ${NC}" 2>&1 | tee -a $LOGFILE
 
-mkdir /var/guacamole-proxy
+mkdir -p /var/guacamole-proxy
 git clone https://bitbucket.org/rangeforce/guacamole-proxy.git /var/guacamole-proxy
 sudo useradd -U -r -d /var/guacamole-proxy guacamole
+chown guacamole:guacamole /var/guacamole-proxy
 cd /var/guacamole-proxy
 npm install --save bunyan
 npm install --save bunyan-syslog
@@ -470,14 +479,4 @@ systemctl enable guacamole-proxy.service
 systemctl start guacamole-proxy.service
 systemctl status guacamole-proxy.service
 
-
-
-echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}Installing VboxManager with memcache ${NC}" 2>&1 | tee -a $LOGFILE
-
-cd /var/labs/
-git clone https://bitbucket.org/rangeforce/vboxmanager.git
-cd vboxmanager 
-/bin/bash setup.sh
-
 echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${GREEN}I-Tee installed and should be availiable at https://$(hostname -f)/ ${NC}" 2>&1 | tee -a $LOGFILE
-
