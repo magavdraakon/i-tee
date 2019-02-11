@@ -235,6 +235,7 @@ class Vm < ActiveRecord::Base
 
         # set global admin user password
         begin
+          admin_extra = []
           admin_username = Rails.configuration.guacamole2["username"]
           admin_password = Rails.configuration.guacamole2["password"]
           pw_hash = Digest::SHA256.hexdigest(admin_password)
