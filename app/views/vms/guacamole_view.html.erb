@@ -25,8 +25,16 @@
         <textarea id="inside" placeholder="VM clipboard contents" readonly></textarea>
       </li>
     <% end %>
-    <li class="action" onclick="releaseControlKeys(event)">Release stuck keys</li>
-    <li class="action" onclick="sendControlAltDelete(event)">Ctrl+Alt+Del</li>
+    <li class="dropdown action" onclick="toggle_dropdown(event)">
+      <a  href="#"><span id="key_placholder">Send keys</span> <span class="caret light"></span></a>
+      <ul>
+        <% ['Ctrl+Alt+Del', 'Alt+Tab', 'Alt+F4', 'Windows' ].each do |t| %>
+          <li onclick="sendKeys(event)"><a href="#" ><span><%= t %></span></a></li>
+        <% end %>
+          <li onclick="releaseControlKeys(event)"><a href="#" ><span>Release stuck keys</span></a></li>
+      </ul>
+
+    </li>
     <li class="action">
       <%= link_to('Reset RDP', rdp_reset_path+'/'+@vm.id.to_s, data: { turbolinks: false }) if @vm %>
       <%= link_to "reset RDP", "/manage_vm/reset_rdp/#{params[:name]}" unless @vm %>

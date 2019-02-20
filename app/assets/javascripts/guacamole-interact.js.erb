@@ -15,25 +15,47 @@ function restore_text(el, text, time){
   }, time)
 }
 
+
+// Keys to release on clipboard close https://guacamole.apache.org/doc/0.8.3/guacamole-common-js/symbols/src/src_main_resources_keyboard.js.html
+var controlKeyCodes = {
+  altgr: 0xFE03, // ISO Level 3 Shift (AltGr)
+  shift: 0xFFE1, // Left shift
+  rshift: 0xFFE2, // Right shift
+  ctrl: 0xFFE3, // Left ctrl
+  rctrl: 0xFFE4, // Right ctrl
+  caps: 0xFFE5, // Caps Lock
+  meta: 0xFFE7, // Left meta
+  rmeta: 0xFFE8, // Right meta
+  alt: 0xFFE9, // Left alt
+  ralt: 0xFFEA, // Right alt
+  lhyper: 0xFFEB, // Left hyper
+  rhyper: 0xFFEC,  // Right hyper
+  del: 0xFFFF, // delete
+  backspace: 0xFF08,
+  tab: 0xFF09,
+  enter: 0xFF0D,
+  esc: 0xFF1B,
+  windows:0xFFEB,
+  f1: 0xFFBE,  
+  f2: 0xFFBF,  
+  f3: 0xFFC0, 
+  f4: 0xFFC1,
+  f5: 0xFFC2, 
+  f6: 0xFFC3, 
+  f7: 0xFFC4, 
+  f8: 0xFFC5,
+  f9: 0xFFC6,
+  f10: 0xFFC7, 
+  f11: 0xFFC8,
+  f12: 0xFFC9,
+  numlock: 0xFF7F,
+  scrlock: 0xFF14  // scroll lock
+};
+
 function releaseControlKeys(event) {
-  // Keys to release on clipboard close
-  var controlKeyCodes = [
-    0xFE03, // ISO Level 3 Shift (AltGr)
-    0xFFE1, // Left shift
-    0xFFE2, // Right shift
-    0xFFE3, // Left ctrl
-    0xFFE4, // Right ctrl
-    0xFFE5, // Caps Lock
-    0xFFE7, // Left meta
-    0xFFE8, // Right meta
-    0xFFE9, // Left alt
-    0xFFEA, // Right alt
-    0xFFEB, // Left hyper
-    0xFFEC  // Right hyper
-  ];
-  var el = event.target
-  var original = set_text(el, "Releasing...")
-  for(var i=0; i< controlKeyCodes.length; i++) {
+  var el = document.querySelector("#key_placholder")
+  var original = set_text(el, "Releasing keys")
+  for(var i in controlKeyCodes) {
     keyCode = controlKeyCodes[i]
     client.sendKeyEvent(0, keyCode);
   }
@@ -124,6 +146,24 @@ function sendControlAltDelete(event) {
 }
 //https://www.w3schools.com/jsref/jsref_charcodeat.asp
 
+
+function sendKeys(event) {
+  var el = document.querySelector("#key_placholder")
+  var original = set_text(el, "Sending keys")
+  // split original
+  var keys = event.target.textContent.split('+')
+  // iterate key down
+  keys.forEach(function(key){
+    client.sendKeyEvent(1, controlKeyCodes[key.toLowerCase()]); 
+  })
+  // iterate key up
+  keys.forEach(function(key){
+    client.sendKeyEvent(0, controlKeyCodes[key.toLowerCase()]); 
+  })
+  restore_text(el, original)
+}
+
+
 function toggle_menu(event, cl){
   event.stopPropagation();
   var menu = document.querySelector("#menu");
@@ -150,5 +190,15 @@ function toggle_menu(event, cl){
   } else {
     return false;
   }
-  
+}
+
+function toggle_dropdown(event){
+  event.preventDefault();
+  var el = event.target
+  // get the parent li
+  while ((el.getAttribute('class')||'').indexOf('dropdown')<0) {
+    el = el.parentNode
+  }
+ // console.log(el, $(el).find('ul'))
+  $(el).toggleClass( "open" )
 }

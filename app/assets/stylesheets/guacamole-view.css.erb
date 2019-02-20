@@ -142,3 +142,38 @@ a {
     font-size: 14px;
     padding: 6px 12px;
 }
+
+.caret {
+  border: solid black;
+  border-width: 0 2px 2px 0;
+  display: inline-block;
+  padding: 2px;
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+  vertical-align: middle;
+}
+.caret.light {
+  border-color: white;
+}
+
+.dropdown ul {
+  display: none;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  background: #111;
+}
+.dropdown.open ul {
+  display: block;
+}
+.dropdown li {
+  padding: 0!important;
+  margin: 0!important;
+}
+.dropdown li:hover {
+  background: #222;
+}
+.dropdown ul span {
+  display: block;
+  padding:10px;
+}
