@@ -423,8 +423,9 @@ echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}Creating vboxnet0 netowork${N
 vboxmanage hostonlyif create
 vboxmanage hostonlyif ipconfig vboxnet0 --ip 172.18.0.1
 
-while [ $(docker inspect -f {{.State.Running}} mysql | grep -c “true”) -eq 1 ]; do
-	sleep 5
+while [ $(docker inspect -f {{.State.Running}} mysql) != "true" ]; do
+	echo "Waiting for MySQL..."
+	sleep 2
 done
 
 # Filling I-Tee database
