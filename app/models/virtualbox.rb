@@ -532,17 +532,12 @@ class Virtualbox < ActiveRecord::Base
 		vm
 	end
 
-	def self.get_all_rdp(user, port)
-		[
-			{os: ['Windows'], program: '', rdpline: Virtualbox.remote('win', port, user) },
-			{os: ['Linux', 'UNIX'], program: 'xfreerdp', rdpline: Virtualbox.remote('xfreerdp', port, user) },
-			{os: ['Linux', 'UNIX'], program: 'rdesktop', rdpline: Virtualbox.remote('rdesktop', port, user) },
-			{os: ['MacOS'], program: '', rdpline: Virtualbox.remote('mac', port, user) }
-		]
-	end
-	# connection informations
-	def self.remote(typ, port, user, admin=false)
-		add = ( admin ? '-admin' : '')
+	# connection information
+	def self.remote(typ, port, username=nil, password=nil)
+		username = Rails.configuration.guacamole2["username"] unless username
+		password = Rails.configuration.guacamole2["password"] unless password
+		raise "No username or password given" unless username && password
+
 		begin
 			rdp_host = ITee::Application.config.rdp_host
 		rescue
@@ -551,16 +546,16 @@ class Virtualbox < ActiveRecord::Base
 
 		case typ
 			when 'win'
-				desc = "cmdkey /generic:#{rdp_host} /user:localhost&#92;#{user.username}#{add} /pass:#{user.rdp_password}&amp;&amp;"
+				desc = "cmdkey /generic:#{rdp_host} /user:localhost&#92;#{username} /pass:#{password}&amp;&amp;"
 				desc += "mstsc.exe /v:#{rdp_host}:#{port} /f"
 			when 'rdesktop'
-				desc ="rdesktop  -u#{user.username}#{add} -p#{user.rdp_password} -N -a16 #{rdp_host}:#{port}"
+				desc ="rdesktop  -u#{username} -p#{password} -N -a16 #{rdp_host}:#{port}"
 			when 'xfreerdp'
-				desc ="xfreerdp  --plugin cliprdr -g 90% -u #{user.username}#{add} -p #{user.rdp_password} #{rdp_host}:#{port}"
+				desc ="xfreerdp  --plugin cliprdr -g 90% -u #{username} -p #{password} #{rdp_host}:#{port}"
 			when 'mac'
-				desc ="open rdp://#{user.username}#{add}:#{user.rdp_password}@#{rdp_host}:#{port}"
+				desc ="open rdp://#{username}:#{password}@#{rdp_host}:#{port}"
 			else
-				desc ="rdesktop  -u#{user.username}#{add} -p#{user.rdp_password} -N -a16 #{rdp_host}:#{port}"
+				desc ="rdesktop  -u#{username} -p#{password} -N -a16 #{rdp_host}:#{port}"
 		end
 
 	end

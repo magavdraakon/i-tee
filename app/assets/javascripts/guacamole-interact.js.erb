@@ -58,6 +58,7 @@ function releaseControlKeys(event) {
   for(var i in controlKeyCodes) {
     keyCode = controlKeyCodes[i]
     client.sendKeyEvent(0, keyCode);
+    client.sendKeyEvent(0, keyCode);
   }
   restore_text(el, original)    
 }
