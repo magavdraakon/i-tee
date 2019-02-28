@@ -395,10 +395,11 @@ echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}Working with services ${NC}" 
 sysctl --system
 
 systemctl daemon-reload  2>&1 | tee -a $LOGFILE
+systemctl restart docker.service 2>&1 | tee -a $LOGFILE
 systemctl enable ferm phpvirtualbox ldap-tunnel mysql nginx guacamole i-tee netdata vboxweb-service  2>&1 | tee -a $LOGFILE
 systemctl restart ferm  2>&1 | tee -a $LOGFILE
 systemctl restart phpvirtualbox ldap-tunnel mysql nginx guacamole i-tee netdata vboxweb-service  2>&1 | tee -a $LOGFILE
-
+systemctl restart docker.service
 echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${GREEN}Services enabled and started ${NC}" 2>&1 | tee -a $LOGFILE
 
 echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}Currently running containers: ${NC}\n" 2>&1 | tee -a $LOGFILE
@@ -421,6 +422,10 @@ fi
 echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}Creating vboxnet0 netowork${NC}" 2>&1 | tee -a $LOGFILE
 vboxmanage hostonlyif create
 vboxmanage hostonlyif ipconfig vboxnet0 --ip 172.18.0.1
+
+while [ $(docker inspect -f {{.State.Running}} mysql | grep -c “true”) -eq 1 ]; do
+	sleep 5
+done
 
 # Filling I-Tee database
 echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}FIlling I-Tee database ${NC}" 2>&1 | tee -a $LOGFILE
