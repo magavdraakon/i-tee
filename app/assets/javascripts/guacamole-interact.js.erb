@@ -153,6 +153,7 @@ function sendKeys(event) {
   var original = set_text(el, "Sending keys")
   // split original
   var keys = event.target.textContent.split('+')
+  console.log("sending keys", keys)
   // iterate key down
   keys.forEach(function(key){
     client.sendKeyEvent(1, controlKeyCodes[key.toLowerCase()]); 

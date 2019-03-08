@@ -236,6 +236,14 @@ class Virtualbox < ActiveRecord::Base
 		logger.info "RESET RDP END: #{result}"
 		result
 	end
+	# run guestcontrol sun --exe command as user
+	def self.gc_run(vm, user='', pass='', cmd={}, sync=false)
+		logger.info "GC RUN CALLED: vm=#{vm}"
+		result = Virtualbox.put_request('/vms/gc/run.json', {name: vm, username:user, password:pass, cmd:cmd, sync: sync}, true)
+		logger.info "GC RUN END: #{result}"
+		result
+	end
+
 
 	def self.take_snapshot(vm, sync=false)
 		logger.info "SNAPSHOT CALLED: vm=#{vm}"
@@ -248,33 +256,35 @@ class Virtualbox < ActiveRecord::Base
 
 	### HTTP
 
-	def self.get_request(path, params)
-		Virtualbox.request_json :get, path, params
+	def self.get_request(path, params, all=false)
+		Virtualbox.request_json :get, path, params, all
 	end
 
-	def self.post_request(path, params)
-		Virtualbox.request_json :post, path, params
+	def self.post_request(path, params, all=false)
+		Virtualbox.request_json :post, path, params, all
 	end
 
-	def self.put_request(path, params)
-		Virtualbox.request_json :put, path, params
+	def self.put_request(path, params, all=false)
+		Virtualbox.request_json :put, path, params, all
 	end
 
-	def self.delete_request(path, params)
-		Virtualbox.request_json :delete, path, params
+	def self.delete_request(path, params, all=false)
+		Virtualbox.request_json :delete, path, params, all
 	end
 
 	# manage the result, raise error when request not HTTP OK
-	def self.request_json(method, path, params)
+	def self.request_json(method, path, params, all=false)
 		response = Virtualbox.request(method, path, params)
 		# check response code
+		body = JSON.parse(response.body)
 		if response.is_a?(Net::HTTPSuccess)
-			body = JSON.parse(response.body)
+			return body if all
 			return body['data'] if body.is_a?(Hash) # data contains result
 			return body if body.is_a?(Array) # public methods (vm lists) return arrays
 		else # some other http return code
+			logger.warn "REQUEST ERROR"
 			logger.warn response.body
-			body = JSON.parse(response.body)
+			return body if all && body
 			raise body['data'] # data contains error message
 		end
 		rescue JSON::ParserError

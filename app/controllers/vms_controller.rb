@@ -10,7 +10,7 @@ class VmsController < ApplicationController
   before_action :admin_tab, :except=>[:show,:index, :vms_by_lab, :vms_by_state]
   before_action :vm_tab, :only=>[:show,:index, :vms_by_lab, :vms_by_state]
 
-  skip_before_action :authenticate_user!, :only => [:network]
+  skip_before_action :authenticate_user!, :only => [:network, :guestcontrol]
   
   def vms_by_lab
     @b_by='lab'
@@ -516,10 +516,12 @@ end
       if @labuser
         vm = @labuser.vms.where(:name=> params[:name]).first
         if vm 
-          params[:network] = '' if params[:network].blank?          
-          result = vm.manage_network(request.method, params[:network])
-          format.html { redirect_to root_path, :notice=> 'Sorry, this machine does not belong to you!' }
-          format.json { render json: result }
+          format.html { redirect_to root_path, :notice=> 'Invalid endpoint!' }
+          format.json { 
+            params[:network] = '' if params[:network].blank?          
+            result = vm.manage_network(request.method, params[:network])
+            render json: result 
+          }
         else
           format.html { redirect_to root_path , :notice=> 'Sorry, this machine does not belong to you!' }
           format.json { render :json=> {:success => false , :message=>  'Sorry, this machine does not belong to you!'} }
@@ -527,6 +529,38 @@ end
       else
         format.html { redirect_to root_path , :notice=> 'Restricted access' }
         format.json { render :json=> {:success => false , :message=>  'Unable to find lab attempt'} }
+      end
+    end
+  end
+
+  def guestcontrol
+    # identify labuser by uuid. get machine and perform action
+    # params: uuid, name, network : {slot, type, name}
+    respond_to do |format|
+      begin
+        @labuser = LabUser.where(:uuid=>  params[:uuid]).first
+        if @labuser
+          vm = @labuser.vms.where(:name=> params[:name]).first
+          if vm
+            user = params[:username] if params[:username]
+            pass = params[:password] if params[:password]
+            # TODO: credentials from config?
+            result = Virtualbox.gc_run(vm.name, user, pass, params[:cmd])
+            
+            response.status = result[:status] if result[:status]
+            format.html { render plain: result['data'] }
+            format.json { render json: result  }
+          else
+            format.html { render plain: 'Sorry, this machine does not belong to you!' }
+            format.json { render :json=> {:success => false , :message=>  'Sorry, this machine does not belong to you!'} }
+          end
+        else
+          format.html { render plain: 'Unable to find lab attempt' }
+          format.json { render :json=> {:success => false , :message=>  'Unable to find lab attempt'} }
+        end
+      rescue Exception => e 
+        format.html  { render plain: e  }
+        format.json  { render :json => {:success=>false, :message=> e.to_s } }
       end
     end
   end

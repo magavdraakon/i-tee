@@ -72,6 +72,7 @@ Rails.application.routes.draw do
 
   resources :vms
   match 'vm_network', :to=>"vms#network", via: [:get, :post, :delete]
+  match 'guestcontrol', :to=>"vms#guestcontrol", via: [:post]
 
   resources :materials
   
