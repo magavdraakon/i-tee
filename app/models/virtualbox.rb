@@ -236,6 +236,14 @@ class Virtualbox < ActiveRecord::Base
 		logger.info "RESET RDP END: #{result}"
 		result
 	end
+	# run guestcontrol sun --exe command as user
+	def self.gc_run(vm, user='', pass='', cmd={}, sync=false)
+		logger.info "GC RUN CALLED: vm=#{vm}"
+		result = Virtualbox.put_request('/vms/gc/run.json', {name: vm, username:user, password:pass, cmd:cmd, sync: sync}, true)
+		logger.info "GC RUN END: #{result}"
+		result
+	end
+
 
 	def self.take_snapshot(vm, sync=false)
 		logger.info "SNAPSHOT CALLED: vm=#{vm}"
@@ -248,33 +256,35 @@ class Virtualbox < ActiveRecord::Base
 
 	### HTTP
 
-	def self.get_request(path, params)
-		Virtualbox.request_json :get, path, params
+	def self.get_request(path, params, all=false)
+		Virtualbox.request_json :get, path, params, all
 	end
 
-	def self.post_request(path, params)
-		Virtualbox.request_json :post, path, params
+	def self.post_request(path, params, all=false)
+		Virtualbox.request_json :post, path, params, all
 	end
 
-	def self.put_request(path, params)
-		Virtualbox.request_json :put, path, params
+	def self.put_request(path, params, all=false)
+		Virtualbox.request_json :put, path, params, all
 	end
 
-	def self.delete_request(path, params)
-		Virtualbox.request_json :delete, path, params
+	def self.delete_request(path, params, all=false)
+		Virtualbox.request_json :delete, path, params, all
 	end
 
 	# manage the result, raise error when request not HTTP OK
-	def self.request_json(method, path, params)
+	def self.request_json(method, path, params, all=false)
 		response = Virtualbox.request(method, path, params)
 		# check response code
+		body = JSON.parse(response.body)
 		if response.is_a?(Net::HTTPSuccess)
-			body = JSON.parse(response.body)
+			return body if all
 			return body['data'] if body.is_a?(Hash) # data contains result
 			return body if body.is_a?(Array) # public methods (vm lists) return arrays
 		else # some other http return code
+			logger.warn "REQUEST ERROR"
 			logger.warn response.body
-			body = JSON.parse(response.body)
+			return body if all && body
 			raise body['data'] # data contains error message
 		end
 		rescue JSON::ParserError
@@ -324,6 +334,81 @@ class Virtualbox < ActiveRecord::Base
 			logger.error "HOST Exception: #{Rails.configuration.vbox['host']} - #{e}"
 			raise "Unknown error while connecting to host"
 	end
+
+
+# set global admin credentials to machines, 
+	# only set admin for machines not in db if only_others is true to save time as machine start sets the global admin already
+	# 
+	def self.set_admin(only_others=false)
+		logger.info "SET ADMIN CALLED"
+		username = Rails.configuration.guacamole2["username"]
+		password = Rails.configuration.guacamole2["password"]
+		raise "No username or password given, check the configuration!" unless username && password
+
+		hash = Digest::SHA256.hexdigest(password)
+    Virtualbox.all_machines.each do |vm|
+      begin
+      	if only_others && Vm.where(name: vm).first
+      		logger.debug "SET ADMIN: skipping #{vm} as it is in database and probably has the password already"
+      		next
+      	end
+        Virtualbox.set_extra_data(vm, "VBoxAuthSimple/users/#{username}", hash);
+        logger.debug "SET ADMIN: successfully set global admin for #{vm}"
+      rescue Exception => e
+        logger.error "SET ADMIN: Failed to set RDP password for machine #{vm}: #{e.message}"
+      end
+    end
+    logger.info "SET ADMIN END"
+	end
+
+	# get token for machine by name
+	def self.open_rdp(vm, user, readonly=false)
+		machine = Virtualbox.vm_info(vm)
+		if user.is_admin?
+			return Virtualbox.guacamole_token(machine['vrdeport'].to_i, nil, nil, readonly)
+		else
+			raise 'Permission denied'
+		end
+	end
+
+	# generate guacamole token based on port, username and password
+	def self.guacamole_token(port, username=nil, password=nil, readonly=false)
+		username = Rails.configuration.guacamole2["username"] unless username
+		password = Rails.configuration.guacamole2["password"] unless password
+		raise "No username or password given" unless username && password
+		data = {
+      "connection": {
+        "type": "rdp", 
+        "settings": { 
+          "hostname": Rails.configuration.guacamole2["guacd_host"], 
+          "username": username, 
+          "password": password, 
+          "port": port, 
+          "clipboard-encoding": "UTF-8"
+        } 
+      } 
+    }
+    unless readonly
+      data[:connection][:settings][:"resize-method"] = "display-update"
+    else
+      data[:connection][:settings][:"read-only"] = true
+    end
+    iv = SecureRandom.random_bytes(16)
+    cipher = OpenSSL::Cipher.new('AES-256-CBC')
+    cipher.encrypt  # set cipher to be encryption mode
+    cipher.key = Rails.configuration.guacamole2["cipher_password"]
+    cipher.iv  = iv
+    encrypted = ''
+    encrypted << cipher.update(data.to_json)
+    encrypted << cipher.final
+    value = {
+      iv:  Base64.encode64(iv),
+      value: Base64.encode64(encrypted)
+    }
+    token = Base64.encode64(value.to_json).gsub(/\n/, '')
+    token
+	end
+
 
 
  #### OLD METHODS some are still needed afterwards
@@ -457,17 +542,12 @@ class Virtualbox < ActiveRecord::Base
 		vm
 	end
 
-	def self.get_all_rdp(user, port)
-		[
-			{os: ['Windows'], program: '', rdpline: Virtualbox.remote('win', port, user) },
-			{os: ['Linux', 'UNIX'], program: 'xfreerdp', rdpline: Virtualbox.remote('xfreerdp', port, user) },
-			{os: ['Linux', 'UNIX'], program: 'rdesktop', rdpline: Virtualbox.remote('rdesktop', port, user) },
-			{os: ['MacOS'], program: '', rdpline: Virtualbox.remote('mac', port, user) }
-		]
-	end
-	# connection informations
-	def self.remote(typ, port, user, admin=false)
-		add = ( admin ? '-admin' : '')
+	# connection information
+	def self.remote(typ, port, username=nil, password=nil)
+		username = Rails.configuration.guacamole2["username"] unless username
+		password = Rails.configuration.guacamole2["password"] unless password
+		raise "No username or password given" unless username && password
+
 		begin
 			rdp_host = ITee::Application.config.rdp_host
 		rescue
@@ -476,16 +556,16 @@ class Virtualbox < ActiveRecord::Base
 
 		case typ
 			when 'win'
-				desc = "cmdkey /generic:#{rdp_host} /user:localhost&#92;#{user.username}#{add} /pass:#{user.rdp_password}&amp;&amp;"
+				desc = "cmdkey /generic:#{rdp_host} /user:localhost&#92;#{username} /pass:#{password}&amp;&amp;"
 				desc += "mstsc.exe /v:#{rdp_host}:#{port} /f"
 			when 'rdesktop'
-				desc ="rdesktop  -u#{user.username}#{add} -p#{user.rdp_password} -N -a16 #{rdp_host}:#{port}"
+				desc ="rdesktop  -u#{username} -p#{password} -N -a16 #{rdp_host}:#{port}"
 			when 'xfreerdp'
-				desc ="xfreerdp  --plugin cliprdr -g 90% -u #{user.username}#{add} -p #{user.rdp_password} #{rdp_host}:#{port}"
+				desc ="xfreerdp  --plugin cliprdr -g 90% -u #{username} -p #{password} #{rdp_host}:#{port}"
 			when 'mac'
-				desc ="open rdp://#{user.username}#{add}:#{user.rdp_password}@#{rdp_host}:#{port}"
+				desc ="open rdp://#{username}:#{password}@#{rdp_host}:#{port}"
 			else
-				desc ="rdesktop  -u#{user.username}#{add} -p#{user.rdp_password} -N -a16 #{rdp_host}:#{port}"
+				desc ="rdesktop  -u#{username} -p#{password} -N -a16 #{rdp_host}:#{port}"
 		end
 
 	end
@@ -594,6 +674,9 @@ class Virtualbox < ActiveRecord::Base
 			{success: false, message: 'please start this virtual machine before trying to establish a connection'}
 		end
 	end
+
+
+
 
 	# NOT IN USE?
 	def self.state(vm)

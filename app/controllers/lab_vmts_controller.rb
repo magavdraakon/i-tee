@@ -84,6 +84,6 @@ class LabVmtsController < ApplicationController
   end
 
   def lab_vmt_params
-    params.require(:lab_vmt).permit(:id, :name, :lab_id, :vmt_id, :allow_remote, :nickname, :position, :g_type, :primary, :allow_restart, :expose_uuid, :enable_rdp)
+    params.require(:lab_vmt).permit(:id, :name, :lab_id, :vmt_id, :allow_remote, :allow_clipboard, :nickname, :position, :g_type, :primary, :allow_restart, :expose_uuid, :enable_rdp)
   end
 end

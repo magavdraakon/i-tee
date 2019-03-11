@@ -32,13 +32,15 @@
         <td><%= vm['VRDEActiveConnection'] if vm['VRDEActiveConnection'] %></td>
         <td>
         	<% if vm['VMState']=='running' %>
-                <%= link_to "Open in browser", "virtualbox_guacamole/#{vm['name']}", target: '_blank' %>
+                <%= link_to "Open in browser", "virtualbox_rdp/#{vm['name']}", target: '_blank' %> | 
+                <%= link_to "Open read only", "virtualbox_readonly/#{vm['name']}", target: '_blank' %>
+
                 <div class="remote_connections">
                     <span onclick="toggleOtherOsButtons(this)" class="showtoggle">&lt; more</span>
-                    <span class="button win-button Windows" onclick="show_remote(this, '<strong><%=Virtualbox.remote('win', vm['vrdeport'], current_user, true)%></strong>')">Windows</span>
-                    <span class="button mac-button MacOS" onclick="show_remote(this, '<strong><%=Virtualbox.remote('mac',vm['vrdeport'], current_user, true)%></strong>')">Mac</span>
-                    <span class="button rdesktop-button Linux UNIX" onclick="show_remote(this, '<strong><%=Virtualbox.remote('rdesktop',vm['vrdeport'], current_user, true)%></strong>')">Linux (rdesktop)</span>
-                    <span class="button xfreerdp-button Linux UNIX" onclick="show_remote(this, '<strong><%=Virtualbox.remote('xfreerdp',vm['vrdeport'], current_user, true)%></strong>')">Linux (xfreerdp)</span>
+                    <span class="button win-button Windows" onclick="show_remote(this, '<strong><%=Virtualbox.remote('win', vm['vrdeport'])%></strong>')">Windows</span>
+                    <span class="button mac-button MacOS" onclick="show_remote(this, '<strong><%=Virtualbox.remote('mac',vm['vrdeport'])%></strong>')">Mac</span>
+                    <span class="button rdesktop-button Linux UNIX" onclick="show_remote(this, '<strong><%=Virtualbox.remote('rdesktop',vm['vrdeport'])%></strong>')">Linux (rdesktop)</span>
+                    <span class="button xfreerdp-button Linux UNIX" onclick="show_remote(this, '<strong><%=Virtualbox.remote('xfreerdp',vm['vrdeport'])%></strong>')">Linux (xfreerdp)</span>
 
                   <div escape="false" class="remote copyMe">
                     <div class="parentheight hidden"><div class="helptext ">Click to copy</div></div>

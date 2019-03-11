@@ -93,6 +93,26 @@ class Vm < ActiveRecord::Base
     rdp_port
   end
 
+  def rdp_token(info=nil, readonly=false, try_again = true)
+    loginfo = self.log_info.to_s
+    logger.debug "VM RDP TOKEN CALLED: #{loginfo}"
+    info = self.vm_info(try_again) if info.blank?
+    state = self.state(info, false) # get curent state
+    token = false
+    if info && state=='running' && self.lab_vmt.allow_remote && self.lab_vmt.g_type != 'none' 
+      # only if machine exists, is running, and rdp is allowed
+      begin
+        groupname,dummy,username = self.name.rpartition('-')
+        token = Virtualbox.guacamole_token(self.rdp_port(info), username, self.password, readonly)
+      rescue Exception => e
+        logger.error e
+        logger.info e.backtrace.join("\n")
+      end
+    end
+    logger.debug "VM RDP TOKEN: #{token} #{loginfo}"
+    token
+  end
+
 # check if vbox knows this vm, stop if needed, but always delete
   def delete_vm
     loginfo = self.log_info.to_s
@@ -137,6 +157,9 @@ class Vm < ActiveRecord::Base
     end    
   end
 
+  def nickname 
+    self.lab_vmt.nickname
+  end
   def start_vm(info=nil)
     loginfo = self.log_info.to_s
     logger.info "START_VM CALLED: #{loginfo}"
@@ -210,19 +233,16 @@ class Vm < ActiveRecord::Base
           Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSKU", "System SKU")
         end
 
-        # set all admin user passwords
+        # set global admin user password
         begin
           admin_extra = []
-          users = User.where(role: 2) # admin
-          users.each do |user|
-            logger.debug "START_VM: setting #{user.username}-admin password #{loginfo}"
-            pw_hash = Digest::SHA256.hexdigest(user.rdp_password)
-            admin_extra << {key: "VBoxAuthSimple/users/#{user.username}-admin", value: pw_hash}
-          end
-          # bulk setting
+          admin_username = Rails.configuration.guacamole2["username"]
+          admin_password = Rails.configuration.guacamole2["password"]
+          pw_hash = Digest::SHA256.hexdigest(admin_password)
+          admin_extra << {key: "VBoxAuthSimple/users/#{admin_username}", value: pw_hash}
           Virtualbox.set_extra(name, admin_extra) unless admin_extra.empty?
         rescue Exception => e
-          logger.error "START_VM: Failed to set RDP password #{loginfo}: #{e.message}"
+          logger.error "START_VM: Failed to set global RDP password #{loginfo}: #{e.message}"
         end
 
         logger.debug "START_VM: Starting machine #{loginfo}"

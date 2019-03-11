@@ -22,6 +22,11 @@ Rails.application.routes.draw do
   match 'vm_details/:name', :to=>'virtualbox#vm_details', via: [:get, :post]
   match 'virtualbox_guacamole/:name', :to=>'virtualbox#open_guacamole', via:[:get]
 
+  match 'virtualbox_rdp/:name', :to=>'virtualbox#rdp_connection', via:[:get]  
+  match 'virtualbox_readonly/:name', :to=>'virtualbox#readonly_connection', via:[:get]
+  match 'rdp_admin', :to=>'virtualbox#rdp_admin', via:[:post]
+
+
   match 'jobs',:to=> 'home#jobs', via: [:get, :post]
   match 'jobs/:id', :to=>'home#delete_job', via: [:delete]
   match 'jobs/:id', :to=>'home#run_job', via: [:put]
@@ -67,6 +72,7 @@ Rails.application.routes.draw do
 
   resources :vms
   match 'vm_network', :to=>"vms#network", via: [:get, :post, :delete]
+  match 'guestcontrol', :to=>"vms#guestcontrol", via: [:post]
 
   resources :materials
   
@@ -111,6 +117,10 @@ Rails.application.routes.draw do
   match 'rdp_of', :to=> 'vms#get_rdp', via: [:get, :post]
   match 'rdp_reset', :to=> 'vms#rdp_reset', via: [:get, :post]
   
+  # guacamole
+  match 'vm/:id/rdp', :to=>'vms#guacamole_view', via: [:get]
+  match 'vm/:id/readonly', :to=>'vms#readonly_view', via: [:get]
+
     #no id
   match 'start_all', :to=> 'vms#start_all', via: [:get, :post]
   match 'stop_all', :to=> 'vms#stop_all', via: [:get, :post]

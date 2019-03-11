@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <%= favicon_link_tag 'iteelogo.png' %>
+	<title><%= @vm ? @vm.nickname : params[:name]%></title>
+  <%= stylesheet_link_tag 'guacamole-view' %>
+</head>
+<body>
+<div id="wrapper" class="<%= !@readonly ? 'sidebar' : '' %>">
+  <div id="holder" data-host="<%= @ws_host %>" data-token="<%= @token %>">
+  	
+  </div>
+  <div id="hider">
+    
+  </div>
+</div>
+<% if !@readonly %>
+  
+  <div id="filler" onclick="toggle_menu(event, 'open');"></div>
+  <ul id="menu" onclick="toggle_menu(event, 'open');">
+    <% if @vm.blank? || @vm.lab_vmt.allow_clipboard %>
+      <li id="clipboard">
+        <textarea id="clip" placeholder="Text to copy" onchange="changeClip(event)"></textarea>
+        <button onclick="send2clip(event)">Copy to VM</button>
+        <textarea id="inside" placeholder="VM clipboard contents" readonly></textarea>
+      </li>
+    <% end %>
+    <li class="dropdown action" onclick="toggle_dropdown(event)">
+      <a  href="#"><span id="key_placholder">Send keys</span> <span class="caret light"></span></a>
+      <ul>
+        <% ['Ctrl+Alt+Del', 'Alt+Tab', 'Alt+F4', 'Windows' ].each do |t| %>
+          <li onclick="sendKeys(event)"><a href="#" ><span><%= t %></span></a></li>
+        <% end %>
+          <li onclick="releaseControlKeys(event)"><a href="#" ><span>Release stuck keys</span></a></li>
+      </ul>
+
+    </li>
+    <li class="action">
+      <%= link_to('Reset RDP', rdp_reset_path+'/'+@vm.id.to_s, data: { turbolinks: false }) if @vm %>
+      <%= link_to "reset RDP", "/manage_vm/reset_rdp/#{params[:name]}" unless @vm %>
+    </li>
+  </ul>
+<% end # if readonly%>
+
+<%= javascript_include_tag "guacamole-common.min.js"  %>
+<%= javascript_include_tag "guacamole-connect.js"  %>
+<%= javascript_include_tag "guacamole-interact.js" if !@readonly  %>
+
+</body>
+</html>

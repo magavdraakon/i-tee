@@ -116,6 +116,55 @@ class VirtualboxController < ApplicationController
 	    end
 	end
 
+	# open guacamole-lite
+	def rdp_connection
+		respond_to do |format|
+			begin
+				@readonly = false
+	      @token = Virtualbox.open_rdp(params[:name], current_user, @readonly)
+	      @ws_host = Rails.configuration.guacamole2["ws_host"]
+	      format.html{
+	        render 'vms/guacamole_view', layout: false
+	      }
+	    rescue Exception => e
+	    	format.html{
+	    		flash[:alert] = e.message
+	        redirect_to virtualization_path
+	      }
+	    end
+    end
+	end
+	# open guacamole-lit readonly (no mouse & keyboard)
+	def readonly_connection
+		respond_to do |format|
+			begin
+				@readonly = true
+	      @token = Virtualbox.open_rdp(params[:name], current_user, @readonly)
+	      @ws_host = Rails.configuration.guacamole2["ws_host"]
+	      format.html{
+	        render 'vms/guacamole_view', layout: false
+	      }
+      rescue Exception => e
+	    	format.html{
+	    		flash[:alert] = e.message
+	        redirect_to virtualization_path
+	      }
+	    end
+    end
+	end
+
+	def rdp_admin
+		respond_to do |format|
+			Virtualbox.set_admin(!params[:global].blank?)
+      format.html{
+        redirect_back fallback_location: virtualization_path
+      }
+    end
+	end
+
+
+
+
 private
 	def set_user
 		if params[:username] && @admin # admin may remove others passwords

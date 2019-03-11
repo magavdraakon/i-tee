@@ -1,0 +1,206 @@
+//= require jquery
+//= require jquery_ujs
+
+// return original text while changing the text
+function set_text(el,text){
+  var original = el.innerHTML
+  el.innerHTML = text
+  return original;
+}
+// set element text to text after time
+function restore_text(el, text, time){
+  time = typeof(time) == 'undefined' ? 500 : time;
+  setTimeout(function(){
+    el.innerHTML = text;
+  }, time)
+}
+
+
+// Keys to release on clipboard close https://guacamole.apache.org/doc/0.8.3/guacamole-common-js/symbols/src/src_main_resources_keyboard.js.html
+var controlKeyCodes = {
+  altgr: 0xFE03, // ISO Level 3 Shift (AltGr)
+  shift: 0xFFE1, // Left shift
+  rshift: 0xFFE2, // Right shift
+  ctrl: 0xFFE3, // Left ctrl
+  rctrl: 0xFFE4, // Right ctrl
+  caps: 0xFFE5, // Caps Lock
+  meta: 0xFFE7, // Left meta
+  rmeta: 0xFFE8, // Right meta
+  alt: 0xFFE9, // Left alt
+  ralt: 0xFFEA, // Right alt
+  lhyper: 0xFFEB, // Left hyper
+  rhyper: 0xFFEC,  // Right hyper
+  del: 0xFFFF, // delete
+  backspace: 0xFF08,
+  tab: 0xFF09,
+  enter: 0xFF0D,
+  esc: 0xFF1B,
+  windows:0xFFEB,
+  f1: 0xFFBE,  
+  f2: 0xFFBF,  
+  f3: 0xFFC0, 
+  f4: 0xFFC1,
+  f5: 0xFFC2, 
+  f6: 0xFFC3, 
+  f7: 0xFFC4, 
+  f8: 0xFFC5,
+  f9: 0xFFC6,
+  f10: 0xFFC7, 
+  f11: 0xFFC8,
+  f12: 0xFFC9,
+  numlock: 0xFF7F,
+  scrlock: 0xFF14  // scroll lock
+};
+
+function releaseControlKeys(event) {
+  var el = document.querySelector("#key_placholder")
+  var original = set_text(el, "Releasing keys")
+  for(var i in controlKeyCodes) {
+    keyCode = controlKeyCodes[i]
+    client.sendKeyEvent(0, keyCode);
+    client.sendKeyEvent(0, keyCode);
+  }
+  restore_text(el, original)    
+}
+// Mouse
+var mouse = new Guacamole.Mouse(client.getDisplay().getElement());
+mouse.onmousedown = 
+mouse.onmouseup   =
+mouse.onmousemove = function(mouseState) {
+  client.sendMouseState(mouseState);
+};
+
+// Keyboard
+var keyboard = new Guacamole.Keyboard(document);
+keyboard.onkeydown = function(keysym) {
+  if($("#menu").hasClass('open')) {
+    return true;
+  }
+  client.sendKeyEvent(1, keysym);
+  return false;
+};
+keyboard.onkeyup = function(keysym) {
+  if($("#menu").hasClass('open')) {
+    return true;
+  }
+  client.sendKeyEvent(0, keysym);
+  return false;
+};
+
+var guestClip = ''
+var userClip = ''
+
+function changeClip(event){
+  event.stopPropagation()
+  userClip = event.target.value
+}
+function take2clip(event){
+  var el = event.target
+  var original = set_text(el, "Importing")
+
+  clip.value=guestClip;
+  restore_text(el, original)
+}
+
+function send2clip(event){
+  var el = event.target
+  var original = set_text(el, "Copying")
+  var clipStream = client.createClipboardStream('text/plain')
+  console.log('sending to clipboard')
+  clipStream.sendBlob(btoa(userClip));
+  clipStream.sendEnd();
+  restore_text(el, original)
+}
+
+client.onclipboard = function(stream){
+  var inside = document.querySelector('#inside')
+  // Assemble received data into a single string
+  var data = [];
+  stream.onblob = function(blob) {
+    data.push(atob(blob));
+  };
+  stream.onend = function() {
+    if (inside){ 
+      console.log("clipboard in:", data.join(''))
+      guestClip = data.join('')
+      inside.value = guestClip
+    }
+  }
+}
+
+function pressEnter(){
+	client.sendKeyEvent(1, 0xFF0D);
+	client.sendKeyEvent(0, 0xFF0D)
+}
+
+function sendControlAltDelete(event) {
+  var el = event.target
+  var original = set_text(el, "Sending...")
+  client.sendKeyEvent(1, 0xffe3); // control
+  client.sendKeyEvent(1, 0xffe9); // alt
+  client.sendKeyEvent(1, 0xffff); // delete
+  // releasing them in reverse order does not seem to work as well
+  client.sendKeyEvent(0, 0xffe3); // control
+  client.sendKeyEvent(0, 0xffe9); // alt
+  client.sendKeyEvent(0, 0xffff); // delete
+  restore_text(el, original)
+}
+//https://www.w3schools.com/jsref/jsref_charcodeat.asp
+
+
+function sendKeys(event) {
+  var el = document.querySelector("#key_placholder")
+  var original = set_text(el, "Sending keys")
+  // split original
+  var keys = event.target.textContent.split('+')
+  console.log("sending keys", keys)
+  // iterate key down
+  keys.forEach(function(key){
+    client.sendKeyEvent(1, controlKeyCodes[key.toLowerCase()]); 
+  })
+  // iterate key up
+  keys.forEach(function(key){
+    client.sendKeyEvent(0, controlKeyCodes[key.toLowerCase()]); 
+  })
+  restore_text(el, original)
+}
+
+
+function toggle_menu(event, cl){
+  event.stopPropagation();
+  var menu = document.querySelector("#menu");
+  var filler = document.querySelector("#filler");
+  if ([menu, filler].indexOf(event.target)>=0){
+    var existing = "";
+    if (typeof(menu.getAttribute('class'))=='string'){
+      existing = menu.getAttribute('class')
+    }
+    if (existing.indexOf(cl)>=0 ){ // close menu
+      $(filler).css({
+        display: 'none',
+        left: 0
+      });
+      menu.setAttribute('class', existing.replace(cl, ''))
+    } else { // open menu
+      $(filler).show();
+      $(filler).animate({
+        left: "400px"
+      }, 400)
+      menu.setAttribute('class', existing + " " + cl)
+    }
+
+  } else {
+    return false;
+  }
+}
+
+function toggle_dropdown(event){
+  event.preventDefault();
+  var el = event.target
+  // get the parent li
+  while ((el.getAttribute('class')||'').indexOf('dropdown')<0) {
+    el = el.parentNode
+  }
+ // console.log(el, $(el).find('ul'))
+  $(el).toggleClass( "open" )
+}

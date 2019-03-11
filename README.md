@@ -27,6 +27,7 @@ i-tee contains three layers such as: Virtualisation, Web frontend (access contro
 
 
 * Install https://bitbucket.org/rangeforce/vboxmanager/src/master/ for VM management
+* Install https://bitbucket.org/rangeforce/guacamole-proxy/src/master/ for Guacamole RDP viewer
 
 
 * Bare metal host for virtualization
@@ -53,6 +54,13 @@ i-tee contains three layers such as: Virtualisation, Web frontend (access contro
 		"user" : "Replace_with_your_bind_user",
 		"password" : "Replace_with_your_bind_user"
 	},
+    "guacamole2":{
+        "ws_host":"wss://localhost/gml/",
+        "cipher_password":"SECRET for the AES-256-CBC cypher set in guacamole-proxy install",
+        "guacd_host":"host.local",
+        "username":"global admin username",
+        "password":"global admin password"
+    },
 	"skin" : "vequrity",
 	"admins": [ "list","of","your","admins"]
 }
