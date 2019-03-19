@@ -384,7 +384,8 @@ class Virtualbox < ActiveRecord::Base
           "username": username, 
           "password": password, 
           "port": port, 
-          "clipboard-encoding": "UTF-8"
+          "clipboard-encoding": "UTF-8",
+          "color-depth":16
         } 
       } 
     }
