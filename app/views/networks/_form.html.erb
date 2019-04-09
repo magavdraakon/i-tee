@@ -1,3 +1,9 @@
+<% if @network.new_record? %>
+<h3>Creating network</h3>
+<% else %>
+<h3>Editing network</h3>
+<% end %>
+
 <p>Use the following patterns:</p>
 <ul>
   <li><b>{user}</b> for VM owner username </li>
@@ -24,9 +30,9 @@
   </div>
     <div class="field">
       <%= f.label :net_type %><br />
-      <%= f.select :net_type, options_for_select(['intnet','bridgeadapter', 'hostonlyadapter', 'nat']) %>
+      <%= f.select :net_type, options_for_select(['intnet','bridgeadapter', 'hostonlyadapter', 'nat'], @network.net_type) %>
     </div>
   <div class="actions">
-    <%= f.submit %>
+    <%= f.submit %> <%= link_to 'Cancel', networks_path, :class=>' button' %>
   </div>
 <% end %>

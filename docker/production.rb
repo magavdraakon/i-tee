@@ -218,4 +218,6 @@ Rails.application.configure do
   end
   # place for lab export / import jsons
   config.export_location = '/var/labs/exports'
+  # place for drive isos and vdi-s  
+  config.drive_location = '/var/labs/isos'
 end

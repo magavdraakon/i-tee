@@ -40,7 +40,10 @@ class LabsController < ApplicationController
   # GET /labs/new.xml
   def new
     @lab = Lab.new
-    @lab.lab_vmts.build.lab_vmt_networks.build
+    @vmt = @lab.lab_vmts.build
+    @vmt.lab_vmt_networks.build
+    @vmt.lab_vmt_storages.build
+
     @all_users=false
     @user_count=0
     respond_to do |format|
@@ -53,8 +56,11 @@ class LabsController < ApplicationController
   def edit
     @lab.lab_vmts.each do |v|
       v.lab_vmt_networks.build
+      v.lab_vmt_storages.build
     end
-    @lab.lab_vmts.build.lab_vmt_networks.build
+    @vmt = @lab.lab_vmts.build
+    @vmt.lab_vmt_networks.build
+    @vmt.lab_vmt_storages.build
     
     #@lab = Lab.find(params[:id])
     @all_users=false
@@ -460,7 +466,9 @@ class LabsController < ApplicationController
 
   def lab_params
     params.require(:lab).permit(:id, :name, :description, :config, :short_description, :host_id, :restartable, :endable, :startAll, :vms_by_one, :poll_freq, :end_timeout, :power_timeout, :lab_hash, :lab_token, :assistant_id, :ping_low, :ping_mid, :ping_high, 
-      lab_vmts_attributes: [:id, :name, :lab_id, :vmt_id, :allow_remote, :allow_clipboard, :nickname, :position, :g_type, :primary, :allow_restart, :expose_uuid, :enable_rdp, :_destroy, lab_vmt_networks_attributes: [:id, :network_id, :slot, :lab_vmt_id, :promiscuous, :reinit_mac,:ip, :_destroy]
+      lab_vmts_attributes: [:id, :name, :lab_id, :vmt_id, :allow_remote, :allow_clipboard, :nickname, :position, :g_type, :primary, :allow_restart, :expose_uuid, :enable_rdp, :_destroy, 
+        lab_vmt_networks_attributes: [:id, :network_id, :slot, :lab_vmt_id, :promiscuous, :reinit_mac,:ip, :_destroy], 
+        lab_vmt_storages_attributes: [:id, :storage_id, :controller, :lab_vmt_id, :port, :device, :mount, :_destroy]
         ]
       )
   end

@@ -22,38 +22,6 @@
 <% end %>
 </table>
   </div>
-<br />
-<%= link_to 'New Network', networks_path, :class=>'add-button button' if params[:id] %>
 
-<p>Use the following patterns:</p>
-<ul>
-  <li><b>{user}</b> for VM owner username </li>
-  <li><b>{year}</b> for current year</li>
-  <li><b>{slot}</b> for the network interface nr set during network configuration</li>
-  <li><b>{labVmt}</b> for vmt name in lab</li>
-</ul>
-<%= form_for(@network) do |f| %>
-  <% if @network.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@network.errors.count, 'error') %> prohibited this network from being saved:</h2>
 
-      <ul>
-      <% @network.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-      </ul>
-    </div>
-  <% end %>
-
-  <div class="field">
-    <%= f.label :name %><br />
-    <%= f.text_field :name %>
-  </div>
-      <div class="field">
-        <%= f.label :net_type, 'Network type' %><br />
-        <%= f.select :net_type, options_for_select([['internal','intnet'],['bridged','bridgeadapter'], ['host-only','hostonlyadapter'], ['NAT','nat']], selected: @network.net_type) %>
-      </div>
-  <div class="actions">
-    <%= f.submit %> 
-  </div>
-<% end %>
+<%= render 'form', network: @network %>

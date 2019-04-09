@@ -1,0 +1,29 @@
+<h1>Storages</h1>
+<div id="index_t">
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Path</th>
+      <th>Enabled</th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @storages.each do |storage| %>
+      <tr>
+        <td><%= storage.storage_type %></td>
+        <td><%= storage.path %></td>
+        <td><%= storage.enabled %></td>
+        <td class="narrow"><%#= link_to 'Show', storage %>
+          <%= link_to 'Edit', edit_storage_path(storage), :class=>'edit-button button' %>
+          <%= link_to 'Destroy', storage, method: :delete, data: { confirm: 'Are you sure?' } , :class=>'delete-button button'%></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+</div>
+
+<%= render 'form', storage: @storage %>
+

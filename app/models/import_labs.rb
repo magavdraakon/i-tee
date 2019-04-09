@@ -79,7 +79,7 @@ def self.import_from_folder(foldername)
 			if assistant_obj.blank? # no assistant
 				assistant = {id: nil}
 			else
-				assistant = Assistant.where("uri=?", assistant_obj['uri']).first
+				assistant = Assistant.where(uri: assistant_obj['uri']).first
 				# filter out fields not in model
 				diff = assistant_obj.keys - Assistant.column_names
 				diff.each { |k| assistant_obj.delete k }
@@ -104,7 +104,7 @@ def self.import_from_folder(foldername)
 			lab_obj['assistant_id'] = assistant[:id] # set new assistant id
 			lab_obj.delete('id') # remove id field
 
-			lab = Lab.where("name=?", lab_obj['name']).first # find if this lab already exists (unique name)
+			lab = Lab.where(name: lab_obj['name']).first # find if this lab already exists (unique name)
 			# filter out fields not in model
 			diff = lab_obj.keys - Lab.column_names
 			diff.each { |k| lab_obj.delete k }
@@ -130,7 +130,7 @@ def self.import_from_folder(foldername)
 					lvmt['lab_id'] = lab.id # set new lab id
 					lvmt['vmt'].delete('id') # remove id from vmt
 
-					vmt = Vmt.where('image=?', lvmt['vmt']['image']).first
+					vmt = Vmt.where(image: lvmt['vmt']['image']).first
 					# filter out fields not in model
 					diff = lvmt['vmt'].keys - Vmt.column_names
 					diff.each { |k| lvmt['vmt'].delete k }
@@ -148,8 +148,9 @@ def self.import_from_folder(foldername)
 					lvmt['vmt_id'] = vmt.id # set new vmt id
 
 					l_nets = lvmt.delete('lab_vmt_networks') # extract networks
+					l_store = lvmt.delete('lab_vmt_storages') # extract storages
 					# if no errors try to find the lab_vmt
-					lab_vmt = LabVmt.where('name=?', lvmt['name'] ).first
+					lab_vmt = LabVmt.where(name: lvmt['name'] ).first
 					# filter out fields not in model
 					diff = lvmt.keys - LabVmt.column_names
 					diff.each { |k| lvmt.delete k }
@@ -165,14 +166,14 @@ def self.import_from_folder(foldername)
 					end
 
 					# delete all existing lab vmt networks bound to this lab vmt
-					LabVmtNetwork.where("lab_vmt_id=?", lab_vmt.id).destroy_all
+					LabVmtNetwork.where(lab_vmt_id: lab_vmt.id).destroy_all
 					#get l_v_n + networks
 					l_nets.each do |vnet|
 						vnet.delete('id') # remove id from lab_vmt_network
 						vnet['network'].delete('id') # remove id from network
 						vnet['lab_vmt_id']=lab_vmt.id # set new lab vmt id
 
-						network = Network.where('name=?', vnet['network']['name']).first
+						network = Network.where(name: vnet['network']['name']).first
 						# filter out fields not in model
 						diff = vnet['network'].keys - Network.column_names
 						diff.each { |k| vnet['network'].delete k }
@@ -198,6 +199,42 @@ def self.import_from_folder(foldername)
 							return {success: false, message: "lab vmt #{lab_vmt.name} network can not be created #{vnet['slot']}"}
 						end
 					end # eof create networking
+
+					# delete all existing lab vmt storages bound to this lab vmt
+					LabVmtStorage.where(lab_vmt_id: lab_vmt.id).destroy_all
+					#get l_v_s + storages
+					l_store.each do |store|
+						store.delete('id') # remove id from lab_vmt_storage
+						store['storage'].delete('id') # remove id from storage
+						store['lab_vmt_id']=lab_vmt.id # set new lab vmt id
+
+						storage = Storage.where(path: store['storage']['path'], storage_type: store['storage']['storage_type']).first
+						# filter out fields not in model
+						diff = store['storage'].keys - Storage.column_names
+						diff.each { |k| store['storage'].delete k }
+						if storage
+							unless storage.update_attributes(store['storage'])
+								return {success: false, message: "storage can not be updated #{store['storage']['path']} (#{store['storage']['storage_type']})"}
+							end
+						else
+							storage = Storage.new(store['storage'])
+							unless storage.save
+								return {success: false, message: "storage can not be created #{store['storage']['path']} (#{store['storage']['storage_type']})"}
+							end
+						end
+						store['storage_id'] = storage.id
+						store.delete('storage')
+						# create new storage mount
+						puts store
+						# filter out fields not in model
+						diff = store.keys - LabVmtStorage.column_names
+						diff.each { |k| store.delete k }
+						lab_vmt_storage = LabVmtStorage.new(store)
+						unless lab_vmt_storage.save
+							return {success: false, message: "lab vmt #{lab_vmt.name} storage can not be created to #{store['controller']} #{store['port']} #{store['device']}"}
+						end
+					end # eof create storage
+
 				end # eof vmts
 				# check for vmts with names not included in vmts_obj
 				gotnames = lab.lab_vmts.pluck(:name)
@@ -205,9 +242,9 @@ def self.import_from_folder(foldername)
 				diff = gotnames - names
 				# remove lab_vmts and their networks
 				diff.each do |n|
-					lab_vmt = LabVmt.where('name=?', n ).first
-					LabVmtNetwork.where("lab_vmt_id=?", lab_vmt.id).destroy_all
-					LabVmt.where('name=?', n ).destroy_all
+					lab_vmt = LabVmt.where(name: n ).first
+					LabVmtNetwork.where(lab_vmt_id: lab_vmt.id).destroy_all
+					LabVmt.where(name: n ).destroy_all
 				end
 
 				# if not returned by now, success
@@ -223,10 +260,10 @@ def self.import_from_folder(foldername)
 	end
 end
 
-
+# not used?
 def self.export_lab_separate(id)
 	# get lab
-	l = Lab.where("id=?", id).first
+	l = Lab.where(id: id).first
 	if l # lab exists
 		unless File.exists?(@@dir) && File.directory?(@@dir)
 			return {success: false, message: "folder does not exist #{@@dir}"}
@@ -290,7 +327,7 @@ end
 
 
 def self.export_labuser(uuid, pretty)
-	lu = LabUser.where("uuid=?", uuid).first
+	lu = LabUser.where(uuid: uuid).first
 	if lu
 		loginfo = lu.log_info
 		logger.info "GETTING LABUSER INFO INFO CALLED: #{loginfo}"
@@ -325,6 +362,11 @@ def self.export_labuser(uuid, pretty)
 						t['network'] = n.network.as_json.except('created_at', 'updated_at')
 						t
 					}
+					r['lab_vmt']['lab_vmt_storages'] = vm.lab_vmt.lab_vmt_storages.map{ |n|
+						t = n.as_json.except('created_at', 'updated_at')
+						t['storage'] = n.storage.as_json.except('created_at', 'updated_at')
+						t
+					}
 					r['lab_vmt']['vmt'] = vm.lab_vmt.vmt.as_json.except('created_at', 'updated_at')
 					r
 				}
@@ -347,7 +389,7 @@ end
 
 def self.export_lab(id)
 	# get lab
-	l = Lab.where("id=?", id).first
+	l = Lab.where(id: id).first
 	if l # lab exists
 		unless File.exists?(@@dir) && File.directory?(@@dir)
 			return {success: false, message: "folder does not exist #{@@dir}"}
@@ -368,25 +410,33 @@ def self.export_lab(id)
 		# write to file
 		#puts JSON.pretty_generate(l.as_json)
 		File.open(dirname+"/lab.json","w") do |f|
-		  f.write( JSON.pretty_generate( l.as_json ) )
+		  f.write( JSON.pretty_generate( l.as_json.except('created_at', 'updated_at', 'id', 'host_id', 'assistant_id') ) )
 		end
 		File.open(dirname+"/assistant.json","w") do |f|
-		  f.write( JSON.pretty_generate( l.assistant ? l.assistant.as_json : {} ) )
+		  f.write( JSON.pretty_generate( l.assistant ? l.assistant.as_json.except('created_at', 'updated_at', 'id') : {} ) )
 		end
 		# find all lab_vmts
 		
 		lab_vmts = [] # will fill lab_vmts into here
 		l.lab_vmts.each do |lvt|
-			temp_vmt = JSON.parse( JSON.generate( lvt.as_json ))
+			temp_vmt = JSON.parse( JSON.generate( lvt.as_json.except('created_at', 'updated_at', 'id', 'lab_id', 'vmt_id') ))
 			lab_vmt_networks = []
 			lvt.lab_vmt_networks.each do |lvt_n|
-				temp = JSON.parse( JSON.generate( lvt_n.as_json ))
-				temp['network'] = lvt_n.network.as_json
+				temp = JSON.parse( JSON.generate( lvt_n.as_json.except('created_at', 'updated_at', 'id', 'network_id', 'lab_vmt_id') ))
+				temp['network'] = lvt_n.network.as_json.except('created_at', 'updated_at', 'id')
 				
 				lab_vmt_networks<<temp
 			end
 			temp_vmt['lab_vmt_networks'] = lab_vmt_networks
-			vmt = lvt.vmt.as_json
+			lab_vmt_storages = []
+			lvt.lab_vmt_storages.each do |lvt_n|
+				temp = JSON.parse( JSON.generate( lvt_n.as_json.except('created_at', 'updated_at', 'id', 'storage_id', 'lab_vmt_id') ))
+				temp['storage'] = lvt_n.storage.as_json.except('created_at', 'updated_at', 'id')
+				
+				lab_vmt_storages<<temp
+			end
+			temp_vmt['lab_vmt_storages'] = lab_vmt_storages
+			vmt = lvt.vmt.as_json.except('created_at', 'updated_at', 'id')
 			temp_vmt['vmt'] = vmt
 			lab_vmts << temp_vmt
 		end

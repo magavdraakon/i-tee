@@ -1,0 +1,46 @@
+<%= form_with(model: lab_vmt_storage, local: true) do |form| %>
+  <% if lab_vmt_storage.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(lab_vmt_storage.errors.count, "error") %> prohibited this lab_vmt_storage from being saved:</h2>
+
+      <ul>
+      <% lab_vmt_storage.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <div class="field">
+    <%= form.label :storage_id %><br />
+    <%= form.select :storage_id, options_from_collection_for_select(Storage.all, :id, :menustr , @lab_vmt_storage.storage_id)   %>
+  </div>
+
+  <div class="field">
+    <%= form.label :lab_vmt_id %><br />
+    <%= form.select :lab_vmt_id, options_from_collection_for_select(LabVmt.all, :id, :menustr , @lab_vmt_storage.lab_vmt_id)   %>
+  </div>
+
+  <div class="field">
+    <%= form.label :controller %>
+    <%= form.select :controller, options_for_select(['SATA','IDE'], @lab_vmt_storage.controller)%>
+  </div>
+
+  <div class="field">
+    <%= form.label :port %>
+    <%= form.number_field :port %>
+  </div>
+
+  <div class="field">
+    <%= form.label :device %>
+    <%= form.number_field :device %>
+  </div>
+
+  <div class="field">
+    <%= form.label :mount %>
+    <%= form.text_field :mount %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>
