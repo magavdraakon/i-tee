@@ -232,7 +232,12 @@ class Vm < ActiveRecord::Base
         else
           Virtualbox.set_extra_data(name, "VBoxInternal/Devices/pcbios/0/Config/DmiSystemSKU", "System SKU")
         end
-
+        # set drives
+        drives = []
+        self.lab_vmt.lab_vmt_storages.each do |store|
+          drives << {controller: store.controller, port: store.port, device:store.device, type: store.storage.storage_type, path: store.storage.location }
+        end
+        Virtualbox.set_drives(name, drives) unless drives.empty?
         # set global admin user password
         begin
           admin_extra = []
@@ -489,7 +494,11 @@ class Vm < ActiveRecord::Base
   def manage_network(action, nw)
     loginfo = self.log_info.to_s
     logger.info "MANAGE_NETWORK CALLED: #{loginfo}"
-    data = Virtualbox.get_vm_info(self.name)
+    begin
+     data = Virtualbox.vm_info(self.name)
+    rescue Exception => e
+      return {success: false, message: "Machine '#{name}' is not initialized"}
+    end
     data.each do |key, value|
       unless ['nic','macaddress','cableconnected', 'intnet', 'natnet', 'hostonlyadapter', 'bridgeadapter'].any? { |word| key.include?(word) }
         data.delete(key) 
@@ -510,7 +519,11 @@ class Vm < ActiveRecord::Base
         return {success: false, message: "network type not supported", allowed: allowed}
       end
       logger.debug "MANAGE_NETWORK ADD: set network for running machine #{loginfo}"
-      Virtualbox.set_running_network(self.name, nw[:slot], nw[:type], nw[:name])
+      begin
+        Virtualbox.set_running_network(self.name, nw[:slot], nw[:type], nw[:name])
+      rescue Exception => e
+        return {success: false, message: e.message }
+      end
       logger.debug "MANAGE_NETWORK ADD SUCCESS: #{loginfo}"
       return {success: true, message: "added network to #{self.name}", network: nw}
     when 'delete'
@@ -538,9 +551,74 @@ class Vm < ActiveRecord::Base
         end
       end
       logger.debug "MANAGE_NETWORK DELETE: unset network for running machine #{loginfo}"
-      Virtualbox.set_running_network(self.name, nw[:slot], 'null', '')
+      begin
+        Virtualbox.set_running_network(self.name, nw[:slot], 'null', '')
+      rescue Exception => e
+        return {success: false, message: e.message }
+      end
       logger.debug "MANAGE_NETWORK DELETE SUCCESS: #{loginfo}"
       return {success: true, message: "removed network from #{self.name}", network: nw}
+    end
+  end
+
+  def manage_storage(action, storage)
+    loginfo = self.log_info.to_s
+    logger.info "MANAGE_STORAGE CALLED: #{loginfo}"
+    begin
+     data = Virtualbox.vm_info(self.name)
+    rescue Exception => e
+      return {success: false, message: "Machine '#{name}' is not initialized"}
+    end
+    data.each do |key, value|
+      unless ['storagecontroller','SATA','IDE'].any? { |word| key.include?(word) }
+        data.delete(key) 
+      end
+    end
+    case action.downcase 
+    when 'get' # read storage info
+      logger.debug "MANAGE_STORAGE: got info #{loginfo}"
+      return  JSON.pretty_generate(data)
+    when 'post' # add storage
+       if storage.blank? || storage[:controller].blank? || storage[:port].blank? || storage[:device].blank? || storage[:type].blank? || storage[:path].blank?
+        logger.debug "MANAGE_STORAGE ADD FAILED: storage not specified #{loginfo}"
+        return {success: false, message: "not enough info to add a storage : controller, port, device, type, path"}
+      end
+      allowed = ['IDE', 'SATA']
+      unless allowed.include?(storage[:controller])
+        logger.debug "MANAGE_STORAGE ADD FAILED: controller not allowed #{loginfo}"
+        return {success: false, message: "controller not supported", allowed: allowed}
+      end
+      allowed = ['dvddrive', 'hdd', 'fdd']
+      unless allowed.include?(storage[:type])
+        logger.debug "MANAGE_STORAGE ADD FAILED: controller not allowed #{loginfo}"
+        return {success: false, message: "controller not supported", allowed: allowed}
+      end
+      logger.debug "MANAGE_STORAGE ADD: set storage for running machine #{loginfo}"
+      begin
+        Virtualbox.set_drive(self.name, storage[:controller], storage[:port], storage[:device], storage[:type], storage[:path] )
+      rescue Exception => e
+          return {success: false, message: e.message }
+        end
+      logger.debug "MANAGE_STORAGE ADD SUCCESS: #{loginfo}"
+      return {success: true, message: "added storage to #{self.name}", storage: storage}
+    when 'delete' # remove storage
+      if storage.blank? || storage[:controller].blank? || storage[:port].blank? || storage[:device].blank?
+        logger.debug "MANAGE_STORAGE DELETE FAILED: storage not specified #{loginfo}"
+        return {success: false, message: "not enough info to remove a storage : controller, port, device"}
+      end
+      if data.key?("#{storage[:controller]}-#{storage[:port]}-#{storage[:device]}") # port described
+        logger.debug "MANAGE_STORAGE DELETE: unset storage for running machine #{loginfo}"
+        begin
+          Virtualbox.unset_drive(self.name, storage[:controller], storage[:port], storage[:device] )
+        rescue Exception => e
+          return {success: false, message: e.message }
+        end
+        logger.debug "MANAGE_STORAGE DELETE SUCCESS: #{loginfo}"
+        return {success: true, message: "removed storage from #{self.name}", storage: storage}
+      else
+        logger.debug "MANAGE_STORAGE DELETE FAILED: storage not existing #{loginfo}"
+        return {success: false, message: "can not remove a storage that does not exist"}
+      end
     end
   end
 

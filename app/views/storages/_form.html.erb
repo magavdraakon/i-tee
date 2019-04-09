@@ -1,0 +1,37 @@
+<% if @storage.new_record? %>
+<h3>Creating storage</h3>
+<% else %>
+<h3>Editing storage</h3>
+<% end %>
+<%= form_with(model: storage, local: true) do |form| %>
+  <% if storage.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(storage.errors.count, "error") %> prohibited this storage from being saved:</h2>
+
+      <ul>
+      <% storage.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :storage_type %>
+    <%= form.select :storage_type, options_for_select(['dvddrive','hdd', 'fdd'], @storage.storage_type) %>
+  </div>
+
+  <div class="field">
+    <%= form.label :path %>
+     <%= form.select :path, options_for_select(@storage.available, @storage.path) %>
+  </div>
+
+  <div class="field">
+    <%= form.label :enabled %>
+    <%= form.check_box :enabled %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit %> <%= link_to 'Cancel', storages_path, :class=>' button' %>
+  </div>
+<% end %>

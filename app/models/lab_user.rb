@@ -24,7 +24,7 @@ class LabUser < ActiveRecord::Base
       peak = self.labuser_connections.order("end_at-start_at DESC").first
       data['ping_peak'] = peak.end_at-peak.start_at if peak
       last_ping = self.labuser_connections.order("end_at DESC").first
-      data['last_ping'] = last_ping.end_at
+      data['last_ping'] = last_ping.end_at if last_ping
     end
     data
   end

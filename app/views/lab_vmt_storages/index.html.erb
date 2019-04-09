@@ -1,0 +1,30 @@
+<h1>Lab Vmt Storages</h1>
+<div id="index_t">
+<table>
+  <thead>
+    <tr>
+      <th>Controller</th>
+      <th>Port</th>
+      <th>Device</th>
+      <th>Mount</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @lab_vmt_storages.each do |lab_vmt_storage| %>
+      <tr>
+        <td><%= lab_vmt_storage.controller %></td>
+        <td><%= lab_vmt_storage.port %></td>
+        <td><%= lab_vmt_storage.device %></td>
+        <td><%= lab_vmt_storage.mount %></td>
+        <td><%= link_to 'Show', lab_vmt_storage %></td>
+        <td><%= link_to 'Edit', edit_lab_vmt_storage_path(lab_vmt_storage) %></td>
+        <td><%= link_to 'Destroy', lab_vmt_storage, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+</div>
+
+<%= link_to 'New Lab Vmt Storage', new_lab_vmt_storage_path %>

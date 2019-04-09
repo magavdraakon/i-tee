@@ -475,7 +475,7 @@ body.sessions #messages {
     margin:3px;
     border-width: 1px 0;
 }
-#lab_vmts .network{
+#lab_vmts .network, #lab_vmts .drive{
     padding:3px;
     border:solid 1px #c0c0c0;
     display:inline-block;

@@ -1,0 +1,18 @@
+
+<p>
+  <strong>Type:</strong>
+  <%= @storage.storage_type %>
+</p>
+
+<p>
+  <strong>Path:</strong>
+  <%= @storage.path %>
+</p>
+
+<p>
+  <strong>Enabled:</strong>
+  <%= @storage.enabled %>
+</p>
+
+<%= link_to 'Edit', edit_storage_path(@storage) %> |
+<%= link_to 'Back', storages_path %>

@@ -276,7 +276,7 @@ function add_network_to_vmt(el) {
 
 	/* IP */
 	innerHtml.push('<label for="lab_lab_vmts_attributes_' + p + '_lab_vmt_networks_attributes_' + n + '_ip">IP</label> ' +
-		'<input type="text" id="lab_lab_vmts_attributes_' + p + '_lab_vmt_networks_attributes_' + n + '_ip" name="lab[lab_vmts_attributes][' + p + '][lab_vmt_networks_attributes][' + n + '][ip]"/><br/>');
+		'<textarea id="lab_lab_vmts_attributes_' + p + '_lab_vmt_networks_attributes_' + n + '_ip" name="lab[lab_vmts_attributes][' + p + '][lab_vmt_networks_attributes][' + n + '][ip]"></textarea><br/>');
 
 	/* promiscuous */
 	innerHtml.push('<input type="hidden" name="lab[lab_vmts_attributes][' + p + '][lab_vmt_networks_attributes][' + n + '][promiscuous]" value="0" />' +
@@ -294,6 +294,42 @@ function add_network_to_vmt(el) {
 		' <label for="lab_lab_vmts_attributes_' + p + '_lab_vmt_networks_attributes_' + n + '__destroy">Remove</label><br/>');
 
 	$(el).parents('.vmt').find('.networks').append('<div class="network">' + innerHtml.join('') + '</div>');
+}
+
+function add_drive_to_vmt(el){
+	var n = $(el).parents('.vmt').find('.drive').size();
+	var p = $(".vmt").index($(el).parents('.vmt'));
+	var s_options = $("#storages").html();
+	var c_options = $("#controllers").html();
+	var innerHtml = [ ];
+
+	/* storage id */
+	innerHtml.push('<label for="lab_lab_vmts_attributes_' + p + '_lab_vmt_storages_attributes_' + n + '_storage_id">Storage</label> ' +
+		'<select id="lab_lab_vmts_attributes_' + p + '_lab_vmt_storages_attributes_' + n + '_storage_id" name="lab[lab_vmts_attributes][' + p + '][lab_vmt_storages_attributes][' + n + '][storage_id]">' + s_options + '</select><br/>');
+
+	/* controller */
+	innerHtml.push('<label for="lab_lab_vmts_attributes_' + p + '_lab_vmt_storages_attributes_' + n + '_controller">Controller</label> ' +
+		'<select id="lab_lab_vmts_attributes_' + p + '_lab_vmt_storages_attributes_' + n + '_controller" name="lab[lab_vmts_attributes][' + p + '][lab_vmt_storages_attributes][' + n + '][controller]">' + c_options + '</select><br/>');
+
+	/* port */
+	innerHtml.push('<label for="lab_lab_vmts_attributes_' + p + '_lab_vmt_storages_attributes_' + n + '_port">Port</label> ' +
+		'<input type="number" id="lab_lab_vmts_attributes_' + p + '_lab_vmt_storages_attributes_' + n + '_port" name="lab[lab_vmts_attributes][' + p + '][lab_vmt_storages_attributes][' + n + '][port]" size="30" min="0" /><br/>');
+
+	/* device */
+	innerHtml.push('<label for="lab_lab_vmts_attributes_' + p + '_lab_vmt_storages_attributes_' + n + '_device">Device</label> ' +
+		'<input type="number" id="lab_lab_vmts_attributes_' + p + '_lab_vmt_storages_attributes_' + n + '_device" name="lab[lab_vmts_attributes][' + p + '][lab_vmt_storages_attributes][' + n + '][device]" size="30" min="0" /><br/>');
+
+	/* mount */
+	innerHtml.push('<label for="lab_lab_vmts_attributes_' + p + '_lab_vmt_storages_attributes_' + n + '_mount">Mount</label> ' +
+		'<textarea id="lab_lab_vmts_attributes_' + p + '_lab_vmt_storages_attributes_' + n + '_mount" name="lab[lab_vmts_attributes][' + p + '][lab_vmt_storages_attributes][' + n + '][mount]" ></textarea><br/><br/>');
+
+
+	/* delete */
+	innerHtml.push('<input type="hidden" name="lab[lab_vmts_attributes][' + p + '][lab_vmt_storages_attributes][' + n + '][_destroy]" value="0" />' +
+		'<input type="checkbox" id="lab_lab_vmts_attributes_' + p + '_lab_vmt_storages_attributes_' + n + '__destroy" name="lab[lab_vmts_attributes][' + p + '][lab_vmt_storages_attributes][' + n + '][_destroy]" value="1" />' +
+		' <label for="lab_lab_vmts_attributes_' + p + '_lab_vmt_storages_attributes_' + n + '__destroy">Remove</label><br/>');
+
+	$(el).parents('.vmt').find('.drives').append('<div class="drive">' + innerHtml.join('') + '</div>');
 }
 
 // add vmts to lab in edit/new lab
@@ -363,6 +399,16 @@ function add_vmt_to_lab() {
 	};
 	$(".vmt").last().append(s);
 	s.click();
+
+	$(".vmt").last().append('<div class="drives" />');
+	var d = document.createElement('span');
+	d.innerHTML = 'Add more drives';
+	d.setAttribute('class', 'button add-button');
+	d.onclick = function() {
+		add_drive_to_vmt(this);
+	};
+	$(".vmt").last().append(d);
+	d.click();
 }
 
 function show_remote(el, html) {

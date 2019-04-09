@@ -126,7 +126,7 @@
                 <br />
                 <%= labVmtNet_form.label :slot %> <%= labVmtNet_form.number_field :slot, min: 1 %><br/>
 
-                <%= labVmtNet_form.label :ip, 'IP' %> <%= labVmtNet_form.text_field :ip %><br/>
+                <%= labVmtNet_form.label :ip, 'IP' %> <%= labVmtNet_form.text_area :ip %><br/>
 
 
                 <%= labVmtNet_form.check_box :promiscuous %> <%= labVmtNet_form.label :promiscuous %><br />
@@ -138,6 +138,25 @@
           <%end%>
           </div>
           <span class="button add-button" onclick="add_network_to_vmt(this);">Add more networks</span>
+
+          <div class="drives">
+          <%= labVmt_form.fields_for :lab_vmt_storages do |storage_form| %>
+              <div class="drive">
+                <%= storage_form.label :storage_id %>
+                <%= storage_form.select :storage_id, options_from_collection_for_select(Storage.where(enabled: true), :id, :menustr, ( storage_form.object ? storage_form.object.storage_id : '')), {:prompt => 'Select storage device'}  %>
+                <br />
+
+                <%= storage_form.label :controller %> <%= storage_form.select :controller, options_for_select(['SATA','IDE'], ( storage_form.object ? storage_form.object.controller : '')) %><br/>
+                <%= storage_form.label :port %> <%= storage_form.number_field :port, min: 0 %><br/>
+                <%= storage_form.label :device %> <%= storage_form.number_field :device, min: 0 %><br/>
+                <%= storage_form.label :mount %> <%= storage_form.text_area :mount%><br/>
+
+                <br/>
+                <%= storage_form.check_box :_destroy%>  <%= storage_form.label :_destroy, 'Remove' %>
+              </div>
+          <%end%>
+          </div>
+          <span class="button add-button" onclick="add_drive_to_vmt(this);">Add more drives</span>
        </div>
     <% end %>
       
@@ -153,6 +172,8 @@
   </div>
 <% end %>
 <%= select_tag :networks, options_from_collection_for_select(Network.all,:id, :name), {:prompt => 'Select network template', :style=>'display:none'}  %>
+<%= select_tag :storages, options_from_collection_for_select(Storage.where(enabled: true), :id, :menustr), {:prompt => 'Select storage device', :style=>'display:none'}  %>
+<%= select_tag :controllers, options_for_select([ 'SATA','IDE']), { :style => 'display:none' }  %>
 <%= select_tag :vm_templates, options_from_collection_for_select(Vmt.all,:id, :image), {:prompt => 'Select VM template', :style=>'display:none'}  %>
 <%= select_tag :g_types, options_for_select([ 'none', 'rdp', 'vnc', 'ssh' ]), { :style => 'display:none' }  %>
       

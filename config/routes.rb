@@ -1,4 +1,8 @@
 Rails.application.routes.draw do
+  
+  match 'storages/:id/edit', :to => 'storages#index', via: [:get, :post]
+  resources :storages
+  resources :lab_vmt_storages
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
   resources :assistants
   match 'ping', :to=>'home#ping', via:[:get, :post]
@@ -71,7 +75,8 @@ Rails.application.routes.draw do
   match 'users', :to=>'users#update', via: [:put]
 
   resources :vms
-  match 'vm_network', :to=>"vms#network", via: [:get, :post, :delete]
+  match 'vm_network', :to=>"vms#network", via: [:get, :post, :delete]  
+  match 'vm_storage', :to=>"vms#storage", via: [:get, :post, :delete]
   match 'guestcontrol', :to=>"vms#guestcontrol", via: [:post]
 
   resources :materials

@@ -254,6 +254,39 @@ class Virtualbox < ActiveRecord::Base
 		result
 	end
 
+
+	def self.set_drive(vm, controller, port, device, type, path, sync=false )
+		logger.info "SET DRIVE CALLED: vm=#{vm}"
+		result = Virtualbox.put_request('/vms/drive.json', {name: vm, controller: controller, port: port, device: device, type:type, path:path, sync: sync})
+		# result is either a success message or raises a error
+		logger.info "SET DRIVE END: #{result}"
+		result
+	end
+
+	def self.set_drives(vm, drives, sync=false )
+		logger.info "SET DRIVES CALLED: vm=#{vm}"
+		result = Virtualbox.put_request('/vms/drive.json', {name: vm, drives:drives, sync: sync})
+		# result is either a success message or raises a error
+		logger.info "SET DRIVES END: #{result}"
+		result
+	end
+
+  def self.unset_drive(vm, controller, port, device, sync=false )
+  	logger.info "UNSET DRIVE CALLED: vm=#{vm}"
+		result = Virtualbox.delete_request('/vms/drive.json', {name: vm, controller: controller, port: port, device: device, sync: sync})
+		# result is either a success message or raises a error
+		logger.info "UNSET DRIVE END: #{result}"
+		result
+  end
+
+  def self.unset_drives(vm, drives, sync=false )
+  	logger.info "UNSET DRIVE CALLED: vm=#{vm}"
+		result = Virtualbox.delete_request('/vms/drive.json', {name: vm, drives:drives, sync: sync})
+		# result is either a success message or raises a error
+		logger.info "UNSET DRIVE END: #{result}"
+		result
+  end
+
 	### HTTP
 
 	def self.get_request(path, params, all=false)
