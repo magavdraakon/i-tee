@@ -1,28 +1,67 @@
 <p> This is a guide to user permissions in the server, to help admins set up the system.</p>
 
-<p><%=AppVersion::APP_VERSION.chomp%></p>
-<p><%=AppVersion::PLATFORM_INFO%></p>
-<p>Running as: <%= %x(whoami 2>&1)%></p>
+<div class="section">
+	<h3>I-Tee</h3>
+	<p><%=AppVersion::APP_VERSION.chomp%></p>
+	<p><%=AppVersion::PLATFORM_INFO%></p>
+	<p><b>Running as:</b> <%= %x(whoami 2>&1)%></p>
 
-<%= form_tag(system_path, method: "post", role:'form') do %>
-	<p>Current log level is <%= @levels[@level][0] %>
-	<div class="col-xs-2">
-		<b>Change log level to: </b> 
-		<%= select_tag :loglevel, options_for_select(@levels, params[:loglevel] || @level ), include_blank: false %>
-		<%= submit_tag "Apply", class: 'btn btn-success' %> 
-	</div>
-	
-<% end %>
+	<%= form_tag(system_path, method: "post", role:'form') do %>
+		Current log level is <%= @levels[@level][0] %>
+		<div class="col-xs-2">
+			<b>Change log level to: </b> 
+			<%= select_tag :loglevel, options_for_select(@levels, params[:loglevel] || @level ), include_blank: false %>
+			<%= submit_tag "Apply", class: 'btn btn-success' %> 
+		</div>
+	<% end %>
+</div>
+<div class="section">
+	<h3>VboxManager</h3>
+	<% begin %>
+		<% info  = Check.vboxmanager_status %>
+		<% if info.key?('versions') %>
+		<div>
+			<b>Commit:</b> <%= info['versions']['git'] %> (<%= info['versions']['date'] %>), <b>Ruby:</b> <%= info['versions']['ruby'] %>
+		</div>
+		<% end %>
+		<b>Response time:</b> <%= info['diff']%> ms
+		<p>
+		  Number of virtual machines total: <b><%= Virtualbox.all_machines.length %></b><br/>
+		  Number of running virtual machines: <b><%= Virtualbox.running_machines.length %></b><br/>
+		  <% if Check.has_free_resources[:success] %>
+		  	<b style="color:green">Enough resources to start a new lab instance</b>
+		  <% else %>
+		  	<b style="color:red">Not enough resources to start a new lab instance</b>
+		  <% end %>		  
+		</p>
+	<% rescue Exception => e %>
+		<p><b style="color:red">PROBLEM: <%= e.message %></b></p>
+	<% end %>
+</div>
 
-<% begin %>
-	<p>
-  Number of virtual machines total: <%= Virtualbox.all_machines.length %><br/>
-  Number of running virtual machines: <%= Virtualbox.running_machines.length %></p>
-<% rescue Exception => e %>
-	<p><b style="color:red">PROBLEM WITH VBOXMANAGER SETUP: <%= e.message %></b></p>
-<% end %>
-  Memory information [GB]<hr>
-  <pre><%=%x(free -g)%></pre>
-  Disk information<hr>
-  <pre><%=%x(df -h)%></pre>
+<div class="section">
+	<h3>Guacamole Proxy</h3>
+	<% begin %>
+		<% info  = Check.guacamole_proxy_status %>
+		<% if info.key?('versions') %>
+		<div>
+			<b>Commit:</b> <%= info['versions']['git'] %> (<%= info['versions']['date'] %>), <b>Node:</b> <%= info['versions']['node'] %>
+		</div>
+		<% end %>
+		<b>Response time:</b> <%= info['diff']%> ms<br/>&nbsp;
+		
+	<% rescue Exception => e %>
+		<p><b style="color:red">PROBLEM: <%= e.message %></b></p>
+	<% end %>
+</div>
+
+<hr/>
+<b>Memory information [GB]</b>
+<hr/>
+<pre><%=%x(free -g)%></pre>
+  
+<hr/>
+<b>Disk information</b>
+<hr/>
+<pre><%=%x(df -h)%></pre>
 

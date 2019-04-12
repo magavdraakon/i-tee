@@ -1,5 +1,5 @@
 class HomeController < ApplicationController
-  before_action :authorise_as_admin, :only=>[:backup, :export, :import, :system_info, :template_info, :jobs, :delete_job, :run_job]
+  before_action :authorise_as_admin, :only=>[:status, :backup, :export, :import, :system_info, :template_info, :jobs, :delete_job, :run_job]
   before_action :home_tab, :except=>[:about]
   require 'zip'
   # ist labs and import/export links
@@ -171,6 +171,14 @@ class HomeController < ApplicationController
   def template_info
   end
   
+  def status
+    result = Check.platform_versions
+    respond_to do |format|
+      format.html  {redirect_to root_path, :notice=>'Seems that the page you were looking for does not exist, so you\'ve been redirected here.' }
+      format.json  { render :json => result }
+    end
+  end
+
   def check_resources
     result = Check.has_free_resources
     respond_to do |format|

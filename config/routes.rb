@@ -6,7 +6,7 @@ Rails.application.routes.draw do
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
   resources :assistants
   match 'ping', :to=>'home#ping', via:[:get, :post]
-
+  get 'status', :to => 'home#status'
   get 'check_resources', :to=>'home#check_resources'
 
   match 'backup', :to=> 'home#backup', via: [ :get]
