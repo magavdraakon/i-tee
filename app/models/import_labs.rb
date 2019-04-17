@@ -167,73 +167,77 @@ def self.import_from_folder(foldername)
 
 					# delete all existing lab vmt networks bound to this lab vmt
 					LabVmtNetwork.where(lab_vmt_id: lab_vmt.id).destroy_all
-					#get l_v_n + networks
-					l_nets.each do |vnet|
-						vnet.delete('id') # remove id from lab_vmt_network
-						vnet['network'].delete('id') # remove id from network
-						vnet['lab_vmt_id']=lab_vmt.id # set new lab vmt id
+					if l_nets
+						#get l_v_n + networks
+						l_nets.each do |vnet|
+							vnet.delete('id') # remove id from lab_vmt_network
+							vnet['network'].delete('id') # remove id from network
+							vnet['lab_vmt_id']=lab_vmt.id # set new lab vmt id
 
-						network = Network.where(name: vnet['network']['name']).first
-						# filter out fields not in model
-						diff = vnet['network'].keys - Network.column_names
-						diff.each { |k| vnet['network'].delete k }
-						if network
-							unless network.update_attributes(vnet['network'])
-								return {success: false, message: "network can not be updated #{vnet['network']['name']}"}
+							network = Network.where(name: vnet['network']['name']).first
+							# filter out fields not in model
+							diff = vnet['network'].keys - Network.column_names
+							diff.each { |k| vnet['network'].delete k }
+							if network
+								unless network.update_attributes(vnet['network'])
+									return {success: false, message: "network can not be updated #{vnet['network']['name']}"}
+								end
+							else
+								network = Network.new(vnet['network'])
+								unless network.save
+									return {success: false, message: "network can not be created #{vnet['network']['name']}"}
+								end
 							end
-						else
-							network = Network.new(vnet['network'])
-							unless network.save
-								return {success: false, message: "network can not be created #{vnet['network']['name']}"}
+							vnet['network_id'] = network.id
+							vnet.delete('network')
+							# create new network card
+							puts vnet
+							# filter out fields not in model
+							diff = vnet.keys - LabVmtNetwork.column_names
+							diff.each { |k| vnet.delete k }
+							lab_vmt_network = LabVmtNetwork.new(vnet)
+							unless lab_vmt_network.save
+								return {success: false, message: "lab vmt #{lab_vmt.name} network can not be created #{vnet['slot']}"}
 							end
-						end
-						vnet['network_id'] = network.id
-						vnet.delete('network')
-						# create new network card
-						puts vnet
-						# filter out fields not in model
-						diff = vnet.keys - LabVmtNetwork.column_names
-						diff.each { |k| vnet.delete k }
-						lab_vmt_network = LabVmtNetwork.new(vnet)
-						unless lab_vmt_network.save
-							return {success: false, message: "lab vmt #{lab_vmt.name} network can not be created #{vnet['slot']}"}
-						end
-					end # eof create networking
+						end # eof create networking
+					end # if networks
 
 					# delete all existing lab vmt storages bound to this lab vmt
 					LabVmtStorage.where(lab_vmt_id: lab_vmt.id).destroy_all
 					#get l_v_s + storages
-					l_store.each do |store|
-						store.delete('id') # remove id from lab_vmt_storage
-						store['storage'].delete('id') # remove id from storage
-						store['lab_vmt_id']=lab_vmt.id # set new lab vmt id
+					if l_store
+						l_store.each do |store|
+							store.delete('id') # remove id from lab_vmt_storage
+							store['storage'].delete('id') # remove id from storage
+							store['lab_vmt_id']=lab_vmt.id # set new lab vmt id
 
-						storage = Storage.where(path: store['storage']['path'], storage_type: store['storage']['storage_type']).first
-						# filter out fields not in model
-						diff = store['storage'].keys - Storage.column_names
-						diff.each { |k| store['storage'].delete k }
-						if storage
-							unless storage.update_attributes(store['storage'])
-								return {success: false, message: "storage can not be updated #{store['storage']['path']} (#{store['storage']['storage_type']})"}
+							storage = Storage.where(path: store['storage']['path'], storage_type: store['storage']['storage_type']).first
+							# filter out fields not in model
+							diff = store['storage'].keys - Storage.column_names
+							diff.each { |k| store['storage'].delete k }
+							if storage
+								unless storage.update_attributes(store['storage'])
+									return {success: false, message: "storage can not be updated #{store['storage']['path']} (#{store['storage']['storage_type']})"}
+								end
+							else
+								storage = Storage.new(store['storage'])
+								unless storage.save
+									return {success: false, message: "storage can not be created #{store['storage']['path']} (#{store['storage']['storage_type']})"}
+								end
 							end
-						else
-							storage = Storage.new(store['storage'])
-							unless storage.save
-								return {success: false, message: "storage can not be created #{store['storage']['path']} (#{store['storage']['storage_type']})"}
+							store['storage_id'] = storage.id
+							store.delete('storage')
+							# create new storage mount
+							puts store
+							# filter out fields not in model
+							diff = store.keys - LabVmtStorage.column_names
+							diff.each { |k| store.delete k }
+							lab_vmt_storage = LabVmtStorage.new(store)
+							unless lab_vmt_storage.save
+								return {success: false, message: "lab vmt #{lab_vmt.name} storage can not be created to #{store['controller']} #{store['port']} #{store['device']}"}
 							end
-						end
-						store['storage_id'] = storage.id
-						store.delete('storage')
-						# create new storage mount
-						puts store
-						# filter out fields not in model
-						diff = store.keys - LabVmtStorage.column_names
-						diff.each { |k| store.delete k }
-						lab_vmt_storage = LabVmtStorage.new(store)
-						unless lab_vmt_storage.save
-							return {success: false, message: "lab vmt #{lab_vmt.name} storage can not be created to #{store['controller']} #{store['port']} #{store['device']}"}
-						end
-					end # eof create storage
+						end # eof create storage
+					end# if storages
 
 				end # eof vmts
 				# check for vmts with names not included in vmts_obj
