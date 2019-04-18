@@ -346,17 +346,21 @@ def self.export_labuser(uuid, pretty)
 			assistant = lab.assistant if lab # if lab is blank then there is no assistant
 			assistant = {} unless assistant
 			#logger.debug "ASSISTANT: #{assistant.as_json.except('created_at', 'updated_at') }"
+
+			extra = JSON.parse( ( lu.extra.blank? ? '{}' : lu.extra ) )  # extract extra JSON string to hash
+			#logger.debug extra
+			
 			conf = JSON.parse( ( lab.config.blank? ? '{}' : lab.config ) )  # extract config JSON string to hash
 			#logger.debug conf
 			lab = JSON.parse(lab.to_json) # convert lab to hash
-			lab[:config] = conf # overwrite conf with hash version
+			lab[:config] = conf.merge(extra) # overwrite conf with hash version combined with labuser extra
 			#logger.debug "LAB: #{lab.as_json.except('created_at', 'updated_at', 'description', 'short_description')}"
-
+			
 			data = {
 				success: true,
 				lab: lab.as_json.except('created_at', 'updated_at', 'description', 'short_description'),
 				assistant: assistant.as_json.except('created_at', 'updated_at'),
-				labuser: lu.as_json.except('created_at', 'updated_at'),
+				labuser: lu.as_json.except('created_at', 'updated_at', 'extra'),
 				user: user.as_json.slice('id', 'username', 'name', 'user_key'),
 				vms: lu.vms.map { |vm|
 					r = vm.as_json.except('created_at', 'updated_at', 'description')
