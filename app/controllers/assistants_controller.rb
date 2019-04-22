@@ -3,7 +3,7 @@ class AssistantsController < ApplicationController
   before_action :authorise_as_admin
   before_action :set_assistant, only: [:show, :edit, :update, :destroy]
   before_action :admin_tab
-  respond_to :html
+  respond_to :html, :json
 
   def index
     @assistants = Assistant.all
