@@ -130,6 +130,12 @@ def self.import_from_folder(foldername)
 					lvmt['lab_id'] = lab.id # set new lab id
 					lvmt['vmt'].delete('id') # remove id from vmt
 
+					# try to find the lab_vmt to validate that it can be used
+					lab_vmt = LabVmt.where(name: lvmt['name'] ).first
+					# check if bound to another lab
+					return {success: false, message:"lab vmt by the name '#{lvmt['name']}' is already in use in lab '#{lab_vmt.lab.name}' (#{lab_vmt.lab_id}). Change the name and import again"} if lab_vmt && lab_vmt.lab_id != lab.id
+				
+
 					vmt = Vmt.where(image: lvmt['vmt']['image']).first
 					# filter out fields not in model
 					diff = lvmt['vmt'].keys - Vmt.column_names
@@ -149,8 +155,6 @@ def self.import_from_folder(foldername)
 
 					l_nets = lvmt.delete('lab_vmt_networks') # extract networks
 					l_store = lvmt.delete('lab_vmt_storages') # extract storages
-					# if no errors try to find the lab_vmt
-					lab_vmt = LabVmt.where(name: lvmt['name'] ).first
 					# filter out fields not in model
 					diff = lvmt.keys - LabVmt.column_names
 					diff.each { |k| lvmt.delete k }

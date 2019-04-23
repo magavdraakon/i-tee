@@ -149,9 +149,9 @@
         <div id="content" >
           <div id="menu-show"></div>
           <div id="messages">
-            <%= content_tag(:div, flash[:error].html_safe, :id => 'flash_error', :escape=>false) if flash[:error] %>
-            <%= content_tag(:div, flash[:notice].html_safe, :id => 'flash_notice', :escape=>false) if flash[:notice] %>
-            <%= content_tag(:div, flash[:alert].html_safe, :id => 'flash_alert', :escape=>false) if flash[:alert] %>
+            <%= content_tag(:div, flash[:error].html_safe, :class => 'flash error', :escape=>false) if flash[:error] %>
+            <%= content_tag(:div, flash[:notice].html_safe, :class => 'flash notice', :escape=>false) if flash[:notice] %>
+            <%= content_tag(:div, flash[:alert].html_safe, :class => 'flash alert', :escape=>false) if flash[:alert] %>
           </div>
 
           <%= yield  %>
