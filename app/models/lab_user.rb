@@ -106,26 +106,36 @@ class LabUser < ActiveRecord::Base
         self.last_activity = Time.now
         self.activity = 'Lab start'
         unless self.vta_setup # do not repeat setup if set by api
-          logger.debug "LAB START: begin VTA setup #{loginfo}"
-          # check if lab has assistant to be able to create the vta labuser
-          if !lab.assistant_id.blank?
-            assistant = lab.assistant
-            password = SecureRandom.urlsafe_base64(16)
-            rdp_host = ITee::Application.config.rdp_host
-            result = assistant.create_labuser({"api_key": lab.lab_token , "lab": lab.lab_hash, "username": user.username, "fullname": user.name, "password": password,  "host": rdp_host , "info":{"somefield": "somevalue"}})
-            if result && !result['key'].blank?
-              # save to user
-              user.user_key = result['key'];
-              unless user.save
-                logger.error "LAB START FAILED: VTA setup failed - save failed #{loginfo}"
-                return {success: false, message: 'unable to remember user token in assistant'}
+          if lab.create_labuser # check if lab configuration tells to create the labuser
+            logger.debug "LAB START: begin VTA setup #{loginfo}"
+            # check if lab has assistant to be able to create the vta labuser
+            if !lab.assistant_id.blank?
+              assistant = lab.assistant
+              password = SecureRandom.urlsafe_base64(16)
+              rdp_host = ITee::Application.config.rdp_host
+              result = false
+              begin
+                result = assistant.create_labuser({"api_key": lab.lab_token , "lab": lab.lab_hash, "username": user.username, "fullname": user.name, "password": password,  "host": rdp_host , "info":{"somefield": "somevalue"}})
+              rescue Exception => e
+                # empty result will trigger the connection error message
+                logger.error e
               end
-              logger.info "LAB START: VTA setup success #{loginfo}"
-            else
-              logger.error "LAB START FAILED: VTA setup failed - request error #{loginfo}"
-              logger.error result
-              return {success: false, message: 'unable to communicate with assistant'}
+              if result && !result['key'].blank?
+                # save to user
+                user.user_key = result['key'];
+                unless user.save
+                  logger.error "LAB START FAILED: VTA setup failed - save failed #{loginfo}"
+                  return {success: false, message: 'unable to remember user token in assistant'}
+                end
+                logger.info "LAB START: VTA setup success #{loginfo}"
+              else
+                logger.error "LAB START FAILED: VTA setup failed - request error #{loginfo}"
+                logger.error result
+                return {success: false, message: 'unable to communicate with assistant'}
+              end
             end
+          else
+            logger.debug "LAB START: skipping VTA setup #{loginfo}"
           end
         end
       	self.save

@@ -96,7 +96,9 @@
         <%= f.label :lab_hash, 'Lab id in assistant' %><br/>
         <%= f.text_field :lab_hash %>
       </div>
-
+      <div class="field">
+        <%= f.check_box :create_labuser %> <%= f.label :create_labuser %>
+      </div>
     </fieldset>
     <h3>Virtual machines in this lab</h3>
     <div id="lab_vmts">
