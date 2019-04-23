@@ -32,10 +32,14 @@
       </tr>
     </thead>
     <% @vms.each do |vm| %>
-      <% 
-      info = vm.vm_info(false) || {'VMState': 'stopped', 'vrdeport': 0}
-      state = (@state.nil? ? vm.state(info, false) : @state) # get state only in 'view all' views 
-      rdp_port = vm.rdp_port(info, false) %>
+      <% begin
+          info = vm.vm_info(false) 
+        rescue Exception => e
+          info = {'VMState': 'N/A', 'vrdeport': 0}
+        end
+        state = (@state.nil? ? vm.state(info, false) : @state) # get state only in 'view all' views 
+        rdp_port = vm.rdp_port(info, false) 
+      %>
 
       <tr class="vm 
                 <%if state=='running' || state=='paused' || state=='stopped' %>

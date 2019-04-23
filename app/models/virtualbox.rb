@@ -359,13 +359,13 @@ class Virtualbox < ActiveRecord::Base
 	    end
 		rescue Errno::ENOENT
 			logger.error "HOST ENOENT: error #{Rails.configuration.vbox['host']}"
-			raise "Host not found" #false if can't find the server
+			raise "VboxManager not found" #false if can't find the server
 		rescue Errno::ECONNREFUSED
 			logger.error "HOST ECONNREFUSED: error #{Rails.configuration.vbox['host']}"
-			raise "Connection to host denied" # connection refused
+			raise "Connection to VboxManager denied" # connection refused
 		rescue Exception => e
 			logger.error "HOST Exception: #{Rails.configuration.vbox['host']} - #{e}"
-			raise "Unknown error while connecting to host"
+			raise "Unknown error while connecting to VboxManager"
 	end
 
 

@@ -13,7 +13,12 @@ class VirtualboxController < ApplicationController
 	end
 
 	def templates
-		@vms = Virtualbox.get_machines('template', params[:where])
+		begin
+			@vms = Virtualbox.get_machines('template', params[:where])
+		rescue Exception => e 
+			logger.error e
+			redirect_to root_path, alert: e.message
+		end
 	end
 
 	def vm_details
