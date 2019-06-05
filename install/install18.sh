@@ -162,13 +162,13 @@ install_virtualbox() {
 	wget -q https://www.virtualbox.org/download/oracle_vbox.asc -O- | sudo apt-key add -  
 	sudo add-apt-repository "deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian $(lsb_release -cs) contrib"
 	apt update > /dev/null
-	apt install --no-install-recommends -y virtualbox-5.2 gcc make  2>&1 | tee -a $LOGFILE
+	apt install --no-install-recommends -y virtualbox-6.0 gcc make  2>&1 | tee -a $LOGFILE
 	apt dist-upgrade -y  2>&1 | tee -a $LOGFILE
 
 	adduser vbox vboxusers  2>&1 | tee -a $LOGFILE
 
-	VERSION=$(apt-cache policy virtualbox-5.2 | grep Installed: | cut -f2 -d: | cut -f1 -d- | cut -f2 -d' ')
-	SUBVERSION=$(apt-cache policy virtualbox-5.2 | grep Installed: | cut -f2 -d: | cut -f1 -d~ | cut -f2 -d' ')
+	VERSION=$(apt-cache policy virtualbox-6.0 | grep Installed: | cut -f2 -d: | cut -f1 -d- | cut -f2 -d' ')
+	SUBVERSION=$(apt-cache policy virtualbox-6.0 | grep Installed: | cut -f2 -d: | cut -f1 -d~ | cut -f2 -d' ')
 
 	curl "http://download.virtualbox.org/virtualbox/$VERSION/Oracle_VM_VirtualBox_Extension_Pack-$VERSION.vbox-extpack" > \
 		"/tmp/Oracle_VM_VirtualBox_Extension_Pack-$VERSION.vbox-extpack"
@@ -176,7 +176,7 @@ install_virtualbox() {
 	su - vbox -c "echo y | vboxmanage extpack install --replace '/tmp/Oracle_VM_VirtualBox_Extension_Pack-$SUBVERSION.vbox-extpack'" || true
 	su - vbox -c "vboxmanage setproperty vrdeauthlibrary VBoxAuthSimple"
 
-	apt-mark hold virtualbox-5.2  2>&1 | tee -a $LOGFILE
+	apt-mark hold virtualbox-6.0  2>&1 | tee -a $LOGFILE
 }
 echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${YELLOW}Starting Docker and VirtualBox installation ${NC}" 2>&1 | tee -a $LOGFILE
 install_docker
@@ -396,9 +396,9 @@ sysctl --system
 
 systemctl daemon-reload  2>&1 | tee -a $LOGFILE
 systemctl restart docker.service 2>&1 | tee -a $LOGFILE
-systemctl enable ferm phpvirtualbox ldap-tunnel mysql nginx guacamole i-tee netdata vboxweb-service  2>&1 | tee -a $LOGFILE
+systemctl enable ferm phpvirtualbox mysql nginx guacamole i-tee netdata vboxweb-service  2>&1 | tee -a $LOGFILE
 systemctl restart ferm  2>&1 | tee -a $LOGFILE
-systemctl restart phpvirtualbox ldap-tunnel mysql nginx guacamole i-tee netdata vboxweb-service  2>&1 | tee -a $LOGFILE
+systemctl restart phpvirtualbox mysql nginx guacamole i-tee netdata vboxweb-service  2>&1 | tee -a $LOGFILE
 systemctl restart docker.service
 echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${GREEN}Services enabled and started ${NC}" 2>&1 | tee -a $LOGFILE
 
@@ -484,5 +484,8 @@ systemctl daemon-reload
 systemctl enable guacamole-proxy.service
 systemctl start guacamole-proxy.service
 systemctl status guacamole-proxy.service
+systemctl restart memcached.service
+systemctl restart i-tee.service
+systemctl restart vboxManager.service
 
 echo -e "\n$(date '+%Y-%m-%d %H:%M:%S') - ${GREEN}I-Tee installed and should be availiable at https://$(hostname -f)/ ${NC}" 2>&1 | tee -a $LOGFILE
