@@ -93,44 +93,54 @@ class LabUsersController < ApplicationController
   # POST /lab_users
   # POST /lab_users.xml
   def create
-    set_order_by
-    @lab_users = LabUser.order(@order).paginate(:page => params[:page], :per_page => @per_page)
-    # logic for when adding/removing multiple users at once to a specific lab
-    if params[:lab_user] && params[:lab_user][:page]=='bulk_add'
-      LabUser.add_users(params)
-      flash[:notice] = 'successful update.'
-      redirect_back fallback_location: add_users_path
-    else #adding a single user to a lab
-      respond_to do |format|
-        #create lab_user params based on lab_id and user_id
-        if params[:lab_id]
-          params[:lab_user] = { lab_id: params[:lab_id] }
-          if @user
-            params[:lab_user][:user_id] = @user.id
-          end
-        end
-        # continue to create
-        @lab_user = LabUser.new(labuser_params)
-
-        if @lab_user.save
+    respond_to do |format|
+      begin
+        # logic for when adding/removing multiple users at once to a specific lab
+        if params[:lab_user] && params[:lab_user][:page]=='bulk_add'
           format.html { 
-            flash[:notice] = 'successful update.' 
-            redirect_back fallback_location: lab_users_path
+            LabUser.add_users(params)
+            flash[:notice] = 'successful update.'
+            redirect_back fallback_location: add_users_path
           }
-          format.json { 
-            logger.info "LABUSER CREATE SUCCESS: labuser=#{@lab_user.id} lab=#{@lab_user.lab.id} user=#{@lab_user.user.id} [#{@lab_user.user.username}]"
-            render :json=> {:success => true, :lab_user => @lab_user}, :status=> :created
-          }
-        else
-          format.html { render :action => 'index' }
-          format.json { 
-            logger.error "LABUSER CREATE FAILED: lab=#{params[:lab_id]} user=#{params[:user_id]} " + ( @user ? "[#{@user.username}]" : '')
-            logger.error @lab_user.errors.as_json
-            render :json=> {:success => false, :errors => @lab_user.errors}, :status=> :unprocessable_entity
-          }
-        end #end if
-      end #end respond_to
-    end #end else
+        else #adding a single user to a lab
+          #create lab_user params based on lab_id and user_id
+          if params[:lab_id]
+            params[:lab_user] = { lab_id: params[:lab_id] }
+            params[:lab_user][:user_id] = @user.id if @user
+          end
+          # continue to create
+          @lab_user = LabUser.create(labuser_params)
+          if @lab_user.id
+            logger.info "LABUSER CREATE SUCCESS: #{@lab_user.log_info}"
+            format.html { 
+              flash[:notice] = 'successful create.' 
+              redirect_back fallback_location: lab_users_path
+            }
+            format.json { 
+              render :json=> {:success => true, :lab_user => @lab_user}, :status=> :created
+            }
+          else
+            raise "Labuser not created"
+          end #end if
+        end #end else
+      rescue Exception => e
+        logger.error e.message
+        logger.debug e.backtrace.join("\n")
+        logger.error "LABUSER CREATE FAILED: lab=#{params[:lab_id]} user=#{params[:user_id]} " + ( @user ? "[#{@user.username}]" : '')
+        logger.error @lab_user.errors.as_json if @lab_user
+        format.html { 
+          set_order_by
+          @lab_users = LabUser.order(@order).paginate(:page => params[:page], :per_page => @per_page)
+          @users= User.order('username')
+          render :action => 'index'
+         }
+        format.json { 
+          render :json=> {:success => false, :errors => ( @lab_user ? @lab_user.errors : e.message ) }, :status=> :unprocessable_entity
+        }
+      end
+      
+    end #end respond_to
+    
   end
 
   # PUT /lab_users/1
